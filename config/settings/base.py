@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 import os
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 load_dotenv(BASE_DIR / ".env")
 
@@ -11,15 +11,9 @@ SECRET_KEY = os.getenv(
     "SECRET_KEY"
 )
 
-DEBUG = os.getenv(
-    "DEBUG",
-    "False"
-).lower() == "true"
+DEBUG = False
 
-ALLOWED_HOSTS = os.getenv(
-    "ALLOWED_HOSTS",
-    ""
-).split(",")
+ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -70,16 +64,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE':
-            'django.db.backends.sqlite3',
-
-        'NAME':
-            BASE_DIR / 'db.sqlite3',
-    }
-}
-
 AUTH_USER_MODEL = 'users.User'
 
 LANGUAGE_CODE = 'ru-ru'
@@ -93,7 +77,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / 'static'
 ]
 
 MEDIA_URL = '/media/'

@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center">
+
+    <h2>Invoices</h2>
+
+    <a href="/invoices/upload/"
+       class="btn btn-primary">
+
+        Upload Invoice
+
+    </a>
+
+</div>
+
+<div class="card p-4 shadow-sm mt-4">
+
+<table class="table table-hover align-middle">
+
+    <thead>
+
+        <tr>
+
+            <th>ID</th>
+
+            <th>Title</th>
+
+            <th>Amount</th>
+
+            <th>Status</th>
+
+            <th>Invoice Number</th>
+
+            <th>Date</th>
+
+            <th></th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        {% for invoice in invoices %}
+
+        <tr>
+
+            <td>
+                {{ invoice.id }}
+            </td>
+
+            <td>
+                {{ invoice.title }}
+            </td>
+
+            <td>
+                {{ invoice.amount }}
+            </td>
+
+            <td>
+
+                {% if invoice.status == 'approved' %}
+
+                    <span class="badge bg-success">
+                        Approved
+                    </span>
+
+                {% elif invoice.status == 'rejected' %}
+
+                    <span class="badge bg-danger">
+                        Rejected
+                    </span>
+
+                {% elif invoice.status == 'processing' %}
+
+                    <span class="badge bg-warning text-dark">
+                        Processing
+                    </span>
+
+                {% else %}
+
+                    <span class="badge bg-secondary">
+                        New
+                    </span>
+
+                {% endif %}
+
+            </td>
+
+            <td>
+                {{ invoice.invoice_number }}
+            </td>
+
+            <td>
+                {{ invoice.invoice_date }}
+            </td>
+
+            <td>
+
+                <a href="/invoices/{{ invoice.id }}/"
+                   class="btn btn-sm btn-dark">
+
+                    Open
+
+                </a>
+
+            </td>
+
+        </tr>
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="7" class="text-center">
+
+                No invoices uploaded
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+</div>
+
+{% endblock %}

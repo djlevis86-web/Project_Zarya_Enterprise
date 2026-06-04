@@ -1,0 +1,357 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h2 class="page-title">
+            Счета
+        </h2>
+
+        <p class="page-subtitle">
+            Управление загруженными документами
+        </p>
+
+    </div>
+
+    <a href="{% url 'upload_invoice' %}"
+       class="primary-btn">
+
+        Загрузить счет
+
+    </a>
+
+</div>
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-label">
+            Всего счетов
+        </div>
+
+        <div class="stat-value">
+            {{ total_count }}
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">
+            Новые
+        </div>
+
+        <div class="stat-value text-info">
+            {{ new_count }}
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">
+            На проверке
+        </div>
+
+        <div class="stat-value text-warning">
+            {{ review_count }}
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">
+            Оплачено
+        </div>
+
+        <div class="stat-value text-success">
+            {{ paid_count }}
+        </div>
+    </div>
+
+</div>
+
+<form method="get"
+      class="filter-bar">
+
+    <input type="text"
+           name="search"
+           value="{{ search }}"
+           placeholder="Поиск">
+
+    {% if user.is_staff %}
+    <select name="user">
+
+        <option value="">
+            Все пользователи
+        </option>
+
+        {% for u in users %}
+
+        <option value="{{ u.id }}"
+            {% if user_filter == u.id|stringformat:"s" %}
+                selected
+            {% endif %}
+        >
+            {{ u.username }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+    {% endif %}
+
+    <select name="status">
+
+        <option value="">
+            Все статусы
+        </option>
+
+        {% for value, label in statuses %}
+
+        <option value="{{ value }}"
+            {% if status == value %}
+                selected
+            {% endif %}
+        >
+            {{ label }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+    <button type="submit"
+            class="primary-btn">
+        Применить
+    </button>
+
+</form>
+
+
+<div class="content-card">
+
+    <table class="zarya-table">
+
+        <thead>
+
+        <tr>
+
+            <th>
+    <a href="?sort=id">
+        ID
+    </a>
+</th>
+            <th>
+    <a href="?sort=title">
+        Название
+    </a>
+</th>
+            <th>Файл</th>
+            <th>Поставщик</th>
+            <th>Пользователь</th>
+            
+            <th>
+    <a href="?sort=amount">
+        Сумма
+    </a>
+</th>
+<th>Проверка OCR</th>          
+<th>Статус</th>
+            <th>
+    <a href="?sort=-created_at">
+        Дата
+    </a>
+</th>
+
+            <th>Действия</th>
+
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for invoice in page_obj %}
+
+        <tr>
+
+            <td>
+
+                #{{ invoice.id }}
+
+            </td>
+
+            <td>
+                {{ invoice.title }}
+            </td>
+
+            <td>
+
+    <a
+        href="{{ invoice.file.url }}"
+        target="_blank"
+        class="file-link"
+    >
+        📄 {{ invoice.original_filename }}
+    </a>
+
+</td>
+
+            <td>              
+                {{ invoice.vendor|default:"—" }}
+            </td>
+<td>
+    {{ invoice.user.username }}
+</td>
+            <td>
+
+    <td>
+
+    <div class="amount-main">
+        {{ invoice.amount }} ₽
+    </div>
+
+    {% if invoice.ocr_amount %}
+
+    <div class="amount-ocr">
+        OCR: {{ invoice.ocr_amount }} ₽
+    </div>
+
+    {% endif %}
+
+</td>
+
+<td>
+
+    {% if invoice.ocr_amount %}
+
+        {% if invoice.amount_verified %}
+
+            <span class="ocr-ok">
+                ✓
+            </span>
+
+        {% else %}
+
+            <span class="ocr-error">
+                ✗
+            </span>
+
+        {% endif %}
+
+    {% else %}
+
+        <span class="ocr-empty">
+            —
+        </span>
+
+    {% endif %}
+
+</td>
+
+    
+
+</td>
+
+            <td>
+
+    <span class="status status-{{ invoice.status }}">
+
+{% if invoice.status == 'new' %}
+🆕
+{% elif invoice.status == 'review' %}
+⏳
+{% elif invoice.status == 'approved' %}
+✅
+{% elif invoice.status == 'paid' %}
+💰
+{% elif invoice.status == 'rejected' %}
+❌
+{% endif %}
+
+{{ invoice.get_status_display }}
+
+</span>
+
+</td>
+
+            <td>
+    {{ invoice.created_at|date:"d.m.Y H:i" }}
+</td>
+
+<td>
+    <a
+        href="{% url 'invoice_detail' invoice.id %}"
+        class="primary-btn table-action-btn"
+    >
+        Открыть
+    </a>
+</td>
+
+</td>
+        </tr>
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="9">
+
+                Документы отсутствуют
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<div class="pagination">
+
+    {% if page_obj.has_previous %}
+
+    <a href="?page=1">
+
+        Первая
+
+    </a>
+
+    <a href="?page={{ page_obj.previous_page_number }}">
+
+        Назад
+
+    </a>
+
+    {% endif %}
+
+    <span>
+
+        Страница {{ page_obj.number }}
+        из {{ page_obj.paginator.num_pages }}
+
+    </span>
+
+    {% if page_obj.has_next %}
+
+    <a href="?page={{ page_obj.next_page_number }}">
+
+        Далее
+
+    </a>
+
+    <a href="?page={{ page_obj.paginator.num_pages }}">
+
+        Последняя
+
+    </a>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

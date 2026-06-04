@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Project Zarya
+    </title>
+
+    {% load static %}
+
+    <link rel="stylesheet"
+          href="{% static 'css/style.css' %}">
+
+</head>
+
+<body class="{% if user.is_authenticated and user.theme == 'light' %}light-theme{% endif %}">
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div>
+
+            <div class="sidebar-logo">
+                ОАО "Заря"
+            </div>
+
+            <nav class="sidebar-nav">
+
+                <a href="{% url 'dashboard' %}">
+                    Панель управления
+                </a>
+
+                <a href="{% url 'invoice_list' %}">
+                    Счета
+                </a>
+
+                <a href="{% url 'upload_invoice' %}">
+                    Загрузка
+                </a>
+
+                <a href="{% url 'profile' %}">
+                    Профиль
+                </a>
+
+                {% if request.user.is_staff %}
+                <a href="/admin/">
+                    Администрирование
+                </a>
+                {% endif %}
+
+            </nav>
+
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="{% url 'logout' %}" class="logout-link">
+                Выход
+            </a>
+        </div>
+
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
+            <div>
+                Добро пожаловать,
+                <strong>{{ request.user.username }}</strong>
+            </div>
+        </header>
+
+        <div class="page">
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

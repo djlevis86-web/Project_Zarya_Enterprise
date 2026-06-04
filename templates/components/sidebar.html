@@ -1,0 +1,125 @@
+<div x-data="{ open: true }"
+     :class="open ? 'w-72' : 'w-24'"
+     class="transition-all duration-300 bg-zinc-950 border-r border-zinc-800 flex flex-col justify-between min-h-screen p-4">
+
+    <div>
+
+        <!-- LOGO -->
+
+        <div class="flex items-center justify-between mb-10">
+
+            <div x-show="open"
+                 x-transition>
+
+                <h1 class="text-2xl font-bold">
+                    Zarya
+                </h1>
+
+                <p class="text-zinc-500 text-sm">
+                    Enterprise AI
+                </p>
+
+            </div>
+
+            <button @click="open = !open"
+                    class="bg-zinc-900 hover:bg-zinc-800 w-10 h-10 rounded-xl flex items-center justify-center">
+
+                ☰
+
+            </button>
+
+        </div>
+
+        <!-- NAV -->
+
+        <nav class="space-y-2">
+
+            <a href="/dashboard/"
+               class="sidebar-link">
+
+                <span>📊</span>
+
+                <span x-show="open">
+                    Dashboard
+                </span>
+
+            </a>
+
+            <a href="/invoices/"
+               class="sidebar-link">
+
+                <span>📄</span>
+
+                <span x-show="open">
+                    Invoices
+                </span>
+
+            </a>
+
+            <a href="/invoices/upload/"
+               class="sidebar-link">
+
+                <span>⬆️</span>
+
+                <span x-show="open">
+                    Upload
+                </span>
+
+            </a>
+
+            <a href="/reports/"
+               class="sidebar-link">
+
+                <span>📈</span>
+
+                <span x-show="open">
+                    Reports
+                </span>
+
+            </a>
+
+            {% if user.role == 'ADMIN' %}
+
+            <a href="/admin/"
+               class="sidebar-link">
+
+                <span>⚙️</span>
+
+                <span x-show="open">
+                    Admin
+                </span>
+
+            </a>
+
+            {% endif %}
+
+        </nav>
+
+    </div>
+
+    <!-- USER -->
+
+    <div class="dashboard-card">
+
+        <div x-show="open">
+
+            <p class="font-semibold">
+                {{ user.username }}
+            </p>
+
+            <p class="text-zinc-500 text-sm">
+                {{ user.role }}
+            </p>
+
+        </div>
+
+        <a href="/logout/"
+           class="block mt-4 text-center bg-red-500 hover:bg-red-600 transition-all rounded-xl py-3">
+
+            Logout
+
+        </a>
+
+    </div>
+
+</div>

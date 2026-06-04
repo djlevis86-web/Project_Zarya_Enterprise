@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+
+<div>
+
+    <h2 class="page-title">
+        Результат загрузки
+    </h2>
+
+    <p class="page-subtitle">
+        Информация о загруженных документах
+    </p>
+
+</div>
+
+
+</div>
+
+<div class="stats-grid">
+
+
+<div class="stat-card">
+
+    <div class="stat-label">
+        Новых счетов
+    </div>
+
+    <div class="stat-value text-success">
+        {{ uploaded_count }}
+    </div>
+
+</div>
+
+<div class="stat-card">
+
+    <div class="stat-label">
+        Дубликатов
+    </div>
+
+    <div class="stat-value text-warning">
+        {{ duplicates|length }}
+    </div>
+
+</div>
+
+
+</div>
+
+<div class="content-card">
+
+
+{% if uploaded_count > 0 %}
+
+    <h3>
+        Загрузка выполнена успешно
+    </h3>
+
+    <p>
+        В систему добавлено новых документов:
+        <strong>{{ uploaded_count }}</strong>
+    </p>
+
+{% else %}
+
+    <h3>
+        Новых счетов не найдено
+    </h3>
+
+    <p>
+        Все выбранные документы уже были загружены ранее.
+    </p>
+
+{% endif %}
+
+
+</div>
+
+{% if duplicates %}
+
+<div class="content-card">
+
+
+<h3>
+    Обнаружены дубликаты
+</h3>
+
+<p>
+    Следующие документы уже присутствуют в системе:
+</p>
+
+<table class="zarya-table">
+
+    <thead>
+
+        <tr>
+
+            <th width="80">
+                №
+            </th>
+
+            <th>
+                Имя файла
+            </th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        {% for file in duplicates %}
+
+        <tr>
+
+            <td>
+                {{ forloop.counter }}
+            </td>
+
+            <td>
+                {{ file }}
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+
+</div>
+
+{% endif %}
+
+<div class="content-card">
+
+    <div class="upload-actions">
+
+        <a
+            href="{% url 'invoice_list' %}"
+            class="primary-btn"
+        >
+            Перейти к счетам
+        </a>
+
+        <a
+            href="{% url 'upload_invoice' %}"
+            class="primary-btn"
+        >
+            Загрузить ещё
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

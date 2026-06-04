@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="content-card" style="padding:24px;margin-bottom:20px;">
+
+    <h3>Текущий пользователь</h3>
+
+    <p><strong>Логин:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Роль:</strong> {{ user.role }}</p>
+
+</div>
+
+<div class="page-header">
+
+    <div>
+
+        <h2 class="page-title">
+            Профиль пользователя
+        </h2>
+
+        <p class="page-subtitle">
+            Управление личными настройками
+        </p>
+
+    </div>
+
+</div>
+
+<div class="upload-wrapper">
+
+    <div class="upload-card">
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <h3>
+                Личная информация
+            </h3>
+
+            {{ form.as_p }}
+
+            <button
+                type="submit"
+                class="primary-btn"
+            >
+                Сохранить настройки
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1 class="page-title">
+
+    Панель управления
+
+</h1>
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+
+        <div class="stat-title">
+            Всего счетов
+        </div>
+
+        <div class="stat-value">
+            {{ total_count }}
+        </div>
+
+    </div>
+
+    <div class="stat-card">
+
+        <div class="stat-title">
+            Новые
+        </div>
+
+        <div class="stat-value">
+            {{ new_count }}
+        </div>
+
+    </div>
+
+    <div class="stat-card">
+
+        <div class="stat-title">
+            На проверке
+        </div>
+
+        <div class="stat-value">
+            {{ review_count }}
+        </div>
+
+    </div>
+
+    <div class="stat-card">
+
+        <div class="stat-title">
+            Подтверждено
+        </div>
+
+        <div class="stat-value">
+            {{ approved_count }}
+        </div>
+
+    </div>
+
+</div>
+
+<div class="content-card mt-30">
+
+    <div class="card-header">
+
+        Последние счета
+
+    </div>
+
+    <table class="zarya-table">
+
+        <thead>
+
+            <tr>
+
+                <th>ID</th>
+                <th>Название</th>
+                <th>Сумма</th>
+                <th>Статус</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for invoice in latest_invoices %}
+
+            <tr>
+
+                <td>
+                    #{{ invoice.id }}
+                </td>
+
+                <td>
+                    {{ invoice.title }}
+                </td>
+
+                <td>
+                    {{ invoice.amount }}
+                </td>
+
+                <td>
+                    {{ invoice.status }}
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

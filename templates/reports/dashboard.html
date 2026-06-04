@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Reports Dashboard</h2>
+
+<div class="row mt-4">
+
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+
+            <h5>Total Invoices</h5>
+
+            <h2>{{ stats.total_invoices }}</h2>
+
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+
+            <h5>Total Amount</h5>
+
+            <h2>{{ stats.total_amount }}</h2>
+
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+
+            <h5>Approved</h5>
+
+            <h2>{{ stats.approved_count }}</h2>
+
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+
+            <h5>Rejected</h5>
+
+            <h2>{{ stats.rejected_count }}</h2>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="card p-4 shadow-sm mt-5">
+
+    <h4>Monthly Invoice Analytics</h4>
+
+    <canvas id="monthlyChart"></canvas>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const ctx = document.getElementById('monthlyChart');
+
+new Chart(ctx, {
+
+    type: 'line',
+
+    data: {
+
+        labels: {{ labels|safe }},
+
+        datasets: [{
+            label: 'Invoice Amount',
+
+            data: {{ values|safe }},
+
+            tension: 0.3
+        }]
+    }
+});
+
+</script>
+
+{% endblock %}

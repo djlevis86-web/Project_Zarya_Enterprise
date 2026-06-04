@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtualenv
+venv/
+.env/
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+
+# IDE
+.idea/
+.vscode/
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+
+# PyCharm
+*.iml
+
+# Environment
+.env
+.env.*
+
+# OCR temp
+temp/
+tmp/
+
+# Python cache
+.pytest_cache/
+.mypy_cache/
+
+# Git
+.git/

@@ -1,0 +1,405 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h2 class="page-title">
+            {{ invoice.title }}
+        </h2>
+
+        <p class="page-subtitle">
+            Карточка счета №{{ invoice.id }}
+        </p>
+
+    </div>
+
+    <div>
+
+        {% if user.is_staff %}
+        <a href="{% url 'edit_invoice' invoice.id %}"
+           class="primary-btn">
+            Редактировать
+        </a>
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<div class="invoice-layout">
+
+    <div class="invoice-info">
+
+        <div class="content-card">
+
+            <h3>Основная информация</h3>
+
+           <div class="invoice-meta">
+
+    <div class="meta-row">
+        <span>ID</span>
+        <strong>#{{ invoice.id }}</strong>
+    </div>
+
+    <div class="meta-row">
+        <span>Пользователь</span>
+        <strong>{{ invoice.user.username }}</strong>
+    </div>
+
+    <div class="meta-row">
+        <span>Поставщик</span>
+        <strong>{{ invoice.vendor|default:"—" }}</strong>
+    </div>
+
+    <div class="meta-row">
+        <span>Номер счета</span>
+        <strong>{{ invoice.invoice_number|default:"—" }}</strong>
+    </div>
+
+    <div class="meta-row">
+        <span>Сумма</span>
+        <strong>{{ invoice.amount }} ₽</strong>
+    </div>
+
+    <div class="meta-row">
+        <span>OCR сумма</span>
+        <strong>{{ invoice.ocr_amount|default:"—" }} ₽</strong>
+    </div>
+
+    <div class="meta-row">
+    <span>OCR проверка</span>
+
+    {% if invoice.ocr_verified %}
+
+        <strong style="color:#27ae60;">
+            ✓ Пройдена
+        </strong>
+
+    {% else %}
+
+        <strong style="color:#e74c3c;">
+            ✗ Не пройдена
+        </strong>
+
+    {% endif %}
+</div>
+
+{% if invoice.ocr_comment %}
+
+<div class="ocr-comment">
+
+    {{ invoice.ocr_comment }}
+
+</div>
+
+{% endif %}
+
+    {% if invoice.ocr_amount %}
+
+        {% if invoice.amount == invoice.ocr_amount %}
+
+            <div class="ocr-success">
+                ✓ OCR сумма совпадает
+            </div>
+
+        {% else %}
+
+            <div class="ocr-warning">
+                ⚠ OCR сумма отличается от подтвержденной суммы
+            </div>
+
+        {% endif %}
+
+    {% endif %}
+
+</div>
+
+</div>
+
+        <div class="content-card">
+
+    <h3>История</h3>
+
+    {% for log in logs %}
+
+    <div class="timeline-item">
+
+        <div class="timeline-date">
+            {{ log.created_at|date:"d.m.Y H:i" }}
+        </div>
+
+        <div class="timeline-text">
+            {{ log.action }}
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+
+        <div class="content-card">
+
+    <h3>Комментарии</h3>
+
+    <form method="post"
+          action="{% url 'add_comment' invoice.id %}">
+
+        {% csrf_token %}
+
+        <textarea
+            name="text"
+            class="form-control"
+            rows="4"
+            placeholder="Введите комментарий..."
+        ></textarea>
+
+        <button
+            type="submit"
+            class="primary-btn"
+            style="margin-top:12px;"
+        >
+            Добавить комментарий
+        </button>
+
+    </form>
+
+    <hr style="margin:20px 0;">
+
+    {% for comment in comments %}
+
+        <div class="comment-item">
+
+            <div class="comment-header">
+
+                <strong>
+                    {{ comment.user.username }}
+                </strong>
+
+                <span>
+                    {{ comment.created_at|date:"d.m.Y H:i" }}
+                </span>
+
+            </div>
+
+            <div class="comment-text">
+
+                {{ comment.text }}
+
+            </div>
+
+        </div>
+
+    {% empty %}
+
+        <div class="empty-state">
+
+            Пока нет комментариев
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
+    </div>
+
+
+   <div class="invoice-preview">
+
+    <div class="content-card">
+
+        <h3>Просмотр документа</h3>
+
+        {% if invoice.is_pdf %}
+
+            <div class="pdf-toolbar">
+
+                <button id="zoom-out">
+                    −
+                </button>
+
+                <span id="zoom-value">
+                    100%
+                </span>
+
+                <button id="zoom-in">
+                    +
+                </button>
+
+            </div>
+
+            <div id="pdf-container"></div>
+
+        {% else %}
+
+            <img
+                src="{{ invoice.file.url }}"
+                class="preview-image"
+            >
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+    </div>
+
+</div>
+
+{% if invoice.is_pdf %}
+
+{{ invoice.file.url|json_script:"pdf-url" }}
+
+<script type="module">
+
+import * as pdfjsLib from "{% static 'pdfjs/pdf.mjs' %}";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+"{% static 'pdfjs/pdf.worker.mjs' %}";
+
+const pdfUrl =
+JSON.parse(
+    document.getElementById(
+        "pdf-url"
+    ).textContent
+);
+
+const container =
+document.getElementById(
+    "pdf-container"
+);
+
+let scale = 1.2;
+
+async function renderPdf() {
+
+    container.innerHTML = "";
+
+    try {
+
+        const pdf =
+            await pdfjsLib
+                .getDocument({
+                    url: pdfUrl
+                })
+                .promise;
+
+        for (
+            let pageNumber = 1;
+            pageNumber <= pdf.numPages;
+            pageNumber++
+        ) {
+
+            const page =
+                await pdf.getPage(
+                    pageNumber
+                );
+
+            const viewport =
+                page.getViewport({
+                    scale: scale
+                });
+
+            const canvas =
+                document.createElement(
+                    "canvas"
+                );
+
+            const context =
+                canvas.getContext("2d");
+
+            canvas.width =
+                viewport.width;
+
+            canvas.height =
+                viewport.height;
+
+            await page.render({
+
+                canvasContext:
+                    context,
+
+                viewport:
+                    viewport
+
+            }).promise;
+
+            container.appendChild(
+                canvas
+            );
+        }
+
+        document.getElementById(
+            "zoom-value"
+        ).innerText =
+            Math.round(
+                scale * 100
+            ) + "%";
+
+    } catch(error) {
+
+        container.innerHTML = `
+
+            <div class="pdf-error">
+
+                Ошибка загрузки PDF
+
+                <br><br>
+
+                ${error}
+
+            </div>
+
+        `;
+
+        console.error(error);
+    }
+}
+
+document
+.getElementById(
+    "zoom-in"
+)
+.addEventListener(
+    "click",
+    () => {
+
+        scale += 0.2;
+
+        renderPdf();
+    }
+);
+
+document
+.getElementById(
+    "zoom-out"
+)
+.addEventListener(
+    "click",
+    () => {
+
+        if(scale > 0.4){
+
+            scale -= 0.2;
+
+            renderPdf();
+        }
+    }
+);
+
+renderPdf();
+
+</script>
+
+{% endif %}
+
+{% endblock %}

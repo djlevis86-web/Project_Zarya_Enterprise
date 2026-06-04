@@ -41,3 +41,5 @@ tmp/
 
 # Git
 .git/
+
+node_modules/

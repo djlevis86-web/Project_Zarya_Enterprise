@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h2 class="page-title">
+            Резервные копии
+        </h2>
+
+        <p class="page-subtitle">
+            Архивы проекта Project Zarya
+        </p>
+
+    </div>
+
+</div>
+
+<div class="content-card">
+
+    {% if backups %}
+
+    <table class="zarya-table">
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    Имя файла
+                </th>
+
+                <th width="150">
+                    Размер (MB)
+                </th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for backup in backups %}
+
+            <tr>
+
+                <td>
+                    {{ backup.name }}
+                </td>
+
+                <td>
+                    {{ backup.size }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+    <p>
+        Резервные копии отсутствуют.
+    </p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

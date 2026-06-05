@@ -11,9 +11,15 @@ SECRET_KEY = os.getenv(
     "SECRET_KEY"
 )
 
-DEBUG = False
+DEBUG = os.getenv(
+    "DEBUG",
+    "False"
+).lower() == "true"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv(
+    "ALLOWED_HOSTS",
+    ""
+).split(",")
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -27,6 +33,7 @@ INSTALLED_APPS = [
     'invoices',
     'reports',
     'ocr',
+    'system',
 ]
 
 MIDDLEWARE = [
@@ -57,6 +64,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
+                'config.context_processors.project_version',
             ],
         },
     },
@@ -87,3 +96,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/'
+
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    ""
+)

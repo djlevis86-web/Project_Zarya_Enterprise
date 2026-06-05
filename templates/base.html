@@ -50,6 +50,14 @@
                 </a>
 
                 {% if request.user.is_staff %}
+
+                <a href="{% url 'system_dashboard' %}">
+                    Система
+                </a>
+
+                {% endif %}
+
+                {% if request.user.is_staff %}
                 <a href="/admin/">
                     Администрирование
                 </a>
@@ -89,7 +97,19 @@
             {% block content %}
             {% endblock %}
 
-        </div>
+                </div>
+
+        <footer class="app-footer">
+
+            <div>
+                Project Zarya Enterprise
+            </div>
+
+            <div>
+                Версия {{ PROJECT_VERSION }}
+            </div>
+
+        </footer>
 
     </main>
 

@@ -39,7 +39,10 @@ tmp/
 .pytest_cache/
 .mypy_cache/
 
-# Git
-.git/
-
+# Node
 node_modules/
+
+# Backups / local tools
+backups_db/
+backup_database.py
+redis_inspect.json

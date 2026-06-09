@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h2 class="page-title">
+            Обслуживание системы
+        </h2>
+
+        <p class="page-subtitle">
+            Сервисные операции Project Zarya
+        </p>
+
+    </div>
+
+</div>
+
+<div class="content-card">
+
+    <h3>
+        Резервное копирование
+    </h3>
+
+    <div class="upload-actions">
+
+        <a
+            href="{% url 'create_backup' %}"
+            class="primary-btn"
+        >
+            Создать backup БД
+        </a>
+
+    </div>
+
+</div>
+
+<div class="content-card">
+
+    <h3>
+        Проверка системы
+    </h3>
+
+    <div class="upload-actions">
+
+        <a
+            href="{% url 'system_dashboard' %}"
+            class="primary-btn"
+        >
+            Проверить состояние
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -44,4 +44,15 @@ tmp/
 
 node_modules/
 
+# backups
+backups_db/
+backup_database.py
+
+# debug / local tools
+redis_inspect.json
+
+# env / system
 .env
+venv/
+__pycache__/
+*.pyc

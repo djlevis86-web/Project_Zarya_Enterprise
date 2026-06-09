@@ -1,9 +1,32 @@
+import subprocess
 from pathlib import Path
 
-from django.conf import settings
-from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import render
+import django
+import platform
 
+from ocr.models import OCRJob
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
+from django.http import (
+    FileResponse,
+    Http404,
+)
+from django.shortcuts import (
+    render,
+    redirect,
+)
+
+import os
+
+from .github_service import (
+    get_github_version,
+)
+
+from invoices.models import Invoice
+from users.models import User
+
+from .services import create_database_backup
 
 @staff_member_required
 def system_dashboard(request):
@@ -53,6 +76,32 @@ def system_dashboard(request):
                 backup_files[0].name
             )
 
+    db_backups_dir = (
+        Path(settings.BASE_DIR)
+        / "backups_db"
+    )
+
+    db_backup_count = 0
+
+    latest_db_backup = "-"
+
+    if db_backups_dir.exists():
+
+        db_backup_files = sorted(
+            db_backups_dir.glob("*.sqlite3"),
+            reverse=True
+        )
+
+        db_backup_count = len(
+            db_backup_files
+        )
+
+        if db_backup_files:
+
+            latest_db_backup = (
+                db_backup_files[0].name
+            )
+
     db_size = 0
 
     try:
@@ -71,6 +120,73 @@ def system_dashboard(request):
 
     except Exception:
         pass
+
+    python_version = platform.python_version()
+
+    django_version = django.get_version()
+
+    git_branch = "-"
+
+    try:
+
+        git_branch = (
+            subprocess.check_output(
+                [
+                    "git",
+                    "branch",
+                    "--show-current",
+                ],
+                cwd=settings.BASE_DIR
+            )
+            .decode()
+            .strip()
+        )
+
+    except Exception:
+
+        pass
+
+    last_commit = "-"
+
+    try:
+
+        last_commit = (
+            subprocess.check_output(
+                [
+                    "git",
+                    "log",
+                    "-1",
+                    "--pretty=%h %s",
+                ],
+                cwd=settings.BASE_DIR
+            )
+            .decode()
+            .strip()
+        )
+
+    except Exception:
+
+        pass
+
+    try:
+
+        invoice_count = (
+            Invoice.objects.count()
+        )
+
+    except Exception:
+
+        invoice_count = 0
+
+    try:
+
+        user_count = (
+            User.objects.count()
+        )
+
+    except Exception:
+
+        user_count = 0
 
     changelog_items = []
 
@@ -110,6 +226,24 @@ def system_dashboard(request):
     except Exception:
         pass
 
+    ocr_total = OCRJob.objects.count()
+
+    ocr_pending = OCRJob.objects.filter(
+        status=OCRJob.STATUS_PENDING
+    ).count()
+
+    ocr_processing = OCRJob.objects.filter(
+        status=OCRJob.STATUS_PROCESSING
+    ).count()
+
+    ocr_done = OCRJob.objects.filter(
+        status=OCRJob.STATUS_DONE
+    ).count()
+
+    ocr_error = OCRJob.objects.filter(
+        status=OCRJob.STATUS_ERROR
+    ).count()
+    
     return render(
         request,
         "system/dashboard.html",
@@ -117,8 +251,21 @@ def system_dashboard(request):
             "version": version,
             "backup_count": backup_count,
             "latest_backup": latest_backup,
+            "db_backup_count": db_backup_count,
+            "latest_db_backup": latest_db_backup,
             "db_size": db_size,
             "changelog_items": changelog_items,
+            "python_version": python_version,
+            "django_version": django_version,
+            "invoice_count": invoice_count,
+            "user_count": user_count,
+            "git_branch": git_branch,
+            "last_commit": last_commit,
+            "ocr_total": ocr_total,
+            "ocr_pending": ocr_pending,
+            "ocr_processing": ocr_processing,
+            "ocr_done": ocr_done,
+            "ocr_error": ocr_error,
         }
     )
 
@@ -161,4 +308,224 @@ def backups_list(request):
         {
             "backups": backups,
         }
+    )
+
+@staff_member_required
+def create_backup(request):
+
+    try:
+
+        filename = (
+            create_database_backup()
+        )
+
+        messages.success(
+            request,
+            f"Создана резервная копия: {filename}"
+        )
+
+    except Exception as e:
+
+        messages.error(
+            request,
+            f"Ошибка создания резервной копии: {e}"
+        )
+
+    return redirect(
+        "system_dashboard"
+    )
+
+@staff_member_required
+def download_backup(request, filename):
+
+    backup_file = (
+        Path(settings.BASE_DIR)
+        / "backups_db"
+        / filename
+    )
+
+    if not backup_file.exists():
+
+        raise Http404(
+            "Файл не найден"
+        )
+
+    return FileResponse(
+        open(
+            backup_file,
+            "rb"
+        ),
+        as_attachment=True,
+        filename=filename
+    )
+
+@staff_member_required
+def delete_backup(request, filename):
+
+    backup_file = (
+        Path(settings.BASE_DIR)
+        / "backups_db"
+        / filename
+    )
+
+    try:
+
+        if backup_file.exists():
+
+            backup_file.unlink()
+
+            messages.success(
+                request,
+                f"Удалён бэкап: {filename}"
+            )
+
+    except Exception as e:
+
+        messages.error(
+            request,
+            f"Ошибка удаления: {e}"
+        )
+
+    return redirect(
+        "backups_list"
+    )
+
+@staff_member_required
+def versions_page(request):
+
+    version = "-"
+
+    try:
+
+        version = (
+            Path(settings.BASE_DIR)
+            / "VERSION"
+        ).read_text(
+            encoding="utf-8"
+        ).strip()
+
+    except Exception:
+        pass
+
+    git_branch = "-"
+
+    try:
+
+        git_branch = (
+            subprocess.check_output(
+                [
+                    "git",
+                    "branch",
+                    "--show-current",
+                ],
+                cwd=settings.BASE_DIR
+            )
+            .decode()
+            .strip()
+        )
+
+    except Exception:
+        pass
+
+    commits = []
+
+    try:
+
+        output = (
+            subprocess.check_output(
+                [
+                    "git",
+                    "log",
+                    "-10",
+                    "--pretty=format:%h|%ad|%s",
+                    "--date=short",
+                ],
+                cwd=settings.BASE_DIR
+            )
+            .decode()
+            .splitlines()
+        )
+
+        for row in output:
+
+            parts = row.split("|")
+
+            commits.append(
+                {
+                    "hash": parts[0],
+                    "date": parts[1],
+                    "message": parts[2],
+                }
+            )
+
+    except Exception:
+        pass
+
+    return render(
+        request,
+        "system/versions.html",
+        {
+            "version": version,
+            "git_branch": git_branch,
+            "commits": commits,
+        }
+    )
+
+@staff_member_required
+def updates_page(request):
+
+    local_version = "-"
+
+    try:
+
+        local_version = (
+            Path(settings.BASE_DIR)
+            / "VERSION"
+        ).read_text(
+            encoding="utf-8"
+        ).strip()
+
+    except Exception:
+        pass
+
+    github_repo = os.getenv(
+        "GITHUB_REPO"
+    )
+
+    github_version = (
+        get_github_version(
+            github_repo
+        )
+        if github_repo
+        else None
+    )
+
+    update_available = False
+
+    if github_version:
+
+        update_available = (
+            github_version
+            != local_version
+        )
+
+    return render(
+        request,
+        "system/updates.html",
+        {
+            "local_version": local_version,
+            "github_version": (
+                github_version
+                or "не удалось получить"
+            ),
+            "update_available": update_available,
+        }
+    )
+
+@staff_member_required
+def maintenance_page(request):
+
+    return render(
+        request,
+        "system/maintenance.html"
     )

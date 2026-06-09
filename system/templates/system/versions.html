@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h2 class="page-title">
+            Версии системы
+        </h2>
+
+        <p class="page-subtitle">
+            Git и история изменений
+        </p>
+
+    </div>
+
+</div>
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Версия
+        </div>
+
+        <div class="stat-value">
+            {{ version }}
+        </div>
+
+    </div>
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Ветка
+        </div>
+
+        <div class="stat-value">
+            {{ git_branch }}
+        </div>
+
+    </div>
+
+</div>
+
+<div class="content-card">
+
+    <h3>
+        Последние коммиты
+    </h3>
+
+    <table class="zarya-table">
+
+        <thead>
+
+            <tr>
+
+                <th width="120">
+                    Хэш
+                </th>
+
+                <th width="150">
+                    Дата
+                </th>
+
+                <th>
+                    Сообщение
+                </th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for commit in commits %}
+
+            <tr>
+
+                <td>
+                    {{ commit.hash }}
+                </td>
+
+                <td>
+                    {{ commit.date }}
+                </td>
+
+                <td>
+                    {{ commit.message }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

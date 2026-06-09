@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h2 class="page-title">
+            Обновления системы
+        </h2>
+
+        <p class="page-subtitle">
+            Контроль версий Project Zarya
+        </p>
+
+    </div>
+
+</div>
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Локальная версия
+        </div>
+
+        <div class="stat-value">
+            {{ local_version }}
+        </div>
+
+    </div>
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            GitHub версия
+        </div>
+
+        <div class="stat-value">
+            {{ github_version }}
+        </div>
+
+    </div>
+
+</div>
+
+<div class="content-card">
+
+    <h3>
+        Статус обновления
+    </h3>
+
+    {% if update_available %}
+
+        <div class="alert">
+            Доступно обновление системы.
+        </div>
+
+    {% else %}
+
+        <div class="alert">
+            Установлена актуальная версия.
+        </div>
+
+    {% endif %}
+
+</div>
+
+<div class="content-card">
+
+    <table class="zarya-table">
+
+        <tbody>
+
+            <tr>
+
+                <td width="250">
+                    Локальная версия
+                </td>
+
+                <td>
+                    {{ local_version }}
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>
+                    GitHub версия
+                </td>
+
+                <td>
+                    {{ github_version }}
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

@@ -11,8 +11,23 @@
         </h2>
 
         <p class="page-subtitle">
-            Архивы проекта Project Zarya
+            Управление резервными копиями базы данных
         </p>
+
+    </div>
+
+</div>
+
+<div class="content-card">
+
+    <div class="upload-actions">
+
+        <a
+            href="{% url 'create_backup' %}"
+            class="primary-btn"
+        >
+            Создать новый бэкап
+        </a>
 
     </div>
 
@@ -32,8 +47,12 @@
                     Имя файла
                 </th>
 
-                <th width="150">
-                    Размер (MB)
+                <th width="120">
+                    Размер
+                </th>
+
+                <th width="220">
+                    Действия
                 </th>
 
             </tr>
@@ -51,7 +70,30 @@
                 </td>
 
                 <td>
-                    {{ backup.size }}
+                    {{ backup.size }} MB
+                </td>
+
+                <td>
+
+                    <div class="table-actions">
+
+                        <a
+                            href="{% url 'download_backup' backup.name %}"
+                            class="primary-btn"
+                        >
+                            Скачать
+                        </a>
+
+                        <a
+                            href="{% url 'delete_backup' backup.name %}"
+                            class="danger-btn"
+                            onclick="return confirm('Удалить резервную копию?');"
+                        >
+                            Удалить
+                        </a>
+
+                    </div>
+
                 </td>
 
             </tr>

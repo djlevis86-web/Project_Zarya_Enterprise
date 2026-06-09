@@ -2025,6 +2025,30 @@ body.light-theme .comment-header span {
   border-top: 1px solid #dfe4ea;
 }
 
+.danger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #dc3545;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.danger-btn:hover {
+  background: #bb2d3b;
+  color: #fff;
+}
+
+.table-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .hover\:bg-blue-700:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(29 78 216 / var(--tw-bg-opacity));

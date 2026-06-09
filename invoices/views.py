@@ -9,6 +9,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth import get_user_model
+from ocr.models import OCRJob
+from ocr.tasks import process_invoice_ocr
 
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -310,126 +312,14 @@ def upload_invoice(request):
 
                 invoice.save()
 
-                try:
+                job = OCRJob.objects.create(
+                invoice_id=invoice.id,
+                file_path=invoice.file.path
+                )
 
-                    file_path = invoice.file.path
-
-                    print(
-                        'OCR FILE:',
-                        file_path
-                    )
-
-                    if file_path.lower().endswith('.pdf'):
-
-                        text = extract_text_from_pdf(
-                            file_path
-                        )
-
-                    else:
-
-                        text = extract_text_from_image(
-                            file_path
-                        )
-
-                    invoice.ocr_text = text
-
-                    parsed = parse_invoice_data(
-                        text
-                    )
-
-                    invoice.invoice_number = parsed.get(
-                        'invoice_number'
-                    )
-
-                    if invoice.invoice_number:
-
-                        exists_invoice = Invoice.objects.filter(
-                            invoice_number=invoice.invoice_number
-                        ).exclude(
-                            id=invoice.id
-                        ).first()
-
-                        if exists_invoice:
-
-                            invoice.delete()
-
-                            duplicate_files.append(
-                                f'Счет № {invoice.invoice_number}'
-                            )
-
-                            continue
-
-                    invoice.invoice_date = parsed.get(
-                        'invoice_date'
-                    )
-
-                    invoice.vendor = parsed.get(
-                        'vendor'
-                    )
-
-                    amount = parsed.get(
-                        'amount'
-                    )
-
-                    if amount:
-
-                        try:
-
-                            invoice.ocr_amount = float(
-                                str(amount).replace(',', '.')
-                            )
-
-                            if (
-                                invoice.amount is None
-                                or
-                                float(invoice.amount) == 0
-                            ):
-
-                                invoice.amount = invoice.ocr_amount
-
-                                invoice.amount_verified = True
-
-                                invoice.ocr_verified = True
-
-                            else:
-
-                                invoice.amount_verified = (
-                                    float(invoice.amount)
-                                    ==
-                                    float(invoice.ocr_amount)
-                                )
-
-                                invoice.ocr_verified = (
-                                    invoice.amount_verified
-                                )
-
-                        except Exception:
-
-                            invoice.amount_verified = False
-
-                    invoice.save()
-
-                    create_invoice_log(
-                        invoice,
-                        request.user,
-                        'OCR обработка завершена'
-                    )
-
-                    print(
-                        'OCR SUCCESS:',
-                        invoice.id
-                    )
-
-                except Exception as e:
-
-                    print(
-                        'OCR ERROR:'
-                    )
-
-                    print(e)
-
-                    import traceback
-                    traceback.print_exc()
+                process_invoice_ocr.delay(
+                    job.id
+                )
 
                 created_count += 1
 

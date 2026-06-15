@@ -161,6 +161,14 @@ def parse_invoice_data(text):
             'invoice_date': None,
             'vendor': None,
         }
+    
+    text = text.replace("Ha", "на")
+    text = text.replace("maa", "мая")
+    text = text.replace("AHH", "ИНН")
+    text = text.replace("Cu.", "Сч.")
+    text = text.replace("N ", "№ ")
+    text = text.replace("N°", "№")
+    text = text.replace("Сч.", "Счет")
 
     amount = None
     invoice_number = None
@@ -172,6 +180,13 @@ def parse_invoice_data(text):
     # =====================================
 
     invoice_patterns = [
+        r'Счет\s+на\s+оплату\s*№\s*(\d+)',
+
+        r'Счет\s*№\s*(\d+)',
+
+        r'№\s*(\d+)\s*от',
+        
+        r'Счет.*?№\s*([A-Za-zА-Яа-я0-9\-]+)\s*от',
 
         r'Счет\s+на\s+оплату\s*№\s*([^\s]+)',
 
@@ -188,6 +203,7 @@ def parse_invoice_data(text):
         r'Ne([A-Za-zА-Яа-я0-9\-]+)',
 
         r'№([A-Za-zА-Яа-я0-9\-]+)',
+
 
     ]
 
@@ -247,23 +263,21 @@ def parse_invoice_data(text):
 
     vendor_patterns = [
 
-        r'Поставщик.*?[":]\s*(.+)',
+        r'Поставщик.*?(ООО\s+"[^"]+")',
 
-        r'Исполнитель.*?[":]\s*(.+)',
+        r'Поставщик.*?(АО\s+"[^"]+")',
 
-        r'ООО\s+"([^"]+)"',
+        r'Поставщик.*?(ПАО\s+"[^"]+")',
 
-        r'АО\s+"([^"]+)"',
+        r'Поставщик.*?(ОАО\s+"[^"]+")',
 
-        r'ПАО\s+"([^"]+)"',
+        r'(ООО\s+"[^"]+")',
 
-        r'ОАО\s+"([^"]+)"',
+        r'(АО\s+"[^"]+")',
 
-        r'Общество\s+с\s+ограниченной\s+ответственностью\s+"([^"]+)"',
+        r'(ПАО\s+"[^"]+")',
 
-        r'Индивидуальный\s+предприниматель\s+(.+?)(?:ИНН|Адрес|тел|Тел|$)',
-
-        r'Индивидуальный\s+\S*приниматель\s+(.+?)(?:ИНН|Адрес|тел|Тел|$)',
+        r'(ОАО\s+"[^"]+")',
 
     ]
 
@@ -278,6 +292,26 @@ def parse_invoice_data(text):
         if match:
 
             vendor = match.group(1)
+
+            vendor = vendor.replace('Г ОСКОМПЛЕКТ', 'ГОСКОМПЛЕКТ')
+
+            vendor = vendor.replace('OOO', 'ООО')
+            vendor = vendor.replace('OAO', 'ОАО')
+            vendor = vendor.replace('AO', 'АО')
+
+            vendor = re.sub(
+                r'\s+',
+                ' ',
+                vendor
+            )
+
+            vendor = vendor.strip()
+
+            vendor = re.sub(
+                r'\b([А-Я])\s+([А-Я]{5,})',
+                r'\1\2',
+                vendor
+            )
 
             vendor = vendor.split('ИНН')[0]
             vendor = vendor.split('КПП')[0]

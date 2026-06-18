@@ -2220,3 +2220,29 @@ input[type="file"]::file-selector-button {
     white-space: nowrap;
 }
 
+
+
+/* =========================================================
+   Bulk OCR actions
+========================================================= */
+
+.bulk-ocr-form {
+    margin: 0;
+}
+
+.bulk-select-column {
+    width: 44px;
+    min-width: 44px;
+    text-align: center;
+}
+
+.bulk-select-column input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.registry-table-header .registry-actions button {
+    white-space: nowrap;
+}
+

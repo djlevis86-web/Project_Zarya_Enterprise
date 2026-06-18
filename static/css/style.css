@@ -2374,3 +2374,128 @@ input[type="file"]::file-selector-button {
 }
 
 
+
+/* =========================================================
+   ZARYA UI READABILITY PASS v1
+   Better font readability, contrast and table density
+========================================================= */
+
+:root {
+    --z-font: "Segoe UI", Inter, Arial, sans-serif;
+    --z-text: #f7faf8;
+    --z-muted: #b7c2bc;
+    --z-muted-2: #8f9d95;
+}
+
+body {
+    font-size: 15px;
+    line-height: 1.62;
+    letter-spacing: 0;
+}
+
+.page-subtitle,
+.page-header p,
+.topbar-subtitle,
+.muted,
+.registry-table-header span,
+.section-title-row span {
+    color: var(--z-muted);
+}
+
+.page-title,
+.page-header h1,
+.page-header h2 {
+    font-weight: 850;
+    letter-spacing: -0.02em;
+}
+
+.card,
+.content-card,
+.stat-card,
+.registry-summary-card {
+    background: rgba(18, 25, 21, .96);
+}
+
+.registry-table th {
+    color: #c8d2cc;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .035em;
+}
+
+.registry-table td {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.registry-table td strong {
+    font-weight: 760;
+}
+
+.btn {
+    font-weight: 760;
+    letter-spacing: 0;
+}
+
+.btn-sm {
+    font-size: 13px;
+}
+
+.form-group label,
+label {
+    font-weight: 760;
+    color: #e7eee9;
+}
+
+.form-control,
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+    font-size: 14px;
+    color: #f8faf9;
+}
+
+.status-badge {
+    font-size: 12px;
+    font-weight: 760;
+    letter-spacing: 0;
+}
+
+.sidebar-nav a,
+.nav-link,
+.nav-item {
+    font-weight: 720;
+}
+
+.amount-main {
+    font-weight: 800;
+}
+
+.info-row > span {
+    color: var(--z-muted);
+    font-size: 14px;
+}
+
+.info-row > strong,
+.info-row > div {
+    font-size: 14px;
+}
+
+.ocr-comment-box,
+.queue-message,
+.comment-text,
+.timeline-text {
+    font-size: 14px;
+    line-height: 1.58;
+}
+
+@media (max-width: 1280px) {
+    body {
+        font-size: 14px;
+    }
+}
+

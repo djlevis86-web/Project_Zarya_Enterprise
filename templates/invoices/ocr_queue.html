@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h2 class="page-title">
+            Очередь OCR
+        </h2>
+
+        <p class="page-subtitle">
+            Задачи распознавания счетов. Обработка выполняется командой process_ocr_queue.
+        </p>
+    </div>
+
+    <div class="registry-actions">
+        <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+            Счета
+        </a>
+
+        <a href="{% url 'upload_batches' %}" class="btn btn-secondary">
+            Журнал загрузок
+        </a>
+    </div>
+
+</div>
+
+<div class="registry-summary">
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Ожидает
+        </span>
+
+        <strong class="text-warning">
+            {{ pending_count }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Выполняется
+        </span>
+
+        <strong class="text-info">
+            {{ processing_count }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Готово
+        </span>
+
+        <strong class="text-success">
+            {{ done_count }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Ошибки
+        </span>
+
+        <strong class="text-danger">
+            {{ error_count }}
+        </strong>
+    </div>
+
+</div>
+
+<div class="card registry-filter-card">
+
+    <form method="get" class="invoice-filter-form invoice-filter-form-compact">
+
+        <div class="form-group">
+            <label>
+                Статус
+            </label>
+
+            <select name="status" class="form-control">
+
+                <option value="">
+                    Все статусы
+                </option>
+
+                {% for value, label in status_choices %}
+                    <option
+                        value="{{ value }}"
+                        {% if selected_status == value %}selected{% endif %}
+                    >
+                        {{ label }}
+                    </option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+        <div class="registry-filter-actions">
+            <button type="submit" class="btn btn-primary">
+                Применить
+            </button>
+
+            <a href="{% url 'ocr_queue' %}" class="btn btn-secondary">
+                Сбросить
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+<div class="card ocr-queue-command">
+
+    <div class="section-title-row">
+        <div>
+            <h3>
+                Команда обработки
+            </h3>
+
+            <span>
+                Запускается в отдельном PowerShell, чтобы сайт не зависал.
+            </span>
+        </div>
+    </div>
+
+    <pre>python manage.py process_ocr_queue --limit 10</pre>
+
+</div>
+
+<div class="card">
+
+    <div class="registry-table-header">
+
+        <div>
+            <h3>
+                OCR задачи
+            </h3>
+
+            <span>
+                Найдено: {{ page_obj.paginator.count }}
+            </span>
+        </div>
+
+    </div>
+
+    <div class="table-scroll">
+
+        <table class="table registry-table ocr-queue-table">
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Статус</th>
+                    <th>Счет</th>
+                    <th>Пользователь</th>
+                    <th>Источник</th>
+                    <th>Попыток</th>
+                    <th>Создано</th>
+                    <th>Завершено</th>
+                    <th>Сообщение</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for job in page_obj %}
+
+                    <tr>
+                        <td>
+                            #{{ job.id }}
+                        </td>
+
+                        <td>
+                            <span class="status-badge status-{{ job.status }}">
+                                {{ job.get_status_display }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <a href="{% url 'invoice_detail' job.invoice.id %}">
+                                Счет #{{ job.invoice.id }}
+                            </a>
+
+                            <div class="muted">
+                                {{ job.invoice.original_filename|default:job.invoice.title }}
+                            </div>
+                        </td>
+
+                        <td>
+                            {% if job.user %}
+                                {{ job.user.username }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ job.get_source_display }}
+                        </td>
+
+                        <td>
+                            {{ job.attempts }}
+                        </td>
+
+                        <td>
+                            {{ job.created_at|date:"d.m.Y H:i" }}
+                        </td>
+
+                        <td>
+                            {% if job.finished_at %}
+                                {{ job.finished_at|date:"d.m.Y H:i" }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if job.error_message %}
+                                <div class="queue-message queue-message-error">
+                                    {{ job.error_message }}
+                                </div>
+                            {% elif job.message %}
+                                <div class="queue-message">
+                                    {{ job.message }}
+                                </div>
+                            {% else %}
+                                <span class="muted">
+                                    —
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="9" class="empty-table">
+                            OCR задач пока нет.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+
+    <div class="pagination">
+
+        {% if page_obj.has_previous %}
+            <a href="?page=1{% if selected_status %}&status={{ selected_status }}{% endif %}" class="btn btn-secondary">
+                Первая
+            </a>
+
+            <a href="?page={{ page_obj.previous_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="btn btn-secondary">
+                Назад
+            </a>
+        {% endif %}
+
+        <span class="muted">
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="btn btn-secondary">
+                Далее
+            </a>
+
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="btn btn-secondary">
+                Последняя
+            </a>
+        {% endif %}
+
+    </div>
+
+{% endif %}
+
+{% endblock %}

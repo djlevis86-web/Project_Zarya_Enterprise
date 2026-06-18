@@ -106,6 +106,14 @@
             >
                 Повторить OCR для выбранных
             </button>
+
+            <button
+                type="submit"
+                formaction="{% url 'enqueue_ocr_jobs' %}"
+                class="btn btn-secondary"
+            >
+                Поставить OCR в очередь
+            </button>
         </div>
 
     </div>

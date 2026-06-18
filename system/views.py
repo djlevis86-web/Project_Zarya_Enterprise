@@ -1,10 +1,11 @@
+import os
+import platform
 import subprocess
 from pathlib import Path
 
 import django
-import platform
 
-from ocr.models import OCRJob
+from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -13,20 +14,84 @@ from django.http import (
     Http404,
 )
 from django.shortcuts import (
-    render,
     redirect,
-)
-
-import os
-
-from .github_service import (
-    get_github_version,
+    render,
 )
 
 from invoices.models import Invoice
 from users.models import User
 
+from .github_service import get_github_version
 from .services import create_database_backup
+
+
+def get_ocr_job_model():
+
+    for app_label in (
+        'invoices',
+        'ocr',
+    ):
+
+        try:
+
+            return apps.get_model(
+                app_label,
+                'OCRJob'
+            )
+
+        except LookupError:
+
+            continue
+
+    return None
+
+
+def get_ocr_stats():
+
+    OCRJob = get_ocr_job_model()
+
+    if OCRJob is None:
+
+        return {
+            'ocr_total': 0,
+            'ocr_pending': 0,
+            'ocr_processing': 0,
+            'ocr_done': 0,
+            'ocr_error': 0,
+        }
+
+    return {
+        'ocr_total': OCRJob.objects.count(),
+        'ocr_pending': OCRJob.objects.filter(
+            status=getattr(
+                OCRJob,
+                'STATUS_PENDING',
+                'pending'
+            )
+        ).count(),
+        'ocr_processing': OCRJob.objects.filter(
+            status=getattr(
+                OCRJob,
+                'STATUS_PROCESSING',
+                'processing'
+            )
+        ).count(),
+        'ocr_done': OCRJob.objects.filter(
+            status=getattr(
+                OCRJob,
+                'STATUS_DONE',
+                'done'
+            )
+        ).count(),
+        'ocr_error': OCRJob.objects.filter(
+            status=getattr(
+                OCRJob,
+                'STATUS_ERROR',
+                'error'
+            )
+        ).count(),
+    }
+
 
 @staff_member_required
 def system_dashboard(request):
@@ -43,6 +108,7 @@ def system_dashboard(request):
         ).strip()
 
     except Exception:
+
         pass
 
     backups_dir = (
@@ -62,8 +128,9 @@ def system_dashboard(request):
         )
 
         backup_files = [
-            x for x in backup_files
-            if x.is_file()
+            backup_file
+            for backup_file in backup_files
+            if backup_file.is_file()
         ]
 
         backup_count = len(
@@ -72,9 +139,7 @@ def system_dashboard(request):
 
         if backup_files:
 
-            latest_backup = (
-                backup_files[0].name
-            )
+            latest_backup = backup_files[0].name
 
     db_backups_dir = (
         Path(settings.BASE_DIR)
@@ -98,9 +163,7 @@ def system_dashboard(request):
 
         if db_backup_files:
 
-            latest_db_backup = (
-                db_backup_files[0].name
-            )
+            latest_db_backup = db_backup_files[0].name
 
     db_size = 0
 
@@ -119,6 +182,7 @@ def system_dashboard(request):
         )
 
     except Exception:
+
         pass
 
     python_version = platform.python_version()
@@ -170,9 +234,7 @@ def system_dashboard(request):
 
     try:
 
-        invoice_count = (
-            Invoice.objects.count()
-        )
+        invoice_count = Invoice.objects.count()
 
     except Exception:
 
@@ -180,9 +242,7 @@ def system_dashboard(request):
 
     try:
 
-        user_count = (
-            User.objects.count()
-        )
+        user_count = User.objects.count()
 
     except Exception:
 
@@ -215,6 +275,7 @@ def system_dashboard(request):
             if collect:
 
                 if line.startswith("---"):
+
                     break
 
                 if line.startswith("- "):
@@ -224,49 +285,35 @@ def system_dashboard(request):
                     )
 
     except Exception:
+
         pass
 
-    ocr_total = OCRJob.objects.count()
+    ocr_stats = get_ocr_stats()
 
-    ocr_pending = OCRJob.objects.filter(
-        status=OCRJob.STATUS_PENDING
-    ).count()
+    context = {
+        "version": version,
+        "backup_count": backup_count,
+        "latest_backup": latest_backup,
+        "db_backup_count": db_backup_count,
+        "latest_db_backup": latest_db_backup,
+        "db_size": db_size,
+        "changelog_items": changelog_items,
+        "python_version": python_version,
+        "django_version": django_version,
+        "invoice_count": invoice_count,
+        "user_count": user_count,
+        "git_branch": git_branch,
+        "last_commit": last_commit,
+    }
 
-    ocr_processing = OCRJob.objects.filter(
-        status=OCRJob.STATUS_PROCESSING
-    ).count()
+    context.update(
+        ocr_stats
+    )
 
-    ocr_done = OCRJob.objects.filter(
-        status=OCRJob.STATUS_DONE
-    ).count()
-
-    ocr_error = OCRJob.objects.filter(
-        status=OCRJob.STATUS_ERROR
-    ).count()
-    
     return render(
         request,
         "system/dashboard.html",
-        {
-            "version": version,
-            "backup_count": backup_count,
-            "latest_backup": latest_backup,
-            "db_backup_count": db_backup_count,
-            "latest_db_backup": latest_db_backup,
-            "db_size": db_size,
-            "changelog_items": changelog_items,
-            "python_version": python_version,
-            "django_version": django_version,
-            "invoice_count": invoice_count,
-            "user_count": user_count,
-            "git_branch": git_branch,
-            "last_commit": last_commit,
-            "ocr_total": ocr_total,
-            "ocr_pending": ocr_pending,
-            "ocr_processing": ocr_processing,
-            "ocr_done": ocr_done,
-            "ocr_error": ocr_error,
-        }
+        context
     )
 
 
@@ -275,7 +322,7 @@ def backups_list(request):
 
     backups_dir = (
         Path(settings.BASE_DIR)
-        / "backups"
+        / "backups_db"
     )
 
     backups = []
@@ -310,30 +357,30 @@ def backups_list(request):
         }
     )
 
+
 @staff_member_required
 def create_backup(request):
 
     try:
 
-        filename = (
-            create_database_backup()
-        )
+        filename = create_database_backup()
 
         messages.success(
             request,
             f"Создана резервная копия: {filename}"
         )
 
-    except Exception as e:
+    except Exception as error:
 
         messages.error(
             request,
-            f"Ошибка создания резервной копии: {e}"
+            f"Ошибка создания резервной копии: {error}"
         )
 
     return redirect(
         "system_dashboard"
     )
+
 
 @staff_member_required
 def download_backup(request, filename):
@@ -359,6 +406,7 @@ def download_backup(request, filename):
         filename=filename
     )
 
+
 @staff_member_required
 def delete_backup(request, filename):
 
@@ -379,16 +427,17 @@ def delete_backup(request, filename):
                 f"Удалён бэкап: {filename}"
             )
 
-    except Exception as e:
+    except Exception as error:
 
         messages.error(
             request,
-            f"Ошибка удаления: {e}"
+            f"Ошибка удаления: {error}"
         )
 
     return redirect(
         "backups_list"
     )
+
 
 @staff_member_required
 def versions_page(request):
@@ -405,6 +454,7 @@ def versions_page(request):
         ).strip()
 
     except Exception:
+
         pass
 
     git_branch = "-"
@@ -425,6 +475,7 @@ def versions_page(request):
         )
 
     except Exception:
+
         pass
 
     commits = []
@@ -450,15 +501,18 @@ def versions_page(request):
 
             parts = row.split("|")
 
-            commits.append(
-                {
-                    "hash": parts[0],
-                    "date": parts[1],
-                    "message": parts[2],
-                }
-            )
+            if len(parts) >= 3:
+
+                commits.append(
+                    {
+                        "hash": parts[0],
+                        "date": parts[1],
+                        "message": parts[2],
+                    }
+                )
 
     except Exception:
+
         pass
 
     return render(
@@ -470,6 +524,7 @@ def versions_page(request):
             "commits": commits,
         }
     )
+
 
 @staff_member_required
 def updates_page(request):
@@ -486,6 +541,7 @@ def updates_page(request):
         ).strip()
 
     except Exception:
+
         pass
 
     github_repo = os.getenv(
@@ -521,6 +577,7 @@ def updates_page(request):
             "update_available": update_available,
         }
     )
+
 
 @staff_member_required
 def maintenance_page(request):

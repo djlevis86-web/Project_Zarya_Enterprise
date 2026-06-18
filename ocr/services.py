@@ -1082,6 +1082,288 @@ def parse_invoice_data(text):
             'kpp': None,
         }
 
+    amount = None
+    invoice_number = None
+    invoice_date = None
+    vendor = None
+
+    # =====================================
+    # Номер счета
+    # =====================================
+
+    invoice_patterns = [
+
+        r'Счет\s+на\s+оплату\s*№\s*([^\s]+)',
+
+        r'СЧЕТ\s*№\s*([^\s]+)',
+
+        r'Счет\s*№\s*([^\s]+)',
+
+        r'CUET\s*Ne\s*([^\s]+)',
+
+        r'заказу\s+клиента\s+№?\s*([A-Za-zА-Яа-я0-9\-]+)',
+
+        r'заказу\s+клиента\s+Ne\s*([A-Za-zА-Яа-я0-9\-]+)',
+
+        r'Ne([A-Za-zА-Яа-я0-9\-]+)',
+
+        r'№([A-Za-zА-Яа-я0-9\-]+)',
+
+    ]
+
+    for pattern in invoice_patterns:
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        )
+
+        if match:
+
+            invoice_number = match.group(1)
+
+            invoice_number = invoice_number.strip()
+
+            break
+
+
+    # =====================================
+    # Дата счета
+    # =====================================
+
+    date_patterns = [
+
+        r'от\s+(\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4})',
+
+        r'от\s+(\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4}г)',
+
+        r'№\s*[^\s]+\s*от\s*(\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4})',
+
+        r'№\s*[^\s]+\s*от\s*(\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4}г)',
+
+    ]
+
+    for pattern in date_patterns:
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        )
+
+        if match:
+
+            invoice_date = match.group(1)
+
+            invoice_date = invoice_date.strip()
+
+            break
+
+
+    # =====================================
+    # Поставщик
+    # =====================================
+
+    vendor_patterns = [
+
+        r'Поставщик.*?[":]\s*(.+)',
+
+        r'Исполнитель.*?[":]\s*(.+)',
+
+        r'ООО\s+"([^"]+)"',
+
+        r'АО\s+"([^"]+)"',
+
+        r'ПАО\s+"([^"]+)"',
+
+        r'ОАО\s+"([^"]+)"',
+
+        r'Общество\s+с\s+ограниченной\s+ответственностью\s+"([^"]+)"',
+
+        r'Индивидуальный\s+предприниматель\s+(.+?)(?:ИНН|Адрес|тел|Тел|$)',
+
+        r'Индивидуальный\s+\S*приниматель\s+(.+?)(?:ИНН|Адрес|тел|Тел|$)',
+
+    ]
+
+    for pattern in vendor_patterns:
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        )
+
+        if match:
+
+            vendor = match.group(1)
+
+            vendor = vendor.split('ИНН')[0]
+            vendor = vendor.split('КПП')[0]
+            vendor = vendor.split('Адрес')[0]
+            vendor = vendor.split('тел')[0]
+            vendor = vendor.split('Тел')[0]
+
+            vendor = vendor.replace('\n', ' ')
+
+            vendor = re.sub(
+                r'\s+',
+                ' ',
+                vendor
+            )
+
+            vendor = re.sub(
+                r'ИНН.*',
+                '',
+                vendor,
+                flags=re.IGNORECASE
+            )
+
+            vendor = vendor.strip(' ,.-')
+
+            if vendor:
+
+                vendor = vendor.replace(
+                    'OOO',
+                    'ООО'
+                )
+
+                vendor = vendor.replace(
+                    'OAO',
+                    'ОАО'
+                )
+
+                vendor = vendor.replace(
+                    'AO',
+                    'АО'
+                )
+
+                vendor = vendor.strip()
+
+            break
+
+
+    # =====================================
+    # Сумма
+    # =====================================
+
+    amount_patterns = [
+
+        r'Всего\s+наименований.*?на\s+сумму\s+([\d\s$.,]+)',
+
+        r'Всего\s+к\s+оплате[:\s]*([\d\s$.,]+)',
+
+        r'Итого\s+с\s+НДС[:\s]*([\d\s$.,]+)',
+
+        r'на\s+сумму\s+([\d\s$.,]+)',
+
+        r'сумму\s+([\d\s$.,]+)\s*руб',
+
+        r'Итого[:\s]*([\d\s$.,]+)',
+
+    ]
+
+    for pattern in amount_patterns:
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        )
+
+        if match:
+
+            amount = match.group(1)
+
+            amount = (
+                amount
+                .replace("'", "")
+                .replace(" ", "")
+                .replace(",", ".")
+            )
+
+            amount = re.sub(
+                r'[^0-9.]',
+                '',
+                amount
+            )
+
+            amount_match = re.search(
+                r'(\d+\.\d{2})',
+                amount
+            )
+
+            if amount_match:
+
+                amount = amount_match.group(1)
+
+            break
+
+
+    # -------------------------------------
+    # Резервный поиск суммы
+    # -------------------------------------
+
+    if not amount:
+
+        money_candidates = re.findall(
+            r'\d[\d\s]{0,12}[.,]\d{2}',
+            text
+        )
+
+        values = []
+
+        for item in money_candidates:
+
+            try:
+
+                item = (
+                    item
+                    .replace(' ', '')
+                    .replace(',', '.')
+                )
+
+                value = float(item)
+
+                # защита от ИНН, р/с, БИК и прочего мусора
+
+                if value <= 0:
+                    continue
+
+                if value > 10000000:
+                    continue
+
+                values.append(value)
+
+            except:
+
+                pass
+
+        if values:
+
+            amount = str(max(values))
+
+        if amount:
+
+            try:
+
+                amount_float = float(amount)
+
+                if amount_float > 500000:
+
+                    amount = None
+
+            except:
+
+                amount = None
+
+    print("---------------")
+    print("VENDOR:", vendor)
+    print("NUMBER:", invoice_number)
+    print("DATE:", invoice_date)
+    print("AMOUNT:", amount)
+    print("---------------")
     invoice_number = parse_invoice_number(
         text
     )

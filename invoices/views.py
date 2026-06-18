@@ -1,79 +1,54 @@
-from django.shortcuts import (
-render,
-redirect,
-get_object_or_404
-)
-
+from datetime import date, datetime
+from decimal import Decimal
 from pathlib import Path
 
-from django.conf import settings
-from django.core.files.storage import FileSystemStorage
-
-from django.http import HttpResponse
-
-from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib import messages
-from django.core.exceptions import PermissionDenied
-from django.contrib.auth import get_user_model
-from ocr.models import OCRJob
-from ocr.tasks import process_invoice_ocr
-from django.shortcuts import render
-from datetime import date
-from datetime import datetime
-
-from django.core.paginator import Paginator
-from django.db.models import (
-    Q,
-    Count,
-    Sum,
-)
-
-from invoices.counterparty_service import (
-    normalize_counterparty_name,
-    extract_requisites_near_vendor,
-)
-
 import hashlib
-
+import traceback
 import uuid
 
-from decimal import Decimal
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.core.files.storage import FileSystemStorage
+from django.core.paginator import Paginator
+from django.db.models import Count, Q, Sum
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import (
-    Invoice,
-    Counterparty,
-    CompanyRequisites,
-    InvoiceUploadBatch,
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font, PatternFill
+
+from .comment_forms import InvoiceCommentForm
+from .comment_models import InvoiceComment
+from .counterparty_service import (
+    extract_requisites_near_vendor,
+    normalize_counterparty_name,
 )
-
 from .forms import (
-    InvoiceForm,
-    InvoiceEditForm,
     CounterpartyImportForm,
     CounterpartyManualForm,
     InvoiceCounterpartyAssignForm,
+    InvoiceEditForm,
+    InvoiceForm,
 )
-
 from .log_service import create_invoice_log
+from .models import (
+    CompanyRequisites,
+    Counterparty,
+    Invoice,
+    InvoiceUploadBatch,
+)
+from .one_c_import_service import import_counterparties_from_file
 
 from ocr.services import (
-extract_text_from_pdf,
-extract_text_from_image,
-parse_invoice_data
+    extract_text_from_image,
+    extract_text_from_pdf,
+    parse_invoice_data,
 )
 
-from .comment_models import InvoiceComment
-from .comment_forms import InvoiceCommentForm
-from openpyxl import Workbook
-from openpyxl.styles import Font
-from openpyxl.styles import Alignment
-from openpyxl.styles import PatternFill
-from openpyxl.utils import get_column_letter
-from invoices.counterparty_service import (
-    normalize_counterparty_name,
-    extract_requisites_near_vendor,
-)
 
 def calculate_uploaded_file_hash(uploaded_file):
 
@@ -88,7 +63,9 @@ def calculate_uploaded_file_hash(uploaded_file):
 
     return hasher.hexdigest()
 
+
 def create_upload_token(request):
+
     token = uuid.uuid4().hex
 
     request.session['invoice_upload_token'] = token
@@ -110,6 +87,7 @@ def get_latest_upload_batches_for_user(user, limit=5):
     )
 
     if not user.is_staff:
+
         batches = batches.filter(
             user=user
         )
@@ -131,16 +109,22 @@ def render_upload_invoice_form(request, form):
         }
     )
 
+
 @login_required
 def invoice_list(request):
 
     User = get_user_model()
 
-    invoices = Invoice.objects.select_related(
-        'user'
-    ).all()
+    invoices = (
+        Invoice.objects
+        .select_related(
+            'user'
+        )
+        .all()
+    )
 
     if not request.user.is_staff:
+
         invoices = invoices.filter(
             user=request.user
         )
@@ -168,15 +152,19 @@ def invoice_list(request):
     if search:
 
         invoices = invoices.filter(
-
-            Q(title__icontains=search) |
-            Q(original_filename__icontains=search) |
-            Q(description__icontains=search) |
-            Q(vendor__icontains=search) |
-            Q(invoice_number__icontains=search) |
-            Q(ocr_text__icontains=search) |
+            Q(title__icontains=search)
+            |
+            Q(original_filename__icontains=search)
+            |
+            Q(description__icontains=search)
+            |
+            Q(vendor__icontains=search)
+            |
+            Q(invoice_number__icontains=search)
+            |
+            Q(ocr_text__icontains=search)
+            |
             Q(user__username__icontains=search)
-
         )
 
     if status:
@@ -203,9 +191,12 @@ def invoice_list(request):
     ]
 
     if sort not in allowed_sorts:
+
         sort = '-created_at'
 
-    invoices = invoices.order_by(sort)
+    invoices = invoices.order_by(
+        sort
+    )
 
     paginator = Paginator(
         invoices,
@@ -263,10 +254,8 @@ def invoice_list(request):
             'status': status,
             'sort': sort,
             'user_filter': user_filter,
-
             'statuses': Invoice.STATUS_CHOICES,
             'users': users,
-
             'total_count': total_count,
             'new_count': new_count,
             'review_count': review_count,
@@ -299,12 +288,21 @@ def upload_invoice(request):
                 'Форма загрузки уже была отправлена. Повторная отправка отменена.'
             )
 
-            if request.session.get('last_upload_result'):
-                return redirect('upload_result')
+            if request.session.get(
+                'last_upload_result'
+            ):
 
-            return redirect('upload_invoice')
+                return redirect(
+                    'upload_result'
+                )
 
-        create_upload_token(request)
+            return redirect(
+                'upload_invoice'
+            )
+
+        create_upload_token(
+            request
+        )
 
         form = InvoiceForm(
             request.POST,
@@ -350,7 +348,7 @@ def upload_invoice(request):
                 request,
                 form
             )
-        
+
         batch = InvoiceUploadBatch.objects.create(
             user=request.user,
             upload_token=posted_token,
@@ -362,7 +360,7 @@ def upload_invoice(request):
             '.pdf',
             '.jpg',
             '.jpeg',
-            '.png'
+            '.png',
         )
 
         created_count = 0
@@ -389,8 +387,12 @@ def upload_invoice(request):
 
             existing_invoice = (
                 Invoice.objects
-                .filter(file_hash=file_hash)
-                .order_by('id')
+                .filter(
+                    file_hash=file_hash
+                )
+                .order_by(
+                    'id'
+                )
                 .first()
             )
 
@@ -432,27 +434,142 @@ def upload_invoice(request):
 
             try:
 
-                job = OCRJob.objects.create(
-                    invoice_id=invoice.id,
-                    file_path=invoice.file.path
+                file_path = invoice.file.path
+
+                print(
+                    'OCR FILE:',
+                    file_path
                 )
 
-                process_invoice_ocr.delay(
-                    job.id
+                if file_path.lower().endswith(
+                    '.pdf'
+                ):
+
+                    text = extract_text_from_pdf(
+                        file_path
+                    )
+
+                else:
+
+                    text = extract_text_from_image(
+                        file_path
+                    )
+
+                invoice.ocr_text = text
+
+                parsed = parse_invoice_data(
+                    text
                 )
+
+                invoice.invoice_number = parsed.get(
+                    'invoice_number'
+                )
+
+                if invoice.invoice_number:
+
+                    exists_invoice = (
+                        Invoice.objects
+                        .filter(
+                            invoice_number=invoice.invoice_number
+                        )
+                        .exclude(
+                            id=invoice.id
+                        )
+                        .first()
+                    )
+
+                    if exists_invoice:
+
+                        invoice.delete()
+
+                        duplicate_files.append(
+                            {
+                                'filename': uploaded_file.name,
+                                'invoice_id': exists_invoice.id,
+                                'invoice_title': exists_invoice.title,
+                            }
+                        )
+
+                        continue
+
+                invoice.invoice_date = parsed.get(
+                    'invoice_date'
+                )
+
+                invoice.vendor = parsed.get(
+                    'vendor'
+                )
+
+                amount = parsed.get(
+                    'amount'
+                )
+
+                if amount:
+
+                    try:
+
+                        invoice.ocr_amount = float(
+                            str(amount).replace(
+                                ',',
+                                '.'
+                            )
+                        )
+
+                        if (
+                            invoice.amount is None
+                            or
+                            float(invoice.amount) == 0
+                        ):
+
+                            invoice.amount = invoice.ocr_amount
+                            invoice.amount_verified = True
+                            invoice.ocr_verified = True
+
+                        else:
+
+                            invoice.amount_verified = (
+                                float(invoice.amount)
+                                ==
+                                float(invoice.ocr_amount)
+                            )
+
+                            invoice.ocr_verified = (
+                                invoice.amount_verified
+                            )
+
+                    except Exception:
+
+                        invoice.amount_verified = False
+
+                invoice.save()
 
                 create_invoice_log(
                     invoice,
                     request.user,
-                    'OCR задача создана'
+                    'OCR обработка завершена'
+                )
+
+                print(
+                    'OCR SUCCESS:',
+                    invoice.id
                 )
 
             except Exception as error:
 
+                print(
+                    'OCR ERROR:'
+                )
+
+                print(
+                    error
+                )
+
+                traceback.print_exc()
+
                 create_invoice_log(
                     invoice,
                     request.user,
-                    f'OCR задача не создана: {error}'
+                    f'OCR ошибка: {error}'
                 )
 
             created_count += 1
@@ -460,15 +577,24 @@ def upload_invoice(request):
         if created_count > 0 and (
             duplicate_files or skipped_files
         ):
+
             batch_status = InvoiceUploadBatch.STATUS_PARTIAL
+
         elif created_count > 0:
+
             batch_status = InvoiceUploadBatch.STATUS_COMPLETED
+
         else:
+
             batch_status = InvoiceUploadBatch.STATUS_EMPTY
 
         batch.uploaded_count = created_count
-        batch.duplicate_count = len(duplicate_files)
-        batch.skipped_count = len(skipped_files)
+        batch.duplicate_count = len(
+            duplicate_files
+        )
+        batch.skipped_count = len(
+            skipped_files
+        )
         batch.duplicate_files = duplicate_files
         batch.skipped_files = skipped_files
         batch.status = batch_status
@@ -504,12 +630,128 @@ def upload_invoice(request):
         form
     )
 
-@login_required
-def invoice_detail(
-    request,
-    invoice_id
-):
 
+@login_required
+def upload_result(request):
+
+    result = request.session.get(
+        'last_upload_result',
+        {}
+    )
+
+    batch = None
+
+    batch_id = result.get(
+        'batch_id'
+    )
+
+    if batch_id:
+
+        batch = (
+            InvoiceUploadBatch.objects
+            .filter(
+                id=batch_id
+            )
+            .first()
+        )
+
+    return render(
+        request,
+        'invoices/upload_result.html',
+        {
+            'batch': batch,
+            'uploaded_count': result.get(
+                'uploaded_count',
+                0
+            ),
+            'duplicates': result.get(
+                'duplicates',
+                []
+            ),
+            'skipped_files': result.get(
+                'skipped_files',
+                []
+            ),
+        }
+    )
+
+
+@login_required
+def upload_batches(request):
+
+    batches = (
+        InvoiceUploadBatch.objects
+        .select_related(
+            'user'
+        )
+        .order_by(
+            '-created_at'
+        )
+    )
+
+    if not request.user.is_staff:
+
+        batches = batches.filter(
+            user=request.user
+        )
+
+    paginator = Paginator(
+        batches,
+        20
+    )
+
+    page_obj = paginator.get_page(
+        request.GET.get(
+            'page'
+        )
+    )
+
+    return render(
+        request,
+        'invoices/upload_batches.html',
+        {
+            'page_obj': page_obj,
+        }
+    )
+
+
+@login_required
+def upload_batch_detail(request, batch_id):
+
+    batch = get_object_or_404(
+        InvoiceUploadBatch.objects.select_related(
+            'user'
+        ),
+        id=batch_id
+    )
+
+    if not request.user.is_staff and batch.user_id != request.user.id:
+
+        raise PermissionDenied
+
+    invoices = (
+        batch.invoices
+        .select_related(
+            'counterparty',
+            'user'
+        )
+        .order_by(
+            '-created_at'
+        )
+    )
+
+    return render(
+        request,
+        'invoices/upload_batch_detail.html',
+        {
+            'batch': batch,
+            'invoices': invoices,
+        }
+    )
+
+
+@login_required
+def invoice_detail(request, invoice_id):
 
     invoice = get_object_or_404(
         Invoice,
@@ -520,14 +762,20 @@ def invoice_detail(
         not request.user.is_staff
         and invoice.user != request.user
     ):
+
         raise PermissionDenied
 
-    comments = InvoiceComment.objects.filter(
-        invoice=invoice
-    ).select_related(
-        'user'
-    ).order_by(
-        '-created_at'
+    comments = (
+        InvoiceComment.objects
+        .filter(
+            invoice=invoice
+        )
+        .select_related(
+            'user'
+        )
+        .order_by(
+            '-created_at'
+        )
     )
 
     comment_form = InvoiceCommentForm()
@@ -545,16 +793,7 @@ def invoice_detail(
 
 
 @staff_member_required
-def change_invoice_status(
-    request,
-    invoice_id,
-    status
-):
-
-    user_filter = request.GET.get(
-        'user',
-        ''
-    )
+def change_invoice_status(request, invoice_id, status):
 
     invoice = get_object_or_404(
         Invoice,
@@ -603,11 +842,7 @@ def change_invoice_status(
 
 
 @login_required
-def add_comment(
-    request,
-    invoice_id
-):
-
+def add_comment(request, invoice_id):
 
     invoice = get_object_or_404(
         Invoice,
@@ -642,11 +877,9 @@ def add_comment(
         invoice_id=invoice.id
     )
 
+
 @staff_member_required
-def edit_invoice(
-    request,
-    invoice_id
-):
+def edit_invoice(request, invoice_id):
 
     invoice = get_object_or_404(
         Invoice,
@@ -691,195 +924,10 @@ def edit_invoice(
         'invoices/edit_invoice.html',
         {
             'invoice': invoice,
-            'form': form
+            'form': form,
         }
     )
 
-@login_required
-def upload_result(request):
-
-    result = request.session.get(
-        'last_upload_result',
-        {}
-    )
-
-    batch = None
-
-    batch_id = result.get(
-        'batch_id'
-    )
-
-    if batch_id:
-
-        batch = (
-            InvoiceUploadBatch.objects
-            .filter(
-                id=batch_id
-            )
-            .first()
-        )
-
-    return render(
-        request,
-        'invoices/upload_result.html',
-        {
-            'batch': batch,
-            'uploaded_count': result.get(
-                'uploaded_count',
-                0
-            ),
-            'duplicates': result.get(
-                'duplicates',
-                []
-            ),
-            'skipped_files': result.get(
-                'skipped_files',
-                []
-            ),
-        }
-    )
-
-@login_required
-def upload_batches(request):
-
-    batches = (
-        InvoiceUploadBatch.objects
-        .select_related(
-            'user'
-        )
-        .order_by(
-            '-created_at'
-        )
-    )
-
-    if not request.user.is_staff:
-        batches = batches.filter(
-            user=request.user
-        )
-
-    paginator = Paginator(
-        batches,
-        20
-    )
-
-    page_obj = paginator.get_page(
-        request.GET.get(
-            'page'
-        )
-    )
-
-    return render(
-        request,
-        'invoices/upload_batches.html',
-        {
-            'page_obj': page_obj,
-        }
-    )
-
-
-@login_required
-def upload_batch_detail(request, batch_id):
-
-    batch = get_object_or_404(
-        InvoiceUploadBatch.objects.select_related(
-            'user'
-        ),
-        id=batch_id
-    )
-
-    if not request.user.is_staff and batch.user_id != request.user.id:
-        raise PermissionDenied
-
-    invoices = (
-        batch.invoices
-        .select_related(
-            'counterparty',
-            'user'
-        )
-        .order_by(
-            '-created_at'
-        )
-    )
-
-    return render(
-        request,
-        'invoices/upload_batch_detail.html',
-        {
-            'batch': batch,
-            'invoices': invoices,
-        }
-    )
-
-@login_required
-def upload_batches(request):
-
-    batches = (
-        InvoiceUploadBatch.objects
-        .select_related(
-            'user'
-        )
-        .order_by(
-            '-created_at'
-        )
-    )
-
-    if not request.user.is_staff:
-        batches = batches.filter(
-            user=request.user
-        )
-
-    paginator = Paginator(
-        batches,
-        20
-    )
-
-    page_obj = paginator.get_page(
-        request.GET.get(
-            'page'
-        )
-    )
-
-    return render(
-        request,
-        'invoices/upload_batches.html',
-        {
-            'page_obj': page_obj,
-        }
-    )
-
-
-@login_required
-def upload_batch_detail(request, batch_id):
-
-    batch = get_object_or_404(
-        InvoiceUploadBatch.objects.select_related(
-            'user'
-        ),
-        id=batch_id
-    )
-
-    if not request.user.is_staff and batch.user_id != request.user.id:
-        raise PermissionDenied
-
-    invoices = (
-        batch.invoices
-        .select_related(
-            'counterparty',
-            'user'
-        )
-        .order_by(
-            '-created_at'
-        )
-    )
-
-    return render(
-        request,
-        'invoices/upload_batch_detail.html',
-        {
-            'batch': batch,
-            'invoices': invoices,
-        }
-    )
 
 @login_required
 def payment_schedule(request):
@@ -924,8 +972,12 @@ def payment_schedule(request):
 
     total_amount = (
         base_invoices.aggregate(
-            total=Sum('amount')
-        ).get('total')
+            total=Sum(
+                'amount'
+            )
+        ).get(
+            'total'
+        )
         or 0
     )
 
@@ -970,6 +1022,7 @@ def payment_schedule(request):
             'total_amount': total_amount,
         }
     )
+
 
 @login_required
 def payment_registry(request):
@@ -1050,8 +1103,12 @@ def payment_registry(request):
 
     total_amount = (
         invoices.aggregate(
-            total=Sum('amount')
-        ).get('total')
+            total=Sum(
+                'amount'
+            )
+        ).get(
+            'total'
+        )
         or 0
     )
 
@@ -1088,6 +1145,7 @@ def payment_registry(request):
             'status_choices': Invoice.STATUS_CHOICES,
         }
     )
+
 
 @login_required
 def export_payment_registry_excel(request):
@@ -1215,15 +1273,11 @@ def export_payment_registry_excel(request):
             vertical='center'
         )
 
-    total_amount = 0
+    total_amount = Decimal(
+        '0.00'
+    )
 
     for invoice in invoices:
-
-        counterparty_name = ''
-
-        inn = ''
-
-        kpp = ''
 
         if invoice.counterparty:
 
@@ -1234,8 +1288,12 @@ def export_payment_registry_excel(request):
         else:
 
             counterparty_name = invoice.vendor or ''
+            inn = ''
+            kpp = ''
 
-        amount = invoice.amount or 0
+        amount = invoice.amount or Decimal(
+            '0.00'
+        )
 
         total_amount += amount
 
@@ -1366,6 +1424,7 @@ def export_payment_registry_excel(request):
     )
 
     return response
+
 
 @login_required
 def export_payment_registry_1c(request):
@@ -1732,6 +1791,7 @@ def export_payment_registry_1c(request):
 
     return response
 
+
 @login_required
 def unmatched_counterparties(request):
 
@@ -1811,6 +1871,7 @@ def unmatched_counterparties(request):
         }
     )
 
+
 @login_required
 def export_unmatched_counterparties_excel(request):
 
@@ -1862,7 +1923,7 @@ def export_unmatched_counterparties_excel(request):
                 'kpp': kpp or '',
                 'invoice_ids': [],
                 'invoice_numbers': [],
-                'amount_total': 0,
+                'amount_total': Decimal('0.00'),
                 'count': 0,
             }
 
@@ -1877,7 +1938,7 @@ def export_unmatched_counterparties_excel(request):
             )
 
         candidates[key]['amount_total'] += (
-            invoice.amount or 0
+            invoice.amount or Decimal('0.00')
         )
 
         candidates[key]['count'] += 1
@@ -1949,7 +2010,9 @@ def export_unmatched_counterparties_excel(request):
                 'Да',
                 '',
                 candidate['count'],
-                ', '.join(candidate['invoice_ids']),
+                ', '.join(
+                    candidate['invoice_ids']
+                ),
                 ', '.join(
                     sorted(
                         set(
@@ -2027,6 +2090,7 @@ def export_unmatched_counterparties_excel(request):
 
     return response
 
+
 @staff_member_required
 def import_counterparties_1c(request):
 
@@ -2098,6 +2162,7 @@ def import_counterparties_1c(request):
         }
     )
 
+
 @staff_member_required
 def rematch_counterparties_1c(request):
 
@@ -2107,16 +2172,14 @@ def rematch_counterparties_1c(request):
             'unmatched_counterparties'
         )
 
+    from .counterparty_service import get_or_create_counterparty_from_invoice
+
     invoices = Invoice.objects.all().order_by(
         'id'
     )
 
     matched = 0
     not_found = 0
-
-    from invoices.counterparty_service import (
-        get_or_create_counterparty_from_invoice
-    )
 
     for invoice in invoices:
 
@@ -2156,6 +2219,7 @@ def rematch_counterparties_1c(request):
     return redirect(
         'unmatched_counterparties'
     )
+
 
 @staff_member_required
 def counterparties_missing_requisites(request):
@@ -2223,6 +2287,7 @@ def counterparties_missing_requisites(request):
             'counterparties_count': counterparties.count(),
         }
     )
+
 
 @staff_member_required
 def counterparty_directory(request):
@@ -2319,26 +2384,30 @@ def counterparty_directory(request):
         Invoice.STATUS_APPROVED,
     ]
 
-    counterparties = counterparties.annotate(
-        invoices_count=Count(
-            'invoices',
-            distinct=True
-        ),
-        unpaid_invoices_count=Count(
-            'invoices',
-            filter=Q(
-                invoices__status__in=payment_statuses
+    counterparties = (
+        counterparties
+        .annotate(
+            invoices_count=Count(
+                'invoices',
+                distinct=True
             ),
-            distinct=True
-        ),
-        unpaid_total=Sum(
-            'invoices__amount',
-            filter=Q(
-                invoices__status__in=payment_statuses
+            unpaid_invoices_count=Count(
+                'invoices',
+                filter=Q(
+                    invoices__status__in=payment_statuses
+                ),
+                distinct=True
+            ),
+            unpaid_total=Sum(
+                'invoices__amount',
+                filter=Q(
+                    invoices__status__in=payment_statuses
+                )
             )
         )
-    ).order_by(
-        'name'
+        .order_by(
+            'name'
+        )
     )
 
     paginator = Paginator(
@@ -2408,8 +2477,12 @@ def counterparty_detail(request, counterparty_id):
 
     unpaid_total = (
         unpaid_invoices.aggregate(
-            total=Sum('amount')
-        ).get('total')
+            total=Sum(
+                'amount'
+            )
+        ).get(
+            'total'
+        )
         or 0
     )
 
@@ -2424,6 +2497,7 @@ def counterparty_detail(request, counterparty_id):
             'unpaid_total': unpaid_total,
         }
     )
+
 
 @staff_member_required
 def counterparty_create(request):
@@ -2548,6 +2622,7 @@ def counterparty_edit(request, counterparty_id):
             'counterparty': counterparty,
         }
     )
+
 
 @staff_member_required
 def invoice_assign_counterparty(request, invoice_id):

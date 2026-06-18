@@ -46,6 +46,7 @@
             <nav class="sidebar-nav">
 
                 <div class="nav-section">
+
                     <div class="nav-section-title">
                         Работа
                     </div>
@@ -68,16 +69,16 @@
                         <span>Загрузка</span>
                     </a>
 
-                    <a
-                        href="{% url 'upload_batches' %}"
-                        class="nav-link {% if current == 'upload_batches' or current == 'upload_batch_detail' %}is-active{% endif %}"
-                    >
-                        <span>◷</span>
+                    <a href="{% url 'upload_batches' %}"
+                       class="nav-link {% if current == 'upload_batches' or current == 'upload_batch_detail' %}is-active{% endif %}">
+                        <span class="nav-icon">◷</span>
                         <span>Журнал загрузок</span>
                     </a>
+
                 </div>
 
                 <div class="nav-section">
+
                     <div class="nav-section-title">
                         Финансы
                     </div>
@@ -93,10 +94,13 @@
                         <span class="nav-icon">₽</span>
                         <span>Реестр оплаты</span>
                     </a>
+
                 </div>
 
                 {% if request.user.is_staff %}
+
                     <div class="nav-section">
+
                         <div class="nav-section-title">
                             Справочники
                         </div>
@@ -124,10 +128,13 @@
                             <span class="nav-icon">⇄</span>
                             <span>Импорт из 1С</span>
                         </a>
+
                     </div>
+
                 {% endif %}
 
                 <div class="nav-section">
+
                     <div class="nav-section-title">
                         Аккаунт
                     </div>
@@ -139,8 +146,9 @@
                     </a>
 
                     {% if request.user.is_staff %}
+
                         <a href="{% url 'system_dashboard' %}"
-                           class="nav-link {% if current == 'system_dashboard' %}is-active{% endif %}">
+                           class="nav-link {% if current == 'system_dashboard' or current == 'backups_list' or current == 'versions_page' or current == 'updates_page' or current == 'maintenance_page' %}is-active{% endif %}">
                             <span class="nav-icon">⚙</span>
                             <span>Система</span>
                         </a>
@@ -149,7 +157,9 @@
                             <span class="nav-icon">▣</span>
                             <span>Администрирование</span>
                         </a>
+
                     {% endif %}
+
                 </div>
 
             </nav>
@@ -167,62 +177,88 @@
 
     <main class="main">
 
-       <header class="topbar">
+        <header class="topbar">
 
-    <div>
-        <div class="topbar-title">
+            <div>
+                <div class="topbar-title">
 
-            {% if current == 'dashboard' %}
-                Панель управления
-            {% elif current == 'invoice_list' %}
-                Счета
-            {% elif current == 'invoice_detail' %}
-                Карточка счета
-            {% elif current == 'upload_invoice' %}
-                Загрузка счетов
-            {% elif current == 'upload_batches' %}
-                Журнал загрузок
-            {% elif current == 'upload_batch_detail' %}
-                Пакет загрузки    
-            {% elif current == 'payment_schedule' %}
-                График платежей
-            {% elif current == 'payment_registry' %}
-                Реестр оплаты
-            {% elif current == 'counterparty_directory' %}
-                Справочник контрагентов
-            {% elif current == 'counterparty_detail' %}
-                Карточка контрагента
-            {% elif current == 'unmatched_counterparties' %}
-                Не найдено в 1С
-            {% elif current == 'counterparties_missing_requisites' %}
-                Проверка реквизитов
-            {% elif current == 'import_counterparties_1c' %}
-                Импорт из 1С
-            {% elif current == 'system_dashboard' %}
-                Система
-            {% else %}
-                Project Zarya Enterprise
-            {% endif %}
+                    {% if current == 'dashboard' %}
+                        Панель управления
+                    {% elif current == 'invoice_list' %}
+                        Счета
+                    {% elif current == 'invoice_detail' %}
+                        Карточка счета
+                    {% elif current == 'edit_invoice' %}
+                        Редактирование счета
+                    {% elif current == 'upload_invoice' %}
+                        Загрузка счетов
+                    {% elif current == 'upload_result' %}
+                        Результат загрузки
+                    {% elif current == 'upload_batches' %}
+                        Журнал загрузок
+                    {% elif current == 'upload_batch_detail' %}
+                        Пакет загрузки
+                    {% elif current == 'payment_schedule' %}
+                        График платежей
+                    {% elif current == 'payment_registry' %}
+                        Реестр оплаты
+                    {% elif current == 'counterparty_directory' %}
+                        Справочник контрагентов
+                    {% elif current == 'counterparty_detail' %}
+                        Карточка контрагента
+                    {% elif current == 'counterparty_create' %}
+                        Новый контрагент
+                    {% elif current == 'counterparty_edit' %}
+                        Редактирование контрагента
+                    {% elif current == 'invoice_assign_counterparty' %}
+                        Привязка контрагента
+                    {% elif current == 'unmatched_counterparties' %}
+                        Не найдено в 1С
+                    {% elif current == 'counterparties_missing_requisites' %}
+                        Проверка реквизитов
+                    {% elif current == 'import_counterparties_1c' %}
+                        Импорт из 1С
+                    {% elif current == 'system_dashboard' %}
+                        Система
+                    {% elif current == 'backups_list' %}
+                        Резервные копии
+                    {% elif current == 'versions_page' %}
+                        Версии
+                    {% elif current == 'updates_page' %}
+                        Обновления
+                    {% elif current == 'maintenance_page' %}
+                        Обслуживание
+                    {% elif current == 'profile' %}
+                        Профиль
+                    {% else %}
+                        Project Zarya Enterprise
+                    {% endif %}
 
-        </div>
+                </div>
 
-        <div class="topbar-subtitle">
-            Пользователь: <strong>{{ request.user.username }}</strong>
-        </div>
-    </div>
+                <div class="topbar-subtitle">
+                    Пользователь: <strong>{{ request.user.username }}</strong>
+                </div>
+            </div>
 
-</header>
+        </header>
 
         <section class="page">
 
             {% if messages %}
+
                 <div class="messages">
+
                     {% for message in messages %}
+
                         <div class="alert alert-{{ message.tags|default:'info' }}">
                             {{ message }}
                         </div>
+
                     {% endfor %}
+
                 </div>
+
             {% endif %}
 
             {% block content %}
@@ -231,6 +267,7 @@
         </section>
 
         <footer class="app-footer">
+
             <div>
                 Project Zarya Enterprise
             </div>
@@ -238,6 +275,7 @@
             <div>
                 Версия {{ PROJECT_VERSION }}
             </div>
+
         </footer>
 
     </main>

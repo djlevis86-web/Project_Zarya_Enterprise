@@ -5,110 +5,113 @@
 <div class="page-header">
 
     <div>
-
         <h2 class="page-title">
             Резервные копии
         </h2>
 
         <p class="page-subtitle">
-            Управление резервными копиями базы данных
+            Управление резервными копиями базы данных Project Zarya
         </p>
-
     </div>
 
-</div>
-
-<div class="content-card">
-
-    <div class="upload-actions">
-
+    <div class="registry-actions">
         <a
             href="{% url 'create_backup' %}"
-            class="primary-btn"
+            class="btn btn-primary"
         >
             Создать новый бэкап
         </a>
 
+        <a
+            href="{% url 'system_dashboard' %}"
+            class="btn btn-secondary"
+        >
+            Назад в систему
+        </a>
     </div>
 
 </div>
 
-<div class="content-card">
+<div class="card system-inner-card">
+
+    <div class="section-title-row">
+        <div>
+            <h3>
+                Список резервных копий
+            </h3>
+
+            <span>
+                Файлы базы данных, доступные для скачивания или удаления
+            </span>
+        </div>
+    </div>
 
     {% if backups %}
 
-    <table class="zarya-table">
+        <div class="table-scroll">
+            <table class="registry-table system-backups-table">
 
-        <thead>
+                <thead>
+                    <tr>
+                        <th>
+                            Имя файла
+                        </th>
 
-            <tr>
+                        <th>
+                            Размер
+                        </th>
 
-                <th>
-                    Имя файла
-                </th>
+                        <th>
+                            Действия
+                        </th>
+                    </tr>
+                </thead>
 
-                <th width="120">
-                    Размер
-                </th>
+                <tbody>
+                    {% for backup in backups %}
 
-                <th width="220">
-                    Действия
-                </th>
+                        <tr>
+                            <td>
+                                <strong class="system-file-name">
+                                    {{ backup.name }}
+                                </strong>
+                            </td>
 
-            </tr>
+                            <td>
+                                {{ backup.size }} MB
+                            </td>
 
-        </thead>
+                            <td>
+                                <div class="table-actions">
+                                    <a
+                                        href="{% url 'download_backup' backup.name %}"
+                                        class="btn btn-sm btn-secondary"
+                                    >
+                                        Скачать
+                                    </a>
 
-        <tbody>
+                                    <a
+                                        href="{% url 'delete_backup' backup.name %}"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Удалить резервную копию?');"
+                                    >
+                                        Удалить
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
 
-            {% for backup in backups %}
+                    {% endfor %}
+                </tbody>
 
-            <tr>
-
-                <td>
-                    {{ backup.name }}
-                </td>
-
-                <td>
-                    {{ backup.size }} MB
-                </td>
-
-                <td>
-
-                    <div class="table-actions">
-
-                        <a
-                            href="{% url 'download_backup' backup.name %}"
-                            class="primary-btn"
-                        >
-                            Скачать
-                        </a>
-
-                        <a
-                            href="{% url 'delete_backup' backup.name %}"
-                            class="danger-btn"
-                            onclick="return confirm('Удалить резервную копию?');"
-                        >
-                            Удалить
-                        </a>
-
-                    </div>
-
-                </td>
-
-            </tr>
-
-            {% endfor %}
-
-        </tbody>
-
-    </table>
+            </table>
+        </div>
 
     {% else %}
 
-    <p>
-        Резервные копии отсутствуют.
-    </p>
+        <div class="empty-state">
+            Резервные копии отсутствуют.
+        </div>
 
     {% endif %}
 

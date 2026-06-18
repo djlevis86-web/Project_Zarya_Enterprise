@@ -3038,4 +3038,159 @@ select {
     }
 }
 
+/* =========================================================
+   ZARYA UI SYSTEM INNER PAGES PASS v1
+========================================================= */
+
+.system-inner-card {
+    padding: 24px;
+}
+
+.system-inner-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.system-backups-table {
+    min-width: 860px;
+}
+
+.system-backups-table th:nth-child(1),
+.system-backups-table td:nth-child(1) {
+    width: auto;
+}
+
+.system-backups-table th:nth-child(2),
+.system-backups-table td:nth-child(2) {
+    width: 140px;
+}
+
+.system-backups-table th:nth-child(3),
+.system-backups-table td:nth-child(3) {
+    width: 230px;
+}
+
+.system-versions-table {
+    min-width: 820px;
+}
+
+.system-versions-table th:nth-child(1),
+.system-versions-table td:nth-child(1) {
+    width: 120px;
+}
+
+.system-versions-table th:nth-child(2),
+.system-versions-table td:nth-child(2) {
+    width: 150px;
+}
+
+.system-file-name,
+.system-code {
+    color: var(--z-accent-2);
+    font-weight: 650;
+    overflow-wrap: anywhere;
+}
+
+.system-update-status {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px;
+    border-radius: 16px;
+    border: 1px solid var(--z-border);
+}
+
+.system-update-status strong {
+    font-size: 17px;
+    font-weight: 750;
+}
+
+.system-update-status span {
+    color: var(--z-muted);
+    line-height: 1.55;
+}
+
+.system-update-success {
+    background: rgba(34, 197, 94, .10);
+    border-color: rgba(34, 197, 94, .24);
+}
+
+.system-update-success strong {
+    color: #bbf7d0;
+}
+
+.system-update-warning {
+    background: rgba(245, 158, 11, .10);
+    border-color: rgba(245, 158, 11, .24);
+}
+
+.system-update-warning strong {
+    color: #fde68a;
+}
+
+.system-kv-grid-single {
+    grid-template-columns: 1fr;
+}
+
+.system-maintenance-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    align-items: stretch;
+}
+
+.system-maintenance-card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 24px;
+}
+
+.system-maintenance-icon {
+    width: 56px;
+    height: 56px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: rgba(39, 174, 96, .14);
+    border: 1px solid rgba(39, 174, 96, .24);
+    color: var(--z-accent-2);
+    font-weight: 800;
+}
+
+.system-maintenance-card h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 750;
+}
+
+.system-maintenance-card p {
+    margin: 0;
+    color: var(--z-muted);
+    line-height: 1.58;
+}
+
+.system-maintenance-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: auto;
+}
+
+@media (max-width: 1280px) {
+    .system-maintenance-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .system-inner-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .system-maintenance-actions .btn {
+        width: 100%;
+    }
+}
+
 

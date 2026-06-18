@@ -5,100 +5,117 @@
 <div class="page-header">
 
     <div>
-
         <h2 class="page-title">
             Версии системы
         </h2>
 
         <p class="page-subtitle">
-            Git и история изменений
+            Git, текущая версия и история последних изменений
         </p>
+    </div>
 
+    <div class="registry-actions">
+        <a
+            href="{% url 'system_dashboard' %}"
+            class="btn btn-secondary"
+        >
+            Назад в систему
+        </a>
     </div>
 
 </div>
 
-<div class="stats-grid">
+<div class="stats-grid system-inner-stats">
 
     <div class="stat-card">
-
         <div class="stat-label">
             Версия
         </div>
 
-        <div class="stat-value">
+        <div class="stat-value system-version-value">
             {{ version }}
         </div>
-
     </div>
 
     <div class="stat-card">
-
         <div class="stat-label">
             Ветка
         </div>
 
-        <div class="stat-value">
+        <div class="stat-value system-version-value">
             {{ git_branch }}
         </div>
-
     </div>
 
 </div>
 
-<div class="content-card">
+<div class="card system-inner-card">
 
-    <h3>
-        Последние коммиты
-    </h3>
+    <div class="section-title-row">
+        <div>
+            <h3>
+                Последние коммиты
+            </h3>
 
-    <table class="zarya-table">
+            <span>
+                Последние 10 изменений из локального Git-репозитория
+            </span>
+        </div>
+    </div>
 
-        <thead>
+    {% if commits %}
 
-            <tr>
+        <div class="table-scroll">
+            <table class="registry-table system-versions-table">
 
-                <th width="120">
-                    Хэш
-                </th>
+                <thead>
+                    <tr>
+                        <th>
+                            Хэш
+                        </th>
 
-                <th width="150">
-                    Дата
-                </th>
+                        <th>
+                            Дата
+                        </th>
 
-                <th>
-                    Сообщение
-                </th>
+                        <th>
+                            Сообщение
+                        </th>
+                    </tr>
+                </thead>
 
-            </tr>
+                <tbody>
+                    {% for commit in commits %}
 
-        </thead>
+                        <tr>
+                            <td>
+                                <strong class="system-code">
+                                    {{ commit.hash }}
+                                </strong>
+                            </td>
 
-        <tbody>
+                            <td>
+                                {{ commit.date }}
+                            </td>
 
-            {% for commit in commits %}
+                            <td>
+                                {{ commit.message }}
+                            </td>
+                        </tr>
 
-            <tr>
+                    {% endfor %}
+                </tbody>
 
-                <td>
-                    {{ commit.hash }}
-                </td>
+            </table>
+        </div>
 
-                <td>
-                    {{ commit.date }}
-                </td>
+    {% else %}
 
-                <td>
-                    {{ commit.message }}
-                </td>
+        <div class="empty-state">
+            История коммитов недоступна.
+        </div>
 
-            </tr>
-
-            {% endfor %}
-
-        </tbody>
-
-    </table>
+    {% endif %}
 
 </div>
 

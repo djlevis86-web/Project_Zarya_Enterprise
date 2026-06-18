@@ -5,102 +5,133 @@
 <div class="page-header">
 
     <div>
-
         <h2 class="page-title">
             Обновления системы
         </h2>
 
         <p class="page-subtitle">
-            Контроль версий Project Zarya
+            Проверка локальной версии Project Zarya и версии из GitHub
         </p>
+    </div>
 
+    <div class="registry-actions">
+        <a
+            href="{% url 'system_dashboard' %}"
+            class="btn btn-secondary"
+        >
+            Назад в систему
+        </a>
     </div>
 
 </div>
 
-<div class="stats-grid">
+<div class="stats-grid system-inner-stats">
 
     <div class="stat-card">
-
         <div class="stat-label">
             Локальная версия
         </div>
 
-        <div class="stat-value">
+        <div class="stat-value system-version-value">
             {{ local_version }}
         </div>
-
     </div>
 
     <div class="stat-card">
-
         <div class="stat-label">
             GitHub версия
         </div>
 
-        <div class="stat-value">
+        <div class="stat-value system-version-value">
             {{ github_version }}
         </div>
-
     </div>
 
 </div>
 
-<div class="content-card">
+<div class="system-page-grid">
 
-    <h3>
-        Статус обновления
-    </h3>
+    <div class="card system-inner-card">
 
-    {% if update_available %}
+        <div class="section-title-row">
+            <div>
+                <h3>
+                    Статус обновления
+                </h3>
 
-        <div class="alert">
-            Доступно обновление системы.
+                <span>
+                    Сравнение локальной и удалённой версии проекта
+                </span>
+            </div>
         </div>
 
-    {% else %}
+        {% if update_available %}
 
-        <div class="alert">
-            Установлена актуальная версия.
+            <div class="system-update-status system-update-warning">
+                <strong>
+                    Доступно обновление системы
+                </strong>
+
+                <span>
+                    Версия в GitHub отличается от локальной версии.
+                </span>
+            </div>
+
+        {% else %}
+
+            <div class="system-update-status system-update-success">
+                <strong>
+                    Установлена актуальная версия
+                </strong>
+
+                <span>
+                    Локальная версия совпадает с доступной версией.
+                </span>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+    <div class="card system-inner-card">
+
+        <div class="section-title-row">
+            <div>
+                <h3>
+                    Детали проверки
+                </h3>
+
+                <span>
+                    Текущие значения версий
+                </span>
+            </div>
         </div>
 
-    {% endif %}
+        <div class="system-kv-grid system-kv-grid-single">
 
-</div>
-
-<div class="content-card">
-
-    <table class="zarya-table">
-
-        <tbody>
-
-            <tr>
-
-                <td width="250">
+            <div class="system-kv-item">
+                <span>
                     Локальная версия
-                </td>
+                </span>
 
-                <td>
+                <strong>
                     {{ local_version }}
-                </td>
+                </strong>
+            </div>
 
-            </tr>
-
-            <tr>
-
-                <td>
+            <div class="system-kv-item">
+                <span>
                     GitHub версия
-                </td>
+                </span>
 
-                <td>
+                <strong>
                     {{ github_version }}
-                </td>
+                </strong>
+            </div>
 
-            </tr>
+        </div>
 
-        </tbody>
-
-    </table>
+    </div>
 
 </div>
 

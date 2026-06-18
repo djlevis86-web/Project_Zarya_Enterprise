@@ -5,52 +5,120 @@
 <div class="page-header">
 
     <div>
-
         <h2 class="page-title">
             Обслуживание системы
         </h2>
 
         <p class="page-subtitle">
-            Сервисные операции Project Zarya
+            Сервисные операции и быстрые действия администратора
         </p>
-
     </div>
 
-</div>
-
-<div class="content-card">
-
-    <h3>
-        Резервное копирование
-    </h3>
-
-    <div class="upload-actions">
-
-        <a
-            href="{% url 'create_backup' %}"
-            class="primary-btn"
-        >
-            Создать backup БД
-        </a>
-
-    </div>
-
-</div>
-
-<div class="content-card">
-
-    <h3>
-        Проверка системы
-    </h3>
-
-    <div class="upload-actions">
-
+    <div class="registry-actions">
         <a
             href="{% url 'system_dashboard' %}"
-            class="primary-btn"
+            class="btn btn-secondary"
         >
-            Проверить состояние
+            Назад в систему
         </a>
+    </div>
+
+</div>
+
+<div class="system-maintenance-grid">
+
+    <div class="card system-maintenance-card">
+
+        <div class="system-maintenance-icon">
+            БД
+        </div>
+
+        <div>
+            <h3>
+                Резервное копирование
+            </h3>
+
+            <p>
+                Создать свежую резервную копию базы данных перед обновлениями или техническими работами.
+            </p>
+        </div>
+
+        <div class="system-maintenance-actions">
+            <a
+                href="{% url 'create_backup' %}"
+                class="btn btn-primary"
+            >
+                Создать backup БД
+            </a>
+
+            <a
+                href="{% url 'backups_list' %}"
+                class="btn btn-secondary"
+            >
+                Открыть копии
+            </a>
+        </div>
+
+    </div>
+
+    <div class="card system-maintenance-card">
+
+        <div class="system-maintenance-icon">
+            ✓
+        </div>
+
+        <div>
+            <h3>
+                Проверка системы
+            </h3>
+
+            <p>
+                Перейти на системную панель, чтобы проверить версию, базу данных, OCR и Git-состояние проекта.
+            </p>
+        </div>
+
+        <div class="system-maintenance-actions">
+            <a
+                href="{% url 'system_dashboard' %}"
+                class="btn btn-primary"
+            >
+                Проверить состояние
+            </a>
+        </div>
+
+    </div>
+
+    <div class="card system-maintenance-card">
+
+        <div class="system-maintenance-icon">
+            Git
+        </div>
+
+        <div>
+            <h3>
+                Версии и обновления
+            </h3>
+
+            <p>
+                Посмотреть текущую ветку, историю коммитов и сведения о доступных обновлениях.
+            </p>
+        </div>
+
+        <div class="system-maintenance-actions">
+            <a
+                href="{% url 'versions_page' %}"
+                class="btn btn-secondary"
+            >
+                Версии
+            </a>
+
+            <a
+                href="{% url 'updates_page' %}"
+                class="btn btn-secondary"
+            >
+                Обновления
+            </a>
+        </div>
 
     </div>
 

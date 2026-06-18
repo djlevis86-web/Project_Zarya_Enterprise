@@ -186,6 +186,21 @@
 
 <div class="card">
 
+    <form
+        method="post"
+        action="{% url 'bulk_repeat_ocr' %}"
+        class="bulk-ocr-form"
+        onsubmit="return confirm('Повторить OCR для выбранных счетов?');"
+    >
+
+        {% csrf_token %}
+
+        <input
+            type="hidden"
+            name="next"
+            value="{{ request.get_full_path }}"
+        >
+
     <div class="registry-table-header">
 
         <div>
@@ -206,6 +221,13 @@
             <a href="{% url 'counterparties_missing_requisites' %}" class="btn btn-secondary">
                 Проверить реквизиты
             </a>
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Повторить OCR для выбранных
+            </button>
         </div>
 
     </div>
@@ -216,6 +238,15 @@
 
             <thead>
                 <tr>
+                    <th class="bulk-select-column">
+                        <input
+                            type="checkbox"
+                            class="bulk-select-all"
+                            data-target=".invoice-bulk-checkbox"
+                            aria-label="Выбрать все счета на странице"
+                        >
+                    </th>
+
                     <th>
                         ID
                     </th>
@@ -251,6 +282,16 @@
                 {% for invoice in page_obj %}
 
                     <tr>
+                        <td class="bulk-select-column">
+                            <input
+                                type="checkbox"
+                                name="invoice_ids"
+                                value="{{ invoice.id }}"
+                                class="invoice-bulk-checkbox"
+                                aria-label="Выбрать счет #{{ invoice.id }}"
+                            >
+                        </td>
+
                         <td>
                             <a href="{% url 'invoice_detail' invoice.id %}">
                                 #{{ invoice.id }}
@@ -367,7 +408,7 @@
                 {% empty %}
 
                     <tr>
-                        <td colspan="7" class="empty-table">
+                        <td colspan="8" class="empty-table">
                             Документы отсутствуют.
                         </td>
                     </tr>
@@ -379,6 +420,8 @@
         </table>
 
     </div>
+
+    </form>
 
 </div>
 

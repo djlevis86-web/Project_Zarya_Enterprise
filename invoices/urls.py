@@ -8,6 +8,7 @@ from .views import (
     upload_batch_detail,
     invoice_detail,
     repeat_ocr,
+    bulk_repeat_ocr,
     change_invoice_status,
     add_comment,
     edit_invoice,
@@ -34,6 +35,12 @@ urlpatterns = [
         '',
         invoice_list,
         name='invoice_list'
+    ),
+
+    path(
+        'bulk-repeat-ocr/',
+        bulk_repeat_ocr,
+        name='bulk_repeat_ocr'
     ),
 
     path(
@@ -142,7 +149,9 @@ urlpatterns = [
         '<int:invoice_id>/',
         invoice_detail,
         name='invoice_detail'
-    ),    path(
+    ),
+
+    path(
         '<int:invoice_id>/repeat-ocr/',
         repeat_ocr,
         name='repeat_ocr'

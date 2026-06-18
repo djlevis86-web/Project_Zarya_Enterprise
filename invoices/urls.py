@@ -7,6 +7,7 @@ from .views import (
     upload_batches,
     upload_batch_detail,
     invoice_detail,
+    repeat_ocr,
     change_invoice_status,
     add_comment,
     edit_invoice,
@@ -141,7 +142,12 @@ urlpatterns = [
         '<int:invoice_id>/',
         invoice_detail,
         name='invoice_detail'
+    ),    path(
+        '<int:invoice_id>/repeat-ocr/',
+        repeat_ocr,
+        name='repeat_ocr'
     ),
+
 
     path(
         '<int:invoice_id>/assign-counterparty/',

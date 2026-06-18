@@ -16,7 +16,11 @@
 
             <div class="form-group">
                 <label for="q">Поиск</label>
-                <input id="q" type="text" name="q" value="{{ filters.q }}" placeholder="Пользователь, объект, сообщение, IP">
+                <input id="q"
+                       type="text"
+                       name="q"
+                       value="{{ filters.q }}"
+                       placeholder="Пользователь, объект, сообщение, IP">
             </div>
 
             <div class="form-group">
@@ -24,7 +28,9 @@
                 <select id="action" name="action">
                     <option value="">Все действия</option>
                     {% for value, label in actions %}
-                        <option value="{{ value }}" {% if filters.action == value %}selected{% endif %}>{{ label }}</option>
+                        <option value="{{ value }}" {% if filters.action == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
                     {% endfor %}
                 </select>
             </div>
@@ -34,7 +40,9 @@
                 <select id="object_type" name="object_type">
                     <option value="">Все объекты</option>
                     {% for item in object_types %}
-                        <option value="{{ item }}" {% if filters.object_type == item %}selected{% endif %}>{{ item }}</option>
+                        <option value="{{ item }}" {% if filters.object_type == item %}selected{% endif %}>
+                            {{ item }}
+                        </option>
                     {% endfor %}
                 </select>
             </div>
@@ -60,6 +68,7 @@
     </section>
 
     <section class="audit-table-card">
+
         <div class="audit-table-wrap">
             <table class="audit-table">
                 <thead>
@@ -77,23 +86,37 @@
                     {% for item in page_obj %}
                         <tr>
                             <td>{{ item.created_at|date:"d.m.Y H:i:s" }}</td>
-                            <td>{% if item.user %}{{ item.user.username }}{% else %}system{% endif %}</td>
+
+                            <td>
+                                {% if item.user %}
+                                    {{ item.user.username }}
+                                {% else %}
+                                    system
+                                {% endif %}
+                            </td>
+
                             <td>{{ item.get_action_display }}</td>
+
                             <td>
                                 <strong>{{ item.object_type|default:"—" }}</strong>
+
                                 {% if item.object_id %}
                                     <span class="audit-muted">#{{ item.object_id }}</span>
                                 {% endif %}
+
                                 {% if item.object_repr %}
                                     <div class="audit-object-repr">{{ item.object_repr }}</div>
                                 {% endif %}
                             </td>
+
                             <td>{{ item.message|default:"—" }}</td>
                             <td>{{ item.ip_address|default:"—" }}</td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="6" class="audit-empty">Событий пока нет.</td>
+                            <td colspan="6" class="audit-empty">
+                                Событий пока нет.
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -103,16 +126,23 @@
         {% if page_obj.has_other_pages %}
             <div class="pagination">
                 {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Назад</a>
+                    <a href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">
+                        Назад
+                    </a>
                 {% endif %}
 
-                <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+                <span>
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+                </span>
 
                 {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Вперёд</a>
+                    <a href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">
+                        Вперёд
+                    </a>
                 {% endif %}
             </div>
         {% endif %}
+
     </section>
 
 </div>

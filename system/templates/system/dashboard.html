@@ -5,15 +5,13 @@
 <div class="page-header">
 
     <div>
-
         <h2 class="page-title">
             Система
         </h2>
 
         <p class="page-subtitle">
-            Мониторинг и обслуживание Project Zarya
+            Мониторинг, резервные копии и обслуживание Project Zarya
         </p>
-
     </div>
 
 </div>
@@ -21,19 +19,16 @@
 <div class="stats-grid">
 
     <div class="stat-card">
-
         <div class="stat-label">
             Версия проекта
         </div>
 
-        <div class="stat-value">
+        <div class="stat-value system-version-value">
             {{ version }}
         </div>
-
     </div>
 
     <div class="stat-card">
-
         <div class="stat-label">
             Размер БД
         </div>
@@ -41,11 +36,9 @@
         <div class="stat-value">
             {{ db_size }} MB
         </div>
-
     </div>
 
     <div class="stat-card">
-
         <div class="stat-label">
             Бэкапов
         </div>
@@ -53,288 +46,292 @@
         <div class="stat-value">
             {{ backup_count }}
         </div>
-
     </div>
 
     <div class="stat-card">
-
         <div class="stat-label">
             OCR
         </div>
 
-        <div class="stat-value">
+        <div class="stat-value text-success">
             ON
+        </div>
+    </div>
+
+</div>
+
+<div class="system-page-grid">
+
+    <div class="card system-status-card">
+
+        <div class="section-title-row">
+            <div>
+                <h3>
+                    Состояние системы
+                </h3>
+
+                <span>
+                    Ключевые параметры окружения и проекта
+                </span>
+            </div>
+        </div>
+
+        <div class="system-kv-grid">
+
+            <div class="system-kv-item">
+                <span>
+                    Версия
+                </span>
+
+                <strong>
+                    {{ version }}
+                </strong>
+            </div>
+
+            <div class="system-kv-item">
+                <span>
+                    База данных
+                </span>
+
+                <strong>
+                    SQLite
+                </strong>
+            </div>
+
+            <div class="system-kv-item">
+                <span>
+                    Размер базы
+                </span>
+
+                <strong>
+                    {{ db_size }} MB
+                </strong>
+            </div>
+
+            <div class="system-kv-item">
+                <span>
+                    Python
+                </span>
+
+                <strong>
+                    {{ python_version }}
+                </strong>
+            </div>
+
+            <div class="system-kv-item">
+                <span>
+                    Django
+                </span>
+
+                <strong>
+                    {{ django_version }}
+                </strong>
+            </div>
+
+            <div class="system-kv-item">
+                <span>
+                    Пользователей
+                </span>
+
+                <strong>
+                    {{ user_count }}
+                </strong>
+            </div>
+
+            <div class="system-kv-item">
+                <span>
+                    Счетов
+                </span>
+
+                <strong>
+                    {{ invoice_count }}
+                </strong>
+            </div>
+
+            <div class="system-kv-item">
+                <span>
+                    OCR
+                </span>
+
+                <strong class="text-success">
+                    Активен
+                </strong>
+            </div>
+
+            <div class="system-kv-item">
+                <span>
+                    Git ветка
+                </span>
+
+                <strong>
+                    {{ git_branch }}
+                </strong>
+            </div>
+
+            <div class="system-kv-item system-kv-wide">
+                <span>
+                    Последний коммит
+                </span>
+
+                <strong>
+                    {{ last_commit }}
+                </strong>
+            </div>
+
+            <div class="system-kv-item">
+                <span>
+                    Последний бэкап БД
+                </span>
+
+                <strong>
+                    {{ latest_db_backup }}
+                </strong>
+            </div>
+
+            <div class="system-kv-item">
+                <span>
+                    Количество бэкапов БД
+                </span>
+
+                <strong>
+                    {{ db_backup_count }}
+                </strong>
+            </div>
+
+            <div class="system-kv-item system-kv-wide">
+                <span>
+                    Последний общий бэкап
+                </span>
+
+                <strong>
+                    {{ latest_backup }}
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card system-actions-card">
+
+        <div class="section-title-row">
+            <div>
+                <h3>
+                    Обслуживание
+                </h3>
+
+                <span>
+                    Быстрые действия администратора
+                </span>
+            </div>
+        </div>
+
+        <div class="system-actions-grid">
+
+            <a
+                href="{% url 'create_backup' %}"
+                class="system-action-card"
+            >
+                <strong>
+                    Создать бэкап БД
+                </strong>
+
+                <span>
+                    Сохранить текущую базу данных
+                </span>
+            </a>
+
+            <a
+                href="{% url 'backups_list' %}"
+                class="system-action-card"
+            >
+                <strong>
+                    Резервные копии
+                </strong>
+
+                <span>
+                    Просмотр созданных архивов
+                </span>
+            </a>
+
+            <a
+                href="{% url 'versions_page' %}"
+                class="system-action-card"
+            >
+                <strong>
+                    Версии системы
+                </strong>
+
+                <span>
+                    История версий проекта
+                </span>
+            </a>
+
+            <a
+                href="{% url 'updates_page' %}"
+                class="system-action-card"
+            >
+                <strong>
+                    Обновления
+                </strong>
+
+                <span>
+                    Управление обновлениями
+                </span>
+            </a>
+
+            <a
+                href="{% url 'maintenance_page' %}"
+                class="system-action-card"
+            >
+                <strong>
+                    Обслуживание
+                </strong>
+
+                <span>
+                    Технические операции
+                </span>
+            </a>
+
         </div>
 
     </div>
 
 </div>
 
-<div class="content-card">
-
-    <h3>
-        Состояние системы
-    </h3>
-
-    <table class="zarya-table">
-
-        <tbody>
-
-            <tr>
-
-                <td width="250">
-                    Версия
-                </td>
-
-                <td>
-                    {{ version }}
-                </td>
-
-            </tr>
-
-            <tr>
-
-                <td>
-                    База данных
-                </td>
-
-                <td>
-                    SQLite
-                </td>
-
-            </tr>
-
-            <tr>
-
-                <td>
-                    Размер базы
-                </td>
-
-                <tr>
-
-    <td>
-        Python
-    </td>
-
-    <td>
-        {{ python_version }}
-    </td>
-
-</tr>
-
-<tr>
-
-    <td>
-        Django
-    </td>
-
-    <td>
-        {{ django_version }}
-    </td>
-
-</tr>
-
-<tr>
-
-    <td>
-        Пользователей
-    </td>
-
-    <td>
-        {{ user_count }}
-    </td>
-
-</tr>
-
-<tr>
-
-    <td>
-        Счетов
-    </td>
-
-    <td>
-        {{ invoice_count }}
-    </td>
-
-</tr>
-
-                <td>
-                    {{ db_size }} MB
-                </td>
-
-            </tr>
-
-            <tr>
-
-                <td>
-                    OCR
-                </td>
-
-                <td>
-                    Активен
-                </td>
-
-            </tr>
-
-            <tr>
-
-                <td>
-                    GitHub
-                </td>
-
-                <tr>
-
-    <td>
-        Git ветка
-    </td>
-
-    <td>
-        {{ git_branch }}
-    </td>
-
-</tr>
-
-<tr>
-
-    <td>
-        Последний коммит
-    </td>
-
-    <td>
-        {{ last_commit }}
-    </td>
-
-</tr>
-
-                <td>
-                    Подключен
-                </td>
-
-            </tr>
-
-            <tr>
-
-                <td>
-                    Последний бэкап
-                </td>
-
-<tr>
-
-    <td>
-        Последний бэкап БД
-    </td>
-
-    <td>
-        {{ latest_db_backup }}
-    </td>
-
-</tr>
-
-<tr>
-
-    <td>
-        Количество бэкапов БД
-    </td>
-
-    <td>
-        {{ db_backup_count }}
-    </td>
-
-</tr>
-
-                <td>
-                    {{ latest_backup }}
-                </td>
-
-            </tr>
-
-        </tbody>
-
-    </table>
-
-</div>
-
-<div class="content-card">
-
-    <h3>
-        Обслуживание
-    </h3>
-
-    <div class="upload-actions">
-
-    <a
-        href="{% url 'create_backup' %}"
-        class="primary-btn"
-    >
-        Создать бэкап БД
-    </a>
-
-    <a
-        href="{% url 'backups_list' %}"
-        class="primary-btn"
-    >
-        Резервные копии
-    </a>
-
-    <a
-    href="{% url 'versions_page' %}"
-    class="primary-btn"
->
-    Версии системы
-    </a>
-
-    <a
-    href="{% url 'updates_page' %}"
-    class="primary-btn"
->
-    Обновления
-</a>
-
-<a
-    href="{% url 'maintenance_page' %}"
-    class="primary-btn"
->
-    Обслуживание
-</a>
-
-
-</div>
-
-</div>
-
-<div class="content-card">
-
-    <h3>
-        Последние изменения версии {{ version }}
-    </h3>
+<div class="card system-changelog-card">
+
+    <div class="section-title-row">
+        <div>
+            <h3>
+                Последние изменения версии {{ version }}
+            </h3>
+
+            <span>
+                Краткий список изменений текущей версии
+            </span>
+        </div>
+    </div>
 
     {% if changelog_items %}
 
-    <table class="zarya-table">
-
-        <tbody>
+        <div class="system-changelog-list">
 
             {% for item in changelog_items %}
 
-            <tr>
-
-                <td>
+                <div class="system-changelog-item">
                     {{ item }}
-                </td>
-
-            </tr>
+                </div>
 
             {% endfor %}
 
-        </tbody>
-
-    </table>
+        </div>
 
     {% else %}
 
-    <p>
-        Информация о версии отсутствует
-    </p>
+        <div class="empty-state">
+            Информация о версии отсутствует.
+        </div>
 
     {% endif %}
 

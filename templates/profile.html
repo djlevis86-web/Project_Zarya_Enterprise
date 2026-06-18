@@ -2,52 +2,146 @@
 
 {% block content %}
 
-<div class="content-card" style="padding:24px;margin-bottom:20px;">
-
-    <h3>Текущий пользователь</h3>
-
-    <p><strong>Логин:</strong> {{ user.username }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Роль:</strong> {{ user.role }}</p>
-
-</div>
-
 <div class="page-header">
 
     <div>
-
         <h2 class="page-title">
             Профиль пользователя
         </h2>
 
         <p class="page-subtitle">
-            Управление личными настройками
+            Личные данные, роль и настройки интерфейса
         </p>
-
     </div>
 
 </div>
 
-<div class="upload-wrapper">
+<div class="profile-page-grid">
 
-    <div class="upload-card">
+    <div class="card profile-summary-card">
 
-        <form method="post">
+        <div class="section-title-row">
+            <div>
+                <h3>
+                    Текущий пользователь
+                </h3>
+
+                <span>
+                    Основная информация аккаунта
+                </span>
+            </div>
+        </div>
+
+        <div class="profile-avatar-block">
+
+            <div class="profile-avatar">
+                {{ user.username|first|upper }}
+            </div>
+
+            <div>
+                <div class="profile-name">
+                    {{ user.username }}
+                </div>
+
+                <div class="profile-role">
+                    {% if user.role %}
+                        {{ user.role }}
+                    {% elif user.is_staff %}
+                        Администратор
+                    {% else %}
+                        Пользователь
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="info-list profile-info-list">
+
+            <div class="info-row">
+                <span>
+                    Логин
+                </span>
+
+                <strong>
+                    {{ user.username }}
+                </strong>
+            </div>
+
+            <div class="info-row">
+                <span>
+                    Email
+                </span>
+
+                <strong>
+                    {{ user.email|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="info-row">
+                <span>
+                    Доступ
+                </span>
+
+                <strong>
+                    {% if user.is_staff %}
+                        Администратор
+                    {% else %}
+                        Пользователь
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="info-row">
+                <span>
+                    Статус
+                </span>
+
+                {% if user.is_active %}
+                    <span class="status-badge status-approved">
+                        Активен
+                    </span>
+                {% else %}
+                    <span class="status-badge status-rejected">
+                        Отключен
+                    </span>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card profile-form-card">
+
+        <div class="section-title-row">
+            <div>
+                <h3>
+                    Личная информация
+                </h3>
+
+                <span>
+                    Изменение доступных параметров профиля
+                </span>
+            </div>
+        </div>
+
+        <form method="post" class="profile-form">
 
             {% csrf_token %}
 
-            <h3>
-                Личная информация
-            </h3>
+            <div class="profile-form-fields">
+                {{ form.as_p }}
+            </div>
 
-            {{ form.as_p }}
-
-            <button
-                type="submit"
-                class="primary-btn"
-            >
-                Сохранить настройки
-            </button>
+            <div class="profile-actions">
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Сохранить настройки
+                </button>
+            </div>
 
         </form>
 

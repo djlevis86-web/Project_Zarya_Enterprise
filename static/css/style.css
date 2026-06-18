@@ -2499,3 +2499,317 @@ textarea {
     }
 }
 
+
+/* =========================================================
+   ZARYA UI POLISH PASS v2
+   Font weight, table columns, profile/system readability
+========================================================= */
+
+:root {
+    --z-font: "Segoe UI", Arial, sans-serif;
+    --z-text: #f2f6f3;
+    --z-muted: #b8c4bd;
+    --z-muted-2: #98a79f;
+}
+
+/* Global typography softening */
+
+body {
+    font-family: var(--z-font);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+.page-title,
+.page-header h1,
+.page-header h2,
+.dashboard-hero h2,
+.counterparty-profile-main h3 {
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    text-shadow: none;
+}
+
+.section-title-row h3,
+.registry-table-header h3,
+.card h3,
+.content-card h3 {
+    font-weight: 750;
+}
+
+strong,
+.sidebar-nav a,
+.nav-link,
+.nav-item,
+.btn,
+.status-badge,
+.form-group label,
+label {
+    font-weight: 650;
+}
+
+.stat-value,
+.registry-summary-card strong,
+.hero-metric strong {
+    font-weight: 760;
+    text-shadow: none;
+}
+
+.brand-title,
+.sidebar-title,
+.sidebar-logo {
+    font-weight: 750;
+}
+
+/* Sidebar readability */
+
+.sidebar-nav a,
+.nav-link,
+.nav-item {
+    font-size: 14px;
+    letter-spacing: 0;
+}
+
+.sidebar-section-title,
+.nav-group-title {
+    color: #a8b4ae;
+    font-weight: 650;
+}
+
+/* Buttons: remove excessive boldness */
+
+.btn,
+button,
+input[type="submit"],
+input[type="button"] {
+    font-weight: 650;
+    letter-spacing: 0;
+}
+
+button:not(.btn),
+input[type="submit"],
+input[type="button"] {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border: 1px solid var(--z-border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .045);
+    color: var(--z-text);
+    cursor: pointer;
+}
+
+button:not(.btn):hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+    background: rgba(255, 255, 255, .075);
+    color: #ffffff;
+}
+
+/* Form readability */
+
+.form-control,
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+    font-size: 14px;
+    font-weight: 400;
+    color: #f4f7f5;
+}
+
+.form-group label,
+label {
+    color: #dce6e0;
+}
+
+/* Tables: readable and not too heavy */
+
+.registry-table th {
+    color: #c8d4ce;
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: .025em;
+}
+
+.registry-table td {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.registry-table td strong {
+    font-weight: 650;
+}
+
+/* Fix invoice table after checkbox column was added */
+
+.invoice-table-compact {
+    table-layout: fixed;
+}
+
+.invoice-table-compact th:nth-child(1),
+.invoice-table-compact td:nth-child(1) {
+    width: 44px;
+}
+
+.invoice-table-compact th:nth-child(2),
+.invoice-table-compact td:nth-child(2) {
+    width: 72px;
+}
+
+.invoice-table-compact th:nth-child(3),
+.invoice-table-compact td:nth-child(3) {
+    width: 28%;
+}
+
+.invoice-table-compact th:nth-child(4),
+.invoice-table-compact td:nth-child(4) {
+    width: 26%;
+}
+
+.invoice-table-compact th:nth-child(5),
+.invoice-table-compact td:nth-child(5) {
+    width: 110px;
+}
+
+.invoice-table-compact th:nth-child(6),
+.invoice-table-compact td:nth-child(6) {
+    width: 160px;
+}
+
+.invoice-table-compact th:nth-child(7),
+.invoice-table-compact td:nth-child(7) {
+    width: 125px;
+}
+
+.invoice-table-compact th:nth-child(8),
+.invoice-table-compact td:nth-child(8) {
+    width: 100px;
+}
+
+.invoice-table-compact td:nth-child(4),
+.invoice-table-compact td:nth-child(5) {
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.invoice-table-compact .btn-sm {
+    min-width: 74px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* Muted text should be readable, not dim */
+
+.muted,
+.page-subtitle,
+.page-header p,
+.topbar-subtitle,
+.registry-table-header span,
+.section-title-row span,
+.card p {
+    color: var(--z-muted);
+}
+
+/* Profile / System pages: make raw content look closer to app style */
+
+.page-content > form,
+.content-area > form,
+.main-content > form {
+    max-width: 100%;
+}
+
+.profile-card,
+.system-card,
+.card {
+    color: var(--z-text);
+}
+
+.card p,
+.content-card p {
+    line-height: 1.62;
+}
+
+.card ul,
+.content-card ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.card li,
+.content-card li {
+    margin: 6px 0;
+    color: var(--z-muted);
+}
+
+/* System page raw key/value blocks */
+
+.system-info,
+.system-status,
+.profile-info {
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.system-info strong,
+.system-status strong,
+.profile-info strong {
+    font-weight: 650;
+}
+
+/* Inputs on profile page should not look too heavy */
+
+select.form-control,
+select {
+    font-weight: 400;
+}
+
+/* OCR queue command blocks */
+
+.ocr-worker-help-card strong,
+.ocr-queue-command strong {
+    font-weight: 650;
+}
+
+.ocr-worker-help-card pre,
+.ocr-queue-command pre {
+    font-size: 13px;
+    font-weight: 650;
+}
+
+/* Reduce oversized white visual weight */
+
+.text-success,
+.amount-main,
+.strong-link,
+.file-link,
+.invoice-id-link,
+.table a:not(.btn) {
+    font-weight: 650;
+}
+
+/* Better compact cards */
+
+.quick-action-card,
+.process-item,
+.upload-step,
+.info-row,
+.comment-item,
+.timeline-item {
+    background: rgba(255, 255, 255, .018);
+}
+
+/* Mobile/tablet keeps horizontal scroll instead of broken columns */
+
+@media (max-width: 1280px) {
+    .invoice-table-compact {
+        min-width: 1120px !important;
+    }
+}
+

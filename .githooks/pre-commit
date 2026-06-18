@@ -1,0 +1,22 @@
+#!/bin/sh
+
+echo ""
+echo "Running Project Zarya preflight check..."
+echo ""
+
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/preflight_check.ps1
+
+RESULT=$?
+
+if [ $RESULT -ne 0 ]; then
+    echo ""
+    echo "Commit blocked: preflight check failed."
+    echo ""
+    exit $RESULT
+fi
+
+echo ""
+echo "Preflight passed."
+echo ""
+
+exit 0

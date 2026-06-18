@@ -379,11 +379,6 @@ strong {
     padding: 24px;
 }
 
-<<<<<<< HEAD
-.hover\:bg-blue-700:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(29 78 216 / var(--tw-bg-opacity));
-=======
 .card:hover,
 .content-card:hover,
 .stat-card:hover {
@@ -412,7 +407,6 @@ strong {
 
 .text-info {
     color: #bfdbfe !important;
->>>>>>> 88bd7a0 (Add upload batches and backup scripts)
 }
 
 .amount-main {

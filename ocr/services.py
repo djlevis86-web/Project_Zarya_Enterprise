@@ -1082,7 +1082,6 @@ def parse_invoice_data(text):
             'kpp': None,
         }
 
-<<<<<<< HEAD
     amount = None
     invoice_number = None
     invoice_date = None
@@ -1365,7 +1364,6 @@ def parse_invoice_data(text):
     print("DATE:", invoice_date)
     print("AMOUNT:", amount)
     print("---------------")
-=======
     invoice_number = parse_invoice_number(
         text
     )
@@ -1398,7 +1396,6 @@ def parse_invoice_data(text):
     print('INN:', inn)
     print('KPP:', kpp)
     print('---------------')
->>>>>>> 88bd7a0 (Add upload batches and backup scripts)
 
     return {
         'amount': amount,

@@ -52,6 +52,37 @@
         </form>
 
 
+
+        <form
+            method="post"
+            action="{% url 'enqueue_ocr_jobs' %}"
+            class="registry-action-form"
+            onsubmit="return confirm('Поставить OCR этого счета в очередь?');"
+        >
+
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="invoice_id"
+                value="{{ invoice.id }}"
+            >
+
+            <input
+                type="hidden"
+                name="next"
+                value="{{ request.get_full_path }}"
+            >
+
+            <button
+                type="submit"
+                class="btn btn-secondary"
+            >
+                OCR в очередь
+            </button>
+
+        </form>
+
         <a
             href="{% url 'invoice_list' %}"
             class="btn btn-secondary"

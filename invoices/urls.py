@@ -9,6 +9,8 @@ from .views import (
     invoice_detail,
     repeat_ocr,
     bulk_repeat_ocr,
+    enqueue_ocr_jobs,
+    ocr_queue,
     change_invoice_status,
     add_comment,
     edit_invoice,
@@ -35,6 +37,18 @@ urlpatterns = [
         '',
         invoice_list,
         name='invoice_list'
+    ),
+
+    path(
+        'ocr-queue/',
+        ocr_queue,
+        name='ocr_queue'
+    ),
+
+    path(
+        'ocr-queue/enqueue/',
+        enqueue_ocr_jobs,
+        name='enqueue_ocr_jobs'
     ),
 
     path(

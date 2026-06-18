@@ -21,6 +21,9 @@ from django.shortcuts import (
 from invoices.models import Invoice
 from users.models import User
 
+from audit.models import AuditLog
+from audit.services import log_action
+
 from .github_service import get_github_version
 from .services import create_database_backup
 
@@ -370,11 +373,36 @@ def create_backup(request):
             f"Создана резервная копия: {filename}"
         )
 
+        log_action(
+            request=request,
+            action=AuditLog.ACTION_BACKUP,
+            object_type="Backup",
+            object_id=filename,
+            object_repr=filename,
+            message="Создана резервная копия базы данных.",
+            metadata={
+                "event": "backup_created",
+                "filename": filename,
+            },
+        )
+
     except Exception as error:
 
         messages.error(
             request,
             f"Ошибка создания резервной копии: {error}"
+        )
+
+        log_action(
+            request=request,
+            action=AuditLog.ACTION_BACKUP,
+            object_type="Backup",
+            object_repr="Создание бэкапа",
+            message=f"Ошибка создания резервной копии: {error}",
+            metadata={
+                "event": "backup_create_failed",
+                "error": str(error),
+            },
         )
 
     return redirect(
@@ -396,6 +424,20 @@ def download_backup(request, filename):
         raise Http404(
             "Файл не найден"
         )
+
+    log_action(
+        request=request,
+        action=AuditLog.ACTION_BACKUP,
+        object_type="Backup",
+        object_id=filename,
+        object_repr=filename,
+        message="Скачана резервная копия базы данных.",
+        metadata={
+            "event": "backup_downloaded",
+            "filename": filename,
+            "size_bytes": backup_file.stat().st_size,
+        },
+    )
 
     return FileResponse(
         open(
@@ -420,6 +462,8 @@ def delete_backup(request, filename):
 
         if backup_file.exists():
 
+            size_bytes = backup_file.stat().st_size
+
             backup_file.unlink()
 
             messages.success(
@@ -427,11 +471,39 @@ def delete_backup(request, filename):
                 f"Удалён бэкап: {filename}"
             )
 
+            log_action(
+                request=request,
+                action=AuditLog.ACTION_BACKUP,
+                object_type="Backup",
+                object_id=filename,
+                object_repr=filename,
+                message="Удалена резервная копия базы данных.",
+                metadata={
+                    "event": "backup_deleted",
+                    "filename": filename,
+                    "size_bytes": size_bytes,
+                },
+            )
+
     except Exception as error:
 
         messages.error(
             request,
             f"Ошибка удаления: {error}"
+        )
+
+        log_action(
+            request=request,
+            action=AuditLog.ACTION_BACKUP,
+            object_type="Backup",
+            object_id=filename,
+            object_repr=filename,
+            message=f"Ошибка удаления резервной копии: {error}",
+            metadata={
+                "event": "backup_delete_failed",
+                "filename": filename,
+                "error": str(error),
+            },
         )
 
     return redirect(

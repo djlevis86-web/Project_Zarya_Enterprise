@@ -50,6 +50,9 @@ from ocr.services import (
     parse_invoice_data,
 )
 
+from audit.models import AuditLog
+from audit.services import log_action
+
 
 def calculate_uploaded_file_hash(uploaded_file):
 
@@ -431,6 +434,17 @@ def upload_invoice(request):
                 invoice,
                 request.user,
                 'Счет загружен'
+            )
+
+            log_action(
+                request=request,
+                action=AuditLog.ACTION_UPLOAD,
+                obj=invoice,
+                message='Счет загружен.',
+                metadata={
+                    'filename': uploaded_file.name,
+                    'batch_id': batch.id,
+                },
             )
 
             try:
@@ -1010,6 +1024,16 @@ def repeat_ocr(request, invoice_id):
             'OCR повторно выполнен'
         )
 
+        log_action(
+            request=request,
+            action=AuditLog.ACTION_OCR,
+            obj=invoice,
+            message='OCR повторно выполнен вручную.',
+            metadata={
+                'mode': 'single',
+            },
+        )
+
         messages.success(
             request,
             'OCR успешно обновлен.'
@@ -1030,6 +1054,17 @@ def repeat_ocr(request, invoice_id):
             invoice,
             request.user,
             f'OCR повторная ошибка: {error}'
+        )
+
+        log_action(
+            request=request,
+            action=AuditLog.ACTION_OCR,
+            obj=invoice,
+            message=f'OCR повторно не выполнен: {error}',
+            metadata={
+                'mode': 'single',
+                'error': str(error),
+            },
         )
 
         messages.error(
@@ -1369,6 +1404,23 @@ def bulk_repeat_ocr(request):
                 f'#{invoice.id}: {message}'
             )
 
+    log_action(
+        request=request,
+        action=AuditLog.ACTION_OCR,
+        object_type='Invoice',
+        object_repr='Массовый OCR',
+        message='Массовый OCR выбранных счетов выполнен.',
+        metadata={
+            'mode': 'bulk',
+            'requested_count': requested_count,
+            'allowed_count': allowed_count,
+            'success_count': success_count,
+            'error_count': len(error_items),
+            'warning_count': len(warning_items),
+            'requested_invoice_ids': invoice_ids,
+        },
+    )
+
     if success_count:
 
         messages.success(
@@ -1665,6 +1717,10 @@ def change_invoice_status(request, invoice_id, status):
             invoice_id=invoice.id
         )
 
+    old_status = invoice.status
+    old_status_label = dict(Invoice.STATUS_CHOICES).get(old_status, old_status)
+    new_status_label = dict(Invoice.STATUS_CHOICES).get(status, status)
+
     invoice.status = status
 
     invoice.save()
@@ -1673,6 +1729,20 @@ def change_invoice_status(request, invoice_id, status):
         invoice,
         request.user,
         f'Статус изменен на "{invoice.get_status_display()}"'
+    )
+
+    log_action(
+        request=request,
+        action=AuditLog.ACTION_UPDATE,
+        obj=invoice,
+        message=f'Статус счета изменен: {old_status_label} -> {new_status_label}.',
+        metadata={
+            'field': 'status',
+            'old_status': old_status,
+            'new_status': status,
+            'old_status_label': old_status_label,
+            'new_status_label': new_status_label,
+        },
     )
 
     messages.success(

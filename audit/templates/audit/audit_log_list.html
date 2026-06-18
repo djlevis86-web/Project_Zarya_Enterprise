@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="audit-page">
+
+    <div class="page-header">
+        <div>
+            <h1>Журнал действий</h1>
+            <p>История входов, загрузок, OCR-операций и изменений в системе.</p>
+        </div>
+    </div>
+
+    <section class="audit-filter-card">
+        <form method="get" class="audit-filter-form">
+
+            <div class="form-group">
+                <label for="q">Поиск</label>
+                <input id="q"
+                       type="text"
+                       name="q"
+                       value="{{ filters.q }}"
+                       placeholder="Пользователь, объект, сообщение, IP">
+            </div>
+
+            <div class="form-group">
+                <label for="action">Действие</label>
+                <select id="action" name="action">
+                    <option value="">Все действия</option>
+                    {% for value, label in actions %}
+                        <option value="{{ value }}" {% if filters.action == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="object_type">Тип объекта</label>
+                <select id="object_type" name="object_type">
+                    <option value="">Все объекты</option>
+                    {% for item in object_types %}
+                        <option value="{{ item }}" {% if filters.object_type == item %}selected{% endif %}>
+                            {{ item }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="user">Пользователь</label>
+                <select id="user" name="user">
+                    <option value="">Все пользователи</option>
+                    {% for item in users %}
+                        <option value="{{ item.id }}" {% if filters.user == item.id|stringformat:"s" %}selected{% endif %}>
+                            {{ item.username }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="audit-filter-actions">
+                <button type="submit" class="btn btn-primary">Применить</button>
+                <a href="{% url 'audit:audit_log_list' %}" class="btn btn-secondary">Сбросить</a>
+            </div>
+
+        </form>
+    </section>
+
+    <section class="audit-table-card">
+
+        <div class="audit-table-wrap">
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Пользователь</th>
+                        <th>Действие</th>
+                        <th>Объект</th>
+                        <th>Описание</th>
+                        <th>IP</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in page_obj %}
+                        <tr>
+                            <td>{{ item.created_at|date:"d.m.Y H:i:s" }}</td>
+
+                            <td>
+                                {% if item.user %}
+                                    {{ item.user.username }}
+                                {% else %}
+                                    system
+                                {% endif %}
+                            </td>
+
+                            <td>{{ item.get_action_display }}</td>
+
+                            <td>
+                                <strong>{{ item.object_type|default:"—" }}</strong>
+
+                                {% if item.object_id %}
+                                    <span class="audit-muted">#{{ item.object_id }}</span>
+                                {% endif %}
+
+                                {% if item.object_repr %}
+                                    <div class="audit-object-repr">{{ item.object_repr }}</div>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ item.message|default:"—" }}</td>
+                            <td>{{ item.ip_address|default:"—" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="audit-empty">
+                                Событий пока нет.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">
+                        Назад
+                    </a>
+                {% endif %}
+
+                <span>
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">
+                        Вперёд
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    </section>
+
+</div>
+
+{% endblock %}

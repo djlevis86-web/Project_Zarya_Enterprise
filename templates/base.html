@@ -153,6 +153,12 @@
                             <span>Система</span>
                         </a>
 
+{% if user.is_staff %}
+                <a href="{% url 'audit:audit_log_list' %}">
+                    Журнал действий
+                </a>
+                {% endif %}
+
                         <a href="/admin/" class="nav-link">
                             <span class="nav-icon">▣</span>
                             <span>Администрирование</span>

@@ -162,3 +162,11 @@ git add docs/OPERATIONS.md
 git commit -m "Add operations runbook"
 
 git push origin feature-operations-docs:feature-operations-docs
+
+# Project Zarya Enterprise — восстановление на новом ПК
+
+## 1. Клонировать проект
+
+```powershell
+git clone https://github.com/djlevis86-web/Project_Zarya_Enterprise.git D:\Project_Zarya
+cd D:\Project_Zarya

@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h2 class="page-title">
+            График платежей
+        </h2>
+
+        <p class="page-subtitle">
+            Планирование оплат по датам, приоритетам и контрагентам
+        </p>
+    </div>
+
+    <div class="registry-actions">
+        <a href="{% url 'payment_registry' %}" class="btn btn-primary">
+            Реестр оплаты
+        </a>
+
+        <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+            Все счета
+        </a>
+    </div>
+
+</div>
+
+<div class="registry-summary">
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Всего к планированию
+        </span>
+
+        <strong>
+            {{ total_count }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            К оплате сегодня
+        </span>
+
+        <strong>
+            {{ today_count }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Просрочено
+        </span>
+
+        <strong class="summary-danger">
+            {{ overdue_count }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Без даты оплаты
+        </span>
+
+        <strong class="summary-warning">
+            {{ no_date_count }}
+        </strong>
+    </div>
+
+</div>
+
+<div class="card schedule-filter-card">
+
+    <div class="schedule-tabs">
+
+        <a
+            href="{% url 'payment_schedule' %}?filter=all"
+            class="schedule-tab {% if filter_type == 'all' %}is-active{% endif %}"
+        >
+            Все
+        </a>
+
+        <a
+            href="{% url 'payment_schedule' %}?filter=today"
+            class="schedule-tab {% if filter_type == 'today' %}is-active{% endif %}"
+        >
+            К оплате сегодня
+        </a>
+
+        <a
+            href="{% url 'payment_schedule' %}?filter=overdue"
+            class="schedule-tab {% if filter_type == 'overdue' %}is-active{% endif %}"
+        >
+            Просроченные
+        </a>
+
+        <a
+            href="{% url 'payment_schedule' %}?filter=no_date"
+            class="schedule-tab {% if filter_type == 'no_date' %}is-active{% endif %}"
+        >
+            Без даты оплаты
+        </a>
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="registry-table-header">
+
+        <div>
+            <h3>
+                Платежи
+            </h3>
+
+            <span>
+                Сегодня: {{ today|date:"d.m.Y" }}
+            </span>
+        </div>
+
+        <div class="registry-actions">
+            <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
+                Перейти в реестр
+            </a>
+        </div>
+
+    </div>
+
+    <div class="table-scroll table-scroll-fit">
+
+        <table class="table registry-table schedule-table">
+
+            <thead>
+                <tr>
+                    <th>
+                        ID
+                    </th>
+
+                    <th>
+                        Контрагент
+                    </th>
+
+                    <th>
+                        Счет
+                    </th>
+
+                    <th>
+                        Сумма
+                    </th>
+
+                    <th>
+                        План оплаты
+                    </th>
+
+                    <th>
+                        Приоритет
+                    </th>
+
+                    <th>
+                        Статус
+                    </th>
+
+                    <th>
+                        Действия
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for invoice in invoices %}
+
+                    <tr
+                        {% if invoice.planned_payment_date and invoice.planned_payment_date < today %}
+                            class="schedule-row-overdue"
+                        {% elif invoice.planned_payment_date == today %}
+                            class="schedule-row-today"
+                        {% endif %}
+                    >
+                        <td>
+                            <a href="{% url 'invoice_detail' invoice.id %}">
+                                #{{ invoice.id }}
+                            </a>
+                        </td>
+
+                        <td>
+                            {% if invoice.counterparty %}
+                                <strong>
+                                    {{ invoice.counterparty.name }}
+                                </strong>
+
+                                {% if invoice.counterparty.inn %}
+                                    <div class="muted">
+                                        ИНН {{ invoice.counterparty.inn }}
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                {% if invoice.vendor %}
+                                    <div>
+                                        {{ invoice.vendor }}
+                                    </div>
+                                {% endif %}
+
+                                <span class="status-badge status-rejected">
+                                    Не найден в 1С
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if invoice.invoice_number %}
+                                № {{ invoice.invoice_number }}
+                            {% else %}
+                                —
+                            {% endif %}
+
+                            {% if invoice.invoice_date %}
+                                <div class="muted">
+                                    от {{ invoice.invoice_date }}
+                                </div>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <strong class="amount-main">
+                                {{ invoice.amount|floatformat:2 }} ₽
+                            </strong>
+                        </td>
+
+                        <td>
+                            {% if invoice.planned_payment_date %}
+                                <strong>
+                                    {{ invoice.planned_payment_date|date:"d.m.Y" }}
+                                </strong>
+
+                                {% if invoice.planned_payment_date < today %}
+                                    <div>
+                                        <span class="status-badge status-rejected">
+                                            Просрочено
+                                        </span>
+                                    </div>
+                                {% elif invoice.planned_payment_date == today %}
+                                    <div>
+                                        <span class="status-badge status-review">
+                                            Сегодня
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <span class="status-badge status-review">
+                                    Не указана
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="priority-badge priority-{{ invoice.payment_priority }}">
+                                {{ invoice.payment_priority }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="status-badge status-{{ invoice.status }}">
+                                {{ invoice.get_status_display }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="table-actions table-actions-vertical">
+                                <a
+                                    href="{% url 'invoice_detail' invoice.id %}"
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    Открыть
+                                </a>
+
+                                {% if user.is_staff %}
+                                    <a
+                                        href="{% url 'edit_invoice' invoice.id %}"
+                                        class="btn btn-secondary btn-sm"
+                                    >
+                                        Изменить
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="8" class="empty-table">
+                            Для выбранного фильтра платежей нет.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

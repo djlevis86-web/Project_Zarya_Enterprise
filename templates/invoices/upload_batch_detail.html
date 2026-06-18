@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h2 class="page-title">
+            Пакет загрузки #{{ batch.id }}
+        </h2>
+
+        <p class="page-subtitle">
+            {{ batch.created_at|date:"d.m.Y H:i" }} · Пользователь: {{ batch.user.username }}
+        </p>
+    </div>
+
+    <div class="registry-actions">
+        <a href="{% url 'upload_batches' %}" class="btn btn-secondary">
+            Журнал загрузок
+        </a>
+
+        <a href="{% url 'upload_invoice' %}" class="btn btn-primary">
+            Загрузить ещё
+        </a>
+    </div>
+
+</div>
+
+<div class="registry-summary upload-batch-summary">
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Всего файлов
+        </span>
+
+        <strong>
+            {{ batch.total_files }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Новых счетов
+        </span>
+
+        <strong class="text-success">
+            {{ batch.uploaded_count }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Дубликатов
+        </span>
+
+        <strong class="{% if batch.duplicate_count %}summary-warning{% endif %}">
+            {{ batch.duplicate_count }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Пропущено
+        </span>
+
+        <strong class="{% if batch.skipped_count %}summary-warning{% endif %}">
+            {{ batch.skipped_count }}
+        </strong>
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="registry-table-header">
+
+        <div>
+            <h3>
+                Новые счета из пакета
+            </h3>
+
+            <span>
+                Документы, которые были созданы при этой загрузке
+            </span>
+        </div>
+
+    </div>
+
+    <div class="table-scroll table-scroll-fit">
+
+        <table class="table registry-table upload-batch-invoices-table">
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Документ</th>
+                    <th>Контрагент</th>
+                    <th>Сумма</th>
+                    <th>Статус</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for invoice in invoices %}
+
+                    <tr>
+                        <td>
+                            #{{ invoice.id }}
+                        </td>
+
+                        <td>
+                            <strong>
+                                {{ invoice.title }}
+                            </strong>
+
+                            {% if invoice.original_filename %}
+                                <div class="muted">
+                                    {{ invoice.original_filename }}
+                                </div>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if invoice.counterparty %}
+                                {{ invoice.counterparty.name }}
+                            {% elif invoice.vendor %}
+                                <div>
+                                    {{ invoice.vendor }}
+                                </div>
+
+                                <span class="status-badge status-rejected">
+                                    Не найден в 1С
+                                </span>
+                            {% else %}
+                                <span class="muted">
+                                    —
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <strong class="amount-main">
+                                {{ invoice.amount|floatformat:2 }} ₽
+                            </strong>
+                        </td>
+
+                        <td>
+                            <span class="status-badge status-{{ invoice.status }}">
+                                {{ invoice.get_status_display }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <a
+                                href="{% url 'invoice_detail' invoice.id %}"
+                                class="btn btn-primary btn-sm"
+                            >
+                                Открыть счет
+                            </a>
+                        </td>
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="6" class="empty-table">
+                            В этом пакете не было создано новых счетов.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% if batch.duplicate_files %}
+
+<div class="card">
+
+    <div class="registry-table-header">
+
+        <div>
+            <h3>
+                Дубликаты
+            </h3>
+
+            <span>
+                Файлы, которые уже были загружены ранее
+            </span>
+        </div>
+
+    </div>
+
+    <div class="table-scroll table-scroll-fit">
+
+        <table class="table registry-table upload-result-duplicate-table">
+
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Файл</th>
+                    <th>Уже загружен как</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for file in batch.duplicate_files %}
+
+                    <tr>
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
+
+                        <td>
+                            <strong class="upload-result-file-name">
+                                {{ file.filename|default:file }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {% if file.invoice_id %}
+                                <div class="upload-result-existing">
+                                    Счет #{{ file.invoice_id }}
+
+                                    {% if file.invoice_title %}
+                                        <span>
+                                            — {{ file.invoice_title }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <span class="muted">
+                                    Уже есть в системе
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if file.invoice_id %}
+                                <a
+                                    href="{% url 'invoice_detail' file.invoice_id %}"
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    Открыть счет
+                                </a>
+                            {% else %}
+                                <span class="muted">
+                                    —
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+{% if batch.skipped_files %}
+
+<div class="card">
+
+    <div class="registry-table-header">
+
+        <div>
+            <h3>
+                Пропущенные файлы
+            </h3>
+
+            <span>
+                Неподдерживаемые форматы
+            </span>
+        </div>
+
+    </div>
+
+    <div class="table-scroll table-scroll-fit">
+
+        <table class="table registry-table upload-result-table">
+
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Файл</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for file in batch.skipped_files %}
+
+                    <tr>
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
+
+                        <td>
+                            {{ file }}
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2 class="page-title">
+            Привязать контрагента
+        </h2>
+
+        <p class="page-subtitle">
+            Ручное сопоставление счета с официальным контрагентом из 1С или ручного справочника
+        </p>
+    </div>
+
+    <div class="registry-actions">
+        <a
+            href="{% url 'invoice_detail' invoice.id %}"
+            class="btn btn-secondary"
+        >
+            Назад к счету
+        </a>
+
+        <a
+            href="{% url 'counterparty_directory' %}"
+            class="btn btn-secondary"
+        >
+            Справочник контрагентов
+        </a>
+    </div>
+</div>
+
+<div class="registry-summary">
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            ID счета
+        </span>
+
+        <strong>
+            #{{ invoice.id }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Поставщик из OCR
+        </span>
+
+        <strong>
+            {{ invoice.vendor|default:"Не определен" }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Сумма
+        </span>
+
+        <strong>
+            {{ invoice.amount|floatformat:2 }} ₽
+        </strong>
+    </div>
+
+</div>
+
+<div class="card registry-filter-card">
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <input
+            type="hidden"
+            name="next"
+            value="{{ request.GET.next }}"
+        >
+
+        <div class="form-group">
+            <label>
+                Контрагент
+            </label>
+
+            {{ form.counterparty }}
+
+            {% if form.counterparty.errors %}
+                <div class="form-error">
+                    {{ form.counterparty.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="muted">
+            В списке отображаются только активные контрагенты из 1С и ручного справочника.
+        </div>
+
+        <div class="registry-actions" style="margin-top: 18px;">
+            <button type="submit" class="btn btn-primary">
+                Привязать контрагента
+            </button>
+
+            <a
+                href="{% url 'counterparty_create' %}"
+                class="btn btn-secondary"
+            >
+                Добавить контрагента вручную
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+<div class="card">
+
+    <div class="registry-table-header">
+        <h3>
+            Данные счета
+        </h3>
+
+        <span>
+            OCR и текущая привязка
+        </span>
+    </div>
+
+    <table class="table registry-table">
+        <tbody>
+            <tr>
+                <th>
+                    Номер счета
+                </th>
+                <td>
+                    {{ invoice.invoice_number|default:"—" }}
+                </td>
+            </tr>
+
+            <tr>
+                <th>
+                    Дата счета
+                </th>
+                <td>
+                    {{ invoice.invoice_date|default:"—" }}
+                </td>
+            </tr>
+
+            <tr>
+                <th>
+                    Поставщик OCR
+                </th>
+                <td>
+                    {{ invoice.vendor|default:"—" }}
+                </td>
+            </tr>
+
+            <tr>
+                <th>
+                    Текущий контрагент
+                </th>
+                <td>
+                    {% if invoice.counterparty %}
+                        {{ invoice.counterparty.name }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+            </tr>
+
+            <tr>
+                <th>
+                    Статус сопоставления
+                </th>
+                <td>
+                    {{ invoice.get_counterparty_match_status_display }}
+                </td>
+            </tr>
+
+            <tr>
+                <th>
+                    Комментарий
+                </th>
+                <td>
+                    {{ invoice.counterparty_match_comment|default:"—" }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

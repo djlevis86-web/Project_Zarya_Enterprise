@@ -2,17 +2,88 @@
 
 {% block content %}
 
-<h1 class="page-title">
+<div class="page-header">
 
-    Панель управления
+    <div>
+        <h1 class="page-title">
+            Панель управления
+        </h1>
 
-</h1>
+        <p class="page-subtitle">
+            Краткая сводка по счетам, проверке OCR, контрагентам и подготовке оплат
+        </p>
+    </div>
 
-<div class="stats-grid">
+    <div class="registry-actions">
+        <a href="{% url 'upload_invoice' %}" class="btn btn-primary">
+            Загрузить счет
+        </a>
 
-    <div class="stat-card">
+        <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+            Все счета
+        </a>
+    </div>
 
-        <div class="stat-title">
+</div>
+
+<div class="dashboard-hero">
+
+    <div class="dashboard-hero-main">
+
+        <span class="dashboard-kicker">
+            Project Zarya Enterprise
+        </span>
+
+        <h2>
+            Управление счетами и оплатами
+        </h2>
+
+        <p>
+            Загрузка документов, OCR-распознавание, сверка с 1С, контроль реквизитов и подготовка реестра оплаты.
+        </p>
+
+        <div class="dashboard-hero-actions">
+            <a href="{% url 'upload_invoice' %}" class="btn btn-primary">
+                Загрузить новый счет
+            </a>
+
+            <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
+                Перейти в реестр оплаты
+            </a>
+        </div>
+
+    </div>
+
+    <div class="dashboard-hero-side">
+
+        <div class="hero-metric">
+            <span>
+                Всего счетов
+            </span>
+
+            <strong>
+                {{ total_count }}
+            </strong>
+        </div>
+
+        <div class="hero-metric">
+            <span>
+                Требуют внимания
+            </span>
+
+            <strong>
+                {{ review_count }}
+            </strong>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="stats-grid dashboard-stats">
+
+    <a href="{% url 'invoice_list' %}" class="stat-card stat-link">
+        <div class="stat-label">
             Всего счетов
         </div>
 
@@ -20,98 +91,337 @@
             {{ total_count }}
         </div>
 
-    </div>
+        <div class="muted">
+            Все загруженные документы
+        </div>
+    </a>
 
-    <div class="stat-card">
-
-        <div class="stat-title">
+    <a href="{% url 'invoice_list' %}?status=new" class="stat-card stat-link">
+        <div class="stat-label">
             Новые
         </div>
 
-        <div class="stat-value">
+        <div class="stat-value text-info">
             {{ new_count }}
         </div>
 
-    </div>
+        <div class="muted">
+            Ожидают проверки
+        </div>
+    </a>
 
-    <div class="stat-card">
-
-        <div class="stat-title">
+    <a href="{% url 'invoice_list' %}?status=review" class="stat-card stat-link">
+        <div class="stat-label">
             На проверке
         </div>
 
-        <div class="stat-value">
+        <div class="stat-value text-warning">
             {{ review_count }}
+        </div>
+
+        <div class="muted">
+            Нужно принять решение
+        </div>
+    </a>
+
+    <a href="{% url 'invoice_list' %}?status=approved" class="stat-card stat-link">
+        <div class="stat-label">
+            Подтверждено
+        </div>
+
+        <div class="stat-value text-success">
+            {{ approved_count }}
+        </div>
+
+        <div class="muted">
+            Можно готовить к оплате
+        </div>
+    </a>
+
+</div>
+
+<div class="dashboard-grid-two">
+
+    <div class="card">
+
+        <div class="registry-table-header">
+            <div>
+                <h3>
+                    Быстрые действия
+                </h3>
+
+                <span>
+                    Основные рабочие маршруты
+                </span>
+            </div>
+        </div>
+
+        <div class="quick-action-grid">
+
+            <a href="{% url 'upload_invoice' %}" class="quick-action-card">
+                <span class="quick-action-icon">
+                    ↑
+                </span>
+
+                <div>
+                    <strong>
+                        Загрузить счета
+                    </strong>
+
+                    <p>
+                        Добавить PDF, JPG или PNG и запустить OCR.
+                    </p>
+                </div>
+            </a>
+
+            <a href="{% url 'unmatched_counterparties' %}" class="quick-action-card">
+                <span class="quick-action-icon">
+                    !
+                </span>
+
+                <div>
+                    <strong>
+                        Не найдено в 1С
+                    </strong>
+
+                    <p>
+                        Проверить счета без официального контрагента.
+                    </p>
+                </div>
+            </a>
+
+            <a href="{% url 'counterparties_missing_requisites' %}" class="quick-action-card">
+                <span class="quick-action-icon">
+                    ⚑
+                </span>
+
+                <div>
+                    <strong>
+                        Проверить реквизиты
+                    </strong>
+
+                    <p>
+                        Найти контрагентов без ИНН, БИК или расчетного счета.
+                    </p>
+                </div>
+            </a>
+
+            <a href="{% url 'payment_registry' %}" class="quick-action-card">
+                <span class="quick-action-icon">
+                    ₽
+                </span>
+
+                <div>
+                    <strong>
+                        Реестр оплаты
+                    </strong>
+
+                    <p>
+                        Подготовить счета к выгрузке Excel или 1С TXT.
+                    </p>
+                </div>
+            </a>
+
         </div>
 
     </div>
 
-    <div class="stat-card">
+    <div class="card">
 
-        <div class="stat-title">
-            Подтверждено
+        <div class="registry-table-header">
+            <div>
+                <h3>
+                    Рабочий процесс
+                </h3>
+
+                <span>
+                    Правильная последовательность работы
+                </span>
+            </div>
         </div>
 
-        <div class="stat-value">
-            {{ approved_count }}
+        <div class="process-list">
+
+            <div class="process-item">
+                <span>
+                    1
+                </span>
+
+                <div>
+                    <strong>
+                        Загрузка счета
+                    </strong>
+
+                    <p>
+                        Файл попадает в систему и получает статус «Новый».
+                    </p>
+                </div>
+            </div>
+
+            <div class="process-item">
+                <span>
+                    2
+                </span>
+
+                <div>
+                    <strong>
+                        OCR и сверка
+                    </strong>
+
+                    <p>
+                        Система ищет сумму, поставщика и контрагента из 1С.
+                    </p>
+                </div>
+            </div>
+
+            <div class="process-item">
+                <span>
+                    3
+                </span>
+
+                <div>
+                    <strong>
+                        Проверка реквизитов
+                    </strong>
+
+                    <p>
+                        Перед оплатой должны быть заполнены ИНН, банк, БИК и счет.
+                    </p>
+                </div>
+            </div>
+
+            <div class="process-item">
+                <span>
+                    4
+                </span>
+
+                <div>
+                    <strong>
+                        Реестр оплаты
+                    </strong>
+
+                    <p>
+                        Подтвержденные счета попадают в платежный реестр.
+                    </p>
+                </div>
+            </div>
+
         </div>
 
     </div>
 
 </div>
 
-<div class="content-card mt-30">
+<div class="card">
 
-    <div class="card-header">
+    <div class="registry-table-header">
 
-        Последние счета
+        <div>
+            <h3>
+                Последние счета
+            </h3>
+
+            <span>
+                Недавно загруженные документы
+            </span>
+        </div>
+
+        <div class="registry-actions">
+            <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+                Смотреть все
+            </a>
+        </div>
 
     </div>
 
-    <table class="zarya-table">
+    <div class="table-scroll">
 
-        <thead>
+        <table class="table registry-table dashboard-latest-table">
 
-            <tr>
+            <thead>
+                <tr>
+                    <th>
+                        ID
+                    </th>
 
-                <th>ID</th>
-                <th>Название</th>
-                <th>Сумма</th>
-                <th>Статус</th>
+                    <th>
+                        Документ
+                    </th>
 
-            </tr>
+                    <th>
+                        Сумма
+                    </th>
 
-        </thead>
+                    <th>
+                        Статус
+                    </th>
 
-        <tbody>
+                    <th>
+                        Действие
+                    </th>
+                </tr>
+            </thead>
 
-        {% for invoice in latest_invoices %}
+            <tbody>
 
-            <tr>
+                {% for invoice in latest_invoices %}
 
-                <td>
-                    #{{ invoice.id }}
-                </td>
+                    <tr>
+                        <td>
+                            <a href="{% url 'invoice_detail' invoice.id %}">
+                                #{{ invoice.id }}
+                            </a>
+                        </td>
 
-                <td>
-                    {{ invoice.title }}
-                </td>
+                        <td>
+                            <strong>
+                                {{ invoice.title }}
+                            </strong>
 
-                <td>
-                    {{ invoice.amount }}
-                </td>
+                            {% if invoice.invoice_number %}
+                                <div class="muted">
+                                    Счет № {{ invoice.invoice_number }}
+                                </div>
+                            {% endif %}
+                        </td>
 
-                <td>
-                    {{ invoice.status }}
-                </td>
+                        <td>
+                            <strong class="amount-main">
+                                {{ invoice.amount|floatformat:2 }} ₽
+                            </strong>
+                        </td>
 
-            </tr>
+                        <td>
+                            <span class="status-badge status-{{ invoice.status }}">
+                                {{ invoice.get_status_display }}
+                            </span>
+                        </td>
 
-        {% endfor %}
+                        <td>
+                            <a
+                                href="{% url 'invoice_detail' invoice.id %}"
+                                class="btn btn-secondary btn-sm"
+                            >
+                                Открыть
+                            </a>
+                        </td>
+                    </tr>
 
-        </tbody>
+                {% empty %}
 
-    </table>
+                    <tr>
+                        <td colspan="5" class="empty-table">
+                            Счетов пока нет.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
 
 </div>
 

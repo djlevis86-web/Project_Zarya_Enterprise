@@ -1,0 +1,541 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h2 class="page-title">
+            {{ counterparty.name }}
+        </h2>
+
+        <p class="page-subtitle">
+            Карточка контрагента из справочника Project Zarya
+        </p>
+    </div>
+
+    <div class="registry-actions">
+
+        {% if counterparty.source == 'manual' %}
+            <a
+                href="{% url 'counterparty_edit' counterparty.id %}"
+                class="btn btn-primary"
+            >
+                Редактировать
+            </a>
+        {% endif %}
+
+        <a
+            href="{% url 'payment_registry' %}?counterparty={{ counterparty.id }}"
+            class="btn btn-secondary"
+        >
+            В реестр оплаты
+        </a>
+
+        <a
+            href="{% url 'counterparty_directory' %}"
+            class="btn btn-secondary"
+        >
+            Назад к справочнику
+        </a>
+
+    </div>
+
+</div>
+
+<div class="counterparty-profile-hero">
+
+    <div class="counterparty-profile-main">
+
+        <div class="counterparty-profile-title-row">
+
+            <div>
+                <div class="counterparty-profile-kicker">
+                    Контрагент
+                </div>
+
+                <h3>
+                    {{ counterparty.name }}
+                </h3>
+
+                {% if counterparty.full_name and counterparty.full_name != counterparty.name %}
+                    <p>
+                        {{ counterparty.full_name }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <div class="counterparty-profile-badges">
+
+                <span class="status-badge status-new">
+                    {{ counterparty.get_source_display }}
+                </span>
+
+                {% if counterparty.is_active %}
+                    <span class="status-badge status-approved">
+                        Активен
+                    </span>
+                {% else %}
+                    <span class="status-badge status-rejected">
+                        Неактивен
+                    </span>
+                {% endif %}
+
+                {% if counterparty.inn and counterparty.bank_name and counterparty.bik and counterparty.account_number %}
+                    <span class="status-badge status-approved">
+                        Реквизиты заполнены
+                    </span>
+                {% else %}
+                    <span class="status-badge status-rejected">
+                        Есть проблемы
+                    </span>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="registry-summary counterparty-profile-summary">
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Всего счетов
+        </span>
+
+        <strong>
+            {{ invoices_count }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            К оплате
+        </span>
+
+        <strong>
+            {{ unpaid_count }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Сумма к оплате
+        </span>
+
+        <strong>
+            {{ unpaid_total|floatformat:2 }} ₽
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Источник
+        </span>
+
+        <strong class="counterparty-source-value">
+            {{ counterparty.get_source_display }}
+        </strong>
+    </div>
+
+</div>
+
+<div class="counterparty-detail-grid">
+
+    <div class="card counterparty-section-card">
+
+        <div class="section-title-row">
+            <div>
+                <h3>
+                    Основные данные
+                </h3>
+
+                <span>
+                    Наименование и идентификаторы
+                </span>
+            </div>
+        </div>
+
+        <div class="info-list">
+
+            <div class="info-row info-row-vertical">
+                <span>
+                    Наименование
+                </span>
+
+                <strong>
+                    {{ counterparty.name }}
+                </strong>
+            </div>
+
+            <div class="info-row info-row-vertical">
+                <span>
+                    Полное наименование
+                </span>
+
+                <strong>
+                    {{ counterparty.full_name|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="info-row">
+                <span>
+                    ИНН
+                </span>
+
+                {% if counterparty.inn %}
+                    <strong>
+                        {{ counterparty.inn }}
+                    </strong>
+                {% else %}
+                    <span class="status-badge status-rejected">
+                        Нет ИНН
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="info-row">
+                <span>
+                    КПП
+                </span>
+
+                <strong>
+                    {{ counterparty.kpp|default:"—" }}
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card counterparty-section-card">
+
+        <div class="section-title-row">
+            <div>
+                <h3>
+                    Банковские реквизиты
+                </h3>
+
+                <span>
+                    Данные для платежного реестра и выгрузки 1С TXT
+                </span>
+            </div>
+        </div>
+
+        <div class="info-list">
+
+            <div class="info-row info-row-vertical">
+                <span>
+                    Банк
+                </span>
+
+                {% if counterparty.bank_name %}
+                    <strong>
+                        {{ counterparty.bank_name }}
+                    </strong>
+                {% else %}
+                    <span class="status-badge status-rejected">
+                        Нет банка
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="info-row">
+                <span>
+                    БИК
+                </span>
+
+                {% if counterparty.bik %}
+                    <strong>
+                        {{ counterparty.bik }}
+                    </strong>
+                {% else %}
+                    <span class="status-badge status-rejected">
+                        Нет БИК
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="info-row info-row-vertical">
+                <span>
+                    Расчетный счет
+                </span>
+
+                {% if counterparty.account_number %}
+                    <strong>
+                        {{ counterparty.account_number }}
+                    </strong>
+                {% else %}
+                    <span class="status-badge status-rejected">
+                        Нет счета
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="info-row info-row-vertical">
+                <span>
+                    Корреспондентский счет
+                </span>
+
+                <strong>
+                    {{ counterparty.correspondent_account|default:"—" }}
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card counterparty-section-card">
+
+        <div class="section-title-row">
+            <div>
+                <h3>
+                    Контакты
+                </h3>
+
+                <span>
+                    Дополнительные данные контрагента
+                </span>
+            </div>
+        </div>
+
+        <div class="info-list">
+
+            <div class="info-row">
+                <span>
+                    Email
+                </span>
+
+                <strong>
+                    {{ counterparty.email|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="info-row">
+                <span>
+                    Телефон
+                </span>
+
+                <strong>
+                    {{ counterparty.phone|default:"—" }}
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card counterparty-section-card">
+
+        <div class="section-title-row">
+            <div>
+                <h3>
+                    Синхронизация
+                </h3>
+
+                <span>
+                    Связь со справочником 1С
+                </span>
+            </div>
+        </div>
+
+        <div class="info-list">
+
+            <div class="info-row">
+                <span>
+                    Код 1С
+                </span>
+
+                <strong>
+                    {{ counterparty.external_id_1c|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="info-row">
+                <span>
+                    Источник
+                </span>
+
+                <strong>
+                    {{ counterparty.get_source_display }}
+                </strong>
+            </div>
+
+            <div class="info-row">
+                <span>
+                    Дата синхронизации
+                </span>
+
+                <strong>
+                    {{ counterparty.synced_at|date:"d.m.Y H:i"|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="info-row info-row-vertical">
+                <span>
+                    Комментарий
+                </span>
+
+                <strong>
+                    {{ counterparty.sync_comment|default:"—" }}
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="registry-table-header">
+
+        <div>
+            <h3>
+                Счета контрагента
+            </h3>
+
+            <span>
+                {{ invoices_count }} счетов в системе
+            </span>
+        </div>
+
+        <div class="registry-actions">
+            <a
+                href="{% url 'payment_registry' %}?counterparty={{ counterparty.id }}"
+                class="btn btn-secondary"
+            >
+                В реестр оплаты
+            </a>
+        </div>
+
+    </div>
+
+    <div class="table-scroll table-scroll-fit">
+
+        <table class="table registry-table counterparty-invoices-table">
+
+            <thead>
+                <tr>
+                    <th>
+                        ID
+                    </th>
+
+                    <th>
+                        Документ
+                    </th>
+
+                    <th>
+                        Сумма
+                    </th>
+
+                    <th>
+                        Статус
+                    </th>
+
+                    <th>
+                        План оплаты
+                    </th>
+
+                    <th>
+                        Действия
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for invoice in invoices %}
+
+                    <tr>
+                        <td>
+                            <a href="{% url 'invoice_detail' invoice.id %}">
+                                #{{ invoice.id }}
+                            </a>
+                        </td>
+
+                        <td>
+                            <strong>
+                                {{ invoice.title }}
+                            </strong>
+
+                            {% if invoice.invoice_number %}
+                                <div class="muted">
+                                    Счет № {{ invoice.invoice_number }}
+                                </div>
+                            {% endif %}
+
+                            {% if invoice.invoice_date %}
+                                <div class="muted">
+                                    от {{ invoice.invoice_date }}
+                                </div>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <strong class="amount-main">
+                                {{ invoice.amount|floatformat:2 }} ₽
+                            </strong>
+                        </td>
+
+                        <td>
+                            <span class="status-badge status-{{ invoice.status }}">
+                                {{ invoice.get_status_display }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if invoice.planned_payment_date %}
+                                {{ invoice.planned_payment_date|date:"d.m.Y" }}
+                            {% else %}
+                                <span class="muted">
+                                    Не указана
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div class="table-actions">
+                                <a
+                                    href="{% url 'invoice_detail' invoice.id %}"
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    Открыть
+                                </a>
+
+                                {% if user.is_staff %}
+                                    <a
+                                        href="{% url 'edit_invoice' invoice.id %}"
+                                        class="btn btn-secondary btn-sm"
+                                    >
+                                        Изменить
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="6" class="empty-table">
+                            Счетов по этому контрагенту пока нет.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

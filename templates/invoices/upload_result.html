@@ -4,127 +4,304 @@
 
 <div class="page-header">
 
+    <div>
+        <h2 class="page-title">
+            Результат загрузки
+        </h2>
 
-<div>
-
-    <h2 class="page-title">
-        Результат загрузки
-    </h2>
-
-    <p class="page-subtitle">
-        Информация о загруженных документах
-    </p>
-
-</div>
-
-
-</div>
-
-<div class="stats-grid">
-
-
-<div class="stat-card">
-
-    <div class="stat-label">
-        Новых счетов
+        <p class="page-subtitle">
+            Итоги обработки выбранных файлов: новые счета, дубликаты и пропущенные документы
+        </p>
     </div>
 
-    <div class="stat-value text-success">
-        {{ uploaded_count }}
+    <div class="registry-actions">
+        <a href="{% url 'invoice_list' %}" class="btn btn-primary">
+            Перейти к счетам
+        </a>
+
+        <a href="{% url 'upload_invoice' %}" class="btn btn-secondary">
+            Загрузить ещё
+        </a>
     </div>
 
 </div>
 
-<div class="stat-card">
+<div class="registry-summary upload-result-summary">
 
-    <div class="stat-label">
-        Дубликатов
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Новых счетов
+        </span>
+
+        <strong class="text-success">
+            {{ uploaded_count }}
+        </strong>
     </div>
 
-    <div class="stat-value text-warning">
-        {{ duplicates|length }}
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Дубликатов
+        </span>
+
+        <strong class="{% if duplicates %}summary-warning{% endif %}">
+            {{ duplicates|length }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Пропущено
+        </span>
+
+        <strong class="{% if skipped_files %}summary-warning{% endif %}">
+            {{ skipped_files|length }}
+        </strong>
     </div>
 
 </div>
 
+<div class="card upload-result-main-card">
 
-</div>
+    {% if uploaded_count > 0 %}
 
-<div class="content-card">
+        <div class="upload-result-status upload-result-status-success">
 
+            <div class="upload-result-status-icon">
+                ✓
+            </div>
 
-{% if uploaded_count > 0 %}
+            <div>
+                <h3>
+                    Загрузка выполнена успешно
+                </h3>
 
-    <h3>
-        Загрузка выполнена успешно
-    </h3>
+                <p>
+                    В систему добавлено новых документов:
+                    <strong>{{ uploaded_count }}</strong>.
+                    Для них созданы счета и запущена OCR-обработка.
+                </p>
+            </div>
 
-    <p>
-        В систему добавлено новых документов:
-        <strong>{{ uploaded_count }}</strong>
-    </p>
+        </div>
 
-{% else %}
+    {% else %}
 
-    <h3>
-        Новых счетов не найдено
-    </h3>
+        <div class="upload-result-status upload-result-status-warning">
 
-    <p>
-        Все выбранные документы уже были загружены ранее.
-    </p>
+            <div class="upload-result-status-icon">
+                !
+            </div>
 
-{% endif %}
+            <div>
+                <h3>
+                    Новых счетов не найдено
+                </h3>
 
+                <p>
+                    Новые документы не были добавлены. Возможно, выбранные файлы уже были загружены ранее
+                    или не подходят по формату.
+                </p>
+            </div>
+
+        </div>
+
+    {% endif %}
 
 </div>
 
 {% if duplicates %}
 
-<div class="content-card">
+<div class="card">
 
+    <div class="registry-table-header">
 
-<h3>
-    Обнаружены дубликаты
-</h3>
+        <div>
+            <h3>
+                Обнаружены дубликаты
+            </h3>
 
-<p>
-    Следующие документы уже присутствуют в системе:
-</p>
+            <span>
+                Эти файлы уже присутствуют в системе и не были загружены повторно
+            </span>
+        </div>
 
-<table class="zarya-table">
+    </div>
+
+    <div class="table-scroll">
+
+        <table class="table registry-table upload-result-table upload-result-duplicate-table">
+
+            <thead>
+                <tr>
+                    <th>
+                        №
+                    </th>
+
+                    <th>
+                        Файл
+                    </th>
+
+                    <th>
+                        Уже загружен как
+                    </th>
+
+                    <th>
+                        Действие
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for file in duplicates %}
+
+                    <tr>
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
+
+                        <td>
+                            <strong class="upload-result-file-name">
+                                {{ file.filename|default:file }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {% if file.invoice_id %}
+                                <div class="upload-result-existing">
+                                    Счет #{{ file.invoice_id }}
+
+                                    {% if file.invoice_title %}
+                                        <span>
+                                            — {{ file.invoice_title }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <span class="muted">
+                                    Уже есть в системе
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if file.invoice_id %}
+                                <a
+                                    href="{% url 'invoice_detail' file.invoice_id %}"
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    Открыть счет
+                                </a>
+                            {% else %}
+                                <span class="muted">
+                                    —
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+{% if skipped_files %}
+
+<div class="card">
+
+    <div class="registry-table-header">
+
+        <div>
+            <h3>
+                Пропущены файлы неподдерживаемого формата
+            </h3>
+
+            <span>
+                Разрешены только PDF, JPG, JPEG и PNG
+            </span>
+        </div>
+
+    </div>
+
+    <div class="table-scroll">
+
+        <table class="table registry-table upload-result-table upload-result-duplicate-table">
 
     <thead>
-
         <tr>
-
-            <th width="80">
+            <th>
                 №
             </th>
 
             <th>
-                Имя файла
+                Файл
             </th>
 
-        </tr>
+            <th>
+                Уже загружен как
+            </th>
 
+            <th>
+                Действие
+            </th>
+        </tr>
     </thead>
 
     <tbody>
 
         {% for file in duplicates %}
 
-        <tr>
+            <tr>
+                <td>
+                    {{ forloop.counter }}
+                </td>
 
-            <td>
-                {{ forloop.counter }}
-            </td>
+                <td>
+                    <strong class="upload-result-file-name">
+                        {{ file.filename|default:file }}
+                    </strong>
+                </td>
 
-            <td>
-                {{ file }}
-            </td>
+                <td>
+                    {% if file.invoice_id %}
+                        <div class="upload-result-existing">
+                            Счет #{{ file.invoice_id }}
 
-        </tr>
+                            {% if file.invoice_title %}
+                                <span>
+                                    — {{ file.invoice_title }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <span class="muted">
+                            Уже есть в системе
+                        </span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if file.invoice_id %}
+                        <a
+                            href="{% url 'invoice_detail' file.invoice_id %}"
+                            class="btn btn-primary btn-sm"
+                        >
+                            Открыть счет
+                        </a>
+                    {% else %}
+                        <span class="muted">
+                            —
+                        </span>
+                    {% endif %}
+                </td>
+            </tr>
 
         {% endfor %}
 
@@ -132,27 +309,26 @@
 
 </table>
 
+    </div>
 
 </div>
 
 {% endif %}
 
-<div class="content-card">
+<div class="card upload-result-actions-card">
 
-    <div class="upload-actions">
+    <div class="upload-result-actions">
 
-        <a
-            href="{% url 'invoice_list' %}"
-            class="primary-btn"
-        >
+        <a href="{% url 'invoice_list' %}" class="btn btn-primary">
             Перейти к счетам
         </a>
 
-        <a
-            href="{% url 'upload_invoice' %}"
-            class="primary-btn"
-        >
+        <a href="{% url 'upload_invoice' %}" class="btn btn-secondary">
             Загрузить ещё
+        </a>
+
+        <a href="{% url 'unmatched_counterparties' %}" class="btn btn-secondary">
+            Не найдено в 1С
         </a>
 
     </div>

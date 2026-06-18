@@ -2,6 +2,277 @@ from django.db import models
 from django.conf import settings
 
 
+class Counterparty(models.Model):
+
+    SOURCE_1C = '1c'
+    SOURCE_MANUAL = 'manual'
+    SOURCE_OCR = 'ocr'
+
+    SOURCE_CHOICES = [
+        (SOURCE_1C, '1С'),
+        (SOURCE_MANUAL, 'Вручную'),
+        (SOURCE_OCR, 'OCR'),
+    ]
+
+    external_id_1c = models.CharField(
+        "Код / ссылка 1С",
+        max_length=255,
+        blank=True,
+        null=True,
+        db_index=True
+    )
+
+    name = models.CharField(
+        "Наименование",
+        max_length=255
+    )
+
+    full_name = models.CharField(
+        "Полное наименование",
+        max_length=500,
+        blank=True,
+        null=True
+    )
+
+    inn = models.CharField(
+        "ИНН",
+        max_length=20,
+        blank=True,
+        null=True,
+        db_index=True
+    )
+
+    kpp = models.CharField(
+        "КПП",
+        max_length=20,
+        blank=True,
+        null=True,
+        db_index=True
+    )
+
+    bank_name = models.CharField(
+        "Банк",
+        max_length=255,
+        blank=True,
+        null=True
+    )
+
+    bik = models.CharField(
+        "БИК",
+        max_length=20,
+        blank=True,
+        null=True
+    )
+
+    account_number = models.CharField(
+        "Расчетный счет",
+        max_length=50,
+        blank=True,
+        null=True
+    )
+
+    correspondent_account = models.CharField(
+        "Корр. счет",
+        max_length=50,
+        blank=True,
+        null=True
+    )
+
+    email = models.EmailField(
+        blank=True,
+        null=True
+    )
+
+    phone = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
+    source = models.CharField(
+        "Источник",
+        max_length=20,
+        choices=SOURCE_CHOICES,
+        default=SOURCE_OCR
+    )
+
+    is_active = models.BooleanField(
+        "Активен",
+        default=True
+    )
+
+    synced_at = models.DateTimeField(
+        "Дата синхронизации",
+        blank=True,
+        null=True
+    )
+
+    sync_comment = models.TextField(
+        "Комментарий синхронизации",
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        verbose_name = "Контрагент"
+        verbose_name_plural = "Контрагенты"
+        ordering = [
+            'name'
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class CompanyRequisites(models.Model):
+
+    name = models.CharField(
+        "Наименование организации",
+        max_length=255,
+        default='ОАО "Заря"'
+    )
+
+    inn = models.CharField(
+        "ИНН",
+        max_length=20
+    )
+
+    kpp = models.CharField(
+        "КПП",
+        max_length=20,
+        blank=True,
+        null=True
+    )
+
+    bank_name = models.CharField(
+        "Банк",
+        max_length=255
+    )
+
+    bik = models.CharField(
+        "БИК",
+        max_length=20
+    )
+
+    account_number = models.CharField(
+        "Расчетный счет",
+        max_length=50
+    )
+
+    correspondent_account = models.CharField(
+        "Корреспондентский счет",
+        max_length=50,
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        verbose_name = "Реквизиты организации"
+        verbose_name_plural = "Реквизиты организации"
+
+    def __str__(self):
+        return self.name
+
+
+class InvoiceUploadBatch(models.Model):
+
+    STATUS_COMPLETED = 'completed'
+    STATUS_PARTIAL = 'partial'
+    STATUS_EMPTY = 'empty'
+
+    STATUS_CHOICES = [
+        (STATUS_COMPLETED, 'Загружено'),
+        (STATUS_PARTIAL, 'Частично загружено'),
+        (STATUS_EMPTY, 'Новых файлов нет'),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='invoice_upload_batches',
+        verbose_name='Пользователь'
+    )
+
+    upload_token = models.CharField(
+        max_length=64,
+        blank=True,
+        db_index=True,
+        verbose_name='Токен загрузки'
+    )
+
+    total_files = models.PositiveIntegerField(
+        default=0,
+        verbose_name='Всего файлов'
+    )
+
+    uploaded_count = models.PositiveIntegerField(
+        default=0,
+        verbose_name='Новых счетов'
+    )
+
+    duplicate_count = models.PositiveIntegerField(
+        default=0,
+        verbose_name='Дубликатов'
+    )
+
+    skipped_count = models.PositiveIntegerField(
+        default=0,
+        verbose_name='Пропущено'
+    )
+
+    duplicate_files = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name='Файлы-дубликаты'
+    )
+
+    skipped_files = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name='Пропущенные файлы'
+    )
+
+    status = models.CharField(
+        max_length=32,
+        choices=STATUS_CHOICES,
+        default=STATUS_EMPTY,
+        db_index=True,
+        verbose_name='Статус'
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата загрузки'
+    )
+
+    class Meta:
+        ordering = [
+            '-created_at'
+        ]
+
+        verbose_name = 'Пакет загрузки счетов'
+        verbose_name_plural = 'Пакеты загрузки счетов'
+
+    def __str__(self):
+        return f'Пакет загрузки #{self.id}'
+
+
 class Invoice(models.Model):
 
     STATUS_NEW = 'new'
@@ -18,10 +289,31 @@ class Invoice(models.Model):
         (STATUS_REJECTED, 'Отклонен'),
     ]
 
+    COUNTERPARTY_MATCH_NOT_PROCESSED = 'not_processed'
+    COUNTERPARTY_MATCH_FOUND = 'found'
+    COUNTERPARTY_MATCH_NOT_FOUND = 'not_found'
+    COUNTERPARTY_MATCH_AMBIGUOUS = 'ambiguous'
+
+    COUNTERPARTY_MATCH_CHOICES = [
+        (COUNTERPARTY_MATCH_NOT_PROCESSED, 'Не проверялся'),
+        (COUNTERPARTY_MATCH_FOUND, 'Найден'),
+        (COUNTERPARTY_MATCH_NOT_FOUND, 'Не найден в 1С'),
+        (COUNTERPARTY_MATCH_AMBIGUOUS, 'Найдено несколько вариантов'),
+    ]
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='invoices'
+    )
+
+    upload_batch = models.ForeignKey(
+        InvoiceUploadBatch,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='invoices',
+        verbose_name='Пакет загрузки'
     )
 
     title = models.CharField(
@@ -37,16 +329,17 @@ class Invoice(models.Model):
         upload_to='invoices/'
     )
 
-    file_hash = models.CharField(
-        max_length=64,
-        blank=True,
-        null=True,
-        db_index=True
-    )
-
     original_filename = models.CharField(
         max_length=255,
         blank=True
+    )
+
+    file_hash = models.CharField(
+        max_length=64,
+        blank=True,
+        default='',
+        db_index=True,
+        verbose_name='Хэш файла'
     )
 
     amount = models.DecimalField(
@@ -62,7 +355,7 @@ class Invoice(models.Model):
         blank=True,
         verbose_name='OCR сумма'
     )
-    
+
     ocr_verified = models.BooleanField(
         default=False,
         verbose_name='OCR проверен'
@@ -102,11 +395,50 @@ class Invoice(models.Model):
         null=True
     )
 
+    counterparty = models.ForeignKey(
+        Counterparty,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='invoices',
+        verbose_name='Контрагент'
+    )
+
+    counterparty_match_status = models.CharField(
+        "Статус поиска контрагента",
+        max_length=30,
+        choices=COUNTERPARTY_MATCH_CHOICES,
+        default=COUNTERPARTY_MATCH_NOT_PROCESSED
+    )
+
+    counterparty_match_comment = models.TextField(
+        "Комментарий поиска контрагента",
+        blank=True,
+        null=True
+    )
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default=STATUS_NEW,
         verbose_name='Статус'
+    )
+
+    planned_payment_date = models.DateField(
+        "Плановая дата оплаты",
+        null=True,
+        blank=True
+    )
+
+    paid_at = models.DateField(
+        "Дата оплаты",
+        null=True,
+        blank=True
+    )
+
+    payment_priority = models.IntegerField(
+        "Приоритет",
+        default=3
     )
 
     created_at = models.DateTimeField(
@@ -119,7 +451,7 @@ class Invoice(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.user.username})"
-   
+
     @property
     def is_pdf(self):
         return self.file.name.lower().endswith('.pdf')

@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h2 class="page-title">
+            Импорт контрагентов из 1С
+        </h2>
+
+        <p class="page-subtitle">
+            Загрузка официального справочника контрагентов из Excel или CSV
+        </p>
+    </div>
+
+    <div class="registry-actions">
+        <a href="{% url 'counterparty_directory' %}" class="btn btn-secondary">
+            Справочник
+        </a>
+
+        <a href="{% url 'unmatched_counterparties' %}" class="btn btn-secondary">
+            Не найдено в 1С
+        </a>
+
+        <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
+            Реестр оплаты
+        </a>
+    </div>
+
+</div>
+
+<div class="import-layout">
+
+    <div class="card import-card">
+
+        <div class="section-title-row">
+            <div>
+                <h3>
+                    Загрузить файл из 1С
+                </h3>
+
+                <span>
+                    Поддерживаются .xlsx, .xlsm и .csv
+                </span>
+            </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="import-form">
+
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="form-error">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="import-dropzone">
+
+                <div class="upload-dropzone-icon">
+                    ⇄
+                </div>
+
+                <div>
+                    <strong>
+                        Файл выгрузки из 1С
+                    </strong>
+
+                    <p>
+                        Excel или CSV со справочником контрагентов
+                    </p>
+                </div>
+
+                {{ form.file }}
+
+                {% if form.file.errors %}
+                    <div class="form-error">
+                        {{ form.file.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+            <div class="import-options">
+
+                <label class="check-row">
+                    {{ form.clear_ocr }}
+
+                    <span>
+                        <strong>
+                            Удалить OCR-контрагентов
+                        </strong>
+
+                        <small>
+                            Удаляются только старые технические контрагенты с источником OCR. Контрагенты из 1С сохраняются.
+                        </small>
+                    </span>
+                </label>
+
+                <label class="check-row">
+                    {{ form.deactivate_missing }}
+
+                    <span>
+                        <strong>
+                            Деактивировать отсутствующих в новой выгрузке
+                        </strong>
+
+                        <small>
+                            Использовать только если файл содержит полный актуальный справочник 1С.
+                        </small>
+                    </span>
+                </label>
+
+            </div>
+
+            <div class="registry-actions import-actions">
+                <button type="submit" class="btn btn-primary">
+                    Импортировать из 1С
+                </button>
+
+                <a href="{% url 'counterparty_directory' %}" class="btn btn-secondary">
+                    Отмена
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+
+    <div class="import-side">
+
+        <div class="card import-help-card">
+
+            <h3>
+                Что должно быть в файле
+            </h3>
+
+            <div class="import-columns-list">
+
+                <div>
+                    Код
+                </div>
+
+                <div>
+                    Наименование
+                </div>
+
+                <div>
+                    Полное наименование
+                </div>
+
+                <div>
+                    ИНН
+                </div>
+
+                <div>
+                    КПП
+                </div>
+
+                <div>
+                    Банк
+                </div>
+
+                <div>
+                    БИК
+                </div>
+
+                <div>
+                    Расчетный счет
+                </div>
+
+                <div>
+                    Корреспондентский счет
+                </div>
+
+                <div>
+                    Пометка удаления
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card import-help-card">
+
+            <h3>
+                После импорта
+            </h3>
+
+            <div class="process-list">
+
+                <div class="process-item">
+                    <span>
+                        1
+                    </span>
+
+                    <div>
+                        <strong>
+                            Справочник обновится
+                        </strong>
+
+                        <p>
+                            Контрагенты будут созданы или обновлены по коду 1С, ИНН/КПП или названию.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="process-item">
+                    <span>
+                        2
+                    </span>
+
+                    <div>
+                        <strong>
+                            Нужно пересопоставить счета
+                        </strong>
+
+                        <p>
+                            Уже загруженные счета будут заново связаны с официальными контрагентами.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="process-item">
+                    <span>
+                        3
+                    </span>
+
+                    <div>
+                        <strong>
+                            Проверить реквизиты
+                        </strong>
+
+                        <p>
+                            Перед выгрузкой платежей должны быть заполнены ИНН, банк, БИК и расчетный счет.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% if result %}
+
+<div class="registry-summary import-result-summary">
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Строк в файле
+        </span>
+
+        <strong>
+            {{ result.rows }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Создано
+        </span>
+
+        <strong class="text-success">
+            {{ result.created }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Обновлено
+        </span>
+
+        <strong>
+            {{ result.updated }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Пропущено
+        </span>
+
+        <strong class="summary-warning">
+            {{ result.skipped }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            OCR-контрагенты удалены
+        </span>
+
+        <strong>
+            {{ result.deleted_ocr }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Деактивировано
+        </span>
+
+        <strong>
+            {{ result.deactivated }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Всего из 1С
+        </span>
+
+        <strong>
+            {{ result.total_1c }}
+        </strong>
+    </div>
+
+</div>
+
+<div class="card import-next-card">
+
+    <div class="section-title-row">
+        <div>
+            <h3>
+                Следующий шаг
+            </h3>
+
+            <span>
+                Нужно пересопоставить уже загруженные счета с обновленным справочником 1С
+            </span>
+        </div>
+    </div>
+
+    <form method="post" action="{% url 'rematch_counterparties_1c' %}" class="inline-form">
+
+        {% csrf_token %}
+
+        <button type="submit" class="btn btn-primary">
+            Пересопоставить счета с 1С
+        </button>
+
+    </form>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

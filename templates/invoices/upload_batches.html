@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h2 class="page-title">
+            Журнал загрузок
+        </h2>
+
+        <p class="page-subtitle">
+            История пакетных загрузок счетов: новые документы, дубликаты и пропущенные файлы
+        </p>
+    </div>
+
+    <div class="registry-actions">
+        <a href="{% url 'upload_invoice' %}" class="btn btn-primary">
+            Загрузить счет
+        </a>
+
+        <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+            Все счета
+        </a>
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="registry-table-header">
+
+        <div>
+            <h3>
+                Пакеты загрузки
+            </h3>
+
+            <span>
+                Найдено: {{ page_obj.paginator.count }}
+            </span>
+        </div>
+
+    </div>
+
+    <div class="table-scroll table-scroll-fit">
+
+        <table class="table registry-table upload-batches-table">
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Дата</th>
+                    <th>Пользователь</th>
+                    <th>Статус</th>
+                    <th>Файлы</th>
+                    <th>Новые</th>
+                    <th>Дубли</th>
+                    <th>Пропущено</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for batch in page_obj %}
+
+                    <tr>
+                        <td>
+                            #{{ batch.id }}
+                        </td>
+
+                        <td>
+                            <strong>
+                                {{ batch.created_at|date:"d.m.Y" }}
+                            </strong>
+
+                            <div class="muted">
+                                {{ batch.created_at|date:"H:i" }}
+                            </div>
+                        </td>
+
+                        <td>
+                            {{ batch.user.username }}
+                        </td>
+
+                        <td>
+                            <span class="status-badge status-{{ batch.status }}">
+                                {{ batch.get_status_display }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ batch.total_files }}
+                        </td>
+
+                        <td>
+                            <strong class="text-success">
+                                {{ batch.uploaded_count }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            <strong class="{% if batch.duplicate_count %}summary-warning{% endif %}">
+                                {{ batch.duplicate_count }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            <strong class="{% if batch.skipped_count %}summary-warning{% endif %}">
+                                {{ batch.skipped_count }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            <a
+                                href="{% url 'upload_batch_detail' batch.id %}"
+                                class="btn btn-primary btn-sm"
+                            >
+                                Открыть
+                            </a>
+                        </td>
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="9" class="empty-table">
+                            Пакетов загрузки пока нет.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+
+    <div class="pagination">
+
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">
+                Назад
+            </a>
+        {% endif %}
+
+        <span class="muted">
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">
+                Вперед
+            </a>
+        {% endif %}
+
+    </div>
+
+{% endif %}
+
+{% endblock %}

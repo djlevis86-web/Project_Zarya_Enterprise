@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h2 class="page-title">
+            Контрагенты без реквизитов
+        </h2>
+
+        <p class="page-subtitle">
+            Контрагенты, которые используются в счетах к оплате, но имеют незаполненные платежные данные
+        </p>
+    </div>
+
+    <div class="registry-actions">
+        <a href="{% url 'import_counterparties_1c' %}" class="btn btn-primary">
+            Импорт из 1С
+        </a>
+
+        <a href="{% url 'counterparty_directory' %}" class="btn btn-secondary">
+            Справочник
+        </a>
+
+        <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
+            Реестр оплаты
+        </a>
+    </div>
+
+</div>
+
+<div class="registry-summary requisites-summary">
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Контрагентов с проблемами
+        </span>
+
+        <strong class="{% if counterparties_count %}summary-warning{% endif %}">
+            {{ counterparties_count }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Проверка
+        </span>
+
+        {% if counterparties_count %}
+            <strong class="summary-warning">
+                Требуется
+            </strong>
+        {% else %}
+            <strong class="text-success">
+                Пройдена
+            </strong>
+        {% endif %}
+    </div>
+
+</div>
+
+<div class="card requisites-info-card">
+
+    <div class="registry-table-header">
+
+        <div>
+            <h3>
+                Обязательные реквизиты для платежей
+            </h3>
+
+            <span>
+                Без этих данных выгрузка 1С TXT будет остановлена
+            </span>
+        </div>
+
+    </div>
+
+    <div class="requisites-rules">
+
+        <div class="requisite-rule">
+            ИНН
+        </div>
+
+        <div class="requisite-rule">
+            Банк
+        </div>
+
+        <div class="requisite-rule">
+            БИК
+        </div>
+
+        <div class="requisite-rule">
+            Расчетный счет
+        </div>
+
+    </div>
+
+    <p class="muted requisites-note">
+        КПП для индивидуальных предпринимателей может быть пустым. Для организаций КПП желательно заполнять из 1С.
+    </p>
+
+</div>
+
+<div class="card">
+
+    <div class="registry-table-header">
+
+        <div>
+            <h3>
+                Список проблемных контрагентов
+            </h3>
+
+            <span>
+                Контрагенты из 1С или ручного справочника, участвующие в текущих счетах к оплате
+            </span>
+        </div>
+
+        <div class="registry-actions">
+            <a href="{% url 'counterparty_directory' %}?requisites=missing" class="btn btn-secondary">
+                Открыть в справочнике
+            </a>
+        </div>
+
+    </div>
+
+    <div class="table-scroll table-scroll-fit">
+
+        <table class="table registry-table missing-requisites-table">
+
+            <thead>
+                <tr>
+                    <th>
+                        Контрагент
+                    </th>
+
+                    <th>
+                        ИНН / КПП
+                    </th>
+
+                    <th>
+                        Банк
+                    </th>
+
+                    <th>
+                        БИК
+                    </th>
+
+                    <th>
+                        Расчетный счет
+                    </th>
+
+                    <th>
+                        Счетов
+                    </th>
+
+                    <th>
+                        Сумма
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for counterparty in counterparties %}
+
+                    <tr>
+                        <td>
+                            <a
+                                href="{% url 'counterparty_detail' counterparty.id %}"
+                                class="strong-link"
+                            >
+                                {{ counterparty.name }}
+                            </a>
+
+                            <div class="muted">
+                                Источник: {{ counterparty.get_source_display }}
+                            </div>
+                        </td>
+
+                        <td>
+                            {% if counterparty.inn %}
+                                <strong>
+                                    {{ counterparty.inn }}
+                                </strong>
+                            {% else %}
+                                <span class="status-badge status-rejected">
+                                    Нет ИНН
+                                </span>
+                            {% endif %}
+
+                            <div class="muted">
+                                КПП:
+                                {% if counterparty.kpp %}
+                                    {{ counterparty.kpp }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <td>
+                            {% if counterparty.bank_name %}
+                                {{ counterparty.bank_name }}
+                            {% else %}
+                                <span class="status-badge status-rejected">
+                                    Нет банка
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if counterparty.bik %}
+                                {{ counterparty.bik }}
+                            {% else %}
+                                <span class="status-badge status-rejected">
+                                    Нет БИК
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if counterparty.account_number %}
+                                {{ counterparty.account_number }}
+                            {% else %}
+                                <span class="status-badge status-rejected">
+                                    Нет счета
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ counterparty.invoices_count }}
+                        </td>
+
+                        <td>
+                            <strong class="amount-main">
+                                {{ counterparty.invoices_total|default:0|floatformat:2 }} ₽
+                            </strong>
+                        </td>
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="7" class="empty-table">
+                            Все контрагенты, используемые в реестре оплаты, имеют обязательные реквизиты.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

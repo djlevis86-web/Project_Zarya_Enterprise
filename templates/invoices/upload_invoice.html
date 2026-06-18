@@ -2,68 +2,364 @@
 
 {% block content %}
 
-<div class="upload-wrapper">
+<div class="page-header">
 
-    <div class="upload-card">
-
-        <h2>
+    <div>
+        <h2 class="page-title">
             Загрузка счетов
         </h2>
 
-        <p>
-            Можно выбрать до 20 PDF, JPG или PNG файлов
+        <p class="page-subtitle">
+            Загрузите PDF, JPG или PNG. После загрузки система запустит OCR и попробует сопоставить поставщика со справочником 1С.
         </p>
+    </div>
 
-        <form method="post"
-              enctype="multipart/form-data">
+    <div class="registry-actions">
+        <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+            Все счета
+        </a>
 
+        <a href="{% url 'unmatched_counterparties' %}" class="btn btn-secondary">
+            Не найдено в 1С
+        </a>
+    </div>
+
+</div>
+
+<div class="upload-page-grid">
+
+    <div class="card upload-main-card">
+
+        <div class="registry-table-header">
+
+            <div>
+                <h3>
+                    Файлы счетов
+                </h3>
+
+                <span>
+                    Можно выбрать до 20 файлов за одну загрузку
+                </span>
+            </div>
+
+        </div>
+
+       <form
+            method="post"
+            enctype="multipart/form-data"
+            class="upload-form"
+            id="upload-invoice-form"
+        >
             {% csrf_token %}
 
-            <p>
-                {{ form.title.label_tag }}
-                {{ form.title }}
-            </p>
+            <input
+                type="hidden"
+                name="upload_token"
+                value="{{ upload_token }}"
+            >
 
-            <p>
-                {{ form.description.label_tag }}
-                {{ form.description }}
-            </p>
+            {% if form.non_field_errors %}
+                <div class="form-error">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
 
-            <p>
-                {{ form.amount.label_tag }}
-                {{ form.amount }}
-            </p>
-
-            <p>
-
-                <label for="files">
-
-                    Файлы счетов
-
+            <div class="form-group">
+                <label>
+                    Название
                 </label>
+
+                {{ form.title }}
+
+                <div class="muted">
+                    Можно оставить общее название, например: «Счета поставщиков за июнь».
+                </div>
+
+                {% if form.title.errors %}
+                    <div class="form-error">
+                        {{ form.title.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Описание
+                </label>
+
+                {{ form.description }}
+
+                <div class="muted">
+                    Внутренний комментарий к загрузке. Необязательно.
+                </div>
+
+                {% if form.description.errors %}
+                    <div class="form-error">
+                        {{ form.description.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Сумма по умолчанию
+                </label>
+
+                {{ form.amount }}
+
+                <div class="muted">
+                    Если OCR распознает сумму, она будет показана отдельно для проверки.
+                </div>
+
+                {% if form.amount.errors %}
+                    <div class="form-error">
+                        {{ form.amount.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="upload-dropzone">
+
+                <div class="upload-dropzone-icon">
+                    ↑
+                </div>
+
+                <div>
+                    <strong>
+                        Выберите файлы счетов
+                    </strong>
+
+                    <p>
+                        PDF, JPG, JPEG или PNG
+                    </p>
+                </div>
 
                 <input
                     type="file"
                     id="files"
                     name="files"
-                    class="form-control"
+                    class="form-control upload-file-input"
                     multiple
                     accept=".pdf,.jpg,.jpeg,.png"
                 >
 
-            </p>
+            </div>
 
-            <button
-                type="submit"
-                class="primary-btn"
-            >
-                Загрузить
-            </button>
+            <div class="upload-actions-row">
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    id="upload-submit-btn"
+                >
+                    Загрузить и распознать
+                </button>
+
+                <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+                    Отмена
+                </a>
+
+            </div>
 
         </form>
 
     </div>
 
+    <div class="upload-side">
+
+        <div class="card upload-help-card">
+
+            <h3>
+                Что произойдет после загрузки
+            </h3>
+
+            <div class="upload-steps">
+
+                <div class="upload-step">
+                    <span>
+                        1
+                    </span>
+
+                    <div>
+                        <strong>
+                            Создание счета
+                        </strong>
+
+                        <p>
+                            Файл сохранится в системе и появится в списке счетов.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="upload-step">
+                    <span>
+                        2
+                    </span>
+
+                    <div>
+                        <strong>
+                            OCR-распознавание
+                        </strong>
+
+                        <p>
+                            Система попробует найти номер счета, дату, сумму и поставщика.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="upload-step">
+                    <span>
+                        3
+                    </span>
+
+                    <div>
+                        <strong>
+                            Сверка с 1С
+                        </strong>
+
+                        <p>
+                            Контрагент будет найден в официальном справочнике по ИНН или названию.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="upload-step">
+                    <span>
+                        4
+                    </span>
+
+                    <div>
+                        <strong>
+                            Подготовка к оплате
+                        </strong>
+
+                        <p>
+                            После проверки счет можно отправить в график платежей и реестр оплаты.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card upload-help-card">
+
+            <h3>
+                Важно
+            </h3>
+
+            <div class="upload-note-list">
+
+                <div class="upload-note">
+                    Не загружайте один и тот же файл повторно — система проверяет дубли.
+                </div>
+
+                <div class="upload-note">
+                    Если контрагент не найден в 1С, счет попадет в раздел «Не найдено в 1С».
+                </div>
+
+                <div class="upload-note">
+                    Перед выгрузкой платежей нужно проверить реквизиты контрагентов.
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card upload-help-card">
+
+    <div class="registry-table-header">
+
+        <div>
+            <h3>
+                Последние загрузки
+            </h3>
+
+            <span>
+                Недавние пакеты файлов
+            </span>
+        </div>
+
+        <div class="registry-actions">
+            <a href="{% url 'upload_batches' %}" class="btn btn-secondary btn-sm">
+                Журнал
+            </a>
+        </div>
+
+    </div>
+
+    <div class="latest-upload-list">
+
+        {% for batch in latest_upload_batches %}
+
+            <a
+                href="{% url 'upload_batch_detail' batch.id %}"
+                class="latest-upload-item"
+            >
+
+                <div>
+                    <strong>
+                        Пакет #{{ batch.id }}
+                    </strong>
+
+                    <span>
+                        {{ batch.created_at|date:"d.m.Y H:i" }}
+                    </span>
+                </div>
+
+                <div class="latest-upload-meta">
+
+                    <span class="status-badge status-{{ batch.status }}">
+                        {{ batch.get_status_display }}
+                    </span>
+
+                    <small>
+                        Новых: {{ batch.uploaded_count }} · Дублей: {{ batch.duplicate_count }}
+                    </small>
+
+                </div>
+
+            </a>
+
+        {% empty %}
+
+            <div class="empty-state">
+                Загрузок пока нет.
+            </div>
+
+        {% endfor %}
+
+    </div>
+
 </div>
+
+    </div>
+
+</div>
+
+<script>
+(function () {
+    const form = document.getElementById('upload-invoice-form');
+    const button = document.getElementById('upload-submit-btn');
+
+    if (!form || !button) {
+        return;
+    }
+
+    form.addEventListener('submit', function (event) {
+        if (form.dataset.submitted === 'true') {
+            event.preventDefault();
+            return;
+        }
+
+        form.dataset.submitted = 'true';
+
+        button.disabled = true;
+        button.classList.add('is-loading');
+        button.innerText = 'Загружаем и запускаем OCR...';
+    });
+})();
+</script>
 
 {% endblock %}

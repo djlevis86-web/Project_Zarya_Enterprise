@@ -3,12 +3,29 @@ from django.urls import path
 from .views import (
     invoice_list,
     upload_invoice,
+    upload_result,
+    upload_batches,
+    upload_batch_detail,
     invoice_detail,
     change_invoice_status,
     add_comment,
     edit_invoice,
-    upload_result
+    payment_schedule,
+    payment_registry,
+    export_payment_registry_excel,
+    export_payment_registry_1c,
+    unmatched_counterparties,
+    export_unmatched_counterparties_excel,
+    import_counterparties_1c,
+    rematch_counterparties_1c,
+    counterparties_missing_requisites,
+    counterparty_directory,
+    counterparty_detail,
+    counterparty_create,
+    counterparty_edit,
+    invoice_assign_counterparty,
 )
+
 
 urlpatterns = [
 
@@ -25,9 +42,111 @@ urlpatterns = [
     ),
 
     path(
+        'upload-result/',
+        upload_result,
+        name='upload_result'
+    ),
+
+    path(
+        'uploads/',
+        upload_batches,
+        name='upload_batches'
+    ),
+
+    path(
+        'uploads/<int:batch_id>/',
+        upload_batch_detail,
+        name='upload_batch_detail'
+    ),
+
+    path(
+        'payment-schedule/',
+        payment_schedule,
+        name='payment_schedule'
+    ),
+
+    path(
+        'payment-registry/',
+        payment_registry,
+        name='payment_registry'
+    ),
+
+    path(
+        'payment-registry/export-excel/',
+        export_payment_registry_excel,
+        name='export_payment_registry_excel'
+    ),
+
+    path(
+        'payment-registry/export-1c/',
+        export_payment_registry_1c,
+        name='export_payment_registry_1c'
+    ),
+
+    path(
+        'unmatched-counterparties/',
+        unmatched_counterparties,
+        name='unmatched_counterparties'
+    ),
+
+    path(
+        'unmatched-counterparties/export-excel/',
+        export_unmatched_counterparties_excel,
+        name='export_unmatched_counterparties_excel'
+    ),
+
+    path(
+        'counterparties/import-1c/',
+        import_counterparties_1c,
+        name='import_counterparties_1c'
+    ),
+
+    path(
+        'counterparties/rematch-1c/',
+        rematch_counterparties_1c,
+        name='rematch_counterparties_1c'
+    ),
+
+    path(
+        'counterparties/missing-requisites/',
+        counterparties_missing_requisites,
+        name='counterparties_missing_requisites'
+    ),
+
+    path(
+        'counterparties/',
+        counterparty_directory,
+        name='counterparty_directory'
+    ),
+
+    path(
+        'counterparties/create/',
+        counterparty_create,
+        name='counterparty_create'
+    ),
+
+    path(
+        'counterparties/<int:counterparty_id>/',
+        counterparty_detail,
+        name='counterparty_detail'
+    ),
+
+    path(
+        'counterparties/<int:counterparty_id>/edit/',
+        counterparty_edit,
+        name='counterparty_edit'
+    ),
+
+    path(
         '<int:invoice_id>/',
         invoice_detail,
         name='invoice_detail'
+    ),
+
+    path(
+        '<int:invoice_id>/assign-counterparty/',
+        invoice_assign_counterparty,
+        name='invoice_assign_counterparty'
     ),
 
     path(
@@ -46,12 +165,6 @@ urlpatterns = [
         'invoice/<int:invoice_id>/edit/',
         edit_invoice,
         name='edit_invoice'
-    ),
-
-    path(
-        'upload-result/',
-        upload_result,
-        name='upload_result'
     ),
 
 ]

@@ -455,3 +455,121 @@ class Invoice(models.Model):
     @property
     def is_pdf(self):
         return self.file.name.lower().endswith('.pdf')
+
+
+class OCRJob(models.Model):
+
+    STATUS_PENDING = 'pending'
+    STATUS_PROCESSING = 'processing'
+    STATUS_DONE = 'done'
+    STATUS_ERROR = 'error'
+
+    STATUS_CHOICES = [
+        (STATUS_PENDING, 'Ожидает'),
+        (STATUS_PROCESSING, 'Выполняется'),
+        (STATUS_DONE, 'Готово'),
+        (STATUS_ERROR, 'Ошибка'),
+    ]
+
+    SOURCE_MANUAL = 'manual'
+    SOURCE_SINGLE = 'single'
+    SOURCE_BULK = 'bulk'
+    SOURCE_UPLOAD = 'upload'
+
+    SOURCE_CHOICES = [
+        (SOURCE_MANUAL, 'Вручную'),
+        (SOURCE_SINGLE, 'Карточка счета'),
+        (SOURCE_BULK, 'Массовая постановка'),
+        (SOURCE_UPLOAD, 'Загрузка файла'),
+    ]
+
+    invoice = models.ForeignKey(
+        Invoice,
+        on_delete=models.CASCADE,
+        related_name='ocr_jobs',
+        verbose_name='Счет'
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='ocr_jobs',
+        verbose_name='Пользователь'
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING,
+        db_index=True,
+        verbose_name='Статус'
+    )
+
+    source = models.CharField(
+        max_length=20,
+        choices=SOURCE_CHOICES,
+        default=SOURCE_MANUAL,
+        verbose_name='Источник'
+    )
+
+    attempts = models.PositiveIntegerField(
+        default=0,
+        verbose_name='Попыток'
+    )
+
+    message = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Сообщение'
+    )
+
+    error_message = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Ошибка'
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Создано'
+    )
+
+    started_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        verbose_name='Начато'
+    )
+
+    finished_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        verbose_name='Завершено'
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Обновлено'
+    )
+
+    class Meta:
+        ordering = [
+            '-created_at'
+        ]
+
+        verbose_name = 'OCR задача'
+        verbose_name_plural = 'OCR задачи'
+
+        indexes = [
+            models.Index(
+                fields=[
+                    'status',
+                    'created_at',
+                ]
+            ),
+        ]
+
+    def __str__(self):
+        return f'OCR задача #{self.id} для счета #{self.invoice_id}'
+

@@ -22,6 +22,10 @@
         <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
             Реестр оплаты
         </a>
+
+        <a href="{% url 'ocr_queue' %}" class="btn btn-secondary">
+            Очередь OCR
+        </a>
     </div>
 
 </div>
@@ -227,6 +231,14 @@
                 class="btn btn-primary"
             >
                 Повторить OCR для выбранных
+            </button>
+
+            <button
+                type="submit"
+                formaction="{% url 'enqueue_ocr_jobs' %}"
+                class="btn btn-secondary"
+            >
+                Поставить OCR в очередь
             </button>
         </div>
 

@@ -2246,3 +2246,73 @@ input[type="file"]::file-selector-button {
     white-space: nowrap;
 }
 
+/* =========================================================
+   OCR queue
+========================================================= */
+
+.ocr-queue-command pre {
+    margin: 0;
+    padding: 14px 16px;
+    border: 1px solid var(--z-border);
+    border-radius: 14px;
+    background: rgba(0, 0, 0, .26);
+    color: var(--z-accent-2);
+    overflow-x: auto;
+    font-weight: 850;
+}
+
+.ocr-queue-table {
+    min-width: 1120px;
+}
+
+.ocr-queue-table th:nth-child(1),
+.ocr-queue-table td:nth-child(1) {
+    width: 70px;
+}
+
+.ocr-queue-table th:nth-child(2),
+.ocr-queue-table td:nth-child(2) {
+    width: 130px;
+}
+
+.ocr-queue-table th:nth-child(3),
+.ocr-queue-table td:nth-child(3) {
+    width: 260px;
+}
+
+.ocr-queue-table th:nth-child(4),
+.ocr-queue-table td:nth-child(4) {
+    width: 130px;
+}
+
+.ocr-queue-table th:nth-child(5),
+.ocr-queue-table td:nth-child(5) {
+    width: 150px;
+}
+
+.ocr-queue-table th:nth-child(6),
+.ocr-queue-table td:nth-child(6) {
+    width: 90px;
+}
+
+.queue-message {
+    max-width: 420px;
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.queue-message-error {
+    color: #fca5a5;
+}
+
+.status-done {
+    background: rgba(34, 197, 94, .16);
+    color: #bbf7d0;
+}
+
+.status-pending {
+    background: rgba(245, 158, 11, .15);
+    color: #fde68a;
+}
+
+

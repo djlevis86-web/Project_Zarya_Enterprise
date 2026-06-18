@@ -7,249 +7,525 @@
 <div class="page-header">
 
     <div>
-
         <h2 class="page-title">
             {{ invoice.title }}
         </h2>
 
         <p class="page-subtitle">
-            Карточка счета №{{ invoice.id }}
+            Карточка счета #{{ invoice.id }}
         </p>
-
     </div>
 
-    <div>
+    <div class="registry-actions">
 
         {% if user.is_staff %}
-        <a href="{% url 'edit_invoice' invoice.id %}"
-           class="primary-btn">
-            Редактировать
-        </a>
+            <a
+                href="{% url 'edit_invoice' invoice.id %}"
+                class="btn btn-primary"
+            >
+                Редактировать
+            </a>
         {% endif %}
 
-    </div>
-
-</div>
-
-
-<div class="invoice-layout">
-
-    <div class="invoice-info">
-
-        <div class="content-card">
-
-            <h3>Основная информация</h3>
-
-           <div class="invoice-meta">
-
-    <div class="meta-row">
-        <span>ID</span>
-        <strong>#{{ invoice.id }}</strong>
-    </div>
-
-    <div class="meta-row">
-        <span>Пользователь</span>
-        <strong>{{ invoice.user.username }}</strong>
-    </div>
-
-    <div class="meta-row">
-        <span>Поставщик</span>
-        <strong>{{ invoice.vendor|default:"—" }}</strong>
-    </div>
-
-    <div class="meta-row">
-        <span>Номер счета</span>
-        <strong>{{ invoice.invoice_number|default:"—" }}</strong>
-    </div>
-
-    <div class="meta-row">
-        <span>Сумма</span>
-        <strong>{{ invoice.amount }} ₽</strong>
-    </div>
-
-    <div class="meta-row">
-        <span>OCR сумма</span>
-        <strong>{{ invoice.ocr_amount|default:"—" }} ₽</strong>
-    </div>
-
-    <div class="meta-row">
-    <span>OCR проверка</span>
-
-    {% if invoice.ocr_verified %}
-
-        <strong style="color:#27ae60;">
-            ✓ Пройдена
-        </strong>
-
-    {% else %}
-
-        <strong style="color:#e74c3c;">
-            ✗ Не пройдена
-        </strong>
-
-    {% endif %}
-</div>
-
-{% if invoice.ocr_comment %}
-
-<div class="ocr-comment">
-
-    {{ invoice.ocr_comment }}
-
-</div>
-
-{% endif %}
-
-    {% if invoice.ocr_amount %}
-
-        {% if invoice.amount == invoice.ocr_amount %}
-
-            <div class="ocr-success">
-                ✓ OCR сумма совпадает
-            </div>
-
-        {% else %}
-
-            <div class="ocr-warning">
-                ⚠ OCR сумма отличается от подтвержденной суммы
-            </div>
-
-        {% endif %}
-
-    {% endif %}
-
-</div>
-
-</div>
-
-        <div class="content-card">
-
-    <h3>История</h3>
-
-    {% for log in logs %}
-
-    <div class="timeline-item">
-
-        <div class="timeline-date">
-            {{ log.created_at|date:"d.m.Y H:i" }}
-        </div>
-
-        <div class="timeline-text">
-            {{ log.action }}
-        </div>
-
-    </div>
-
-    {% endfor %}
-
-</div>
-
-
-        <div class="content-card">
-
-    <h3>Комментарии</h3>
-
-    <form method="post"
-          action="{% url 'add_comment' invoice.id %}">
-
-        {% csrf_token %}
-
-        <textarea
-            name="text"
-            class="form-control"
-            rows="4"
-            placeholder="Введите комментарий..."
-        ></textarea>
-
-        <button
-            type="submit"
-            class="primary-btn"
-            style="margin-top:12px;"
+        <a
+            href="{% url 'invoice_assign_counterparty' invoice.id %}"
+            class="btn btn-secondary"
         >
-            Добавить комментарий
-        </button>
+            Привязать контрагента
+        </a>
 
-    </form>
-
-    <hr style="margin:20px 0;">
-
-    {% for comment in comments %}
-
-        <div class="comment-item">
-
-            <div class="comment-header">
-
-                <strong>
-                    {{ comment.user.username }}
-                </strong>
-
-                <span>
-                    {{ comment.created_at|date:"d.m.Y H:i" }}
-                </span>
-
-            </div>
-
-            <div class="comment-text">
-
-                {{ comment.text }}
-
-            </div>
-
-        </div>
-
-    {% empty %}
-
-        <div class="empty-state">
-
-            Пока нет комментариев
-
-        </div>
-
-    {% endfor %}
-
-</div>
+        <a
+            href="{% url 'invoice_list' %}"
+            class="btn btn-secondary"
+        >
+            Назад к счетам
+        </a>
 
     </div>
 
+</div>
 
-   <div class="invoice-preview">
+<div class="invoice-detail-layout">
 
-    <div class="content-card">
+    <div class="invoice-detail-left">
 
-        <h3>Просмотр документа</h3>
+        <div class="card invoice-section-card">
 
-        {% if invoice.is_pdf %}
+            <div class="section-title-row">
+                <div>
+                    <h3>
+                        Основная информация
+                    </h3>
 
-            <div class="pdf-toolbar">
+                    <span>
+                        Данные счета и файла
+                    </span>
+                </div>
 
-                <button id="zoom-out">
-                    −
-                </button>
-
-                <span id="zoom-value">
-                    100%
+                <span class="status-badge status-{{ invoice.status }}">
+                    {{ invoice.get_status_display }}
                 </span>
+            </div>
 
-                <button id="zoom-in">
-                    +
-                </button>
+            <div class="info-list">
+
+                <div class="info-row">
+                    <span>
+                        ID
+                    </span>
+
+                    <strong>
+                        #{{ invoice.id }}
+                    </strong>
+                </div>
+
+                <div class="info-row">
+                    <span>
+                        Пользователь
+                    </span>
+
+                    <strong>
+                        {{ invoice.user.username }}
+                    </strong>
+                </div>
+
+                <div class="info-row">
+                    <span>
+                        Номер счета
+                    </span>
+
+                    <strong>
+                        {{ invoice.invoice_number|default:"—" }}
+                    </strong>
+                </div>
+
+                <div class="info-row">
+                    <span>
+                        Дата счета
+                    </span>
+
+                    <strong>
+                        {{ invoice.invoice_date|default:"—" }}
+                    </strong>
+                </div>
+
+                <div class="info-row">
+                    <span>
+                        Файл
+                    </span>
+
+                    {% if invoice.file %}
+                        <a
+                            href="{{ invoice.file.url }}"
+                            target="_blank"
+                            class="file-link"
+                        >
+                            {{ invoice.original_filename|default:"Открыть файл" }}
+                        </a>
+                    {% else %}
+                        <strong>
+                            —
+                        </strong>
+                    {% endif %}
+                </div>
 
             </div>
 
-            <div id="pdf-container"></div>
+        </div>
 
-        {% else %}
+        <div class="card invoice-section-card">
 
-            <img
-                src="{{ invoice.file.url }}"
-                class="preview-image"
+            <div class="section-title-row">
+                <div>
+                    <h3>
+                        Контрагент
+                    </h3>
+
+                    <span>
+                        OCR-поставщик и связанный справочник
+                    </span>
+                </div>
+            </div>
+
+            <div class="info-list">
+
+                <div class="info-row info-row-vertical">
+                    <span>
+                        Поставщик из OCR
+                    </span>
+
+                    <strong>
+                        {{ invoice.vendor|default:"—" }}
+                    </strong>
+                </div>
+
+                <div class="info-row info-row-vertical">
+                    <span>
+                        Контрагент справочника
+                    </span>
+
+                    {% if invoice.counterparty %}
+                        <div>
+                            <a
+                                href="{% url 'counterparty_detail' invoice.counterparty.id %}"
+                                class="strong-link"
+                            >
+                                {{ invoice.counterparty.name }}
+                            </a>
+
+                            {% if invoice.counterparty.inn %}
+                                <div class="muted">
+                                    ИНН {{ invoice.counterparty.inn }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div>
+                            <span class="status-badge status-rejected">
+                                Не привязан
+                            </span>
+
+                            <div class="invoice-section-action">
+                                <a
+                                    href="{% url 'invoice_assign_counterparty' invoice.id %}"
+                                    class="btn btn-secondary btn-sm"
+                                >
+                                    Привязать вручную
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="info-row info-row-vertical">
+                    <span>
+                        Статус сопоставления
+                    </span>
+
+                    <div>
+                        <strong>
+                            {{ invoice.get_counterparty_match_status_display }}
+                        </strong>
+
+                        {% if invoice.counterparty_match_comment %}
+                            <div class="muted">
+                                {{ invoice.counterparty_match_comment }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card invoice-section-card">
+
+            <div class="section-title-row">
+                <div>
+                    <h3>
+                        Оплата
+                    </h3>
+
+                    <span>
+                        Сумма, план оплаты и приоритет
+                    </span>
+                </div>
+            </div>
+
+            <div class="info-list">
+
+                <div class="info-row">
+                    <span>
+                        Подтвержденная сумма
+                    </span>
+
+                    <strong class="amount-main">
+                        {{ invoice.amount|floatformat:2 }} ₽
+                    </strong>
+                </div>
+
+                <div class="info-row">
+                    <span>
+                        OCR сумма
+                    </span>
+
+                    <strong>
+                        {% if invoice.ocr_amount %}
+                            {{ invoice.ocr_amount|floatformat:2 }} ₽
+                        {% else %}
+                            —
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <div class="info-row">
+                    <span>
+                        Плановая дата оплаты
+                    </span>
+
+                    <strong>
+                        {% if invoice.planned_payment_date %}
+                            {{ invoice.planned_payment_date|date:"d.m.Y" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <div class="info-row">
+                    <span>
+                        Приоритет
+                    </span>
+
+                    <strong>
+                        {{ invoice.payment_priority }}
+                    </strong>
+                </div>
+
+                <div class="info-row">
+                    <span>
+                        Дата оплаты
+                    </span>
+
+                    <strong>
+                        {% if invoice.paid_at %}
+                            {{ invoice.paid_at|date:"d.m.Y H:i" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card invoice-section-card">
+
+            <div class="section-title-row">
+                <div>
+                    <h3>
+                        OCR-проверка
+                    </h3>
+
+                    <span>
+                        Контроль распознавания суммы и данных счета
+                    </span>
+                </div>
+
+                {% if invoice.ocr_verified %}
+                    <span class="status-badge status-approved">
+                        Пройдена
+                    </span>
+                {% else %}
+                    <span class="status-badge status-rejected">
+                        Не пройдена
+                    </span>
+                {% endif %}
+            </div>
+
+            {% if invoice.ocr_amount %}
+
+                {% if invoice.amount_verified %}
+                    <div class="ocr-result-card ocr-result-success">
+                        OCR сумма совпадает с подтвержденной суммой.
+                    </div>
+                {% else %}
+                    <div class="ocr-result-card ocr-result-warning">
+                        OCR сумма отличается от подтвержденной суммы.
+                    </div>
+                {% endif %}
+
+            {% else %}
+
+                <div class="ocr-result-card ocr-result-muted">
+                    OCR сумма не определена.
+                </div>
+
+            {% endif %}
+
+            {% if invoice.ocr_comment %}
+                <div class="ocr-comment-box">
+                    {{ invoice.ocr_comment }}
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div class="card invoice-section-card">
+
+            <div class="section-title-row">
+                <div>
+                    <h3>
+                        История
+                    </h3>
+
+                    <span>
+                        Журнал действий по счету
+                    </span>
+                </div>
+            </div>
+
+            <div class="timeline-list">
+
+                {% for log in logs %}
+
+                    <div class="timeline-item">
+                        <div class="timeline-date">
+                            {{ log.created_at|date:"d.m.Y H:i" }}
+                        </div>
+
+                        <div class="timeline-text">
+                            {{ log.action }}
+                        </div>
+                    </div>
+
+                {% empty %}
+
+                    <div class="empty-state">
+                        Истории пока нет.
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        <div class="card invoice-section-card">
+
+            <div class="section-title-row">
+                <div>
+                    <h3>
+                        Комментарии
+                    </h3>
+
+                    <span>
+                        Внутреннее обсуждение счета
+                    </span>
+                </div>
+            </div>
+
+            <form
+                method="post"
+                action="{% url 'add_comment' invoice.id %}"
+                class="comment-form-clean"
             >
 
-        {% endif %}
+                {% csrf_token %}
+
+                <textarea
+                    name="text"
+                    class="form-control"
+                    rows="4"
+                    placeholder="Введите комментарий..."
+                ></textarea>
+
+                <div class="comment-actions">
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Добавить комментарий
+                    </button>
+                </div>
+
+            </form>
+
+            <div class="comment-list">
+
+                {% for comment in comments %}
+
+                    <div class="comment-item">
+
+                        <div class="comment-header">
+
+                            <strong>
+                                {{ comment.user.username }}
+                            </strong>
+
+                            <span>
+                                {{ comment.created_at|date:"d.m.Y H:i" }}
+                            </span>
+
+                        </div>
+
+                        <div class="comment-text">
+                            {{ comment.text }}
+                        </div>
+
+                    </div>
+
+                {% empty %}
+
+                    <div class="empty-state">
+                        Пока нет комментариев.
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
 
     </div>
 
-</div>
+    <div class="invoice-detail-right">
+
+        <div class="card invoice-document-card">
+
+            <div class="section-title-row">
+                <div>
+                    <h3>
+                        Просмотр документа
+                    </h3>
+
+                    <span>
+                        Оригинальный файл счета
+                    </span>
+                </div>
+            </div>
+
+            {% if invoice.is_pdf %}
+
+                <div class="pdf-toolbar">
+
+                    <button
+                        id="zoom-out"
+                        type="button"
+                        class="btn btn-secondary btn-sm"
+                    >
+                        −
+                    </button>
+
+                    <span id="zoom-value">
+                        100%
+                    </span>
+
+                    <button
+                        id="zoom-in"
+                        type="button"
+                        class="btn btn-secondary btn-sm"
+                    >
+                        +
+                    </button>
+
+                </div>
+
+                <div id="pdf-container"></div>
+
+            {% else %}
+
+                <img
+                    src="{{ invoice.file.url }}"
+                    class="preview-image"
+                    alt="Документ счета"
+                >
+
+            {% endif %}
+
+        </div>
 
     </div>
 
@@ -278,7 +554,7 @@ document.getElementById(
     "pdf-container"
 );
 
-let scale = 1.2;
+let scale = 1.1;
 
 async function renderPdf() {
 
@@ -373,7 +649,7 @@ document
     "click",
     () => {
 
-        scale += 0.2;
+        scale += 0.15;
 
         renderPdf();
     }
@@ -387,9 +663,9 @@ document
     "click",
     () => {
 
-        if(scale > 0.4){
+        if(scale > 0.45){
 
-            scale -= 0.2;
+            scale -= 0.15;
 
             renderPdf();
         }

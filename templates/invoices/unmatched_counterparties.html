@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h2 class="page-title">
+            Не найдено в 1С
+        </h2>
+
+        <p class="page-subtitle">
+            OCR определил поставщика, но система не нашла его в официальном справочнике 1С или ручном справочнике
+        </p>
+    </div>
+
+    <div class="registry-actions">
+
+        <a
+            href="{% url 'export_unmatched_counterparties_excel' %}"
+            class="btn btn-primary"
+        >
+            Выгрузить кандидатов
+        </a>
+
+        <a
+            href="{% url 'import_counterparties_1c' %}"
+            class="btn btn-secondary"
+        >
+            Импорт из 1С
+        </a>
+
+        <form
+            method="post"
+            action="{% url 'rematch_counterparties_1c' %}"
+            class="inline-form"
+        >
+            {% csrf_token %}
+
+            <button type="submit" class="btn btn-secondary">
+                Пересопоставить
+            </button>
+        </form>
+
+        <a
+            href="{% url 'payment_registry' %}"
+            class="btn btn-secondary"
+        >
+            Реестр оплаты
+        </a>
+
+    </div>
+
+</div>
+
+<div class="registry-summary">
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Поставщиков не найдено
+        </span>
+
+        <strong>
+            {{ groups_count }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Счетов требует сверки
+        </span>
+
+        <strong>
+            {{ invoices_count }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Сумма по счетам
+        </span>
+
+        <strong>
+            {{ total_amount|floatformat:2 }} ₽
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Следующее действие
+        </span>
+
+        <strong class="summary-hint">
+            Сверить
+        </strong>
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="registry-table-header">
+
+        <div>
+            <h3>
+                Кандидаты для сверки с 1С
+            </h3>
+
+            <span>
+                Найди этих поставщиков в 1С, импортируй справочник и запусти пересопоставление
+            </span>
+        </div>
+
+        <div class="registry-actions">
+            <a
+                href="{% url 'counterparty_create' %}"
+                class="btn btn-secondary"
+            >
+                Добавить вручную
+            </a>
+        </div>
+
+    </div>
+
+    <div class="table-scroll table-scroll-fit">
+
+        <table class="table registry-table unmatched-table">
+
+            <thead>
+                <tr>
+                    <th>
+                        Поставщик из OCR
+                    </th>
+
+                    <th>
+                        Счетов
+                    </th>
+
+                    <th>
+                        Сумма
+                    </th>
+
+                    <th>
+                        Номера счетов
+                    </th>
+
+                    <th>
+                        Счета
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for group in groups %}
+
+                    <tr>
+                        <td>
+                            <strong>
+                                {{ group.vendor_name }}
+                            </strong>
+
+                            <div class="muted">
+                                Не найден в справочнике 1С
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="status-badge status-review">
+                                {{ group.count }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <strong class="amount-main">
+                                {{ group.total_amount|floatformat:2 }} ₽
+                            </strong>
+                        </td>
+
+                        <td>
+                            {% if group.invoice_numbers %}
+                                <div class="invoice-number-list">
+                                    {{ group.invoice_numbers|join:", " }}
+                                </div>
+                            {% else %}
+                                <span class="muted">
+                                    —
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div class="unmatched-invoice-list">
+
+                                {% for invoice in group.invoices %}
+
+                                    <div class="unmatched-invoice-item">
+
+                                        <a
+                                            href="{% url 'invoice_detail' invoice.id %}"
+                                            class="invoice-id-link"
+                                        >
+                                            #{{ invoice.id }}
+                                        </a>
+
+                                        <a
+                                            href="{% url 'invoice_assign_counterparty' invoice.id %}?next={% url 'unmatched_counterparties' %}"
+                                            class="btn btn-secondary btn-sm"
+                                        >
+                                            Привязать
+                                        </a>
+
+                                    </div>
+
+                                {% endfor %}
+
+                            </div>
+                        </td>
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="5" class="empty-table">
+                            Все счета сопоставлены с контрагентами из справочника 1С.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

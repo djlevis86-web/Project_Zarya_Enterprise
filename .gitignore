@@ -3,56 +3,63 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+*.pyc
 
-# Virtualenv
+# Virtual environments
 venv/
-.env/
+.venv/
+env/
+ENV/
 
-# Django
+# Django local files
 db.sqlite3
+db.sqlite3-journal
+*.sqlite3
+*.sqlite3-journal
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Uploaded files and invoices
 media/
+
+# Backups
+backups/
+*.zip
+*.7z
+*.rar
+
+# Static build output
 staticfiles/
-
-# IDE
-.idea/
-.vscode/
-
-# Windows
-Thumbs.db
-Desktop.ini
 
 # Logs
 *.log
+logs/
 
-# PyCharm
-*.iml
+# Node / Tailwind
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
 
-# Environment
-.env
-.env.*
+# IDE
+.vscode/
+.idea/
 
-# OCR temp
-temp/
-tmp/
+# OS
+.DS_Store
+Thumbs.db
 
-# Python cache
+# Test/cache
 .pytest_cache/
 .mypy_cache/
+.coverage
+htmlcov/
 
-# Git
-.git/
-
-node_modules/
-
-# backups
-backups_db/
-backup_database.py
-
-# debug / local tools
+# Local import/export data
+counterparties_1c.xlsx
+counterparty_candidates_1c.xlsx
 redis_inspect.json
-
-# env / system
-.env
-venv/
-__pycache__/
-*.pyc

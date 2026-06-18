@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2 class="page-title">
+            {{ page_title }}
+        </h2>
+
+        <p class="page-subtitle">
+            Ручной контрагент используется, если его нет в выгрузке 1С, но он нужен для работы реестра оплаты
+        </p>
+    </div>
+
+    <div class="registry-actions">
+        {% if counterparty %}
+            <a
+                href="{% url 'counterparty_detail' counterparty.id %}"
+                class="btn btn-secondary"
+            >
+                Назад к карточке
+            </a>
+        {% endif %}
+
+        <a
+            href="{% url 'counterparty_directory' %}"
+            class="btn btn-secondary"
+        >
+            Справочник
+        </a>
+    </div>
+</div>
+
+<div class="card registry-filter-card">
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="form-error">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>
+                    Наименование
+                </label>
+
+                {{ form.name }}
+
+                {% if form.name.errors %}
+                    <div class="form-error">
+                        {{ form.name.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Полное наименование
+                </label>
+
+                {{ form.full_name }}
+
+                {% if form.full_name.errors %}
+                    <div class="form-error">
+                        {{ form.full_name.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label>
+                    ИНН
+                </label>
+
+                {{ form.inn }}
+
+                {% if form.inn.errors %}
+                    <div class="form-error">
+                        {{ form.inn.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label>
+                    КПП
+                </label>
+
+                {{ form.kpp }}
+
+                {% if form.kpp.errors %}
+                    <div class="form-error">
+                        {{ form.kpp.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Банк
+                </label>
+
+                {{ form.bank_name }}
+
+                {% if form.bank_name.errors %}
+                    <div class="form-error">
+                        {{ form.bank_name.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label>
+                    БИК
+                </label>
+
+                {{ form.bik }}
+
+                {% if form.bik.errors %}
+                    <div class="form-error">
+                        {{ form.bik.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Расчетный счет
+                </label>
+
+                {{ form.account_number }}
+
+                {% if form.account_number.errors %}
+                    <div class="form-error">
+                        {{ form.account_number.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Корреспондентский счет
+                </label>
+
+                {{ form.correspondent_account }}
+
+                {% if form.correspondent_account.errors %}
+                    <div class="form-error">
+                        {{ form.correspondent_account.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Email
+                </label>
+
+                {{ form.email }}
+
+                {% if form.email.errors %}
+                    <div class="form-error">
+                        {{ form.email.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Телефон
+                </label>
+
+                {{ form.phone }}
+
+                {% if form.phone.errors %}
+                    <div class="form-error">
+                        {{ form.phone.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            <label>
+                {{ form.is_active }}
+                Активен
+            </label>
+        </div>
+
+        <div class="registry-actions">
+            <button type="submit" class="btn btn-primary">
+                {{ submit_label }}
+            </button>
+
+            <a
+                href="{% url 'counterparty_directory' %}"
+                class="btn btn-secondary"
+            >
+                Отмена
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

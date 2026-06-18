@@ -2,7 +2,6 @@
 <html lang="ru">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta name="viewport"
@@ -16,60 +15,151 @@
 
     <link rel="stylesheet"
           href="{% static 'css/style.css' %}">
-
 </head>
 
 <body class="{% if user.is_authenticated and user.theme == 'light' %}light-theme{% endif %}">
 
-<div class="layout">
+{% with current=request.resolver_match.url_name %}
+
+<div class="app-shell">
 
     <aside class="sidebar">
 
-        <div>
+        <div class="sidebar-top">
 
-            <div class="sidebar-logo">
-                ОАО "Заря"
-            </div>
+            <a href="{% url 'dashboard' %}" class="sidebar-brand">
+                <span class="brand-mark">
+                    З
+                </span>
+
+                <span>
+                    <strong>
+                        ОАО «Заря»
+                    </strong>
+
+                    <small>
+                        Project Zarya
+                    </small>
+                </span>
+            </a>
 
             <nav class="sidebar-nav">
 
-                <a href="{% url 'dashboard' %}">
-                    Панель управления
-                </a>
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        Работа
+                    </div>
 
-                <a href="{% url 'invoice_list' %}">
-                    Счета
-                </a>
+                    <a href="{% url 'dashboard' %}"
+                       class="nav-link {% if current == 'dashboard' %}is-active{% endif %}">
+                        <span class="nav-icon">⌂</span>
+                        <span>Панель управления</span>
+                    </a>
 
-                <a href="{% url 'upload_invoice' %}">
-                    Загрузка
-                </a>
+                    <a href="{% url 'invoice_list' %}"
+                       class="nav-link {% if current == 'invoice_list' or current == 'invoice_detail' or current == 'edit_invoice' or current == 'invoice_assign_counterparty' %}is-active{% endif %}">
+                        <span class="nav-icon">▦</span>
+                        <span>Счета</span>
+                    </a>
 
-                <a href="{% url 'profile' %}">
-                    Профиль
-                </a>
+                    <a href="{% url 'upload_invoice' %}"
+                       class="nav-link {% if current == 'upload_invoice' %}is-active{% endif %}">
+                        <span class="nav-icon">↑</span>
+                        <span>Загрузка</span>
+                    </a>
+
+                    <a
+                        href="{% url 'upload_batches' %}"
+                        class="nav-link {% if current == 'upload_batches' or current == 'upload_batch_detail' %}is-active{% endif %}"
+                    >
+                        <span>◷</span>
+                        <span>Журнал загрузок</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        Финансы
+                    </div>
+
+                    <a href="{% url 'payment_schedule' %}"
+                       class="nav-link {% if current == 'payment_schedule' %}is-active{% endif %}">
+                        <span class="nav-icon">◷</span>
+                        <span>График платежей</span>
+                    </a>
+
+                    <a href="{% url 'payment_registry' %}"
+                       class="nav-link {% if current == 'payment_registry' %}is-active{% endif %}">
+                        <span class="nav-icon">₽</span>
+                        <span>Реестр оплаты</span>
+                    </a>
+                </div>
 
                 {% if request.user.is_staff %}
+                    <div class="nav-section">
+                        <div class="nav-section-title">
+                            Справочники
+                        </div>
 
-                <a href="{% url 'system_dashboard' %}">
-                    Система
-                </a>
+                        <a href="{% url 'counterparty_directory' %}"
+                           class="nav-link {% if current == 'counterparty_directory' or current == 'counterparty_detail' or current == 'counterparty_create' or current == 'counterparty_edit' %}is-active{% endif %}">
+                            <span class="nav-icon">◎</span>
+                            <span>Контрагенты</span>
+                        </a>
 
+                        <a href="{% url 'unmatched_counterparties' %}"
+                           class="nav-link {% if current == 'unmatched_counterparties' %}is-active{% endif %}">
+                            <span class="nav-icon">!</span>
+                            <span>Не найдено в 1С</span>
+                        </a>
+
+                        <a href="{% url 'counterparties_missing_requisites' %}"
+                           class="nav-link {% if current == 'counterparties_missing_requisites' %}is-active{% endif %}">
+                            <span class="nav-icon">⚑</span>
+                            <span>Проверка реквизитов</span>
+                        </a>
+
+                        <a href="{% url 'import_counterparties_1c' %}"
+                           class="nav-link {% if current == 'import_counterparties_1c' %}is-active{% endif %}">
+                            <span class="nav-icon">⇄</span>
+                            <span>Импорт из 1С</span>
+                        </a>
+                    </div>
                 {% endif %}
 
-                {% if request.user.is_staff %}
-                <a href="/admin/">
-                    Администрирование
-                </a>
-                {% endif %}
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        Аккаунт
+                    </div>
+
+                    <a href="{% url 'profile' %}"
+                       class="nav-link {% if current == 'profile' %}is-active{% endif %}">
+                        <span class="nav-icon">◌</span>
+                        <span>Профиль</span>
+                    </a>
+
+                    {% if request.user.is_staff %}
+                        <a href="{% url 'system_dashboard' %}"
+                           class="nav-link {% if current == 'system_dashboard' %}is-active{% endif %}">
+                            <span class="nav-icon">⚙</span>
+                            <span>Система</span>
+                        </a>
+
+                        <a href="/admin/" class="nav-link">
+                            <span class="nav-icon">▣</span>
+                            <span>Администрирование</span>
+                        </a>
+                    {% endif %}
+                </div>
 
             </nav>
 
         </div>
 
         <div class="sidebar-footer">
-            <a href="{% url 'logout' %}" class="logout-link">
-                Выход
+            <a href="{% url 'logout' %}" class="nav-link logout-link">
+                <span class="nav-icon">↩</span>
+                <span>Выход</span>
             </a>
         </div>
 
@@ -77,30 +167,70 @@
 
     <main class="main">
 
-        <header class="topbar">
-            <div>
-                Добро пожаловать,
-                <strong>{{ request.user.username }}</strong>
-            </div>
-        </header>
+       <header class="topbar">
 
-        <div class="page">
+    <div>
+        <div class="topbar-title">
+
+            {% if current == 'dashboard' %}
+                Панель управления
+            {% elif current == 'invoice_list' %}
+                Счета
+            {% elif current == 'invoice_detail' %}
+                Карточка счета
+            {% elif current == 'upload_invoice' %}
+                Загрузка счетов
+            {% elif current == 'upload_batches' %}
+                Журнал загрузок
+            {% elif current == 'upload_batch_detail' %}
+                Пакет загрузки    
+            {% elif current == 'payment_schedule' %}
+                График платежей
+            {% elif current == 'payment_registry' %}
+                Реестр оплаты
+            {% elif current == 'counterparty_directory' %}
+                Справочник контрагентов
+            {% elif current == 'counterparty_detail' %}
+                Карточка контрагента
+            {% elif current == 'unmatched_counterparties' %}
+                Не найдено в 1С
+            {% elif current == 'counterparties_missing_requisites' %}
+                Проверка реквизитов
+            {% elif current == 'import_counterparties_1c' %}
+                Импорт из 1С
+            {% elif current == 'system_dashboard' %}
+                Система
+            {% else %}
+                Project Zarya Enterprise
+            {% endif %}
+
+        </div>
+
+        <div class="topbar-subtitle">
+            Пользователь: <strong>{{ request.user.username }}</strong>
+        </div>
+    </div>
+
+</header>
+
+        <section class="page">
 
             {% if messages %}
-                {% for message in messages %}
-                    <div class="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'info' }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
             {% endif %}
 
             {% block content %}
             {% endblock %}
 
-                </div>
+        </section>
 
         <footer class="app-footer">
-
             <div>
                 Project Zarya Enterprise
             </div>
@@ -108,12 +238,13 @@
             <div>
                 Версия {{ PROJECT_VERSION }}
             </div>
-
         </footer>
 
     </main>
 
 </div>
+
+{% endwith %}
 
 </body>
 </html>

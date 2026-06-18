@@ -1,0 +1,389 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h2 class="page-title">
+            Справочник контрагентов
+        </h2>
+
+        <p class="page-subtitle">
+            Официальные контрагенты из 1С и ручной справочник Project Zarya
+        </p>
+    </div>
+
+    <div class="registry-actions">
+        <a href="{% url 'counterparty_create' %}" class="btn btn-primary">
+            Добавить вручную
+        </a>
+
+        <a href="{% url 'import_counterparties_1c' %}" class="btn btn-secondary">
+            Импорт из 1С
+        </a>
+
+        <a href="{% url 'counterparties_missing_requisites' %}" class="btn btn-secondary">
+            Проверить реквизиты
+        </a>
+    </div>
+
+</div>
+
+<div class="card directory-info-card">
+
+    <div class="directory-info-grid">
+
+        <div class="directory-info-item">
+            <span>
+                Назначение
+            </span>
+
+            <strong>
+                Единый справочник
+            </strong>
+
+            <p>
+                Система использует этих контрагентов для сопоставления счетов, проверки реквизитов и подготовки реестра оплаты.
+            </p>
+        </div>
+
+        <div class="directory-info-item">
+            <span>
+                Главный источник
+            </span>
+
+            <strong>
+                1С
+            </strong>
+
+            <p>
+                Контрагенты из 1С редактируются в 1С, затем импортируются в Project Zarya.
+            </p>
+        </div>
+
+        <div class="directory-info-item">
+            <span>
+                Ручной источник
+            </span>
+
+            <strong>
+                Вручную
+            </strong>
+
+            <p>
+                Используется только для временных или специальных контрагентов.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card registry-filter-card">
+
+    <form method="get" class="counterparty-filter-form">
+
+        <div class="form-group">
+            <label>
+                Поиск
+            </label>
+
+            <input
+                type="text"
+                name="q"
+                value="{{ search_query }}"
+                class="form-control"
+                placeholder="Название, ИНН, КПП, банк, код 1С"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>
+                Источник
+            </label>
+
+            <select name="source" class="form-control">
+                <option value="">
+                    Все источники
+                </option>
+
+                {% for value, label in source_choices %}
+                    <option value="{{ value }}" {% if source_filter == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>
+                Активность
+            </label>
+
+            <select name="active" class="form-control">
+                <option value="active" {% if active_filter == 'active' %}selected{% endif %}>
+                    Только активные
+                </option>
+
+                <option value="inactive" {% if active_filter == 'inactive' %}selected{% endif %}>
+                    Только неактивные
+                </option>
+
+                <option value="all" {% if active_filter == 'all' %}selected{% endif %}>
+                    Все
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>
+                Реквизиты
+            </label>
+
+            <select name="requisites" class="form-control">
+                <option value="">
+                    Все
+                </option>
+
+                <option value="complete" {% if requisites_filter == 'complete' %}selected{% endif %}>
+                    Заполнены
+                </option>
+
+                <option value="missing" {% if requisites_filter == 'missing' %}selected{% endif %}>
+                    Есть проблемы
+                </option>
+            </select>
+        </div>
+
+        <div class="registry-filter-actions">
+            <button type="submit" class="btn btn-primary">
+                Найти
+            </button>
+
+            <a href="{% url 'counterparty_directory' %}" class="btn btn-secondary">
+                Сбросить
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+<div class="card">
+
+    <div class="registry-table-header">
+
+        <div>
+            <h3>
+                Контрагенты
+            </h3>
+
+            <span>
+                Найдено: {{ page_obj.paginator.count }}
+            </span>
+        </div>
+
+        <div class="registry-actions">
+            <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
+                Реестр оплаты
+            </a>
+        </div>
+
+    </div>
+
+    <div class="counterparty-list">
+
+        {% for counterparty in page_obj %}
+
+            <div class="counterparty-list-card">
+
+                <div class="counterparty-main">
+
+                    <div class="counterparty-title-row">
+
+                        <div>
+                            <a
+                                href="{% url 'counterparty_detail' counterparty.id %}"
+                                class="counterparty-title"
+                            >
+                                {{ counterparty.name }}
+                            </a>
+
+                            {% if counterparty.full_name and counterparty.full_name != counterparty.name %}
+                                <div class="muted counterparty-full-name">
+                                    {{ counterparty.full_name }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="counterparty-badges">
+
+                            <span class="status-badge status-new">
+                                {{ counterparty.get_source_display }}
+                            </span>
+
+                            {% if counterparty.inn and counterparty.bank_name and counterparty.bik and counterparty.account_number %}
+                                <span class="status-badge status-approved">
+                                    Реквизиты заполнены
+                                </span>
+                            {% else %}
+                                <span class="status-badge status-rejected">
+                                    Есть проблемы
+                                </span>
+                            {% endif %}
+
+                            {% if not counterparty.is_active %}
+                                <span class="status-badge status-rejected">
+                                    Неактивен
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    <div class="counterparty-details-grid">
+
+                        <div class="counterparty-detail-item">
+                            <span>
+                                ИНН
+                            </span>
+
+                            <strong>
+                                {{ counterparty.inn|default:"—" }}
+                            </strong>
+                        </div>
+
+                        <div class="counterparty-detail-item">
+                            <span>
+                                КПП
+                            </span>
+
+                            <strong>
+                                {{ counterparty.kpp|default:"—" }}
+                            </strong>
+                        </div>
+
+                        <div class="counterparty-detail-item counterparty-detail-wide">
+                            <span>
+                                Банк
+                            </span>
+
+                            <strong>
+                                {{ counterparty.bank_name|default:"—" }}
+                            </strong>
+
+                            {% if counterparty.bik %}
+                                <div class="muted">
+                                    БИК {{ counterparty.bik }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="counterparty-detail-item">
+                            <span>
+                                Счетов
+                            </span>
+
+                            <strong>
+                                {{ counterparty.invoices_count }}
+                            </strong>
+                        </div>
+
+                        <div class="counterparty-detail-item">
+                            <span>
+                                К оплате
+                            </span>
+
+                            <strong class="amount-main">
+                                {{ counterparty.unpaid_total|default:0|floatformat:2 }} ₽
+                            </strong>
+
+                            <div class="muted">
+                                {{ counterparty.unpaid_invoices_count }} счетов
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {% if counterparty.external_id_1c %}
+                        <div class="muted counterparty-code">
+                            Код 1С: {{ counterparty.external_id_1c }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+                <div class="counterparty-card-actions">
+
+                    <a
+                        href="{% url 'counterparty_detail' counterparty.id %}"
+                        class="btn btn-primary btn-sm"
+                    >
+                        Открыть
+                    </a>
+
+                    <a
+                        href="{% url 'payment_registry' %}?counterparty={{ counterparty.id }}"
+                        class="btn btn-secondary btn-sm"
+                    >
+                        В реестр
+                    </a>
+
+                    {% if counterparty.source == 'manual' %}
+                        <a
+                            href="{% url 'counterparty_edit' counterparty.id %}"
+                            class="btn btn-secondary btn-sm"
+                        >
+                            Редактировать
+                        </a>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            <div class="empty-state">
+                Контрагенты не найдены.
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+
+        <div class="pagination">
+
+            {% if page_obj.has_previous %}
+                <a
+                    class="btn btn-secondary"
+                    href="{% if query_string %}?{{ query_string }}&page={{ page_obj.previous_page_number }}{% else %}?page={{ page_obj.previous_page_number }}{% endif %}"
+                >
+                    Назад
+                </a>
+            {% endif %}
+
+            <span class="muted">
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a
+                    class="btn btn-secondary"
+                    href="{% if query_string %}?{{ query_string }}&page={{ page_obj.next_page_number }}{% else %}?page={{ page_obj.next_page_number }}{% endif %}"
+                >
+                    Вперед
+                </a>
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

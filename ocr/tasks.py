@@ -16,6 +16,10 @@ from invoices.log_service import (
     create_invoice_log,
 )
 
+from invoices.counterparty_service import (
+    get_or_create_counterparty_from_invoice
+)
+
 
 @shared_task
 def process_invoice_ocr(job_id):
@@ -86,6 +90,12 @@ def process_invoice_ocr(job_id):
 
             invoice.vendor = data.get(
                 "vendor"
+            )
+
+            invoice.counterparty = (
+                get_or_create_counterparty_from_invoice(
+                    invoice
+                )
             )
 
             amount = data.get(

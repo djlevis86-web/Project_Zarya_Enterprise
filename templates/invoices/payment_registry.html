@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h2 class="page-title">
+            Реестр оплаты
+        </h2>
+
+        <p class="page-subtitle">
+            Счета, подготовленные для оплаты по контрагентам
+        </p>
+    </div>
+
+    <div class="registry-actions">
+        <a
+            href="{% url 'counterparty_directory' %}"
+            class="btn btn-secondary"
+        >
+            Справочник контрагентов
+        </a>
+
+        <a
+            href="{% url 'unmatched_counterparties' %}"
+            class="btn btn-secondary"
+        >
+            Не найдено в 1С
+        </a>
+    </div>
+
+</div>
+
+<div class="registry-summary">
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Счетов в реестре
+        </span>
+
+        <strong>
+            {{ invoices|length }}
+        </strong>
+    </div>
+
+    <div class="registry-summary-card">
+        <span class="registry-summary-label">
+            Общая сумма
+        </span>
+
+        <strong>
+            {{ total_amount|floatformat:2 }} ₽
+        </strong>
+    </div>
+
+</div>
+
+<div class="card registry-filter-card">
+
+    <form method="get" class="registry-filter-form">
+
+        <div class="form-group">
+            <label>
+                Поиск
+            </label>
+
+            <input
+                type="text"
+                name="q"
+                value="{{ search_query }}"
+                placeholder="Счет, контрагент, файл"
+                class="form-control"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>
+                Статус
+            </label>
+
+            <select name="status" class="form-control">
+
+                <option value="all" {% if selected_status == 'all' %}selected{% endif %}>
+                    Все кроме оплаченных
+                </option>
+
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>
+                Контрагент
+            </label>
+
+            <select name="counterparty" class="form-control">
+
+                <option value="">
+                    Все контрагенты
+                </option>
+
+                {% for counterparty in counterparties %}
+                    <option
+                        value="{{ counterparty.id }}"
+                        {% if selected_counterparty|stringformat:"s" == counterparty.id|stringformat:"s" %}selected{% endif %}
+                    >
+                        {{ counterparty.name }}
+                    </option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>
+                Оплата с
+            </label>
+
+            <input
+                type="date"
+                name="date_from"
+                value="{{ date_from }}"
+                class="form-control"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>
+                Оплата по
+            </label>
+
+            <input
+                type="date"
+                name="date_to"
+                value="{{ date_to }}"
+                class="form-control"
+            >
+        </div>
+
+        <div class="registry-filter-actions">
+            <button type="submit" class="btn btn-primary">
+                Применить
+            </button>
+
+            <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
+                Сбросить
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+<div class="card">
+
+    <div class="registry-table-header">
+
+        <div>
+            <h3>
+                Счета к оплате
+            </h3>
+
+            <span>
+                Реестр для подготовки платежей
+            </span>
+        </div>
+
+        <div class="registry-actions">
+
+            <a
+                href="{% url 'export_payment_registry_excel' %}?{{ request.GET.urlencode }}"
+                class="btn btn-primary"
+            >
+                Выгрузить Excel
+            </a>
+
+            <a
+                href="{% url 'export_payment_registry_1c' %}?{{ request.GET.urlencode }}"
+                class="btn btn-secondary"
+            >
+                Выгрузить 1С TXT
+            </a>
+
+            <a
+                href="{% url 'counterparties_missing_requisites' %}"
+                class="btn btn-secondary"
+            >
+                Проверить реквизиты
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="table-scroll">
+
+        <table class="table registry-table">
+
+            <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+
+                    <th>
+                        ID
+                    </th>
+
+                    <th>
+                        Контрагент
+                    </th>
+
+                    <th>
+                        Счет
+                    </th>
+
+                    <th>
+                        Дата счета
+                    </th>
+
+                    <th>
+                        Сумма
+                    </th>
+
+                    <th>
+                        План оплаты
+                    </th>
+
+                    <th>
+                        Приоритет
+                    </th>
+
+                    <th>
+                        Статус
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for invoice in invoices %}
+
+                    <tr>
+                        <td>
+                            <input
+                                type="checkbox"
+                                name="invoice_ids"
+                                value="{{ invoice.id }}"
+                            >
+                        </td>
+
+                        <td>
+                            <a href="{% url 'invoice_detail' invoice.id %}">
+                                #{{ invoice.id }}
+                            </a>
+                        </td>
+
+                        <td>
+                            {% if invoice.counterparty %}
+                                <strong>
+                                    {{ invoice.counterparty.name }}
+                                </strong>
+
+                                {% if invoice.counterparty.inn %}
+                                    <div class="muted">
+                                        ИНН {{ invoice.counterparty.inn }}
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <span class="status-badge status-rejected">
+                                    Не определен
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if invoice.invoice_number %}
+                                {{ invoice.invoice_number }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if invoice.invoice_date %}
+                                {{ invoice.invoice_date }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <strong class="amount-main">
+                                {{ invoice.amount|floatformat:2 }} ₽
+                            </strong>
+                        </td>
+
+                        <td>
+                            {% if invoice.planned_payment_date %}
+                                {{ invoice.planned_payment_date|date:"d.m.Y" }}
+                            {% else %}
+                                <span class="muted">
+                                    Не указана
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ invoice.payment_priority }}
+                        </td>
+
+                        <td>
+                            <span class="status-badge status-{{ invoice.status }}">
+                                {{ invoice.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="9" class="empty-table">
+                            Нет счетов для выбранных условий.
+                            Для проверки выбери статус «Все кроме оплаченных» или переведи нужные счета в статус «Подтвержден».
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

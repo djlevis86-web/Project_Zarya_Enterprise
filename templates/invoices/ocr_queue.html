@@ -116,16 +116,70 @@
     <div class="section-title-row">
         <div>
             <h3>
-                Команда обработки
+                OCR-worker
             </h3>
 
             <span>
-                Запускается в отдельном PowerShell, чтобы сайт не зависал.
+                Очередь OCR обрабатывается отдельным worker-процессом, чтобы сайт не зависал.
             </span>
         </div>
     </div>
 
-    <pre>python manage.py process_ocr_queue --limit 10</pre>
+    <div class="ocr-worker-help-grid">
+
+        <div class="ocr-worker-help-card">
+            <strong>
+                Постоянный режим
+            </strong>
+
+            <span>
+                Запускает обработку каждые 30 секунд.
+            </span>
+
+            <pre>.\scripts\run_ocr_worker.ps1 -Limit 5 -IntervalSeconds 30</pre>
+        </div>
+
+        <div class="ocr-worker-help-card">
+            <strong>
+                Один проход
+            </strong>
+
+            <span>
+                Проверить очередь один раз и выйти.
+            </span>
+
+            <pre>.\scripts\run_ocr_worker.ps1 -RunOnce</pre>
+        </div>
+
+        <div class="ocr-worker-help-card">
+            <strong>
+                Запуск двойным кликом
+            </strong>
+
+            <span>
+                Можно запускать через BAT-файл.
+            </span>
+
+            <pre>scripts\run_ocr_worker.bat</pre>
+        </div>
+
+        <div class="ocr-worker-help-card">
+            <strong>
+                Остановка
+            </strong>
+
+            <span>
+                В окне worker нажать:
+            </span>
+
+            <pre>Ctrl + C</pre>
+        </div>
+
+    </div>
+
+    <div class="ocr-worker-note">
+        Worker нужно держать открытым в отдельном PowerShell, если требуется автоматическая обработка очереди.
+    </div>
 
 </div>
 

@@ -2206,3 +2206,17 @@ input[type="file"]::file-selector-button {
     color: var(--z-muted);
     font-size: 12px;
 }
+
+/* =========================================================
+   Repeat OCR action
+========================================================= */
+
+.registry-action-form {
+    display: inline-flex;
+    margin: 0;
+}
+
+.registry-action-form .btn {
+    white-space: nowrap;
+}
+

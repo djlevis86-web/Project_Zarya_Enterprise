@@ -33,6 +33,24 @@
         >
             Привязать контрагента
         </a>
+        <form
+            method="post"
+            action="{% url 'repeat_ocr' invoice.id %}"
+            class="registry-action-form"
+            onsubmit="return confirm('Повторить OCR для этого счета? Текущие OCR-данные будут обновлены.');"
+        >
+
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Повторить OCR
+            </button>
+
+        </form>
+
 
         <a
             href="{% url 'invoice_list' %}"

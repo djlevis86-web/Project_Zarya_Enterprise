@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'reports',
     'ocr',
     'system',
+    'audit',
 ]
 
 MIDDLEWARE = [

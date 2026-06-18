@@ -65,4 +65,3 @@ Get-ScheduledTask `
 
 Get-ScheduledTaskInfo `
     -TaskName $TaskName
-

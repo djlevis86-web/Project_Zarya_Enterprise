@@ -1,4 +1,5 @@
-from datetime import date, datetime
+from django.utils.dateparse import parse_date
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
@@ -1852,6 +1853,35 @@ def payment_schedule(request):
         'all'
     )
 
+    search_query = request.GET.get(
+        'q',
+        ''
+    ).strip()
+
+    selected_status = request.GET.get(
+        'status',
+        'payment'
+    )
+
+    selected_priority = request.GET.get(
+        'priority',
+        ''
+    )
+
+    date_from = request.GET.get(
+        'date_from',
+        ''
+    )
+
+    date_to = request.GET.get(
+        'date_to',
+        ''
+    )
+
+    parsed_date_from = parse_date(date_from) if date_from else None
+
+    parsed_date_to = parse_date(date_to) if date_to else None
+
     payment_statuses = [
         Invoice.STATUS_NEW,
         Invoice.STATUS_REVIEW,
@@ -1871,10 +1901,28 @@ def payment_schedule(request):
 
     today = date.today()
 
+    week_end = today + timedelta(
+        days=7
+    )
+
+    month_end = today + timedelta(
+        days=30
+    )
+
     total_count = base_invoices.count()
 
     today_count = base_invoices.filter(
         planned_payment_date=today
+    ).count()
+
+    week_count = base_invoices.filter(
+        planned_payment_date__gte=today,
+        planned_payment_date__lte=week_end
+    ).count()
+
+    month_count = base_invoices.filter(
+        planned_payment_date__gte=today,
+        planned_payment_date__lte=month_end
     ).count()
 
     overdue_count = base_invoices.filter(
@@ -1904,6 +1952,20 @@ def payment_schedule(request):
             planned_payment_date=today
         )
 
+    elif filter_type == 'week':
+
+        invoices = invoices.filter(
+            planned_payment_date__gte=today,
+            planned_payment_date__lte=week_end
+        )
+
+    elif filter_type == 'month':
+
+        invoices = invoices.filter(
+            planned_payment_date__gte=today,
+            planned_payment_date__lte=month_end
+        )
+
     elif filter_type == 'overdue':
 
         invoices = invoices.filter(
@@ -1915,6 +1977,93 @@ def payment_schedule(request):
         invoices = invoices.filter(
             planned_payment_date__isnull=True
         )
+
+    if selected_status and selected_status not in [
+        'payment',
+        'all',
+    ]:
+
+        invoices = invoices.filter(
+            status=selected_status
+        )
+
+    if selected_priority:
+
+        invoices = invoices.filter(
+            payment_priority=selected_priority
+        )
+
+    if parsed_date_from and filter_type != 'no_date':
+
+        invoices = invoices.filter(
+            planned_payment_date__gte=parsed_date_from
+        )
+
+    if parsed_date_to and filter_type != 'no_date':
+
+        invoices = invoices.filter(
+            planned_payment_date__lte=parsed_date_to
+        )
+
+    if search_query:
+
+        invoices = invoices.filter(
+            Q(invoice_number__icontains=search_query)
+            |
+            Q(vendor__icontains=search_query)
+            |
+            Q(counterparty__name__icontains=search_query)
+            |
+            Q(original_filename__icontains=search_query)
+            |
+            Q(title__icontains=search_query)
+            |
+            Q(description__icontains=search_query)
+        )
+
+    filtered_count = invoices.count()
+
+    filtered_amount = (
+        invoices.aggregate(
+            total=Sum(
+                'amount'
+            )
+        ).get(
+            'total'
+        )
+        or 0
+    )
+
+    priority_field = Invoice._meta.get_field(
+        'payment_priority'
+    )
+
+    priority_choices = list(
+        priority_field.choices or []
+    )
+
+    if not priority_choices:
+
+        priority_choices = [
+            (
+                item,
+                item
+            )
+            for item in (
+                base_invoices
+                .exclude(
+                    payment_priority__isnull=True
+                )
+                .order_by(
+                    '-payment_priority'
+                )
+                .values_list(
+                    'payment_priority',
+                    flat=True
+                )
+                .distinct()
+            )
+        ]
 
     invoices = invoices.order_by(
         'planned_payment_date',
@@ -1929,15 +2078,27 @@ def payment_schedule(request):
         {
             'invoices': invoices,
             'today': today,
+            'week_end': week_end,
+            'month_end': month_end,
             'filter_type': filter_type,
+            'search_query': search_query,
+            'selected_status': selected_status,
+            'selected_priority': selected_priority,
+            'date_from': date_from,
+            'date_to': date_to,
+            'status_choices': Invoice.STATUS_CHOICES,
+            'priority_choices': priority_choices,
             'total_count': total_count,
             'today_count': today_count,
+            'week_count': week_count,
+            'month_count': month_count,
             'overdue_count': overdue_count,
             'no_date_count': no_date_count,
             'total_amount': total_amount,
+            'filtered_count': filtered_count,
+            'filtered_amount': filtered_amount,
         }
     )
-
 
 @login_required
 def payment_registry(request):

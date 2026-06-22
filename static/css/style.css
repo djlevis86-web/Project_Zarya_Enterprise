@@ -4037,3 +4037,103 @@ select {
 .payment-registry-add-form .btn {
     width: 100% !important;
 }
+
+/* === Payment registry draft panel === */
+
+.payment-registry-draft-card {
+    margin-bottom: 22px !important;
+    padding: 22px !important;
+    border: 1px solid rgba(39, 174, 96, 0.22) !important;
+    background: linear-gradient(
+        135deg,
+        rgba(15, 23, 42, 0.98),
+        rgba(13, 92, 47, 0.18)
+    ) !important;
+}
+
+.payment-registry-draft-header {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
+    margin-bottom: 18px !important;
+}
+
+.payment-registry-draft-header h3 {
+    margin: 6px 0 6px !important;
+    font-size: 22px !important;
+    line-height: 1.2 !important;
+    color: #f8fafc !important;
+}
+
+.payment-registry-draft-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+}
+
+.payment-registry-draft-table-wrap {
+    overflow-x: auto !important;
+}
+
+.payment-registry-draft-table th,
+.payment-registry-draft-table td {
+    white-space: nowrap !important;
+}
+
+.payment-registry-draft-table td:nth-child(2) {
+    white-space: normal !important;
+    min-width: 240px !important;
+}
+
+.payment-registry-bulk-form {
+    margin: 0 !important;
+}
+
+.payment-registry-bulk-actions {
+    display: flex !important;
+    justify-content: flex-start !important;
+    margin: 0 0 14px !important;
+}
+
+.payment-registry-bulk-actions .btn {
+    min-height: 44px !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+}
+
+@media (max-width: 900px) {
+    .payment-registry-draft-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .payment-registry-draft-actions {
+        justify-content: flex-start !important;
+    }
+
+    .payment-registry-bulk-actions .btn {
+        width: 100% !important;
+    }
+}
+
+/* === Payment registry remove from draft === */
+
+.payment-registry-remove-form {
+    margin: 0 !important;
+}
+
+.payment-registry-remove-form .btn {
+    min-height: 36px !important;
+    padding: 8px 14px !important;
+    border-radius: 10px !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+}
+
+.payment-registry-draft-table th:last-child,
+.payment-registry-draft-table td:last-child {
+    text-align: right !important;
+}

@@ -56,6 +56,160 @@
 
 </div>
 
+<div class="card payment-registry-draft-card">
+
+    <div class="payment-registry-draft-header">
+        <div>
+            <span class="registry-summary-label">
+                Текущий черновик
+            </span>
+
+            {% if draft_registry %}
+                <h3>
+                    Реестр оплаты №{{ draft_registry.id }}
+                </h3>
+
+                <p class="muted">
+                    Создан {{ draft_registry.created_at|date:"d.m.Y H:i" }}
+                    · счетов: {{ draft_registry_items_count }}
+                    · сумма: {{ draft_registry_total_amount|floatformat:2 }} ₽
+                </p>
+            {% else %}
+                <h3>
+                    Черновик реестра пока пуст
+                </h3>
+
+                <p class="muted">
+                    Добавь счета из графика платежей или выбери счета ниже.
+                </p>
+            {% endif %}
+        </div>
+
+        <div class="payment-registry-draft-actions">
+            {% if draft_registry %}
+                <span class="status-badge status-draft">
+                    {{ draft_registry.get_status_display }}
+                </span>
+            {% endif %}
+
+            <a href="{% url 'payment_schedule' %}" class="btn btn-secondary">
+                График платежей
+            </a>
+        </div>
+    </div>
+
+    {% if draft_registry %}
+        <div class="payment-registry-draft-table-wrap">
+            <table class="table payment-registry-draft-table">
+                <thead>
+                    <tr>
+                        <th>
+                            Счёт
+                        </th>
+
+                        <th>
+                            Контрагент
+                        </th>
+
+                        <th>
+                            Сумма
+                        </th>
+
+                        <th>
+                            План оплаты
+                        </th>
+
+                        <th>
+                            Статус строки
+                        </th>
+
+                        <th>
+                            Действия
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in draft_registry_items %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'invoice_detail' item.invoice.id %}">
+                                    #{{ item.invoice.id }}
+                                </a>
+
+                                {% if item.invoice.invoice_number %}
+                                    <div class="muted">
+                                        № {{ item.invoice.invoice_number }}
+                                    </div>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if item.invoice.counterparty %}
+                                    <strong>
+                                        {{ item.invoice.counterparty.name }}
+                                    </strong>
+                                {% else %}
+                                    <span class="muted">
+                                        Не определён
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ item.amount|floatformat:2 }} ₽
+                                </strong>
+                            </td>
+
+                            <td>
+                                {% if item.planned_payment_date %}
+                                    {{ item.planned_payment_date }}
+                                {% else %}
+                                    <span class="muted">
+                                        Не указана
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <span class="status-badge status-{{ item.status }}">
+                                    {{ item.get_status_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <form
+                                    method="post"
+                                    action="{% url 'remove_from_payment_registry_item' item.id %}"
+                                    class="payment-registry-remove-form"
+                                >
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Убрать этот счёт из черновика реестра?');"
+                                    >
+                                        Убрать
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="empty-table">
+                                В черновике пока нет счетов.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+</div>
+
 <div class="card registry-filter-card">
 
     <form method="get" class="registry-filter-form">
@@ -163,7 +317,7 @@
 
         <div>
             <h3>
-                Счета к оплате
+                Счета, доступные для добавления
             </h3>
 
             <span>
@@ -200,7 +354,20 @@
 
     <div class="table-scroll">
 
-        <table class="table registry-table">
+        <form
+        method="post"
+        action="{% url 'add_to_payment_registry' %}"
+        class="payment-registry-bulk-form"
+    >
+        {% csrf_token %}
+
+        <div class="payment-registry-bulk-actions">
+            <button type="submit" class="btn btn-primary">
+                Добавить выбранные в черновик
+            </button>
+        </div>
+
+<table class="table registry-table">
 
             <thead>
                 <tr>
@@ -336,6 +503,8 @@
             </tbody>
 
         </table>
+
+    </form>
 
     </div>
 

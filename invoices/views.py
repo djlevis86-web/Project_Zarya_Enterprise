@@ -2207,6 +2207,75 @@ def add_to_payment_registry(request):
 
 
 @login_required
+def remove_from_payment_registry_item(request, item_id):
+
+    if request.method != 'POST':
+
+        messages.warning(
+            request,
+            'Удалять счета из черновика можно только из формы.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    from .models import PaymentRegistry, PaymentRegistryItem
+    from .payment_registry_services import recalculate_payment_registry
+
+    item = (
+        PaymentRegistryItem.objects
+        .select_related(
+            'registry',
+            'invoice',
+        )
+        .filter(
+            id=item_id,
+            registry__status=PaymentRegistry.STATUS_DRAFT,
+            registry__created_by=request.user,
+        )
+        .exclude(
+            status=PaymentRegistryItem.STATUS_CANCELLED
+        )
+        .first()
+    )
+
+    if not item:
+
+        messages.warning(
+            request,
+            'Строка реестра не найдена или уже удалена.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    registry = item.registry
+    invoice_id = item.invoice_id
+
+    item.status = PaymentRegistryItem.STATUS_CANCELLED
+    item.save(
+        update_fields=(
+            'status',
+        )
+    )
+
+    recalculate_payment_registry(
+        registry
+    )
+
+    messages.success(
+        request,
+        f'Счёт #{invoice_id} удалён из черновика реестра №{registry.id}.'
+    )
+
+    return redirect(
+        'payment_registry'
+    )
+
+
+@login_required
 def payment_registry(request):
 
     selected_status = request.GET.get(
@@ -2234,6 +2303,55 @@ def payment_registry(request):
         ''
     ).strip()
 
+    from .models import PaymentRegistry, PaymentRegistryItem
+    from .payment_registry_services import ACTIVE_REGISTRY_STATUSES
+
+    draft_registry = (
+        PaymentRegistry.objects
+        .filter(
+            status=PaymentRegistry.STATUS_DRAFT,
+            created_by=request.user,
+        )
+        .order_by(
+            '-created_at'
+        )
+        .first()
+    )
+
+    draft_registry_items = PaymentRegistryItem.objects.none()
+
+    if draft_registry:
+
+        draft_registry_items = (
+            draft_registry.items
+            .select_related(
+                'invoice',
+                'invoice__counterparty',
+                'invoice__user',
+            )
+            .exclude(
+                status=PaymentRegistryItem.STATUS_CANCELLED
+            )
+            .order_by(
+                'planned_payment_date',
+                'invoice_id',
+            )
+        )
+
+    active_registry_invoice_ids = (
+        PaymentRegistryItem.objects
+        .filter(
+            registry__status__in=ACTIVE_REGISTRY_STATUSES,
+        )
+        .exclude(
+            status=PaymentRegistryItem.STATUS_CANCELLED
+        )
+        .values_list(
+            'invoice_id',
+            flat=True,
+        )
+    )
+
     invoices = (
         Invoice.objects
         .select_related(
@@ -2242,6 +2360,9 @@ def payment_registry(request):
         )
         .exclude(
             status=Invoice.STATUS_PAID
+        )
+        .exclude(
+            id__in=active_registry_invoice_ids
         )
     )
 
@@ -2325,6 +2446,10 @@ def payment_registry(request):
             'date_from': date_from,
             'date_to': date_to,
             'status_choices': Invoice.STATUS_CHOICES,
+            'draft_registry': draft_registry,
+            'draft_registry_items': draft_registry_items,
+            'draft_registry_items_count': draft_registry.items_count if draft_registry else 0,
+            'draft_registry_total_amount': draft_registry.total_amount if draft_registry else 0,
         }
     )
 

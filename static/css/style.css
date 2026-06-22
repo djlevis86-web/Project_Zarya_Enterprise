@@ -4027,3 +4027,13 @@ select {
         width: 100% !important;
     }
 }
+
+/* === Payment registry add button === */
+
+.payment-registry-add-form {
+    margin: 0 !important;
+}
+
+.payment-registry-add-form .btn {
+    width: 100% !important;
+}

@@ -16,6 +16,7 @@ from .views import (
     edit_invoice,
     payment_schedule,
     payment_registry,
+    add_to_payment_registry,
     export_payment_registry_excel,
     export_payment_registry_1c,
     unmatched_counterparties,
@@ -88,10 +89,16 @@ urlpatterns = [
     ),
 
     path(
+        'payment-registry/add/',
+        add_to_payment_registry,
+        name='add_to_payment_registry'
+    ),
+    path(
         'payment-registry/',
         payment_registry,
         name='payment_registry'
     ),
+
 
     path(
         'payment-registry/export-excel/',

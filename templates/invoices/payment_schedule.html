@@ -315,6 +315,24 @@
                                     Открыть
                                 </a>
 
+                                <form
+                                    method="post"
+                                    action="{% url 'add_to_payment_registry' %}"
+                                    class="payment-registry-add-form"
+                                >
+                                    {% csrf_token %}
+
+                                    <input
+                                        type="hidden"
+                                        name="invoice_ids"
+                                        value="{{ invoice.id }}"
+                                    >
+
+                                    <button type="submit" class="btn btn-secondary btn-sm">
+                                        В реестр
+                                    </button>
+                                </form>
+
                                 {% if user.is_staff %}
                                     <a href="{% url 'edit_invoice' invoice.id %}" class="btn btn-secondary btn-sm">
                                         Изменить

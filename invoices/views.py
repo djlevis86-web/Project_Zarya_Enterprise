@@ -2101,6 +2101,112 @@ def payment_schedule(request):
     )
 
 @login_required
+def add_to_payment_registry(request):
+
+    if request.method != 'POST':
+
+        messages.warning(
+            request,
+            'Добавлять счета в реестр можно только из формы.'
+        )
+
+        return redirect(
+            'payment_schedule'
+        )
+
+    invoice_ids = request.POST.getlist(
+        'invoice_ids'
+    )
+
+    if not invoice_ids:
+
+        messages.warning(
+            request,
+            'Выбери хотя бы один счет для добавления в реестр.'
+        )
+
+        return redirect(
+            'payment_schedule'
+        )
+
+    from .payment_registry_services import (
+        add_invoice_to_payment_registry,
+        get_or_create_draft_payment_registry,
+    )
+
+    registry, created = get_or_create_draft_payment_registry(
+        request.user
+    )
+
+    invoices = (
+        Invoice.objects
+        .select_related(
+            'counterparty',
+            'user'
+        )
+        .filter(
+            id__in=invoice_ids
+        )
+    )
+
+    added_count = 0
+    skipped_messages = []
+    warning_messages = []
+
+    for invoice in invoices:
+
+        item, errors, warnings = add_invoice_to_payment_registry(
+            invoice,
+            registry
+        )
+
+        if item:
+
+            added_count += 1
+
+        if errors:
+
+            skipped_messages.append(
+                f'#{invoice.id}: ' + '; '.join(errors)
+            )
+
+        if warnings:
+
+            warning_messages.append(
+                f'#{invoice.id}: ' + '; '.join(warnings)
+            )
+
+    if added_count:
+
+        messages.success(
+            request,
+            f'Добавлено счетов в реестр №{registry.id}: {added_count}.'
+        )
+
+    if skipped_messages:
+
+        messages.warning(
+            request,
+            'Не добавлено: ' + ' | '.join(skipped_messages[:5])
+        )
+
+    if warning_messages:
+
+        messages.info(
+            request,
+            'Предупреждения: ' + ' | '.join(warning_messages[:5])
+        )
+
+    if created and not added_count:
+
+        registry.delete()
+
+    return redirect(
+        'payment_registry'
+    )
+
+
+@login_required
 def payment_registry(request):
 
     selected_status = request.GET.get(

@@ -2390,7 +2390,7 @@ def payment_registry(request):
     ).strip()
 
     from .models import PaymentRegistry, PaymentRegistryItem
-    from .payment_registry_services import ACTIVE_REGISTRY_STATUSES
+    from .payment_registry_services import ACTIVE_REGISTRY_STATUSES, check_payment_registry
 
     draft_registry = (
         PaymentRegistry.objects
@@ -2405,6 +2405,7 @@ def payment_registry(request):
     )
 
     draft_registry_items = PaymentRegistryItem.objects.none()
+    draft_registry_check_result = None
 
     if draft_registry:
 
@@ -2422,6 +2423,10 @@ def payment_registry(request):
                 'planned_payment_date',
                 'invoice_id',
             )
+        )
+
+        draft_registry_check_result = check_payment_registry(
+            draft_registry
         )
 
     active_registry_invoice_ids = (
@@ -2536,6 +2541,7 @@ def payment_registry(request):
             'draft_registry_items': draft_registry_items,
             'draft_registry_items_count': draft_registry.items_count if draft_registry else 0,
             'draft_registry_total_amount': draft_registry.total_amount if draft_registry else 0,
+            'draft_registry_check_result': draft_registry_check_result,
         }
     )
 

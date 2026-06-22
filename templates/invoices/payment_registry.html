@@ -111,6 +111,117 @@
     </div>
 
     {% if draft_registry %}
+
+        {% if draft_registry_check_result %}
+            <div class="payment-registry-check-panel">
+
+                <div class="payment-registry-check-cards">
+                    <div class="payment-registry-check-card">
+                        <span>
+                            Всего строк
+                        </span>
+
+                        <strong>
+                            {{ draft_registry_check_result.items_count }}
+                        </strong>
+                    </div>
+
+                    <div class="payment-registry-check-card is-ready">
+                        <span>
+                            Готово
+                        </span>
+
+                        <strong>
+                            {{ draft_registry_check_result.ready_count }}
+                        </strong>
+                    </div>
+
+                    <div class="payment-registry-check-card is-error">
+                        <span>
+                            Ошибки
+                        </span>
+
+                        <strong>
+                            {{ draft_registry_check_result.errors_count }}
+                        </strong>
+                    </div>
+
+                    <div class="payment-registry-check-card is-warning">
+                        <span>
+                            Предупреждения
+                        </span>
+
+                        <strong>
+                            {{ draft_registry_check_result.warnings_count }}
+                        </strong>
+                    </div>
+                </div>
+
+                {% if draft_registry_check_result.errors_count %}
+                    <div class="payment-registry-check-list is-error">
+                        <h4>
+                            Что нужно исправить перед выгрузкой
+                        </h4>
+
+                        {% for error in draft_registry_check_result.errors %}
+                            <div class="payment-registry-check-row">
+                                <a href="{% url 'invoice_detail' error.invoice_id %}">
+                                    Счёт #{{ error.invoice_id }}
+                                </a>
+
+                                {% if error.invoice_number %}
+                                    <span>
+                                        № {{ error.invoice_number }}
+                                    </span>
+                                {% endif %}
+
+                                <strong>
+                                    {{ error.messages|join:"; " }}
+                                </strong>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="payment-registry-check-list is-ready">
+                        <h4>
+                            Реестр готов к выгрузке
+                        </h4>
+
+                        <p>
+                            Критических ошибок не найдено. Можно переходить к выгрузке Excel или 1C TXT.
+                        </p>
+                    </div>
+                {% endif %}
+
+                {% if draft_registry_check_result.warnings_count %}
+                    <div class="payment-registry-check-list is-warning">
+                        <h4>
+                            Предупреждения
+                        </h4>
+
+                        {% for warning in draft_registry_check_result.warnings %}
+                            <div class="payment-registry-check-row">
+                                <a href="{% url 'invoice_detail' warning.invoice_id %}">
+                                    Счёт #{{ warning.invoice_id }}
+                                </a>
+
+                                {% if warning.invoice_number %}
+                                    <span>
+                                        № {{ warning.invoice_number }}
+                                    </span>
+                                {% endif %}
+
+                                <strong>
+                                    {{ warning.messages|join:"; " }}
+                                </strong>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+            </div>
+        {% endif %}
+
         <div class="payment-registry-draft-table-wrap">
             <table class="table payment-registry-draft-table">
                 <thead>

@@ -60,9 +60,17 @@
             </div>
 
             <div class="audit-filter-actions">
-                <button type="submit" class="btn btn-primary">Применить</button>
-                <a href="{% url 'audit:audit_log_list' %}" class="btn btn-secondary">Сбросить</a>
-                <a href="{% url 'audit:audit_log_export_csv' %}?{{ querystring }}" class="btn btn-secondary">Экспорт CSV</a>
+                <button type="submit" class="audit-btn audit-btn-apply">
+                    Применить
+                </button>
+
+                <a href="{% url 'audit:audit_log_list' %}" class="audit-btn audit-btn-reset">
+                    Сбросить
+                </a>
+
+                <a href="{% url 'audit:audit_log_export_csv' %}?{{ querystring }}" class="audit-btn audit-btn-export">
+                    Экспорт CSV
+                </a>
             </div>
 
         </form>

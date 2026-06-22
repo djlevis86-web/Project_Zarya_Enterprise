@@ -2276,6 +2276,92 @@ def remove_from_payment_registry_item(request, item_id):
 
 
 @login_required
+def check_payment_registry_view(request, registry_id):
+
+    if request.method != 'POST':
+
+        messages.warning(
+            request,
+            'Проверять реестр можно только из формы.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    from .models import PaymentRegistry
+    from .payment_registry_services import check_payment_registry
+
+    registry = (
+        PaymentRegistry.objects
+        .filter(
+            id=registry_id,
+            created_by=request.user,
+            status=PaymentRegistry.STATUS_DRAFT,
+        )
+        .first()
+    )
+
+    if not registry:
+
+        messages.warning(
+            request,
+            'Черновик реестра не найден.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    result = check_payment_registry(
+        registry
+    )
+
+    if result['items_count'] == 0:
+
+        messages.warning(
+            request,
+            f'Реестр №{registry.id} пуст. Сначала добавь счета.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    if result['errors_count']:
+
+        messages.warning(
+            request,
+            f'Реестр №{registry.id} не готов к выгрузке: ошибок {result["errors_count"]}.'
+        )
+
+        for error in result['errors'][:5]:
+
+            messages.warning(
+                request,
+                f'Счёт #{error["invoice_id"]}: ' + '; '.join(error['messages'])
+            )
+
+    else:
+
+        messages.success(
+            request,
+            f'Реестр №{registry.id} проверен: к выгрузке готово {result["ready_count"]} счетов.'
+        )
+
+    if result['warnings_count']:
+
+        messages.info(
+            request,
+            f'Предупреждений: {result["warnings_count"]}.'
+        )
+
+    return redirect(
+        'payment_registry'
+    )
+
+
+@login_required
 def payment_registry(request):
 
     selected_status = request.GET.get(

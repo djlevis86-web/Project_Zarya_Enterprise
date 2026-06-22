@@ -4137,3 +4137,16 @@ select {
 .payment-registry-draft-table td:last-child {
     text-align: right !important;
 }
+
+/* === Payment registry check action === */
+
+.payment-registry-check-form {
+    margin: 0 !important;
+}
+
+.payment-registry-check-form .btn {
+    min-height: 42px !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+}

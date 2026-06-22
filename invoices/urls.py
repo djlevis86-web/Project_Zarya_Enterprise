@@ -30,6 +30,7 @@ from .views import (
     counterparty_edit,
     invoice_assign_counterparty,
     remove_from_payment_registry_item,
+    check_payment_registry_view,
 )
 
 
@@ -88,6 +89,12 @@ urlpatterns = [
         payment_schedule,
         name='payment_schedule'
     ),
+    path(
+        'payment-registry/<int:registry_id>/check/',
+        check_payment_registry_view,
+        name='check_payment_registry'
+    ),
+
     path(
         'payment-registry/item/<int:item_id>/remove/',
         remove_from_payment_registry_item,

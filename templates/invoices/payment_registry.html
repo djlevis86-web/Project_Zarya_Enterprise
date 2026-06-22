@@ -87,6 +87,18 @@
 
         <div class="payment-registry-draft-actions">
             {% if draft_registry %}
+                <form
+                    method="post"
+                    action="{% url 'check_payment_registry' draft_registry.id %}"
+                    class="payment-registry-check-form"
+                >
+                    {% csrf_token %}
+
+                    <button type="submit" class="btn btn-primary">
+                        Проверить реестр
+                    </button>
+                </form>
+
                 <span class="status-badge status-draft">
                     {{ draft_registry.get_status_display }}
                 </span>

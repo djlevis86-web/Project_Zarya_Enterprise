@@ -152,3 +152,125 @@ def add_invoice_to_payment_registry(invoice, registry):
     recalculate_payment_registry(registry)
 
     return item, errors, warnings
+
+
+def check_payment_registry(registry):
+    items = (
+        registry.items
+        .select_related(
+            "invoice",
+            "invoice__counterparty",
+        )
+        .exclude(
+            status=PaymentRegistryItem.STATUS_CANCELLED
+        )
+        .order_by(
+            "planned_payment_date",
+            "invoice_id",
+        )
+    )
+
+    errors = []
+    warnings = []
+    ready_count = 0
+
+    for item in items:
+        invoice = item.invoice
+        counterparty = invoice.counterparty
+
+        row_errors = []
+        row_warnings = []
+
+        if not item.amount or item.amount <= 0:
+            row_errors.append(
+                "не указана сумма"
+            )
+
+        payment_date = item.planned_payment_date or invoice.planned_payment_date
+
+        if not payment_date:
+            row_errors.append(
+                "не указана дата оплаты"
+            )
+
+        duplicate_item = (
+            PaymentRegistryItem.objects
+            .select_related(
+                "registry"
+            )
+            .filter(
+                invoice=invoice,
+                registry__status__in=ACTIVE_REGISTRY_STATUSES,
+            )
+            .exclude(
+                registry=registry
+            )
+            .exclude(
+                status=PaymentRegistryItem.STATUS_CANCELLED
+            )
+            .first()
+        )
+
+        if duplicate_item:
+            row_errors.append(
+                f"уже есть в реестре №{duplicate_item.registry_id}"
+            )
+
+        if not counterparty:
+            row_errors.append(
+                "контрагент не сопоставлен со справочником"
+            )
+        else:
+            missing_fields = []
+
+            for field_name, title in (
+                ("inn", "ИНН"),
+                ("bank_name", "банк"),
+                ("bank_account", "расчётный счёт"),
+                ("bik", "БИК"),
+            ):
+                value = getattr(
+                    counterparty,
+                    field_name,
+                    ""
+                )
+
+                if not value:
+                    missing_fields.append(
+                        title
+                    )
+
+            if missing_fields:
+                row_errors.append(
+                    "не заполнено: " + ", ".join(missing_fields)
+                )
+
+        if row_errors:
+            errors.append(
+                {
+                    "invoice_id": invoice.id,
+                    "invoice_number": invoice.invoice_number or "",
+                    "messages": row_errors,
+                }
+            )
+        else:
+            ready_count += 1
+
+        if row_warnings:
+            warnings.append(
+                {
+                    "invoice_id": invoice.id,
+                    "invoice_number": invoice.invoice_number or "",
+                    "messages": row_warnings,
+                }
+            )
+
+    return {
+        "items_count": items.count(),
+        "ready_count": ready_count,
+        "errors_count": len(errors),
+        "warnings_count": len(warnings),
+        "errors": errors,
+        "warnings": warnings,
+    }
+

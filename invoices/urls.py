@@ -31,6 +31,8 @@ from .views import (
     invoice_assign_counterparty,
     remove_from_payment_registry_item,
     check_payment_registry_view,
+    export_payment_registry_draft_excel,
+    export_payment_registry_draft_1c,
 )
 
 
@@ -89,6 +91,18 @@ urlpatterns = [
         payment_schedule,
         name='payment_schedule'
     ),
+    path(
+        'payment-registry/<int:registry_id>/export-excel/',
+        export_payment_registry_draft_excel,
+        name='export_payment_registry_draft_excel'
+    ),
+
+    path(
+        'payment-registry/<int:registry_id>/export-1c/',
+        export_payment_registry_draft_1c,
+        name='export_payment_registry_draft_1c'
+    ),
+
     path(
         'payment-registry/<int:registry_id>/check/',
         check_payment_registry_view,

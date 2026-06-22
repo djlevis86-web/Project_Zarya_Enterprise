@@ -4277,3 +4277,22 @@ select {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* === Payment registry export actions === */
+
+.payment-registry-export-form {
+    margin: 0 !important;
+}
+
+.payment-registry-export-form .btn,
+.payment-registry-draft-actions .btn[disabled] {
+    min-height: 42px !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+}
+
+.payment-registry-draft-actions .btn[disabled] {
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
+}

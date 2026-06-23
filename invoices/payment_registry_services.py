@@ -139,6 +139,26 @@ def add_invoice_to_payment_registry(invoice, registry):
     errors = []
     warnings = []
 
+    # registry может прийти как объект, как id или как tuple от get_or_create.
+    if isinstance(registry, tuple):
+        registry = registry[0]
+
+    registry_id = getattr(
+        registry,
+        "id",
+        registry,
+    )
+
+    registry_obj = registry
+
+    if not hasattr(
+        registry_obj,
+        "id",
+    ):
+        registry_obj = PaymentRegistry.objects.get(
+            id=registry_id
+        )
+
     validation_errors, validation_warnings = validate_invoice_for_payment_registry(
         invoice
     )
@@ -146,7 +166,10 @@ def add_invoice_to_payment_registry(invoice, registry):
     errors.extend(validation_errors)
     warnings.extend(validation_warnings)
 
-    summary = get_invoice_payment_summary(invoice)
+    summary = get_invoice_payment_summary(
+        invoice
+    )
+
     remaining_amount = summary["remaining_amount"]
 
     if remaining_amount <= 0:
@@ -160,8 +183,8 @@ def add_invoice_to_payment_registry(invoice, registry):
     existing_item = (
         PaymentRegistryItem.objects
         .filter(
-            registry=registry,
-            invoice=invoice,
+            registry_id=registry_id,
+            invoice_id=invoice.id,
         )
         .first()
     )
@@ -183,7 +206,9 @@ def add_invoice_to_payment_registry(invoice, registry):
                 ]
             )
 
-            recalculate_payment_registry(registry)
+            recalculate_payment_registry(
+                registry_obj
+            )
 
             warnings.append(
                 "Счёт был ранее удалён из черновика и теперь восстановлен."
@@ -198,8 +223,8 @@ def add_invoice_to_payment_registry(invoice, registry):
         return existing_item, errors, warnings
 
     item = PaymentRegistryItem.objects.create(
-        registry=registry,
-        invoice=invoice,
+        registry_id=registry_id,
+        invoice_id=invoice.id,
         amount=remaining_amount,
         planned_payment_date=getattr(
             invoice,
@@ -208,7 +233,9 @@ def add_invoice_to_payment_registry(invoice, registry):
         ),
     )
 
-    recalculate_payment_registry(registry)
+    recalculate_payment_registry(
+        registry_obj
+    )
 
     return item, errors, warnings
 

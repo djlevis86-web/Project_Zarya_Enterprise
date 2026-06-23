@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load invoice_payment_tags %}
 
 {% block content %}
 
@@ -230,11 +229,7 @@
                     >
                         <td>
                             <a href="{% url 'invoice_detail' invoice.id %}">
-                                #{{ invoice.id }
-<td class="invoice-payment-mini-cell">
-    {% include "invoices/partials/invoice_payment_mini.html" with invoice=invoice %}
-</td>
-{{ invoice.id }}
+                                #{{ invoice.id }}
                             </a>
                         </td>
 

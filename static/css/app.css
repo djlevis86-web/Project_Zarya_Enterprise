@@ -1,0 +1,12 @@
+/*
+ * ERP Zarya35 CSS entry point.
+ * 
+ * Этап 1:
+ * Пока импортируем старый style.css целиком,
+ * чтобы ничего визуально не сломать.
+ *
+ * Дальше будем переносить блоки из style.css
+ * в base / layout / components / pages / features.
+ */
+
+@import url("./style.css");

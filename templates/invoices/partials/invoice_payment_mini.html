@@ -1,0 +1,20 @@
+{% load invoice_payment_tags %}
+
+{% invoice_payment_summary invoice as payment_summary %}
+
+<div class="invoice-payment-mini">
+    <div>
+        <span>Оплачено</span>
+        <strong>{{ payment_summary.paid_amount|floatformat:2 }}</strong>
+    </div>
+
+    <div>
+        <span>Остаток</span>
+        <strong>{{ payment_summary.remaining_amount|floatformat:2 }}</strong>
+    </div>
+
+    <div>
+        <span>Статус</span>
+        <strong>{{ payment_summary.payment_status_label }}</strong>
+    </div>
+</div>

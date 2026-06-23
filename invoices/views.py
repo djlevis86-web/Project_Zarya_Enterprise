@@ -2767,6 +2767,107 @@ def export_payment_registry_draft_1c(request, registry_id):
 
 
 @login_required
+def payment_registry_history(request):
+
+    from django.core.paginator import Paginator
+    from django.db.models import Sum, Q
+
+    from .models import PaymentRegistry
+
+    status_filter = request.GET.get(
+        'status',
+        ''
+    ).strip()
+
+    search_query = request.GET.get(
+        'q',
+        ''
+    ).strip()
+
+    registries = (
+        PaymentRegistry.objects
+        .select_related(
+            'created_by',
+            'checked_by',
+            'exported_by',
+        )
+        .all()
+        .order_by(
+            '-created_at',
+        )
+    )
+
+    if not request.user.is_staff:
+
+        registries = registries.filter(
+            created_by=request.user,
+        )
+
+    if status_filter:
+
+        registries = registries.filter(
+            status=status_filter,
+        )
+
+    if search_query:
+
+        registries = registries.filter(
+            Q(title__icontains=search_query)
+            | Q(comment__icontains=search_query)
+            | Q(created_by__username__icontains=search_query)
+            | Q(exported_by__username__icontains=search_query)
+        )
+
+    total_registries = registries.count()
+
+    total_amount = (
+        registries.aggregate(
+            total=Sum('total_amount')
+        ).get('total')
+        or 0
+    )
+
+    draft_count = registries.filter(
+        status=PaymentRegistry.STATUS_DRAFT,
+    ).count()
+
+    exported_count = registries.filter(
+        status=PaymentRegistry.STATUS_EXPORTED,
+    ).count()
+
+    paid_count = registries.filter(
+        status=PaymentRegistry.STATUS_PAID,
+    ).count()
+
+    paginator = Paginator(
+        registries,
+        20,
+    )
+
+    page_obj = paginator.get_page(
+        request.GET.get('page')
+    )
+
+    return render(
+        request,
+        'invoices/payment_registry_history.html',
+        {
+            'page_title': 'История реестров оплаты',
+            'page_obj': page_obj,
+            'registries': page_obj.object_list,
+            'status_filter': status_filter,
+            'search_query': search_query,
+            'status_choices': PaymentRegistry.STATUS_CHOICES,
+            'total_registries': total_registries,
+            'total_amount': total_amount,
+            'draft_count': draft_count,
+            'exported_count': exported_count,
+            'paid_count': paid_count,
+        }
+    )
+
+
+@login_required
 def payment_registry(request):
 
     selected_status = request.GET.get(

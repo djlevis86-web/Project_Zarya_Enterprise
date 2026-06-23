@@ -124,6 +124,17 @@ from .payment_registry_permissions import (
     user_can_mark_payment_registry_paid,
 )
 
+
+def get_payment_registry_permission_context(user):
+    return {
+        "can_manage_payment_registry": user_can_manage_payment_registry(user),
+        "can_check_payment_registry": user_can_check_payment_registry(user),
+        "can_export_payment_registry": user_can_export_payment_registry(user),
+        "can_mark_payment_registry_paid": user_can_mark_payment_registry_paid(user),
+        "can_cancel_payment_registry": user_can_cancel_payment_registry(user),
+    }
+
+
 @login_required
 def invoice_list(request):
 

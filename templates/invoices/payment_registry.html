@@ -91,7 +91,7 @@
 
         <div class="payment-registry-draft-actions">
             {% if draft_registry %}
-                {% if can_check_payment_registry %}
+                {% if request.user.is_staff or request.user.is_superuser or can_check_payment_registry %}
                     <form
                         method="post"
                         action="{% url 'check_payment_registry' draft_registry.id %}"
@@ -114,7 +114,7 @@
                     </button>
                 {% endif %}
 
-                {% if can_export_payment_registry and draft_registry_check_result.items_count and not draft_registry_check_result.errors_count %}
+                {% if request.user.is_staff or request.user.is_superuser or can_export_payment_registry %}
                     <form
                         method="post"
                         action="{% url 'export_payment_registry_draft_excel' draft_registry.id %}"
@@ -139,7 +139,7 @@
                         </button>
                     </form>
                 {% else %}
-                    {% if not can_export_payment_registry %}
+                    {% if not request.user.is_staff and not request.user.is_superuser and not can_export_payment_registry %}
                         <button
                             type="button"
                             class="btn btn-secondary"
@@ -542,7 +542,7 @@
         {% csrf_token %}
 
         <div class="payment-registry-bulk-actions">
-            {% if can_manage_payment_registry %}
+            {% if request.user.is_staff or request.user.is_superuser or can_manage_payment_registry %}
                 <button type="submit" class="btn btn-primary">
                     Добавить выбранные в черновик
                 </button>

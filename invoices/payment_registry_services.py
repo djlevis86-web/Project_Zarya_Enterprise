@@ -135,24 +135,73 @@ def recalculate_payment_registry(registry):
 
 
 def add_invoice_to_payment_registry(invoice, registry):
-    errors, warnings = validate_invoice_for_payment_registry(invoice)
+    errors = []
+    warnings = []
+
+    validation_errors, validation_warnings = validate_invoice_for_payment_registry(
+        invoice
+    )
+
+    errors.extend(validation_errors)
+    warnings.extend(validation_warnings)
 
     if errors:
         return None, errors, warnings
 
-    amount = invoice.amount or getattr(invoice, "ocr_amount", None) or Decimal("0")
+    existing_item = (
+        PaymentRegistryItem.objects
+        .filter(
+            registry=registry,
+            invoice=invoice,
+        )
+        .first()
+    )
+
+    if existing_item:
+        if existing_item.status == PaymentRegistryItem.STATUS_CANCELLED:
+            existing_item.status = PaymentRegistryItem.STATUS_ADDED
+            existing_item.amount = invoice.amount or 0
+            existing_item.planned_payment_date = getattr(
+                invoice,
+                "planned_payment_date",
+                None,
+            )
+            existing_item.save(
+                update_fields=[
+                    "status",
+                    "amount",
+                    "planned_payment_date",
+                ]
+            )
+
+            recalculate_payment_registry(registry)
+
+            warnings.append(
+                "Счёт был ранее удалён из черновика и теперь восстановлен."
+            )
+
+            return existing_item, errors, warnings
+
+        warnings.append(
+            "Счёт уже есть в текущем черновике реестра."
+        )
+
+        return existing_item, errors, warnings
 
     item = PaymentRegistryItem.objects.create(
         registry=registry,
         invoice=invoice,
-        amount=amount,
-        planned_payment_date=invoice.planned_payment_date,
+        amount=invoice.amount or 0,
+        planned_payment_date=getattr(
+            invoice,
+            "planned_payment_date",
+            None,
+        ),
     )
 
     recalculate_payment_registry(registry)
 
     return item, errors, warnings
-
 
 def check_payment_registry(registry):
     items = (

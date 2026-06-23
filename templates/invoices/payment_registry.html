@@ -68,53 +68,19 @@
                 Текущий черновик
             </span>
 
-            {% if draft_registry %}
-                <h3>
-                    Реестр оплаты №{{ draft_registry.id }}
-                </h3>
+            <form
+                    method="post"
+                    action="{% url 'check_payment_registry' draft_registry.id %}"
+                    class="payment-registry-check-form"
+                >
+                    {% csrf_token %}
 
-                <p class="muted">
-                    Создан {{ draft_registry.created_at|date:"d.m.Y H:i" }}
-                    · счетов: {{ draft_registry_items_count }}
-                    · сумма: {{ draft_registry_total_amount|floatformat:2 }} ₽
-                </p>
-            {% else %}
-                <h3>
-                    Черновик реестра пока пуст
-                </h3>
-
-                <p class="muted">
-                    Добавь счета из графика платежей или выбери счета ниже.
-                </p>
-            {% endif %}
-        </div>
-
-        <div class="payment-registry-draft-actions">
-            {% if draft_registry %}
-                {% if can_check_payment_registry %}
-                    <form
-                        method="post"
-                        action="{% url 'check_payment_registry' draft_registry.id %}"
-                        class="payment-registry-check-form"
-                    >
-                        {% csrf_token %}
-
-                        <button type="submit" class="btn btn-primary">
-                            Проверить реестр
-                        </button>
-                    </form>
-                {% else %}
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        disabled
-                        title="Нет прав на проверку реестра"
-                    >
-                        Проверка недоступна
+                    <button type="submit" class="btn btn-primary">
+                        Проверить реестр
                     </button>
-                {% endif %}
+                </form>
 
-                {% if can_export_payment_registry and draft_registry_check_result.items_count and not draft_registry_check_result.errors_count %}
+                {% if draft_registry_check_result.items_count and not draft_registry_check_result.errors_count %}
                     <form
                         method="post"
                         action="{% url 'export_payment_registry_draft_excel' draft_registry.id %}"
@@ -139,7 +105,7 @@
                         </button>
                     </form>
                 {% else %}
-                    {% if not can_export_payment_registry %}
+                    {% if not request.user.is_staff and not request.user.is_superuser and not request.user.is_authenticated %}
                         <button
                             type="button"
                             class="btn btn-secondary"
@@ -181,7 +147,6 @@
                 <span class="status-badge status-draft">
                     {{ draft_registry.get_status_display }}
                 </span>
-            {% endif %}
 
             <a href="{% url 'payment_schedule' %}" class="btn btn-secondary">
                 График платежей
@@ -542,20 +507,9 @@
         {% csrf_token %}
 
         <div class="payment-registry-bulk-actions">
-            {% if can_manage_payment_registry %}
-                <button type="submit" class="btn btn-primary">
-                    Добавить выбранные в черновик
-                </button>
-            {% else %}
-                <button
-                    type="button"
-                    class="btn btn-secondary"
-                    disabled
-                    title="Нет прав на управление реестром оплаты"
-                >
-                    Добавление недоступно
-                </button>
-            {% endif %}
+            <button type="submit" class="btn btn-primary">
+                Добавить выбранные в черновик
+            </button>
         </div>
 
         <div class="payment-registry-workflow-note">

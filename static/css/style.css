@@ -4931,3 +4931,134 @@ select {
     opacity: 0.55 !important;
     cursor: not-allowed !important;
 }
+
+/* === Invoice partial payments UI === */
+
+.invoice-payment-panel {
+    margin-top: 24px;
+    padding: 22px;
+    border-radius: 22px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(15, 23, 42, 0.72);
+}
+
+.payment-panel-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.payment-panel-header h2 {
+    margin: 0 0 6px;
+    color: #f8fafc;
+    font-size: 22px;
+}
+
+.payment-panel-header p {
+    margin: 0;
+    color: #94a3b8;
+}
+
+.payment-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.payment-summary-card {
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.payment-summary-card span {
+    display: block;
+    margin-bottom: 8px;
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.payment-summary-card strong {
+    color: #f8fafc;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.invoice-payment-form {
+    margin: 18px 0;
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(2, 6, 23, 0.34);
+    border: 1px solid rgba(34, 197, 94, 0.18);
+}
+
+.payment-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.payment-form-comment {
+    grid-column: 1 / -1;
+}
+
+.invoice-payment-table-wrap {
+    overflow-x: auto;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.invoice-payment-table {
+    width: 100%;
+    min-width: 880px;
+    border-collapse: collapse;
+}
+
+.invoice-payment-table th,
+.invoice-payment-table td {
+    padding: 13px 14px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.10);
+    color: #e5e7eb;
+    vertical-align: top;
+}
+
+.invoice-payment-table th {
+    background: rgba(15, 23, 42, 0.88);
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.invoice-payment-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.payment-complete-note,
+.table-empty {
+    padding: 14px;
+    color: #bfdbfe;
+    background: rgba(30, 64, 175, 0.12);
+    border-radius: 14px;
+    font-weight: 800;
+}
+
+@media (max-width: 1100px) {
+    .payment-summary-grid,
+    .payment-form-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    .payment-summary-grid,
+    .payment-form-grid {
+        grid-template-columns: 1fr;
+    }
+}

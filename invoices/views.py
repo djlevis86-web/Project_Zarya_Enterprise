@@ -124,6 +124,17 @@ from .payment_registry_permissions import (
     user_can_mark_payment_registry_paid,
 )
 
+
+def get_payment_registry_permission_context(user):
+    return {
+        "can_manage_payment_registry": user_can_manage_payment_registry(user),
+        "can_check_payment_registry": user_can_check_payment_registry(user),
+        "can_export_payment_registry": user_can_export_payment_registry(user),
+        "can_mark_payment_registry_paid": user_can_mark_payment_registry_paid(user),
+        "can_cancel_payment_registry": user_can_cancel_payment_registry(user),
+    }
+
+
 @login_required
 def invoice_list(request):
 
@@ -790,6 +801,30 @@ def invoice_detail(request, invoice_id):
 
         raise PermissionDenied
 
+    from .forms import InvoicePaymentForm
+    from .models import InvoicePayment
+    from .payment_services import get_invoice_payment_summary
+
+    payment_summary = get_invoice_payment_summary(
+        invoice
+    )
+
+    payments = (
+        invoice.payments
+        .filter(
+            status=InvoicePayment.STATUS_POSTED
+        )
+        .select_related(
+            "created_by"
+        )
+        .order_by(
+            "-paid_at",
+            "-created_at"
+        )
+    )
+
+    payment_form = InvoicePaymentForm()
+
     comments = (
         InvoiceComment.objects
         .filter(
@@ -813,6 +848,9 @@ def invoice_detail(request, invoice_id):
             'logs': invoice.logs.all(),
             'comments': comments,
             'comment_form': comment_form,
+            'payment_summary': payment_summary,
+            'payments': payments,
+            'payment_form': payment_form,
         }
     )
 
@@ -1697,6 +1735,87 @@ def ocr_queue(request):
             'done_count': done_count,
             'error_count': error_count,
         }
+    )
+
+@login_required
+def add_invoice_payment(request, invoice_id):
+    invoice = get_object_or_404(
+        Invoice,
+        id=invoice_id
+    )
+
+    if (
+        not request.user.is_staff
+        and not request.user.is_superuser
+        and invoice.user_id != request.user.id
+    ):
+        raise PermissionDenied
+
+    if request.method != "POST":
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id
+        )
+
+    from .forms import InvoicePaymentForm
+    from .payment_services import create_invoice_payment
+
+    form = InvoicePaymentForm(
+        request.POST
+    )
+
+    if not form.is_valid():
+        messages.error(
+            request,
+            "Проверьте данные оплаты."
+        )
+
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id
+        )
+
+    try:
+        payment, updated_summary = create_invoice_payment(
+            invoice=invoice,
+            amount=form.cleaned_data["amount"],
+            user=request.user,
+            paid_at=form.cleaned_data["paid_at"],
+            payment_number=form.cleaned_data.get("payment_number") or "",
+            comment=form.cleaned_data.get("comment") or "",
+        )
+    except ValueError as error:
+        messages.error(
+            request,
+            str(error)
+        )
+
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id
+        )
+
+    create_invoice_log(
+        invoice,
+        request.user,
+        f"Внесена оплата по счёту: {payment.amount}"
+    )
+
+    if updated_summary["remaining_amount"] <= 0:
+        create_invoice_log(
+            invoice,
+            request.user,
+            "Счёт полностью закрыт по оплате"
+        )
+
+    messages.success(
+        request,
+        "Оплата успешно внесена."
+    )
+
+    return redirect(
+        "invoice_detail",
+        invoice_id=invoice.id
     )
 
 @staff_member_required
@@ -2801,84 +2920,53 @@ def export_payment_registry_draft_1c(request, registry_id):
     'Нет прав на отметку реестра оплаченным.',
 )
 def mark_payment_registry_paid(request, registry_id):
-
-    if request.method != 'POST':
-
-        messages.warning(
-            request,
-            'Отметить реестр оплаченным можно только из формы.'
-        )
-
-        return redirect(
-            'payment_registry_detail',
-            registry_id=registry_id,
-        )
-
-    from .models import PaymentRegistry
-    from .payment_registry_services import mark_payment_registry_as_paid
-
-    registry = (
-        PaymentRegistry.objects
-        .filter(
-            id=registry_id,
-        )
-        .first()
+    registry = get_object_or_404(
+        PaymentRegistry,
+        id=registry_id
     )
 
-    if not registry:
+    if (
+        not request.user.is_staff
+        and not request.user.is_superuser
+        and registry.created_by_id != request.user.id
+    ):
+        raise PermissionDenied
 
-        messages.warning(
+    if request.method != "POST":
+        return redirect(
+            "payment_registry_detail",
+            registry_id=registry.id
+        )
+
+    try:
+        result = mark_payment_registry_as_paid(
+            registry,
+            user=request.user
+        )
+    except ValueError as error:
+        messages.error(
             request,
-            'Реестр оплаты не найден.'
+            str(error)
         )
 
         return redirect(
-            'payment_registry_history'
+            "payment_registry_detail",
+            registry_id=registry.id
         )
-
-    if not request.user.is_staff and registry.created_by_id != request.user.id:
-
-        messages.warning(
-            request,
-            'Нет доступа к этому реестру.'
-        )
-
-        return redirect(
-            'payment_registry_history'
-        )
-
-    allowed_statuses = (
-        PaymentRegistry.STATUS_EXPORTED,
-        PaymentRegistry.STATUS_PARTIALLY_PAID,
-    )
-
-    if registry.status not in allowed_statuses:
-
-        messages.warning(
-            request,
-            'Оплаченным можно отметить только выгруженный реестр.'
-        )
-
-        return redirect(
-            'payment_registry_detail',
-            registry_id=registry.id,
-        )
-
-    mark_payment_registry_as_paid(
-        registry,
-        user=request.user,
-    )
 
     messages.success(
         request,
-        f'Реестр оплаты №{registry.id} отмечен как оплаченный.'
+        (
+            "Реестр отмечен оплаченным. "
+            f"Создано оплат: {result.get('paid_count', 0)}. "
+            f"Пропущено закрытых счетов: {result.get('skipped_count', 0)}."
+        )
     )
 
     return redirect(
-        'payment_registry_detail',
-        registry_id=registry.id,
+        "payment_registry_detail",
+        registry_id=registry.id
     )
-
 
 @login_required
 @require_payment_registry_permission(

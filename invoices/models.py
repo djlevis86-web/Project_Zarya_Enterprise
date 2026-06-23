@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 
 class Counterparty(models.Model):
@@ -795,3 +796,103 @@ class PaymentRegistryItem(models.Model):
     def __str__(self):
         return f"{self.registry} · счёт #{self.invoice_id}"
 
+class InvoicePayment(models.Model):
+    STATUS_POSTED = "posted"
+    STATUS_CANCELLED = "cancelled"
+
+    STATUS_CHOICES = (
+        (STATUS_POSTED, "Проведён"),
+        (STATUS_CANCELLED, "Отменён"),
+    )
+
+    SOURCE_MANUAL = "manual"
+    SOURCE_REGISTRY = "registry"
+
+    SOURCE_CHOICES = (
+        (SOURCE_MANUAL, "Ручная оплата"),
+        (SOURCE_REGISTRY, "Реестр оплаты"),
+    )
+
+    invoice = models.ForeignKey(
+        "Invoice",
+        on_delete=models.CASCADE,
+        related_name="payments",
+        verbose_name="Счёт",
+    )
+
+    registry_item = models.ForeignKey(
+        "PaymentRegistryItem",
+        on_delete=models.SET_NULL,
+        related_name="payments",
+        null=True,
+        blank=True,
+        verbose_name="Строка реестра оплаты",
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_POSTED,
+        verbose_name="Статус",
+    )
+
+    source = models.CharField(
+        max_length=20,
+        choices=SOURCE_CHOICES,
+        default=SOURCE_MANUAL,
+        verbose_name="Источник",
+    )
+
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        verbose_name="Сумма оплаты",
+    )
+
+    paid_at = models.DateField(
+        default=timezone.localdate,
+        verbose_name="Дата оплаты",
+    )
+
+    payment_number = models.CharField(
+        max_length=128,
+        blank=True,
+        verbose_name="Номер платёжного документа",
+    )
+
+    comment = models.TextField(
+        blank=True,
+        verbose_name="Комментарий",
+    )
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="created_invoice_payments",
+        null=True,
+        blank=True,
+        verbose_name="Кто внёс",
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Создано",
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Обновлено",
+    )
+
+    class Meta:
+        verbose_name = "Платёж по счёту"
+        verbose_name_plural = "Платежи по счетам"
+        ordering = ("-paid_at", "-created_at")
+        indexes = (
+            models.Index(fields=("invoice", "status")),
+            models.Index(fields=("paid_at", "status")),
+            models.Index(fields=("registry_item", "status")),
+        )
+
+    def __str__(self):
+        return f"{self.invoice} — {self.amount}"

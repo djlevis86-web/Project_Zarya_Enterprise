@@ -4631,3 +4631,16 @@ select {
         min-width: 1200px !important;
     }
 }
+
+/* === Payment registry cancel action === */
+
+.payment-registry-cancel-form {
+    margin: 0 !important;
+}
+
+.payment-registry-cancel-form .btn {
+    min-height: 42px !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+}

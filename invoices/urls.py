@@ -36,6 +36,7 @@ from .views import (
     payment_registry_history,
     payment_registry_detail,
     mark_payment_registry_paid,
+    cancel_payment_registry_view,
 )
 
 
@@ -94,6 +95,12 @@ urlpatterns = [
         payment_schedule,
         name='payment_schedule'
     ),
+    path(
+        'payment-registry/<int:registry_id>/cancel/',
+        cancel_payment_registry_view,
+        name='cancel_payment_registry'
+    ),
+
     path(
         'payment-registry/<int:registry_id>/mark-paid/',
         mark_payment_registry_paid,

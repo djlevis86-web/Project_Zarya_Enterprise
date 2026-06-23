@@ -2848,6 +2848,88 @@ def mark_payment_registry_paid(request, registry_id):
 
 
 @login_required
+def cancel_payment_registry_view(request, registry_id):
+
+    if request.method != 'POST':
+
+        messages.warning(
+            request,
+            'Отменить реестр можно только из формы.'
+        )
+
+        return redirect(
+            'payment_registry_detail',
+            registry_id=registry_id,
+        )
+
+    from .models import PaymentRegistry
+    from .payment_registry_services import cancel_payment_registry
+
+    registry = (
+        PaymentRegistry.objects
+        .filter(
+            id=registry_id,
+        )
+        .first()
+    )
+
+    if not registry:
+
+        messages.warning(
+            request,
+            'Реестр оплаты не найден.'
+        )
+
+        return redirect(
+            'payment_registry_history'
+        )
+
+    if not request.user.is_staff and registry.created_by_id != request.user.id:
+
+        messages.warning(
+            request,
+            'Нет доступа к этому реестру.'
+        )
+
+        return redirect(
+            'payment_registry_history'
+        )
+
+    reason = request.POST.get(
+        'reason',
+        ''
+    ).strip()
+
+    cancelled = cancel_payment_registry(
+        registry,
+        user=request.user,
+        reason=reason,
+    )
+
+    if not cancelled:
+
+        messages.warning(
+            request,
+            'Можно отменить только черновик или проверенный реестр.'
+        )
+
+        return redirect(
+            'payment_registry_detail',
+            registry_id=registry.id,
+        )
+
+    messages.success(
+        request,
+        f'Реестр оплаты №{registry.id} отменён.'
+    )
+
+    return redirect(
+        'payment_registry_detail',
+        registry_id=registry.id,
+    )
+
+
+@login_required
 def payment_registry_detail(request, registry_id):
 
     from .models import PaymentRegistry, PaymentRegistryItem

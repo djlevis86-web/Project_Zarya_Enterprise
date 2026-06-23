@@ -343,3 +343,31 @@ def mark_payment_registry_as_paid(registry, user=None):
 
     return registry
 
+
+def cancel_payment_registry(registry, user=None, reason=""):
+    allowed_statuses = (
+        PaymentRegistry.STATUS_DRAFT,
+        PaymentRegistry.STATUS_CHECKED,
+    )
+
+    if registry.status not in allowed_statuses:
+        return False
+
+    if reason:
+        old_comment = registry.comment or ""
+        registry.comment = (
+            old_comment
+            + ("\n" if old_comment else "")
+            + f"Отменён. Причина: {reason}"
+        )
+
+    registry.status = PaymentRegistry.STATUS_CANCELLED
+    registry.save(
+        update_fields=(
+            "status",
+            "comment",
+        )
+    )
+
+    return True
+

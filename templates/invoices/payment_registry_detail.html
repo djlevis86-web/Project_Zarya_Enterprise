@@ -102,6 +102,30 @@
             </div>
 
             <div class="payment-registry-detail-actions">
+                {% if registry.status == "draft" or registry.status == "checked" %}
+                    <form
+                        method="post"
+                        action="{% url 'cancel_payment_registry' registry.id %}"
+                        class="payment-registry-cancel-form"
+                    >
+                        {% csrf_token %}
+
+                        <input
+                            type="hidden"
+                            name="reason"
+                            value="Отменено пользователем"
+                        >
+
+                        <button
+                            type="submit"
+                            class="btn btn-danger"
+                            onclick="return confirm('Отменить этот реестр? Счета снова будут доступны для нового реестра.');"
+                        >
+                            Отменить реестр
+                        </button>
+                    </form>
+                {% endif %}
+
                 <span class="status-badge status-{{ registry.status }}">
                     {{ registry.get_status_display }}
                 </span>

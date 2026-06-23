@@ -91,19 +91,30 @@
 
         <div class="payment-registry-draft-actions">
             {% if draft_registry %}
-                <form
-                    method="post"
-                    action="{% url 'check_payment_registry' draft_registry.id %}"
-                    class="payment-registry-check-form"
-                >
-                    {% csrf_token %}
+                {% if can_check_payment_registry %}
+                    <form
+                        method="post"
+                        action="{% url 'check_payment_registry' draft_registry.id %}"
+                        class="payment-registry-check-form"
+                    >
+                        {% csrf_token %}
 
-                    <button type="submit" class="btn btn-primary">
-                        Проверить реестр
+                        <button type="submit" class="btn btn-primary">
+                            Проверить реестр
+                        </button>
+                    </form>
+                {% else %}
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        disabled
+                        title="Нет прав на проверку реестра"
+                    >
+                        Проверка недоступна
                     </button>
-                </form>
+                {% endif %}
 
-                {% if draft_registry_check_result.items_count and not draft_registry_check_result.errors_count %}
+                {% if can_export_payment_registry and draft_registry_check_result.items_count and not draft_registry_check_result.errors_count %}
                     <form
                         method="post"
                         action="{% url 'export_payment_registry_draft_excel' draft_registry.id %}"
@@ -128,23 +139,43 @@
                         </button>
                     </form>
                 {% else %}
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        disabled
-                        title="Сначала исправь ошибки проверки реестра"
-                    >
-                        Excel недоступен
-                    </button>
+                    {% if not can_export_payment_registry %}
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            disabled
+                            title="Нет прав на выгрузку реестра"
+                        >
+                            Excel недоступен
+                        </button>
 
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        disabled
-                        title="Сначала исправь ошибки проверки реестра"
-                    >
-                        1C TXT недоступен
-                    </button>
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            disabled
+                            title="Нет прав на выгрузку реестра"
+                        >
+                            1C TXT недоступен
+                        </button>
+                    {% else %}
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            disabled
+                            title="Сначала исправь ошибки проверки реестра"
+                        >
+                            Excel недоступен
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            disabled
+                            title="Сначала исправь ошибки проверки реестра"
+                        >
+                            1C TXT недоступен
+                        </button>
+                    {% endif %}
                 {% endif %}
 
                 <span class="status-badge status-draft">
@@ -511,9 +542,20 @@
         {% csrf_token %}
 
         <div class="payment-registry-bulk-actions">
-            <button type="submit" class="btn btn-primary">
-                Добавить выбранные в черновик
-            </button>
+            {% if can_manage_payment_registry %}
+                <button type="submit" class="btn btn-primary">
+                    Добавить выбранные в черновик
+                </button>
+            {% else %}
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    disabled
+                    title="Нет прав на управление реестром оплаты"
+                >
+                    Добавление недоступно
+                </button>
+            {% endif %}
         </div>
 
         <div class="payment-registry-workflow-note">

@@ -115,6 +115,15 @@ def render_upload_invoice_form(request, form):
     )
 
 
+from .payment_registry_permissions import (
+    require_payment_registry_permission,
+    user_can_cancel_payment_registry,
+    user_can_check_payment_registry,
+    user_can_export_payment_registry,
+    user_can_manage_payment_registry,
+    user_can_mark_payment_registry_paid,
+)
+
 @login_required
 def invoice_list(request):
 
@@ -2101,6 +2110,10 @@ def payment_schedule(request):
     )
 
 @login_required
+@require_payment_registry_permission(
+    user_can_manage_payment_registry,
+    'Нет прав на добавление счетов в реестр оплаты.',
+)
 def add_to_payment_registry(request):
 
     if request.method != 'POST':
@@ -2207,6 +2220,10 @@ def add_to_payment_registry(request):
 
 
 @login_required
+@require_payment_registry_permission(
+    user_can_manage_payment_registry,
+    'Нет прав на удаление счетов из черновика реестра.',
+)
 def remove_from_payment_registry_item(request, item_id):
 
     if request.method != 'POST':
@@ -2276,6 +2293,10 @@ def remove_from_payment_registry_item(request, item_id):
 
 
 @login_required
+@require_payment_registry_permission(
+    user_can_check_payment_registry,
+    'Нет прав на проверку реестра оплаты.',
+)
 def check_payment_registry_view(request, registry_id):
 
     if request.method != 'POST':
@@ -2362,6 +2383,10 @@ def check_payment_registry_view(request, registry_id):
 
 
 @login_required
+@require_payment_registry_permission(
+    user_can_export_payment_registry,
+    'Нет прав на выгрузку реестра оплаты.',
+)
 def export_payment_registry_draft_excel(request, registry_id):
 
     if request.method != 'POST':
@@ -2586,6 +2611,10 @@ def export_payment_registry_draft_excel(request, registry_id):
 
 
 @login_required
+@require_payment_registry_permission(
+    user_can_export_payment_registry,
+    'Нет прав на выгрузку реестра оплаты.',
+)
 def export_payment_registry_draft_1c(request, registry_id):
 
     if request.method != 'POST':
@@ -2767,6 +2796,10 @@ def export_payment_registry_draft_1c(request, registry_id):
 
 
 @login_required
+@require_payment_registry_permission(
+    user_can_mark_payment_registry_paid,
+    'Нет прав на отметку реестра оплаченным.',
+)
 def mark_payment_registry_paid(request, registry_id):
 
     if request.method != 'POST':
@@ -2848,6 +2881,10 @@ def mark_payment_registry_paid(request, registry_id):
 
 
 @login_required
+@require_payment_registry_permission(
+    user_can_cancel_payment_registry,
+    'Нет прав на отмену реестра оплаты.',
+)
 def cancel_payment_registry_view(request, registry_id):
 
     if request.method != 'POST':
@@ -3293,6 +3330,10 @@ def payment_registry(request):
 
 
 @login_required
+@require_payment_registry_permission(
+    user_can_export_payment_registry,
+    'Нет прав на выгрузку реестра оплаты.',
+)
 def export_payment_registry_excel(request):
 
     selected_status = request.GET.get(
@@ -3572,6 +3613,10 @@ def export_payment_registry_excel(request):
 
 
 @login_required
+@require_payment_registry_permission(
+    user_can_export_payment_registry,
+    'Нет прав на выгрузку реестра оплаты.',
+)
 def export_payment_registry_1c(request):
 
     company = CompanyRequisites.objects.first()

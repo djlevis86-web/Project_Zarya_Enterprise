@@ -102,7 +102,7 @@
             </div>
 
             <div class="payment-registry-detail-actions">
-                {% if registry.status == "draft" or registry.status == "checked" %}
+                {% if can_cancel_payment_registry and registry.status == "draft" or can_cancel_payment_registry and registry.status == "checked" %}
                     <form
                         method="post"
                         action="{% url 'cancel_payment_registry' registry.id %}"
@@ -126,7 +126,7 @@
                     </form>
                 {% endif %}
 
-                {% if registry.status == "exported" or registry.status == "partially_paid" %}
+                {% if can_mark_payment_registry_paid and registry.status == "exported" or can_mark_payment_registry_paid and registry.status == "partially_paid" %}
                     <form
                         method="post"
                         action="{% url 'mark_payment_registry_paid' registry.id %}"

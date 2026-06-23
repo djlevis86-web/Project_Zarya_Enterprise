@@ -138,6 +138,26 @@
                 {% endfor %}
 
             </select>
+
+            <div class="filter-field">
+                <label for="payment_status">Оплата</label>
+
+                <select
+                    id="payment_status"
+                    name="payment_status"
+                    class="form-control"
+                >
+                    {% for value, label in payment_status_choices %}
+                        <option
+                            value="{{ value }}"
+                            {% if payment_status_filter == value %}selected{% endif %}
+                        >
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
         </div>
 
         <div class="form-group">
@@ -284,6 +304,10 @@
                     </th>
 
                     <th>
+                        Оплата
+                    </th>
+
+                    <th>
                         Действия
                     </th>
                 </tr>
@@ -397,6 +421,24 @@
                         </td>
 
                         <td>
+                            <div class="payment-mini payment-mini-list payment-mini-{{ invoice.payment_status_code }}">
+                                <div class="payment-mini-row">
+                                    <span>Оплачено</span>
+                                    <strong>{{ invoice.payment_paid_amount|floatformat:2 }} ₽</strong>
+                                </div>
+
+                                <div class="payment-mini-row">
+                                    <span>Остаток</span>
+                                    <strong>{{ invoice.payment_remaining_amount|floatformat:2 }} ₽</strong>
+                                </div>
+
+                                <div class="payment-mini-status">
+                                    {{ invoice.payment_status_label }}
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
                             <div class="table-actions table-actions-vertical">
                                 <a
                                     href="{% url 'invoice_detail' invoice.id %}"
@@ -420,7 +462,7 @@
                 {% empty %}
 
                     <tr>
-                        <td colspan="8" class="empty-table">
+                        <td colspan="9" class="empty-table">
                             Документы отсутствуют.
                         </td>
                     </tr>

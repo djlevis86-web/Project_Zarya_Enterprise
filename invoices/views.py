@@ -801,6 +801,30 @@ def invoice_detail(request, invoice_id):
 
         raise PermissionDenied
 
+    from .forms import InvoicePaymentForm
+    from .models import InvoicePayment
+    from .payment_services import get_invoice_payment_summary
+
+    payment_summary = get_invoice_payment_summary(
+        invoice
+    )
+
+    payments = (
+        invoice.payments
+        .filter(
+            status=InvoicePayment.STATUS_POSTED
+        )
+        .select_related(
+            "created_by"
+        )
+        .order_by(
+            "-paid_at",
+            "-created_at"
+        )
+    )
+
+    payment_form = InvoicePaymentForm()
+
     comments = (
         InvoiceComment.objects
         .filter(
@@ -824,6 +848,9 @@ def invoice_detail(request, invoice_id):
             'logs': invoice.logs.all(),
             'comments': comments,
             'comment_form': comment_form,
+            'payment_summary': payment_summary,
+            'payments': payments,
+            'payment_form': payment_form,
         }
     )
 
@@ -1709,6 +1736,122 @@ def ocr_queue(request):
             'error_count': error_count,
         }
     )
+
+@login_required
+def add_invoice_payment(request, invoice_id):
+    invoice = get_object_or_404(
+        Invoice,
+        id=invoice_id
+    )
+
+    if (
+        not request.user.is_staff
+        and invoice.user_id != request.user.id
+    ):
+        raise PermissionDenied
+
+    if request.method != "POST":
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id
+        )
+
+    from .forms import InvoicePaymentForm
+    from .models import InvoicePayment
+    from .payment_services import get_invoice_payment_summary
+
+    form = InvoicePaymentForm(
+        request.POST
+    )
+
+    summary = get_invoice_payment_summary(
+        invoice
+    )
+
+    remaining_amount = summary["remaining_amount"]
+
+    if not form.is_valid():
+        messages.error(
+            request,
+            "Проверьте данные оплаты."
+        )
+
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id
+        )
+
+    payment = form.save(
+        commit=False
+    )
+
+    if payment.amount > remaining_amount:
+        messages.error(
+            request,
+            (
+                "Сумма оплаты больше остатка по счёту. "
+                f"Остаток: {remaining_amount}."
+            )
+        )
+
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id
+        )
+
+    payment.invoice = invoice
+    payment.created_by = request.user
+    payment.source = InvoicePayment.SOURCE_MANUAL
+    payment.status = InvoicePayment.STATUS_POSTED
+
+    payment.save()
+
+    create_invoice_log(
+        invoice,
+        request.user,
+        f"Внесена оплата по счёту: {payment.amount}"
+    )
+
+    updated_summary = get_invoice_payment_summary(
+        invoice
+    )
+
+    if updated_summary["remaining_amount"] <= 0:
+        update_fields = [
+            "status",
+        ]
+
+        invoice.status = Invoice.STATUS_PAID
+
+        if hasattr(
+            invoice,
+            "paid_at"
+        ):
+            invoice.paid_at = payment.paid_at
+            update_fields.append(
+                "paid_at"
+            )
+
+        invoice.save(
+            update_fields=update_fields
+        )
+
+        create_invoice_log(
+            invoice,
+            request.user,
+            "Счёт полностью оплачен"
+        )
+
+    messages.success(
+        request,
+        "Оплата успешно внесена."
+    )
+
+    return redirect(
+        "invoice_detail",
+        invoice_id=invoice.id
+    )
+
 
 @staff_member_required
 def change_invoice_status(request, invoice_id, status):

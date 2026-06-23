@@ -391,4 +391,55 @@ class InvoiceCounterpartyAssignForm(forms.Form):
             .order_by(
                 'name'
             )
-        )        
+        )
+
+from .models import InvoicePayment
+
+class InvoicePaymentForm(forms.ModelForm):
+    class Meta:
+        model = InvoicePayment
+        fields = (
+            "amount",
+            "paid_at",
+            "payment_number",
+            "comment",
+        )
+        widgets = {
+            "amount": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "step": "0.01",
+                    "min": "0.01",
+                    "placeholder": "Сумма оплаты",
+                }
+            ),
+            "paid_at": forms.DateInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "date",
+                }
+            ),
+            "payment_number": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Номер платёжного документа",
+                }
+            ),
+            "comment": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Комментарий",
+                }
+            ),
+        }
+
+    def clean_amount(self):
+        amount = self.cleaned_data.get("amount")
+
+        if amount is None or amount <= 0:
+            raise forms.ValidationError(
+                "Сумма оплаты должна быть больше нуля."
+            )
+
+        return amount

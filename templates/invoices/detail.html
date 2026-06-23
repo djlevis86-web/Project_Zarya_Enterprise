@@ -727,4 +727,120 @@ renderPdf();
 
 {% endif %}
 
+
+
+<section class="invoice-payment-panel">
+    <div class="payment-panel-header">
+        <div>
+            <h2>Оплаты по счёту</h2>
+            <p>
+                Учитываются частичные оплаты, остаток и итоговый статус оплаты.
+            </p>
+        </div>
+    </div>
+
+    <div class="payment-summary-grid">
+        <div class="payment-summary-card">
+            <span>Сумма счёта</span>
+            <strong>{{ payment_summary.invoice_amount|floatformat:2 }}</strong>
+        </div>
+
+        <div class="payment-summary-card">
+            <span>Оплачено</span>
+            <strong>{{ payment_summary.paid_amount|floatformat:2 }}</strong>
+        </div>
+
+        <div class="payment-summary-card">
+            <span>Остаток</span>
+            <strong>{{ payment_summary.remaining_amount|floatformat:2 }}</strong>
+        </div>
+
+        <div class="payment-summary-card">
+            <span>Статус оплаты</span>
+            <strong>{{ payment_summary.payment_status_label }}</strong>
+        </div>
+    </div>
+
+    {% if payment_summary.remaining_amount > 0 %}
+        <form
+            method="post"
+            action="{% url 'add_invoice_payment' invoice.id %}"
+            class="invoice-payment-form"
+        >
+            {% csrf_token %}
+
+            <div class="payment-form-grid">
+                <div class="form-group">
+                    <label for="{{ payment_form.amount.id_for_label }}">Сумма оплаты</label>
+                    {{ payment_form.amount }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ payment_form.paid_at.id_for_label }}">Дата оплаты</label>
+                    {{ payment_form.paid_at }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ payment_form.payment_number.id_for_label }}">Платёжный документ</label>
+                    {{ payment_form.payment_number }}
+                </div>
+
+                <div class="form-group payment-form-comment">
+                    <label for="{{ payment_form.comment.id_for_label }}">Комментарий</label>
+                    {{ payment_form.comment }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Внести оплату
+            </button>
+        </form>
+    {% else %}
+        <div class="payment-complete-note">
+            Счёт закрыт по оплате. Новая оплата недоступна.
+        </div>
+    {% endif %}
+
+    <div class="invoice-payment-table-wrap">
+        <table class="invoice-payment-table">
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Сумма</th>
+                    <th>Документ</th>
+                    <th>Источник</th>
+                    <th>Кто внёс</th>
+                    <th>Комментарий</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for payment in payments %}
+                    <tr>
+                        <td>{{ payment.paid_at|date:"d.m.Y" }}</td>
+                        <td><strong>{{ payment.amount|floatformat:2 }}</strong></td>
+                        <td>{{ payment.payment_number|default:"—" }}</td>
+                        <td>{{ payment.get_source_display }}</td>
+                        <td>
+                            {% if payment.created_by %}
+                                {{ payment.created_by.get_username }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>{{ payment.comment|default:"—" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="table-empty">
+                            Оплат по этому счёту ещё нет.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+
 {% endblock %}

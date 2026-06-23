@@ -1,16 +1,16 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
 
-<div class="page-header">
+<div class="registry-page-header">
 
     <div>
-        <h2 class="page-title">
+        <h1>
             График платежей
-        </h2>
+        </h1>
 
-        <p class="page-subtitle">
-            Планирование оплат по датам, приоритетам и контрагентам
+        <p>
+            Планирование оплат по счетам: сроки, просрочки, приоритеты и суммы к оплате.
         </p>
     </div>
 
@@ -26,83 +26,153 @@
 
 </div>
 
-<div class="registry-summary">
+<div class="registry-summary payment-schedule-summary">
 
-    <div class="registry-summary-card">
-        <span class="registry-summary-label">
-            Всего к планированию
-        </span>
+    <a href="{% url 'payment_schedule' %}?filter=all" class="registry-summary-card payment-summary-link {% if filter_type == 'all' %}is-active{% endif %}">
+        <span>Всего к оплате</span>
+        <strong>{{ total_count }}</strong>
+        <small>{{ total_amount|floatformat:2 }} ₽</small>
+    </a>
 
-        <strong>
-            {{ total_count }}
-        </strong>
-    </div>
+    <a href="{% url 'payment_schedule' %}?filter=today" class="registry-summary-card payment-summary-link {% if filter_type == 'today' %}is-active{% endif %}">
+        <span>Сегодня</span>
+        <strong>{{ today_count }}</strong>
+        <small>{{ today|date:"d.m.Y" }}</small>
+    </a>
 
-    <div class="registry-summary-card">
-        <span class="registry-summary-label">
-            К оплате сегодня
-        </span>
+    <a href="{% url 'payment_schedule' %}?filter=week" class="registry-summary-card payment-summary-link {% if filter_type == 'week' %}is-active{% endif %}">
+        <span>Неделя</span>
+        <strong>{{ week_count }}</strong>
+        <small>до {{ week_end|date:"d.m.Y" }}</small>
+    </a>
 
-        <strong>
-            {{ today_count }}
-        </strong>
-    </div>
+    <a href="{% url 'payment_schedule' %}?filter=overdue" class="registry-summary-card payment-summary-link is-danger {% if filter_type == 'overdue' %}is-active{% endif %}">
+        <span>Просрочено</span>
+        <strong>{{ overdue_count }}</strong>
+        <small>требует внимания</small>
+    </a>
 
-    <div class="registry-summary-card">
-        <span class="registry-summary-label">
-            Просрочено
-        </span>
+    <a href="{% url 'payment_schedule' %}?filter=no_date" class="registry-summary-card payment-summary-link is-muted {% if filter_type == 'no_date' %}is-active{% endif %}">
+        <span>Без даты</span>
+        <strong>{{ no_date_count }}</strong>
+        <small>нужно назначить</small>
+    </a>
 
-        <strong class="summary-danger">
-            {{ overdue_count }}
-        </strong>
-    </div>
-
-    <div class="registry-summary-card">
-        <span class="registry-summary-label">
-            Без даты оплаты
-        </span>
-
-        <strong class="summary-warning">
-            {{ no_date_count }}
-        </strong>
+    <div class="registry-summary-card payment-summary-selected">
+        <span>Отобрано</span>
+        <strong>{{ filtered_count }}</strong>
+        <small>{{ filtered_amount|floatformat:2 }} ₽</small>
     </div>
 
 </div>
 
 <div class="card schedule-filter-card">
 
-    <div class="schedule-tabs">
+    <form method="get" class="payment-schedule-filter-form">
 
-        <a
-            href="{% url 'payment_schedule' %}?filter=all"
-            class="schedule-tab {% if filter_type == 'all' %}is-active{% endif %}"
-        >
-            Все
-        </a>
+        <div class="form-group">
+            <label>
+                Быстрый период
+            </label>
 
-        <a
-            href="{% url 'payment_schedule' %}?filter=today"
-            class="schedule-tab {% if filter_type == 'today' %}is-active{% endif %}"
-        >
-            К оплате сегодня
-        </a>
+            <select name="filter" class="form-control">
+                <option value="all" {% if filter_type == 'all' %}selected{% endif %}>Все к оплате</option>
+                <option value="today" {% if filter_type == 'today' %}selected{% endif %}>Сегодня</option>
+                <option value="week" {% if filter_type == 'week' %}selected{% endif %}>Ближайшие 7 дней</option>
+                <option value="month" {% if filter_type == 'month' %}selected{% endif %}>Ближайшие 30 дней</option>
+                <option value="overdue" {% if filter_type == 'overdue' %}selected{% endif %}>Просроченные</option>
+                <option value="no_date" {% if filter_type == 'no_date' %}selected{% endif %}>Без даты оплаты</option>
+            </select>
+        </div>
 
-        <a
-            href="{% url 'payment_schedule' %}?filter=overdue"
-            class="schedule-tab {% if filter_type == 'overdue' %}is-active{% endif %}"
-        >
-            Просроченные
-        </a>
+        <div class="form-group">
+            <label>
+                Оплата с
+            </label>
 
-        <a
-            href="{% url 'payment_schedule' %}?filter=no_date"
-            class="schedule-tab {% if filter_type == 'no_date' %}is-active{% endif %}"
-        >
-            Без даты оплаты
-        </a>
+            <input
+                id="payment-date-from"
+                type="date"
+                name="date_from"
+                value="{{ date_from }}"
+                class="form-control"
+            >
+        </div>
 
-    </div>
+        <div class="form-group">
+            <label>
+                Оплата по
+            </label>
+
+            <input
+                id="payment-date-to"
+                type="date"
+                name="date_to"
+                value="{{ date_to }}"
+                class="form-control"
+            >
+        </div>
+<div class="form-group">
+            <label>
+                Статус
+            </label>
+
+            <select name="status" class="form-control">
+                <option value="payment" {% if selected_status == 'payment' %}selected{% endif %}>
+                    Все к оплате
+                </option>
+
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>
+                Приоритет
+            </label>
+
+            <select name="priority" class="form-control">
+                <option value="">
+                    Все приоритеты
+                </option>
+
+                {% for value, label in priority_choices %}
+                    <option value="{{ value }}" {% if selected_priority == value|stringformat:"s" %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group payment-filter-search">
+            <label>
+                Поиск
+            </label>
+
+            <input
+                type="text"
+                name="q"
+                value="{{ search_query }}"
+                placeholder="Контрагент, счет, файл, описание"
+                class="form-control"
+            >
+        </div>
+
+        <div class="payment-schedule-filter-actions">
+            <button type="submit" class="btn btn-primary">
+                Применить
+            </button>
+
+            <a href="{% url 'payment_schedule' %}" class="btn btn-secondary">
+                Сбросить
+            </a>
+        </div>
+
+    </form>
 
 </div>
 
@@ -116,12 +186,12 @@
             </h3>
 
             <span>
-                Сегодня: {{ today|date:"d.m.Y" }}
+                Отобрано счетов: {{ filtered_count }} · сумма: {{ filtered_amount|floatformat:2 }} ₽
             </span>
         </div>
 
         <div class="registry-actions">
-            <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
+            <a href="{% url 'payment_registry' %}?date_from={{ date_from }}&date_to={{ date_to }}&q={{ search_query }}" class="btn btn-secondary">
                 Перейти в реестр
             </a>
         </div>
@@ -130,41 +200,19 @@
 
     <div class="table-scroll table-scroll-fit">
 
-        <table class="table registry-table schedule-table">
+        <table class="table registry-table schedule-table payment-schedule-table">
 
             <thead>
                 <tr>
-                    <th>
-                        ID
-                    </th>
-
-                    <th>
-                        Контрагент
-                    </th>
-
-                    <th>
-                        Счет
-                    </th>
-
-                    <th>
-                        Сумма
-                    </th>
-
-                    <th>
-                        План оплаты
-                    </th>
-
-                    <th>
-                        Приоритет
-                    </th>
-
-                    <th>
-                        Статус
-                    </th>
-
-                    <th>
-                        Действия
-                    </th>
+                    <th>ID</th>
+                    <th>Контрагент</th>
+                    <th>Счет</th>
+                    <th>Сумма</th>
+                    <th>Дата оплаты</th>
+                    <th>Приоритет</th>
+                    <th>Статус</th>
+                    <th>Ответственный</th>
+                    <th>Действия</th>
                 </tr>
             </thead>
 
@@ -187,25 +235,11 @@
 
                         <td>
                             {% if invoice.counterparty %}
-                                <strong>
-                                    {{ invoice.counterparty.name }}
-                                </strong>
-
-                                {% if invoice.counterparty.inn %}
-                                    <div class="muted">
-                                        ИНН {{ invoice.counterparty.inn }}
-                                    </div>
-                                {% endif %}
+                                <strong>{{ invoice.counterparty.name }}</strong>
+                            {% elif invoice.vendor %}
+                                <strong>{{ invoice.vendor }}</strong>
                             {% else %}
-                                {% if invoice.vendor %}
-                                    <div>
-                                        {{ invoice.vendor }}
-                                    </div>
-                                {% endif %}
-
-                                <span class="status-badge status-rejected">
-                                    Не найден в 1С
-                                </span>
+                                <span class="muted">Не указан</span>
                             {% endif %}
                         </td>
 
@@ -213,7 +247,7 @@
                             {% if invoice.invoice_number %}
                                 № {{ invoice.invoice_number }}
                             {% else %}
-                                —
+                                <span class="muted">Без номера</span>
                             {% endif %}
 
                             {% if invoice.invoice_date %}
@@ -250,7 +284,7 @@
                                 {% endif %}
                             {% else %}
                                 <span class="status-badge status-review">
-                                    Не указана
+                                    Без даты
                                 </span>
                             {% endif %}
                         </td>
@@ -268,19 +302,39 @@
                         </td>
 
                         <td>
+                            {% if invoice.user %}
+                                {{ invoice.user.username }}
+                            {% else %}
+                                <span class="muted">—</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
                             <div class="table-actions table-actions-vertical">
-                                <a
-                                    href="{% url 'invoice_detail' invoice.id %}"
-                                    class="btn btn-primary btn-sm"
-                                >
+                                <a href="{% url 'invoice_detail' invoice.id %}" class="btn btn-primary btn-sm">
                                     Открыть
                                 </a>
 
-                                {% if user.is_staff %}
-                                    <a
-                                        href="{% url 'edit_invoice' invoice.id %}"
-                                        class="btn btn-secondary btn-sm"
+                                <form
+                                    method="post"
+                                    action="{% url 'add_to_payment_registry' %}"
+                                    class="payment-registry-add-form"
+                                >
+                                    {% csrf_token %}
+
+                                    <input
+                                        type="hidden"
+                                        name="invoice_ids"
+                                        value="{{ invoice.id }}"
                                     >
+
+                                    <button type="submit" class="btn btn-secondary btn-sm">
+                                        В реестр
+                                    </button>
+                                </form>
+
+                                {% if user.is_staff %}
+                                    <a href="{% url 'edit_invoice' invoice.id %}" class="btn btn-secondary btn-sm">
                                         Изменить
                                     </a>
                                 {% endif %}
@@ -291,8 +345,8 @@
                 {% empty %}
 
                     <tr>
-                        <td colspan="8" class="empty-table">
-                            Для выбранного фильтра платежей нет.
+                        <td colspan="9" class="empty-table">
+                            Для выбранных условий платежей нет.
                         </td>
                     </tr>
 
@@ -305,5 +359,4 @@
     </div>
 
 </div>
-
 {% endblock %}

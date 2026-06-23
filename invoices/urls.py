@@ -16,6 +16,7 @@ from .views import (
     edit_invoice,
     payment_schedule,
     payment_registry,
+    add_to_payment_registry,
     export_payment_registry_excel,
     export_payment_registry_1c,
     unmatched_counterparties,
@@ -28,6 +29,14 @@ from .views import (
     counterparty_create,
     counterparty_edit,
     invoice_assign_counterparty,
+    remove_from_payment_registry_item,
+    check_payment_registry_view,
+    export_payment_registry_draft_excel,
+    export_payment_registry_draft_1c,
+    payment_registry_history,
+    payment_registry_detail,
+    mark_payment_registry_paid,
+    cancel_payment_registry_view,
 )
 
 
@@ -86,12 +95,66 @@ urlpatterns = [
         payment_schedule,
         name='payment_schedule'
     ),
+    path(
+        'payment-registry/<int:registry_id>/cancel/',
+        cancel_payment_registry_view,
+        name='cancel_payment_registry'
+    ),
 
+    path(
+        'payment-registry/<int:registry_id>/mark-paid/',
+        mark_payment_registry_paid,
+        name='mark_payment_registry_paid'
+    ),
+
+    path(
+        'payment-registry/<int:registry_id>/',
+        payment_registry_detail,
+        name='payment_registry_detail'
+    ),
+
+    path(
+        'payment-registry/history/',
+        payment_registry_history,
+        name='payment_registry_history'
+    ),
+
+    path(
+        'payment-registry/<int:registry_id>/export-excel/',
+        export_payment_registry_draft_excel,
+        name='export_payment_registry_draft_excel'
+    ),
+
+    path(
+        'payment-registry/<int:registry_id>/export-1c/',
+        export_payment_registry_draft_1c,
+        name='export_payment_registry_draft_1c'
+    ),
+
+    path(
+        'payment-registry/<int:registry_id>/check/',
+        check_payment_registry_view,
+        name='check_payment_registry'
+    ),
+
+    path(
+        'payment-registry/item/<int:item_id>/remove/',
+        remove_from_payment_registry_item,
+        name='remove_from_payment_registry_item'
+    ),
+
+
+    path(
+        'payment-registry/add/',
+        add_to_payment_registry,
+        name='add_to_payment_registry'
+    ),
     path(
         'payment-registry/',
         payment_registry,
         name='payment_registry'
     ),
+
 
     path(
         'payment-registry/export-excel/',

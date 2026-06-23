@@ -1,4 +1,5 @@
-from datetime import date, datetime
+from django.utils.dateparse import parse_date
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
@@ -1852,6 +1853,35 @@ def payment_schedule(request):
         'all'
     )
 
+    search_query = request.GET.get(
+        'q',
+        ''
+    ).strip()
+
+    selected_status = request.GET.get(
+        'status',
+        'payment'
+    )
+
+    selected_priority = request.GET.get(
+        'priority',
+        ''
+    )
+
+    date_from = request.GET.get(
+        'date_from',
+        ''
+    )
+
+    date_to = request.GET.get(
+        'date_to',
+        ''
+    )
+
+    parsed_date_from = parse_date(date_from) if date_from else None
+
+    parsed_date_to = parse_date(date_to) if date_to else None
+
     payment_statuses = [
         Invoice.STATUS_NEW,
         Invoice.STATUS_REVIEW,
@@ -1871,10 +1901,28 @@ def payment_schedule(request):
 
     today = date.today()
 
+    week_end = today + timedelta(
+        days=7
+    )
+
+    month_end = today + timedelta(
+        days=30
+    )
+
     total_count = base_invoices.count()
 
     today_count = base_invoices.filter(
         planned_payment_date=today
+    ).count()
+
+    week_count = base_invoices.filter(
+        planned_payment_date__gte=today,
+        planned_payment_date__lte=week_end
+    ).count()
+
+    month_count = base_invoices.filter(
+        planned_payment_date__gte=today,
+        planned_payment_date__lte=month_end
     ).count()
 
     overdue_count = base_invoices.filter(
@@ -1904,6 +1952,20 @@ def payment_schedule(request):
             planned_payment_date=today
         )
 
+    elif filter_type == 'week':
+
+        invoices = invoices.filter(
+            planned_payment_date__gte=today,
+            planned_payment_date__lte=week_end
+        )
+
+    elif filter_type == 'month':
+
+        invoices = invoices.filter(
+            planned_payment_date__gte=today,
+            planned_payment_date__lte=month_end
+        )
+
     elif filter_type == 'overdue':
 
         invoices = invoices.filter(
@@ -1915,6 +1977,93 @@ def payment_schedule(request):
         invoices = invoices.filter(
             planned_payment_date__isnull=True
         )
+
+    if selected_status and selected_status not in [
+        'payment',
+        'all',
+    ]:
+
+        invoices = invoices.filter(
+            status=selected_status
+        )
+
+    if selected_priority:
+
+        invoices = invoices.filter(
+            payment_priority=selected_priority
+        )
+
+    if parsed_date_from and filter_type != 'no_date':
+
+        invoices = invoices.filter(
+            planned_payment_date__gte=parsed_date_from
+        )
+
+    if parsed_date_to and filter_type != 'no_date':
+
+        invoices = invoices.filter(
+            planned_payment_date__lte=parsed_date_to
+        )
+
+    if search_query:
+
+        invoices = invoices.filter(
+            Q(invoice_number__icontains=search_query)
+            |
+            Q(vendor__icontains=search_query)
+            |
+            Q(counterparty__name__icontains=search_query)
+            |
+            Q(original_filename__icontains=search_query)
+            |
+            Q(title__icontains=search_query)
+            |
+            Q(description__icontains=search_query)
+        )
+
+    filtered_count = invoices.count()
+
+    filtered_amount = (
+        invoices.aggregate(
+            total=Sum(
+                'amount'
+            )
+        ).get(
+            'total'
+        )
+        or 0
+    )
+
+    priority_field = Invoice._meta.get_field(
+        'payment_priority'
+    )
+
+    priority_choices = list(
+        priority_field.choices or []
+    )
+
+    if not priority_choices:
+
+        priority_choices = [
+            (
+                item,
+                item
+            )
+            for item in (
+                base_invoices
+                .exclude(
+                    payment_priority__isnull=True
+                )
+                .order_by(
+                    '-payment_priority'
+                )
+                .values_list(
+                    'payment_priority',
+                    flat=True
+                )
+                .distinct()
+            )
+        ]
 
     invoices = invoices.order_by(
         'planned_payment_date',
@@ -1929,12 +2078,1031 @@ def payment_schedule(request):
         {
             'invoices': invoices,
             'today': today,
+            'week_end': week_end,
+            'month_end': month_end,
             'filter_type': filter_type,
+            'search_query': search_query,
+            'selected_status': selected_status,
+            'selected_priority': selected_priority,
+            'date_from': date_from,
+            'date_to': date_to,
+            'status_choices': Invoice.STATUS_CHOICES,
+            'priority_choices': priority_choices,
             'total_count': total_count,
             'today_count': today_count,
+            'week_count': week_count,
+            'month_count': month_count,
             'overdue_count': overdue_count,
             'no_date_count': no_date_count,
             'total_amount': total_amount,
+            'filtered_count': filtered_count,
+            'filtered_amount': filtered_amount,
+        }
+    )
+
+@login_required
+def add_to_payment_registry(request):
+
+    if request.method != 'POST':
+
+        messages.warning(
+            request,
+            'Добавлять счета в реестр можно только из формы.'
+        )
+
+        return redirect(
+            'payment_schedule'
+        )
+
+    invoice_ids = request.POST.getlist(
+        'invoice_ids'
+    )
+
+    if not invoice_ids:
+
+        messages.warning(
+            request,
+            'Выбери хотя бы один счет для добавления в реестр.'
+        )
+
+        return redirect(
+            'payment_schedule'
+        )
+
+    from .payment_registry_services import (
+        add_invoice_to_payment_registry,
+        get_or_create_draft_payment_registry,
+    )
+
+    registry, created = get_or_create_draft_payment_registry(
+        request.user
+    )
+
+    invoices = (
+        Invoice.objects
+        .select_related(
+            'counterparty',
+            'user'
+        )
+        .filter(
+            id__in=invoice_ids
+        )
+    )
+
+    added_count = 0
+    skipped_messages = []
+    warning_messages = []
+
+    for invoice in invoices:
+
+        item, errors, warnings = add_invoice_to_payment_registry(
+            invoice,
+            registry
+        )
+
+        if item:
+
+            added_count += 1
+
+        if errors:
+
+            skipped_messages.append(
+                f'#{invoice.id}: ' + '; '.join(errors)
+            )
+
+        if warnings:
+
+            warning_messages.append(
+                f'#{invoice.id}: ' + '; '.join(warnings)
+            )
+
+    if added_count:
+
+        messages.success(
+            request,
+            f'Добавлено счетов в реестр №{registry.id}: {added_count}.'
+        )
+
+    if skipped_messages:
+
+        messages.warning(
+            request,
+            'Не добавлено: ' + ' | '.join(skipped_messages[:5])
+        )
+
+    if warning_messages:
+
+        messages.info(
+            request,
+            'Предупреждения: ' + ' | '.join(warning_messages[:5])
+        )
+
+    if created and not added_count:
+
+        registry.delete()
+
+    return redirect(
+        'payment_registry'
+    )
+
+
+@login_required
+def remove_from_payment_registry_item(request, item_id):
+
+    if request.method != 'POST':
+
+        messages.warning(
+            request,
+            'Удалять счета из черновика можно только из формы.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    from .models import PaymentRegistry, PaymentRegistryItem
+    from .payment_registry_services import recalculate_payment_registry
+
+    item = (
+        PaymentRegistryItem.objects
+        .select_related(
+            'registry',
+            'invoice',
+        )
+        .filter(
+            id=item_id,
+            registry__status=PaymentRegistry.STATUS_DRAFT,
+            registry__created_by=request.user,
+        )
+        .exclude(
+            status=PaymentRegistryItem.STATUS_CANCELLED
+        )
+        .first()
+    )
+
+    if not item:
+
+        messages.warning(
+            request,
+            'Строка реестра не найдена или уже удалена.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    registry = item.registry
+    invoice_id = item.invoice_id
+
+    item.status = PaymentRegistryItem.STATUS_CANCELLED
+    item.save(
+        update_fields=(
+            'status',
+        )
+    )
+
+    recalculate_payment_registry(
+        registry
+    )
+
+    messages.success(
+        request,
+        f'Счёт #{invoice_id} удалён из черновика реестра №{registry.id}.'
+    )
+
+    return redirect(
+        'payment_registry'
+    )
+
+
+@login_required
+def check_payment_registry_view(request, registry_id):
+
+    if request.method != 'POST':
+
+        messages.warning(
+            request,
+            'Проверять реестр можно только из формы.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    from .models import PaymentRegistry
+    from .payment_registry_services import check_payment_registry
+
+    registry = (
+        PaymentRegistry.objects
+        .filter(
+            id=registry_id,
+            created_by=request.user,
+            status=PaymentRegistry.STATUS_DRAFT,
+        )
+        .first()
+    )
+
+    if not registry:
+
+        messages.warning(
+            request,
+            'Черновик реестра не найден.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    result = check_payment_registry(
+        registry
+    )
+
+    if result['items_count'] == 0:
+
+        messages.warning(
+            request,
+            f'Реестр №{registry.id} пуст. Сначала добавь счета.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    if result['errors_count']:
+
+        messages.warning(
+            request,
+            f'Реестр №{registry.id} не готов к выгрузке: ошибок {result["errors_count"]}.'
+        )
+
+        for error in result['errors'][:5]:
+
+            messages.warning(
+                request,
+                f'Счёт #{error["invoice_id"]}: ' + '; '.join(error['messages'])
+            )
+
+    else:
+
+        messages.success(
+            request,
+            f'Реестр №{registry.id} проверен: к выгрузке готово {result["ready_count"]} счетов.'
+        )
+
+    if result['warnings_count']:
+
+        messages.info(
+            request,
+            f'Предупреждений: {result["warnings_count"]}.'
+        )
+
+    return redirect(
+        'payment_registry'
+    )
+
+
+@login_required
+def export_payment_registry_draft_excel(request, registry_id):
+
+    if request.method != 'POST':
+
+        messages.warning(
+            request,
+            'Выгрузка реестра выполняется только из формы.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    from decimal import Decimal
+    from io import BytesIO
+
+    from django.http import HttpResponse
+    from django.utils import timezone
+
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, Alignment, PatternFill
+    from openpyxl.utils import get_column_letter
+
+    from .models import PaymentRegistry, PaymentRegistryItem
+    from .payment_registry_services import (
+        check_payment_registry,
+        recalculate_payment_registry,
+    )
+
+    registry = (
+        PaymentRegistry.objects
+        .filter(
+            id=registry_id,
+            created_by=request.user,
+            status=PaymentRegistry.STATUS_DRAFT,
+        )
+        .first()
+    )
+
+    if not registry:
+
+        messages.warning(
+            request,
+            'Черновик реестра не найден или уже выгружен.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    check_result = check_payment_registry(
+        registry
+    )
+
+    if check_result['items_count'] == 0:
+
+        messages.warning(
+            request,
+            f'Реестр №{registry.id} пуст. Сначала добавь счета.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    if check_result['errors_count']:
+
+        messages.warning(
+            request,
+            f'Реестр №{registry.id} нельзя выгрузить: ошибок {check_result["errors_count"]}.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    items = (
+        registry.items
+        .select_related(
+            'invoice',
+            'invoice__counterparty',
+            'invoice__user',
+        )
+        .exclude(
+            status=PaymentRegistryItem.STATUS_CANCELLED
+        )
+        .order_by(
+            'planned_payment_date',
+            'invoice_id',
+        )
+    )
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = f'Registry {registry.id}'
+
+    headers = [
+        '№ реестра',
+        'ID счета',
+        'Номер счета',
+        'Контрагент',
+        'ИНН',
+        'КПП',
+        'Банк',
+        'Расчетный счет',
+        'БИК',
+        'Корр. счет',
+        'Сумма',
+        'Дата оплаты',
+        'Назначение платежа',
+        'Ответственный',
+    ]
+
+    ws.append(headers)
+
+    header_fill = PatternFill(
+        fill_type='solid',
+        fgColor='1F2937',
+    )
+
+    for cell in ws[1]:
+        cell.font = Font(
+            bold=True,
+            color='FFFFFF',
+        )
+        cell.fill = header_fill
+        cell.alignment = Alignment(
+            horizontal='center',
+            vertical='center',
+        )
+
+    for item in items:
+
+        invoice = item.invoice
+        counterparty = invoice.counterparty
+
+        amount = item.amount or Decimal('0')
+        payment_date = item.planned_payment_date or invoice.planned_payment_date
+
+        purpose = (
+            getattr(invoice, 'payment_purpose', '')
+            or getattr(invoice, 'purpose', '')
+            or getattr(invoice, 'description', '')
+            or ''
+        )
+
+        ws.append(
+            [
+                registry.id,
+                invoice.id,
+                invoice.invoice_number or '',
+                counterparty.name if counterparty else '',
+                getattr(counterparty, 'inn', '') if counterparty else '',
+                getattr(counterparty, 'kpp', '') if counterparty else '',
+                getattr(counterparty, 'bank_name', '') if counterparty else '',
+                getattr(counterparty, 'bank_account', '') if counterparty else '',
+                getattr(counterparty, 'bik', '') if counterparty else '',
+                getattr(counterparty, 'corr_account', '') if counterparty else '',
+                float(amount),
+                payment_date.strftime('%d.%m.%Y') if payment_date else '',
+                purpose,
+                invoice.user.get_username() if invoice.user else '',
+            ]
+        )
+
+    for column_cells in ws.columns:
+        max_length = 0
+        column_letter = get_column_letter(
+            column_cells[0].column
+        )
+
+        for cell in column_cells:
+            value = str(cell.value or '')
+            max_length = max(
+                max_length,
+                len(value),
+            )
+
+        ws.column_dimensions[column_letter].width = min(
+            max_length + 2,
+            42,
+        )
+
+    ws.freeze_panes = 'A2'
+
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    now = timezone.now()
+
+    registry.status = PaymentRegistry.STATUS_EXPORTED
+    registry.exported_by = request.user
+    registry.exported_at = now
+    registry.save(
+        update_fields=(
+            'status',
+            'exported_by',
+            'exported_at',
+        )
+    )
+
+    items.update(
+        status=PaymentRegistryItem.STATUS_EXPORTED,
+        exported_at=now,
+    )
+
+    recalculate_payment_registry(
+        registry
+    )
+
+    response = HttpResponse(
+        output.getvalue(),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+
+    response['Content-Disposition'] = (
+        f'attachment; filename="payment_registry_{registry.id}.xlsx"'
+    )
+
+    return response
+
+
+@login_required
+def export_payment_registry_draft_1c(request, registry_id):
+
+    if request.method != 'POST':
+
+        messages.warning(
+            request,
+            'Выгрузка реестра выполняется только из формы.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    import csv
+    from io import StringIO
+
+    from django.http import HttpResponse
+    from django.utils import timezone
+
+    from .models import PaymentRegistry, PaymentRegistryItem
+    from .payment_registry_services import (
+        check_payment_registry,
+        recalculate_payment_registry,
+    )
+
+    registry = (
+        PaymentRegistry.objects
+        .filter(
+            id=registry_id,
+            created_by=request.user,
+            status=PaymentRegistry.STATUS_DRAFT,
+        )
+        .first()
+    )
+
+    if not registry:
+
+        messages.warning(
+            request,
+            'Черновик реестра не найден или уже выгружен.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    check_result = check_payment_registry(
+        registry
+    )
+
+    if check_result['items_count'] == 0:
+
+        messages.warning(
+            request,
+            f'Реестр №{registry.id} пуст. Сначала добавь счета.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    if check_result['errors_count']:
+
+        messages.warning(
+            request,
+            f'Реестр №{registry.id} нельзя выгрузить: ошибок {check_result["errors_count"]}.'
+        )
+
+        return redirect(
+            'payment_registry'
+        )
+
+    items = (
+        registry.items
+        .select_related(
+            'invoice',
+            'invoice__counterparty',
+            'invoice__user',
+        )
+        .exclude(
+            status=PaymentRegistryItem.STATUS_CANCELLED
+        )
+        .order_by(
+            'planned_payment_date',
+            'invoice_id',
+        )
+    )
+
+    buffer = StringIO()
+    writer = csv.writer(
+        buffer,
+        delimiter=';',
+        lineterminator='\n',
+    )
+
+    writer.writerow(
+        [
+            'RegistryID',
+            'InvoiceID',
+            'InvoiceNumber',
+            'Counterparty',
+            'INN',
+            'KPP',
+            'Bank',
+            'BankAccount',
+            'BIK',
+            'CorrAccount',
+            'Amount',
+            'PaymentDate',
+            'Purpose',
+        ]
+    )
+
+    for item in items:
+
+        invoice = item.invoice
+        counterparty = invoice.counterparty
+        payment_date = item.planned_payment_date or invoice.planned_payment_date
+
+        purpose = (
+            getattr(invoice, 'payment_purpose', '')
+            or getattr(invoice, 'purpose', '')
+            or getattr(invoice, 'description', '')
+            or ''
+        )
+
+        writer.writerow(
+            [
+                registry.id,
+                invoice.id,
+                invoice.invoice_number or '',
+                counterparty.name if counterparty else '',
+                getattr(counterparty, 'inn', '') if counterparty else '',
+                getattr(counterparty, 'kpp', '') if counterparty else '',
+                getattr(counterparty, 'bank_name', '') if counterparty else '',
+                getattr(counterparty, 'bank_account', '') if counterparty else '',
+                getattr(counterparty, 'bik', '') if counterparty else '',
+                getattr(counterparty, 'corr_account', '') if counterparty else '',
+                str(item.amount).replace('.', ','),
+                payment_date.strftime('%d.%m.%Y') if payment_date else '',
+                purpose,
+            ]
+        )
+
+    now = timezone.now()
+
+    registry.status = PaymentRegistry.STATUS_EXPORTED
+    registry.exported_by = request.user
+    registry.exported_at = now
+    registry.save(
+        update_fields=(
+            'status',
+            'exported_by',
+            'exported_at',
+        )
+    )
+
+    items.update(
+        status=PaymentRegistryItem.STATUS_EXPORTED,
+        exported_at=now,
+    )
+
+    recalculate_payment_registry(
+        registry
+    )
+
+    content = '\ufeff' + buffer.getvalue()
+
+    response = HttpResponse(
+        content,
+        content_type='text/plain; charset=utf-8',
+    )
+
+    response['Content-Disposition'] = (
+        f'attachment; filename="payment_registry_{registry.id}_1c.txt"'
+    )
+
+    return response
+
+
+@login_required
+def mark_payment_registry_paid(request, registry_id):
+
+    if request.method != 'POST':
+
+        messages.warning(
+            request,
+            'Отметить реестр оплаченным можно только из формы.'
+        )
+
+        return redirect(
+            'payment_registry_detail',
+            registry_id=registry_id,
+        )
+
+    from .models import PaymentRegistry
+    from .payment_registry_services import mark_payment_registry_as_paid
+
+    registry = (
+        PaymentRegistry.objects
+        .filter(
+            id=registry_id,
+        )
+        .first()
+    )
+
+    if not registry:
+
+        messages.warning(
+            request,
+            'Реестр оплаты не найден.'
+        )
+
+        return redirect(
+            'payment_registry_history'
+        )
+
+    if not request.user.is_staff and registry.created_by_id != request.user.id:
+
+        messages.warning(
+            request,
+            'Нет доступа к этому реестру.'
+        )
+
+        return redirect(
+            'payment_registry_history'
+        )
+
+    allowed_statuses = (
+        PaymentRegistry.STATUS_EXPORTED,
+        PaymentRegistry.STATUS_PARTIALLY_PAID,
+    )
+
+    if registry.status not in allowed_statuses:
+
+        messages.warning(
+            request,
+            'Оплаченным можно отметить только выгруженный реестр.'
+        )
+
+        return redirect(
+            'payment_registry_detail',
+            registry_id=registry.id,
+        )
+
+    mark_payment_registry_as_paid(
+        registry,
+        user=request.user,
+    )
+
+    messages.success(
+        request,
+        f'Реестр оплаты №{registry.id} отмечен как оплаченный.'
+    )
+
+    return redirect(
+        'payment_registry_detail',
+        registry_id=registry.id,
+    )
+
+
+@login_required
+def cancel_payment_registry_view(request, registry_id):
+
+    if request.method != 'POST':
+
+        messages.warning(
+            request,
+            'Отменить реестр можно только из формы.'
+        )
+
+        return redirect(
+            'payment_registry_detail',
+            registry_id=registry_id,
+        )
+
+    from .models import PaymentRegistry
+    from .payment_registry_services import cancel_payment_registry
+
+    registry = (
+        PaymentRegistry.objects
+        .filter(
+            id=registry_id,
+        )
+        .first()
+    )
+
+    if not registry:
+
+        messages.warning(
+            request,
+            'Реестр оплаты не найден.'
+        )
+
+        return redirect(
+            'payment_registry_history'
+        )
+
+    if not request.user.is_staff and registry.created_by_id != request.user.id:
+
+        messages.warning(
+            request,
+            'Нет доступа к этому реестру.'
+        )
+
+        return redirect(
+            'payment_registry_history'
+        )
+
+    reason = request.POST.get(
+        'reason',
+        ''
+    ).strip()
+
+    cancelled = cancel_payment_registry(
+        registry,
+        user=request.user,
+        reason=reason,
+    )
+
+    if not cancelled:
+
+        messages.warning(
+            request,
+            'Можно отменить только черновик или проверенный реестр.'
+        )
+
+        return redirect(
+            'payment_registry_detail',
+            registry_id=registry.id,
+        )
+
+    messages.success(
+        request,
+        f'Реестр оплаты №{registry.id} отменён.'
+    )
+
+    return redirect(
+        'payment_registry_detail',
+        registry_id=registry.id,
+    )
+
+
+@login_required
+def payment_registry_detail(request, registry_id):
+
+    from .models import PaymentRegistry, PaymentRegistryItem
+    from .payment_registry_services import check_payment_registry
+
+    registry = (
+        PaymentRegistry.objects
+        .select_related(
+            'created_by',
+            'checked_by',
+            'exported_by',
+        )
+        .filter(
+            id=registry_id,
+        )
+        .first()
+    )
+
+    if not registry:
+
+        messages.warning(
+            request,
+            'Реестр оплаты не найден.'
+        )
+
+        return redirect(
+            'payment_registry_history'
+        )
+
+    if not request.user.is_staff and registry.created_by_id != request.user.id:
+
+        messages.warning(
+            request,
+            'Нет доступа к этому реестру.'
+        )
+
+        return redirect(
+            'payment_registry_history'
+        )
+
+    registry_items = (
+        registry.items
+        .select_related(
+            'invoice',
+            'invoice__counterparty',
+            'invoice__user',
+        )
+        .exclude(
+            status=PaymentRegistryItem.STATUS_CANCELLED
+        )
+        .order_by(
+            'planned_payment_date',
+            'invoice_id',
+        )
+    )
+
+    check_result = None
+
+    if registry.status == PaymentRegistry.STATUS_DRAFT:
+
+        check_result = check_payment_registry(
+            registry
+        )
+
+    return render(
+        request,
+        'invoices/payment_registry_detail.html',
+        {
+            'page_title': f'Реестр оплаты №{registry.id}',
+            'registry': registry,
+            'registry_items': registry_items,
+            'check_result': check_result,
+        }
+    )
+
+
+@login_required
+def payment_registry_history(request):
+
+    from django.core.paginator import Paginator
+    from django.db.models import Sum, Q
+
+    from .models import PaymentRegistry
+
+    status_filter = request.GET.get(
+        'status',
+        ''
+    ).strip()
+
+    search_query = request.GET.get(
+        'q',
+        ''
+    ).strip()
+
+    registries = (
+        PaymentRegistry.objects
+        .select_related(
+            'created_by',
+            'checked_by',
+            'exported_by',
+        )
+        .all()
+        .order_by(
+            '-created_at',
+        )
+    )
+
+    if not request.user.is_staff:
+
+        registries = registries.filter(
+            created_by=request.user,
+        )
+
+    if status_filter:
+
+        registries = registries.filter(
+            status=status_filter,
+        )
+
+    if search_query:
+
+        registries = registries.filter(
+            Q(title__icontains=search_query)
+            | Q(comment__icontains=search_query)
+            | Q(created_by__username__icontains=search_query)
+            | Q(exported_by__username__icontains=search_query)
+        )
+
+    total_registries = registries.count()
+
+    total_amount = (
+        registries.aggregate(
+            total=Sum('total_amount')
+        ).get('total')
+        or 0
+    )
+
+    draft_count = registries.filter(
+        status=PaymentRegistry.STATUS_DRAFT,
+    ).count()
+
+    exported_count = registries.filter(
+        status=PaymentRegistry.STATUS_EXPORTED,
+    ).count()
+
+    paid_count = registries.filter(
+        status=PaymentRegistry.STATUS_PAID,
+    ).count()
+
+    paginator = Paginator(
+        registries,
+        20,
+    )
+
+    page_obj = paginator.get_page(
+        request.GET.get('page')
+    )
+
+    return render(
+        request,
+        'invoices/payment_registry_history.html',
+        {
+            'page_title': 'История реестров оплаты',
+            'page_obj': page_obj,
+            'registries': page_obj.object_list,
+            'status_filter': status_filter,
+            'search_query': search_query,
+            'status_choices': PaymentRegistry.STATUS_CHOICES,
+            'total_registries': total_registries,
+            'total_amount': total_amount,
+            'draft_count': draft_count,
+            'exported_count': exported_count,
+            'paid_count': paid_count,
         }
     )
 
@@ -1967,6 +3135,60 @@ def payment_registry(request):
         ''
     ).strip()
 
+    from .models import PaymentRegistry, PaymentRegistryItem
+    from .payment_registry_services import ACTIVE_REGISTRY_STATUSES, check_payment_registry
+
+    draft_registry = (
+        PaymentRegistry.objects
+        .filter(
+            status=PaymentRegistry.STATUS_DRAFT,
+            created_by=request.user,
+        )
+        .order_by(
+            '-created_at'
+        )
+        .first()
+    )
+
+    draft_registry_items = PaymentRegistryItem.objects.none()
+    draft_registry_check_result = None
+
+    if draft_registry:
+
+        draft_registry_items = (
+            draft_registry.items
+            .select_related(
+                'invoice',
+                'invoice__counterparty',
+                'invoice__user',
+            )
+            .exclude(
+                status=PaymentRegistryItem.STATUS_CANCELLED
+            )
+            .order_by(
+                'planned_payment_date',
+                'invoice_id',
+            )
+        )
+
+        draft_registry_check_result = check_payment_registry(
+            draft_registry
+        )
+
+    active_registry_invoice_ids = (
+        PaymentRegistryItem.objects
+        .filter(
+            registry__status__in=ACTIVE_REGISTRY_STATUSES,
+        )
+        .exclude(
+            status=PaymentRegistryItem.STATUS_CANCELLED
+        )
+        .values_list(
+            'invoice_id',
+            flat=True,
+        )
+    )
+
     invoices = (
         Invoice.objects
         .select_related(
@@ -1975,6 +3197,9 @@ def payment_registry(request):
         )
         .exclude(
             status=Invoice.STATUS_PAID
+        )
+        .exclude(
+            id__in=active_registry_invoice_ids
         )
     )
 
@@ -2058,6 +3283,11 @@ def payment_registry(request):
             'date_from': date_from,
             'date_to': date_to,
             'status_choices': Invoice.STATUS_CHOICES,
+            'draft_registry': draft_registry,
+            'draft_registry_items': draft_registry_items,
+            'draft_registry_items_count': draft_registry.items_count if draft_registry else 0,
+            'draft_registry_total_amount': draft_registry.total_amount if draft_registry else 0,
+            'draft_registry_check_result': draft_registry_check_result,
         }
     )
 

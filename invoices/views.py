@@ -135,6 +135,58 @@ def get_payment_registry_permission_context(user):
     }
 
 
+
+PAYMENT_STATUS_FILTER_CHOICES = (
+    ("", "Все оплаты"),
+    ("unpaid", "Не оплачен"),
+    ("partial", "Частично оплачен"),
+    ("paid", "Оплачен"),
+    ("overpaid", "Переплата"),
+)
+
+
+def apply_payment_status_filter(queryset, payment_status):
+    if not payment_status:
+        return queryset
+
+    from django.db.models import F
+    from .models import InvoicePayment
+
+    queryset = queryset.annotate(
+        payment_paid_sum=Sum(
+            "payments__amount",
+            filter=Q(
+                payments__status=InvoicePayment.STATUS_POSTED
+            )
+        )
+    )
+
+    if payment_status == "unpaid":
+        return queryset.filter(
+            Q(payment_paid_sum__isnull=True)
+            |
+            Q(payment_paid_sum__lte=0)
+        )
+
+    if payment_status == "partial":
+        return queryset.filter(
+            payment_paid_sum__gt=0,
+            payment_paid_sum__lt=F("amount")
+        )
+
+    if payment_status == "paid":
+        return queryset.filter(
+            payment_paid_sum=F("amount")
+        )
+
+    if payment_status == "overpaid":
+        return queryset.filter(
+            payment_paid_sum__gt=F("amount")
+        )
+
+    return queryset
+
+
 @login_required
 def invoice_list(request):
 
@@ -166,6 +218,11 @@ def invoice_list(request):
 
     user_filter = request.GET.get(
         'user',
+        ''
+    )
+
+    payment_status_filter = request.GET.get(
+        'payment_status',
         ''
     )
 
@@ -203,6 +260,11 @@ def invoice_list(request):
         invoices = invoices.filter(
             user_id=user_filter
         )
+
+    invoices = apply_payment_status_filter(
+        invoices,
+        payment_status_filter
+    )
 
     allowed_sorts = [
         'id',
@@ -279,6 +341,8 @@ def invoice_list(request):
             'status': status,
             'sort': sort,
             'user_filter': user_filter,
+            'payment_status_filter': payment_status_filter,
+            'payment_status_choices': PAYMENT_STATUS_FILTER_CHOICES,
             'statuses': Invoice.STATUS_CHOICES,
             'users': users,
             'total_count': total_count,

@@ -370,7 +370,8 @@ def _model_has_field(instance, field_name):
 
 
 def mark_payment_registry_as_paid(registry, user=None):
-    today = timezone.localdate()
+    paid_at_date = timezone.localdate()
+    paid_at_datetime = timezone.now()
 
     paid_count = 0
     skipped_count = 0
@@ -394,7 +395,7 @@ def mark_payment_registry_as_paid(registry, user=None):
 
         if remaining_amount <= 0:
             item.status = PaymentRegistryItem.STATUS_PAID
-            item.paid_at = today
+            item.paid_at = paid_at_datetime
             item.save(
                 update_fields=[
                     "status",
@@ -415,14 +416,14 @@ def mark_payment_registry_as_paid(registry, user=None):
             amount=payment_amount,
             user=user,
             registry_item=item,
-            paid_at=today,
+            paid_at=paid_at_date,
             payment_number=f"Реестр №{registry.id}",
             comment="Оплата по реестру",
             source="registry",
         )
 
         item.status = PaymentRegistryItem.STATUS_PAID
-        item.paid_at = today
+        item.paid_at = paid_at_datetime
         item.save(
             update_fields=[
                 "status",

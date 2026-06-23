@@ -187,6 +187,36 @@ def apply_payment_status_filter(queryset, payment_status):
     return queryset
 
 
+def apply_positive_payment_balance_filter(queryset):
+    from decimal import Decimal
+    from django.db.models import DecimalField, F, Value
+    from django.db.models.functions import Coalesce
+
+    from .models import InvoicePayment
+
+    queryset = queryset.annotate(
+        payment_paid_sum=Coalesce(
+            Sum(
+                "payments__amount",
+                filter=Q(
+                    payments__status=InvoicePayment.STATUS_POSTED
+                )
+            ),
+            Value(
+                Decimal("0.00"),
+                output_field=DecimalField(
+                    max_digits=12,
+                    decimal_places=2
+                )
+            )
+        )
+    )
+
+    return queryset.filter(
+        payment_paid_sum__lt=F("amount")
+    )
+
+
 @login_required
 def invoice_list(request):
 
@@ -2341,6 +2371,10 @@ def payment_schedule(request):
             )
         ]
 
+    invoices = apply_positive_payment_balance_filter(
+        invoices
+    )
+
     invoices = invoices.order_by(
         'planned_payment_date',
         '-payment_priority',
@@ -3525,6 +3559,10 @@ def payment_registry(request):
         invoices = invoices.filter(
             planned_payment_date__lte=date_to
         )
+
+    invoices = apply_positive_payment_balance_filter(
+        invoices
+    )
 
     total_amount = (
         invoices.aggregate(

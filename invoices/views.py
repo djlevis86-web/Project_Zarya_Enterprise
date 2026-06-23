@@ -1738,6 +1738,80 @@ def ocr_queue(request):
     )
 
 @login_required
+def cancel_invoice_payment(request, payment_id):
+    from .models import InvoicePayment
+    from .payment_services import get_invoice_payment_summary
+
+    payment = get_object_or_404(
+        InvoicePayment.objects.select_related(
+            "invoice"
+        ),
+        id=payment_id
+    )
+
+    invoice = payment.invoice
+
+    if (
+        not request.user.is_staff
+        and not request.user.is_superuser
+        and invoice.user_id != request.user.id
+    ):
+        raise PermissionDenied
+
+    if request.method != "POST":
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id
+        )
+
+    if payment.status == InvoicePayment.STATUS_CANCELLED:
+        messages.warning(
+            request,
+            "Эта оплата уже отменена."
+        )
+
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id
+        )
+
+    payment.status = InvoicePayment.STATUS_CANCELLED
+    payment.comment = (
+        (payment.comment or "")
+        + "\nОтменено пользователем: "
+        + request.user.get_username()
+    ).strip()
+
+    payment.save(
+        update_fields=[
+            "status",
+            "comment",
+            "updated_at",
+        ]
+    )
+
+    create_invoice_log(
+        invoice,
+        request.user,
+        f"Отменена оплата по счёту: {payment.amount}"
+    )
+
+    get_invoice_payment_summary(
+        invoice
+    )
+
+    messages.success(
+        request,
+        "Оплата отменена. Остаток по счёту пересчитан."
+    )
+
+    return redirect(
+        "invoice_detail",
+        invoice_id=invoice.id
+    )
+
+
+@login_required
 def add_invoice_payment(request, invoice_id):
     invoice = get_object_or_404(
         Invoice,

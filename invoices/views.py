@@ -2767,6 +2767,87 @@ def export_payment_registry_draft_1c(request, registry_id):
 
 
 @login_required
+def mark_payment_registry_paid(request, registry_id):
+
+    if request.method != 'POST':
+
+        messages.warning(
+            request,
+            'Отметить реестр оплаченным можно только из формы.'
+        )
+
+        return redirect(
+            'payment_registry_detail',
+            registry_id=registry_id,
+        )
+
+    from .models import PaymentRegistry
+    from .payment_registry_services import mark_payment_registry_as_paid
+
+    registry = (
+        PaymentRegistry.objects
+        .filter(
+            id=registry_id,
+        )
+        .first()
+    )
+
+    if not registry:
+
+        messages.warning(
+            request,
+            'Реестр оплаты не найден.'
+        )
+
+        return redirect(
+            'payment_registry_history'
+        )
+
+    if not request.user.is_staff and registry.created_by_id != request.user.id:
+
+        messages.warning(
+            request,
+            'Нет доступа к этому реестру.'
+        )
+
+        return redirect(
+            'payment_registry_history'
+        )
+
+    allowed_statuses = (
+        PaymentRegistry.STATUS_EXPORTED,
+        PaymentRegistry.STATUS_PARTIALLY_PAID,
+    )
+
+    if registry.status not in allowed_statuses:
+
+        messages.warning(
+            request,
+            'Оплаченным можно отметить только выгруженный реестр.'
+        )
+
+        return redirect(
+            'payment_registry_detail',
+            registry_id=registry.id,
+        )
+
+    mark_payment_registry_as_paid(
+        registry,
+        user=request.user,
+    )
+
+    messages.success(
+        request,
+        f'Реестр оплаты №{registry.id} отмечен как оплаченный.'
+    )
+
+    return redirect(
+        'payment_registry_detail',
+        registry_id=registry.id,
+    )
+
+
+@login_required
 def payment_registry_detail(request, registry_id):
 
     from .models import PaymentRegistry, PaymentRegistryItem

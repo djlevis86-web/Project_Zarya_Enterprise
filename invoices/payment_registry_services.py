@@ -274,3 +274,72 @@ def check_payment_registry(registry):
         "warnings": warnings,
     }
 
+
+def _model_has_field(instance, field_name):
+    try:
+        instance._meta.get_field(field_name)
+        return True
+    except Exception:
+        return False
+
+
+def mark_payment_registry_as_paid(registry, user=None):
+    from django.utils import timezone
+
+    now = timezone.now()
+
+    items = (
+        registry.items
+        .select_related(
+            "invoice",
+        )
+        .exclude(
+            status=PaymentRegistryItem.STATUS_CANCELLED
+        )
+    )
+
+    for item in items:
+        item.status = PaymentRegistryItem.STATUS_PAID
+        item.paid_at = now
+        item.save(
+            update_fields=(
+                "status",
+                "paid_at",
+            )
+        )
+
+        invoice = item.invoice
+        invoice_update_fields = []
+
+        if hasattr(Invoice, "STATUS_PAID"):
+            invoice.status = Invoice.STATUS_PAID
+            invoice_update_fields.append(
+                "status"
+            )
+
+        if _model_has_field(invoice, "paid_at"):
+            invoice.paid_at = now
+            invoice_update_fields.append(
+                "paid_at"
+            )
+
+        if invoice_update_fields:
+            invoice.save(
+                update_fields=tuple(
+                    dict.fromkeys(invoice_update_fields)
+                )
+            )
+
+    registry.status = PaymentRegistry.STATUS_PAID
+    registry.save(
+        update_fields=(
+            "status",
+        )
+    )
+
+    recalculate_payment_registry(
+        registry
+    )
+
+    return registry
+

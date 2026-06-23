@@ -106,6 +106,24 @@
                     {{ registry.get_status_display }}
                 </span>
 
+                {% if registry.status == "exported" or registry.status == "partially_paid" %}
+                    <form
+                        method="post"
+                        action="{% url 'mark_payment_registry_paid' registry.id %}"
+                        class="payment-registry-paid-form"
+                    >
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            onclick="return confirm('Отметить этот реестр как оплаченный?');"
+                        >
+                            Отметить оплаченным
+                        </button>
+                    </form>
+                {% endif %}
+
                 {% if registry.status == "draft" and check_result and check_result.items_count and not check_result.errors_count %}
                     <form
                         method="post"

@@ -4512,3 +4512,16 @@ select {
         justify-content: flex-start !important;
     }
 }
+
+/* === Payment registry paid action === */
+
+.payment-registry-paid-form {
+    margin: 0 !important;
+}
+
+.payment-registry-paid-form .btn {
+    min-height: 42px !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+}

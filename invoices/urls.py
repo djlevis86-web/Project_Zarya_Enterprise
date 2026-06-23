@@ -34,6 +34,7 @@ from .views import (
     export_payment_registry_draft_excel,
     export_payment_registry_draft_1c,
     payment_registry_history,
+    payment_registry_detail,
 )
 
 
@@ -92,6 +93,12 @@ urlpatterns = [
         payment_schedule,
         name='payment_schedule'
     ),
+    path(
+        'payment-registry/<int:registry_id>/',
+        payment_registry_detail,
+        name='payment_registry_detail'
+    ),
+
     path(
         'payment-registry/history/',
         payment_registry_history,

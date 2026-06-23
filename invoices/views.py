@@ -2767,6 +2767,83 @@ def export_payment_registry_draft_1c(request, registry_id):
 
 
 @login_required
+def payment_registry_detail(request, registry_id):
+
+    from .models import PaymentRegistry, PaymentRegistryItem
+    from .payment_registry_services import check_payment_registry
+
+    registry = (
+        PaymentRegistry.objects
+        .select_related(
+            'created_by',
+            'checked_by',
+            'exported_by',
+        )
+        .filter(
+            id=registry_id,
+        )
+        .first()
+    )
+
+    if not registry:
+
+        messages.warning(
+            request,
+            'Реестр оплаты не найден.'
+        )
+
+        return redirect(
+            'payment_registry_history'
+        )
+
+    if not request.user.is_staff and registry.created_by_id != request.user.id:
+
+        messages.warning(
+            request,
+            'Нет доступа к этому реестру.'
+        )
+
+        return redirect(
+            'payment_registry_history'
+        )
+
+    registry_items = (
+        registry.items
+        .select_related(
+            'invoice',
+            'invoice__counterparty',
+            'invoice__user',
+        )
+        .exclude(
+            status=PaymentRegistryItem.STATUS_CANCELLED
+        )
+        .order_by(
+            'planned_payment_date',
+            'invoice_id',
+        )
+    )
+
+    check_result = None
+
+    if registry.status == PaymentRegistry.STATUS_DRAFT:
+
+        check_result = check_payment_registry(
+            registry
+        )
+
+    return render(
+        request,
+        'invoices/payment_registry_detail.html',
+        {
+            'page_title': f'Реестр оплаты №{registry.id}',
+            'registry': registry,
+            'registry_items': registry_items,
+            'check_result': check_result,
+        }
+    )
+
+
+@login_required
 def payment_registry_history(request):
 
     from django.core.paginator import Paginator

@@ -194,15 +194,15 @@
                     {% for registry in registries %}
                         <tr>
                             <td>
-                                <strong>
+                                <a href="{% url 'payment_registry_detail' registry.id %}" class="registry-detail-link">
                                     №{{ registry.id }}
-                                </strong>
+                                </a>
                             </td>
 
                             <td>
-                                <strong>
+                                <a href="{% url 'payment_registry_detail' registry.id %}" class="registry-detail-title">
                                     {{ registry.title|default:"Реестр оплаты" }}
-                                </strong>
+                                </a>
 
                                 {% if registry.comment %}
                                     <div class="muted">

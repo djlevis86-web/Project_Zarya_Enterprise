@@ -2134,6 +2134,11 @@ def payment_schedule(request):
         ''
     )
 
+    schedule_payment_status_filter = request.GET.get(
+        'payment_status',
+        ''
+    )
+
     date_from = request.GET.get(
         'date_from',
         ''
@@ -2259,6 +2264,11 @@ def payment_schedule(request):
             payment_priority=selected_priority
         )
 
+    invoices = apply_payment_status_filter(
+        invoices,
+        schedule_payment_status_filter
+    )
+
     if parsed_date_from and filter_type != 'no_date':
 
         invoices = invoices.filter(
@@ -2350,6 +2360,8 @@ def payment_schedule(request):
             'search_query': search_query,
             'selected_status': selected_status,
             'selected_priority': selected_priority,
+            'schedule_payment_status_filter': schedule_payment_status_filter,
+            'payment_status_choices': PAYMENT_STATUS_FILTER_CHOICES,
             'date_from': date_from,
             'date_to': date_to,
             'status_choices': Invoice.STATUS_CHOICES,
@@ -3383,6 +3395,11 @@ def payment_registry(request):
         ''
     )
 
+    registry_payment_status_filter = request.GET.get(
+        'payment_status',
+        ''
+    )
+
     search_query = request.GET.get(
         'q',
         ''
@@ -3478,6 +3495,11 @@ def payment_registry(request):
             counterparty_id=selected_counterparty
         )
 
+    invoices = apply_payment_status_filter(
+        invoices,
+        registry_payment_status_filter
+    )
+
     if search_query:
 
         invoices = invoices.filter(
@@ -3542,6 +3564,8 @@ def payment_registry(request):
             'total_amount': total_amount,
             'selected_status': selected_status,
             'selected_counterparty': selected_counterparty,
+            'registry_payment_status_filter': registry_payment_status_filter,
+            'payment_status_choices': PAYMENT_STATUS_FILTER_CHOICES,
             'search_query': search_query,
             'date_from': date_from,
             'date_to': date_to,

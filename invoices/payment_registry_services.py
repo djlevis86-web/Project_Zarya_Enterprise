@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.db.models import Sum
 
-from .payment_services import get_invoice_payment_summary
+from .payment_services import create_invoice_payment, get_invoice_payment_summary
 from .models import Invoice, PaymentRegistry, PaymentRegistryItem
 
 
@@ -342,65 +342,83 @@ def _model_has_field(instance, field_name):
 
 
 def mark_payment_registry_as_paid(registry, user=None):
-    from django.utils import timezone
+    today = timezone.localdate()
 
-    now = timezone.now()
+    paid_count = 0
+    skipped_count = 0
 
     items = (
         registry.items
-        .select_related(
-            "invoice",
-        )
         .exclude(
             status=PaymentRegistryItem.STATUS_CANCELLED
+        )
+        .select_related(
+            "invoice"
         )
     )
 
     for item in items:
-        item.status = PaymentRegistryItem.STATUS_PAID
-        item.paid_at = now
-        item.save(
-            update_fields=(
-                "status",
-                "paid_at",
-            )
+        summary = get_invoice_payment_summary(
+            item.invoice
         )
 
-        invoice = item.invoice
-        invoice_update_fields = []
+        remaining_amount = summary["remaining_amount"]
 
-        if hasattr(Invoice, "STATUS_PAID"):
-            invoice.status = Invoice.STATUS_PAID
-            invoice_update_fields.append(
-                "status"
+        if remaining_amount <= 0:
+            item.status = PaymentRegistryItem.STATUS_PAID
+            item.paid_at = today
+            item.save(
+                update_fields=[
+                    "status",
+                    "paid_at",
+                ]
             )
 
-        if _model_has_field(invoice, "paid_at"):
-            invoice.paid_at = now
-            invoice_update_fields.append(
-                "paid_at"
-            )
+            skipped_count += 1
+            continue
 
-        if invoice_update_fields:
-            invoice.save(
-                update_fields=tuple(
-                    dict.fromkeys(invoice_update_fields)
-                )
-            )
+        payment_amount = item.amount
+
+        if payment_amount > remaining_amount:
+            payment_amount = remaining_amount
+
+        create_invoice_payment(
+            invoice=item.invoice,
+            amount=payment_amount,
+            user=user,
+            registry_item=item,
+            paid_at=today,
+            payment_number=f"Реестр №{registry.id}",
+            comment="Оплата по реестру",
+            source="registry",
+        )
+
+        item.status = PaymentRegistryItem.STATUS_PAID
+        item.paid_at = today
+        item.save(
+            update_fields=[
+                "status",
+                "paid_at",
+            ]
+        )
+
+        paid_count += 1
 
     registry.status = PaymentRegistry.STATUS_PAID
     registry.save(
-        update_fields=(
+        update_fields=[
             "status",
-        )
+        ]
     )
 
     recalculate_payment_registry(
         registry
     )
 
-    return registry
-
+    return {
+        "paid_count": paid_count,
+        "skipped_count": skipped_count,
+    }
 
 def cancel_payment_registry(registry, user=None, reason=""):
     allowed_statuses = (

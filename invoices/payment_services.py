@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.db.models import Sum
+from django.utils import timezone
 
 from .models import InvoicePayment
 
@@ -54,3 +55,45 @@ def invoice_has_payment_balance(invoice):
     summary = get_invoice_payment_summary(invoice)
 
     return summary["remaining_amount"] > Decimal("0.00")
+
+def create_invoice_payment(
+    invoice,
+    amount,
+    user=None,
+    registry_item=None,
+    paid_at=None,
+    payment_number="",
+    comment="",
+    source=None,
+):
+    amount = Decimal(str(amount or "0.00"))
+
+    if amount <= 0:
+        raise ValueError("Сумма оплаты должна быть больше нуля.")
+
+    summary = get_invoice_payment_summary(invoice)
+    remaining_amount = summary["remaining_amount"]
+
+    if remaining_amount <= 0:
+        raise ValueError("Счёт уже полностью оплачен или имеет переплату.")
+
+    if amount > remaining_amount:
+        raise ValueError(
+            f"Сумма оплаты больше остатка по счёту. Остаток: {remaining_amount}."
+        )
+
+    payment = InvoicePayment.objects.create(
+        invoice=invoice,
+        registry_item=registry_item,
+        amount=amount,
+        paid_at=paid_at or timezone.localdate(),
+        payment_number=payment_number or "",
+        comment=comment or "",
+        created_by=user,
+        source=source or InvoicePayment.SOURCE_MANUAL,
+        status=InvoicePayment.STATUS_POSTED,
+    )
+
+    updated_summary = get_invoice_payment_summary(invoice)
+
+    return payment, updated_summary

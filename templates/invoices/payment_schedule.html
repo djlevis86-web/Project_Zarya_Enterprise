@@ -210,6 +210,7 @@
                     <th>Сумма</th>
                     <th>Дата оплаты</th>
                     <th>Приоритет</th>
+                    <th class="payment-schedule-remaining-column">Остаток</th>
                     <th>Статус</th>
                     <th>Ответственный</th>
                     <th>Действия</th>
@@ -261,6 +262,24 @@
                             <strong class="amount-main">
                                 {{ invoice.amount|floatformat:2 }} ₽
                             </strong>
+                        </td>
+
+                        <td>
+                            <div class="payment-mini payment-mini-schedule payment-mini-{{ invoice.payment_status_code }}">
+                                <div class="payment-mini-row">
+                                    <span>Оплачено</span>
+                                    <strong>{{ invoice.payment_paid_amount|floatformat:2 }} ₽</strong>
+                                </div>
+
+                                <div class="payment-mini-row">
+                                    <span>Остаток</span>
+                                    <strong>{{ invoice.payment_remaining_amount|floatformat:2 }} ₽</strong>
+                                </div>
+
+                                <div class="payment-mini-status">
+                                    {{ invoice.payment_status_label }}
+                                </div>
+                            </div>
                         </td>
 
                         <td>
@@ -345,7 +364,7 @@
                 {% empty %}
 
                     <tr>
-                        <td colspan="9" class="empty-table">
+                        <td colspan="10" class="empty-table">
                             Для выбранных условий платежей нет.
                         </td>
                     </tr>

@@ -290,6 +290,10 @@
                             Статус строки
                         </th>
 
+                        <th class="payment-registry-draft-payment-column">
+                            Оплата
+                        </th>
+
                         <th>
                             Действия
                         </th>
@@ -330,6 +334,29 @@
                             </td>
 
                             <td>
+                                <div class="payment-mini payment-mini-registry payment-mini-{{ item.invoice.payment_status_code }}">
+                                    <div class="payment-mini-row">
+                                        <span>Счёт</span>
+                                        <strong>{{ item.invoice.amount|floatformat:2 }} ₽</strong>
+                                    </div>
+
+                                    <div class="payment-mini-row">
+                                        <span>Оплачено</span>
+                                        <strong>{{ item.invoice.payment_paid_amount|floatformat:2 }} ₽</strong>
+                                    </div>
+
+                                    <div class="payment-mini-row">
+                                        <span>Остаток</span>
+                                        <strong>{{ item.invoice.payment_remaining_amount|floatformat:2 }} ₽</strong>
+                                    </div>
+
+                                    <div class="payment-mini-status">
+                                        {{ item.invoice.payment_status_label }}
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
                                 {% if item.planned_payment_date %}
                                     {{ item.planned_payment_date }}
                                 {% else %}
@@ -365,7 +392,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="6" class="empty-table">
+                            <td colspan="7" class="empty-table">
                                 В черновике пока нет счетов.
                             </td>
                         </tr>
@@ -553,6 +580,10 @@
                         Приоритет
                     </th>
 
+                    <th class="payment-registry-source-payment-column">
+                        Оплата
+                    </th>
+
                     <th>
                         Статус
                     </th>
@@ -616,6 +647,24 @@
                             <strong class="amount-main">
                                 {{ invoice.amount|floatformat:2 }} ₽
                             </strong>
+                        </td>
+
+                        <td>
+                            <div class="payment-mini payment-mini-registry-source payment-mini-{{ invoice.payment_status_code }}">
+                                <div class="payment-mini-row">
+                                    <span>Оплачено</span>
+                                    <strong>{{ invoice.payment_paid_amount|floatformat:2 }} ₽</strong>
+                                </div>
+
+                                <div class="payment-mini-row">
+                                    <span>Остаток</span>
+                                    <strong>{{ invoice.payment_remaining_amount|floatformat:2 }} ₽</strong>
+                                </div>
+
+                                <div class="payment-mini-status">
+                                    {{ invoice.payment_status_label }}
+                                </div>
+                            </div>
                         </td>
 
                         <td>

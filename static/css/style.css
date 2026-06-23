@@ -5222,3 +5222,66 @@ select {
     color: #ffffff;
     background: rgba(185, 28, 28, 0.72);
 }
+
+/* === Payment mini status in tables === */
+
+.payment-mini {
+    display: grid;
+    gap: 6px;
+    min-width: 150px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    background: rgba(15, 23, 42, 0.34);
+}
+
+.payment-mini-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.payment-mini-row span {
+    color: #94a3b8;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.payment-mini-row strong {
+    color: #e5e7eb;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.payment-mini-status {
+    display: inline-flex;
+    width: fit-content;
+    padding: 4px 8px;
+    border-radius: 999px;
+    color: #cbd5e1;
+    font-size: 11px;
+    font-weight: 900;
+    background: rgba(148, 163, 184, 0.14);
+}
+
+.payment-mini-paid .payment-mini-status {
+    color: #bbf7d0;
+    background: rgba(22, 163, 74, 0.20);
+}
+
+.payment-mini-partial .payment-mini-status {
+    color: #fde68a;
+    background: rgba(202, 138, 4, 0.20);
+}
+
+.payment-mini-unpaid .payment-mini-status {
+    color: #fecaca;
+    background: rgba(185, 28, 28, 0.18);
+}
+
+.payment-mini-overpaid .payment-mini-status {
+    color: #bfdbfe;
+    background: rgba(37, 99, 235, 0.20);
+}

@@ -457,6 +457,69 @@ class Invoice(models.Model):
     def is_pdf(self):
         return self.file.name.lower().endswith('.pdf')
 
+    @property
+    def payment_paid_amount(self):
+        from decimal import Decimal
+        from django.db.models import Sum
+
+        total = (
+            self.payments
+            .filter(status=InvoicePayment.STATUS_POSTED)
+            .aggregate(total=Sum("amount"))
+            .get("total")
+        )
+
+        return total or Decimal("0.00")
+
+    @property
+    def payment_remaining_amount(self):
+        from decimal import Decimal
+
+        invoice_amount = self.amount or Decimal("0.00")
+        paid_amount = self.payment_paid_amount
+        remaining = invoice_amount - paid_amount
+
+        if remaining < Decimal("0.00"):
+            return Decimal("0.00")
+
+        return remaining
+
+    @property
+    def payment_status_code(self):
+        from decimal import Decimal
+
+        invoice_amount = self.amount or Decimal("0.00")
+        paid_amount = self.payment_paid_amount
+
+        if invoice_amount <= Decimal("0.00"):
+            return "no_amount"
+
+        if paid_amount <= Decimal("0.00"):
+            return "unpaid"
+
+        if paid_amount < invoice_amount:
+            return "partial"
+
+        if paid_amount == invoice_amount:
+            return "paid"
+
+        return "overpaid"
+
+    @property
+    def payment_status_label(self):
+        labels = {
+            "no_amount": "Без суммы",
+            "unpaid": "Не оплачен",
+            "partial": "Частично оплачен",
+            "paid": "Оплачен",
+            "overpaid": "Переплата",
+        }
+
+        return labels.get(
+            self.payment_status_code,
+            "Не оплачен"
+        )
+
 
 class OCRJob(models.Model):
 

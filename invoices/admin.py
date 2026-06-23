@@ -1,6 +1,8 @@
 from django.contrib import admin
 
 from .models import (
+    PaymentRegistry,
+    PaymentRegistryItem,
     Invoice,
     InvoiceUploadBatch,
     Counterparty,
@@ -46,6 +48,8 @@ class CounterpartyAdmin(admin.ModelAdmin):
     )
 
 from .models import (
+    PaymentRegistry,
+    PaymentRegistryItem,
     Invoice,
     Counterparty
 )
@@ -177,3 +181,77 @@ class InvoiceUploadBatchAdmin(admin.ModelAdmin):
     ordering = (
         '-created_at',
     )
+
+
+class PaymentRegistryItemInline(admin.TabularInline):
+    model = PaymentRegistryItem
+    extra = 0
+    readonly_fields = (
+        "invoice",
+        "amount",
+        "planned_payment_date",
+        "status",
+        "created_at",
+        "exported_at",
+        "paid_at",
+    )
+    can_delete = False
+
+
+@admin.register(PaymentRegistry)
+class PaymentRegistryAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "title",
+        "status",
+        "items_count",
+        "total_amount",
+        "created_by",
+        "created_at",
+        "exported_at",
+    )
+    list_filter = (
+        "status",
+        "created_at",
+        "exported_at",
+    )
+    search_fields = (
+        "title",
+        "comment",
+        "created_by__username",
+    )
+    readonly_fields = (
+        "created_at",
+        "checked_at",
+        "exported_at",
+        "items_count",
+        "total_amount",
+    )
+    inlines = (
+        PaymentRegistryItemInline,
+    )
+
+
+@admin.register(PaymentRegistryItem)
+class PaymentRegistryItemAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "registry",
+        "invoice",
+        "amount",
+        "planned_payment_date",
+        "status",
+        "created_at",
+    )
+    list_filter = (
+        "status",
+        "planned_payment_date",
+        "created_at",
+    )
+    search_fields = (
+        "registry__title",
+        "invoice__invoice_number",
+        "invoice__vendor",
+        "invoice__counterparty__name",
+    )
+

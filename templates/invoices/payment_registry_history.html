@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="registry-page">
+
+    <div class="registry-page-header">
+        <div>
+            <span class="registry-eyebrow">
+                Финансы
+            </span>
+
+            <h1>
+                История реестров оплаты
+            </h1>
+
+            <p>
+                Все созданные, проверенные, выгруженные и оплаченные реестры оплаты.
+            </p>
+        </div>
+
+        <div class="registry-actions">
+            <a href="{% url 'payment_registry' %}" class="btn btn-primary">
+                Текущий реестр
+            </a>
+
+            <a href="{% url 'payment_schedule' %}" class="btn btn-secondary">
+                График платежей
+            </a>
+        </div>
+    </div>
+
+    <div class="registry-summary payment-registry-history-summary">
+
+        <div class="registry-summary-card">
+            <span>
+                Всего реестров
+            </span>
+
+            <strong>
+                {{ total_registries }}
+            </strong>
+        </div>
+
+        <div class="registry-summary-card">
+            <span>
+                Общая сумма
+            </span>
+
+            <strong>
+                {{ total_amount|floatformat:2 }} ₽
+            </strong>
+        </div>
+
+        <div class="registry-summary-card">
+            <span>
+                Черновики
+            </span>
+
+            <strong>
+                {{ draft_count }}
+            </strong>
+        </div>
+
+        <div class="registry-summary-card">
+            <span>
+                Выгружено
+            </span>
+
+            <strong>
+                {{ exported_count }}
+            </strong>
+        </div>
+
+        <div class="registry-summary-card">
+            <span>
+                Оплачено
+            </span>
+
+            <strong>
+                {{ paid_count }}
+            </strong>
+        </div>
+
+    </div>
+
+    <div class="card registry-filter-card payment-registry-history-filter">
+
+        <form method="get" class="registry-filter-form">
+
+            <div class="form-group">
+                <label>
+                    Статус
+                </label>
+
+                <select name="status" class="form-control">
+                    <option value="">
+                        Все статусы
+                    </option>
+
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Поиск
+                </label>
+
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ search_query }}"
+                    class="form-control"
+                    placeholder="Название, комментарий, пользователь"
+                >
+            </div>
+
+            <div class="registry-filter-actions">
+                <button type="submit" class="btn btn-primary">
+                    Применить
+                </button>
+
+                <a href="{% url 'payment_registry_history' %}" class="btn btn-secondary">
+                    Сбросить
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+
+    <div class="card registry-table-card">
+
+        <div class="registry-table-header">
+            <div>
+                <h2>
+                    Реестры оплаты
+                </h2>
+
+                <p>
+                    Последние операции по подготовке и выгрузке платежей.
+                </p>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table payment-registry-history-table">
+                <thead>
+                    <tr>
+                        <th>
+                            №
+                        </th>
+
+                        <th>
+                            Название
+                        </th>
+
+                        <th>
+                            Статус
+                        </th>
+
+                        <th>
+                            Счетов
+                        </th>
+
+                        <th>
+                            Сумма
+                        </th>
+
+                        <th>
+                            Создал
+                        </th>
+
+                        <th>
+                            Дата создания
+                        </th>
+
+                        <th>
+                            Выгрузил
+                        </th>
+
+                        <th>
+                            Дата выгрузки
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for registry in registries %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'payment_registry_detail' registry.id %}" class="registry-detail-link">
+                                    №{{ registry.id }}
+                                </a>
+                            </td>
+
+                            <td>
+                                <a href="{% url 'payment_registry_detail' registry.id %}" class="registry-detail-title">
+                                    {{ registry.title|default:"Реестр оплаты" }}
+                                </a>
+
+                                {% if registry.comment %}
+                                    <div class="muted">
+                                        {{ registry.comment|truncatechars:80 }}
+                                    </div>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <span class="status-badge status-{{ registry.status }}">
+                                    {{ registry.get_status_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ registry.items_count }}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ registry.total_amount|floatformat:2 }} ₽
+                                </strong>
+                            </td>
+
+                            <td>
+                                {% if registry.created_by %}
+                                    {{ registry.created_by.get_username }}
+                                {% else %}
+                                    <span class="muted">
+                                        —
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ registry.created_at|date:"d.m.Y H:i" }}
+                            </td>
+
+                            <td>
+                                {% if registry.exported_by %}
+                                    {{ registry.exported_by.get_username }}
+                                {% else %}
+                                    <span class="muted">
+                                        —
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if registry.exported_at %}
+                                    {{ registry.exported_at|date:"d.m.Y H:i" }}
+                                {% else %}
+                                    <span class="muted">
+                                        —
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="9" class="empty-table">
+                                Реестры оплаты пока не найдены.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}&q={{ search_query }}">
+                        Назад
+                    </a>
+                {% endif %}
+
+                <span>
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}&q={{ search_query }}">
+                        Вперёд
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -573,3 +573,202 @@ class OCRJob(models.Model):
     def __str__(self):
         return f'OCR задача #{self.id} для счета #{self.invoice_id}'
 
+
+class PaymentRegistry(models.Model):
+    STATUS_DRAFT = "draft"
+    STATUS_CHECKED = "checked"
+    STATUS_EXPORTED = "exported"
+    STATUS_PARTIALLY_PAID = "partially_paid"
+    STATUS_PAID = "paid"
+    STATUS_CANCELLED = "cancelled"
+
+    STATUS_CHOICES = (
+        (STATUS_DRAFT, "Черновик"),
+        (STATUS_CHECKED, "Проверен"),
+        (STATUS_EXPORTED, "Выгружен"),
+        (STATUS_PARTIALLY_PAID, "Частично оплачен"),
+        (STATUS_PAID, "Оплачен"),
+        (STATUS_CANCELLED, "Отменён"),
+    )
+
+    title = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Название реестра",
+    )
+
+    status = models.CharField(
+        max_length=32,
+        choices=STATUS_CHOICES,
+        default=STATUS_DRAFT,
+        db_index=True,
+        verbose_name="Статус",
+    )
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_payment_registries",
+        verbose_name="Создал",
+    )
+
+    checked_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="checked_payment_registries",
+        verbose_name="Проверил",
+    )
+
+    exported_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="exported_payment_registries",
+        verbose_name="Выгрузил",
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True,
+        verbose_name="Дата создания",
+    )
+
+    checked_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Дата проверки",
+    )
+
+    exported_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Дата выгрузки",
+    )
+
+    items_count = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Количество счетов",
+    )
+
+    total_amount = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        default=0,
+        verbose_name="Сумма реестра",
+    )
+
+    comment = models.TextField(
+        blank=True,
+        verbose_name="Комментарий",
+    )
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name = "Реестр оплаты"
+        verbose_name_plural = "Реестры оплаты"
+        indexes = (
+            models.Index(fields=("status", "created_at")),
+            models.Index(fields=("created_by", "created_at")),
+        )
+
+    def __str__(self):
+        if self.title:
+            return self.title
+
+        return f"Реестр оплаты №{self.pk or 'новый'}"
+
+
+class PaymentRegistryItem(models.Model):
+    STATUS_ADDED = "added"
+    STATUS_EXPORTED = "exported"
+    STATUS_PAID = "paid"
+    STATUS_CANCELLED = "cancelled"
+
+    STATUS_CHOICES = (
+        (STATUS_ADDED, "Добавлен"),
+        (STATUS_EXPORTED, "Выгружен"),
+        (STATUS_PAID, "Оплачен"),
+        (STATUS_CANCELLED, "Отменён"),
+    )
+
+    registry = models.ForeignKey(
+        PaymentRegistry,
+        on_delete=models.CASCADE,
+        related_name="items",
+        verbose_name="Реестр",
+    )
+
+    invoice = models.ForeignKey(
+        "Invoice",
+        on_delete=models.PROTECT,
+        related_name="payment_registry_items",
+        verbose_name="Счёт",
+    )
+
+    amount = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        default=0,
+        verbose_name="Сумма",
+    )
+
+    planned_payment_date = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name="Плановая дата оплаты",
+    )
+
+    status = models.CharField(
+        max_length=32,
+        choices=STATUS_CHOICES,
+        default=STATUS_ADDED,
+        db_index=True,
+        verbose_name="Статус строки",
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Дата добавления",
+    )
+
+    exported_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Дата выгрузки",
+    )
+
+    paid_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Дата оплаты",
+    )
+
+    comment = models.TextField(
+        blank=True,
+        verbose_name="Комментарий",
+    )
+
+    class Meta:
+        ordering = ("planned_payment_date", "invoice_id")
+        verbose_name = "Строка реестра оплаты"
+        verbose_name_plural = "Строки реестра оплаты"
+        constraints = (
+            models.UniqueConstraint(
+                fields=("registry", "invoice"),
+                name="unique_invoice_in_payment_registry",
+            ),
+        )
+        indexes = (
+            models.Index(fields=("registry", "status")),
+            models.Index(fields=("invoice", "status")),
+            models.Index(fields=("planned_payment_date",)),
+        )
+
+    def __str__(self):
+        return f"{self.registry} · счёт #{self.invoice_id}"
+

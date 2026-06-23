@@ -126,10 +126,6 @@
                     </form>
                 {% endif %}
 
-                <span class="status-badge status-{{ registry.status }}">
-                    {{ registry.get_status_display }}
-                </span>
-
                 {% if registry.status == "exported" or registry.status == "partially_paid" %}
                     <form
                         method="post"
@@ -146,9 +142,25 @@
                             Отметить оплаченным
                         </button>
                     </form>
+                {% elif registry.status == "paid" %}
+                    <button type="button" class="btn btn-secondary" disabled>
+                        Уже оплачен
+                    </button>
+                {% else %}
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        disabled
+                        title="Оплата доступна только после выгрузки реестра"
+                    >
+                        Оплата после выгрузки
+                    </button>
                 {% endif %}
 
-                {% if registry.status == "draft" and check_result and check_result.items_count and not check_result.errors_count %}
+                <span class="status-badge status-{{ registry.status }}">
+                    {{ registry.get_status_display }}
+                </span>
+{% if registry.status == "draft" and check_result and check_result.items_count and not check_result.errors_count %}
                     <form
                         method="post"
                         action="{% url 'export_payment_registry_draft_excel' registry.id %}"

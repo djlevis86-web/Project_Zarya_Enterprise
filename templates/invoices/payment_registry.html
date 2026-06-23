@@ -103,6 +103,50 @@
                     </button>
                 </form>
 
+                {% if draft_registry_check_result.items_count and not draft_registry_check_result.errors_count %}
+                    <form
+                        method="post"
+                        action="{% url 'export_payment_registry_draft_excel' draft_registry.id %}"
+                        class="payment-registry-export-form"
+                    >
+                        {% csrf_token %}
+
+                        <button type="submit" class="btn btn-secondary">
+                            Выгрузить Excel
+                        </button>
+                    </form>
+
+                    <form
+                        method="post"
+                        action="{% url 'export_payment_registry_draft_1c' draft_registry.id %}"
+                        class="payment-registry-export-form"
+                    >
+                        {% csrf_token %}
+
+                        <button type="submit" class="btn btn-secondary">
+                            Выгрузить 1C TXT
+                        </button>
+                    </form>
+                {% else %}
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        disabled
+                        title="Сначала исправь ошибки проверки реестра"
+                    >
+                        Excel недоступен
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        disabled
+                        title="Сначала исправь ошибки проверки реестра"
+                    >
+                        1C TXT недоступен
+                    </button>
+                {% endif %}
+
                 <span class="status-badge status-draft">
                     {{ draft_registry.get_status_display }}
                 </span>
@@ -452,30 +496,8 @@
             </span>
         </div>
 
-        <div class="registry-actions">
+        
 
-            <a
-                href="{% url 'export_payment_registry_excel' %}?{{ request.GET.urlencode }}"
-                class="btn btn-primary"
-            >
-                Выгрузить Excel
-            </a>
-
-            <a
-                href="{% url 'export_payment_registry_1c' %}?{{ request.GET.urlencode }}"
-                class="btn btn-secondary"
-            >
-                Выгрузить 1С TXT
-            </a>
-
-            <a
-                href="{% url 'counterparties_missing_requisites' %}"
-                class="btn btn-secondary"
-            >
-                Проверить реквизиты
-            </a>
-
-        </div>
 
     </div>
 
@@ -492,6 +514,11 @@
             <button type="submit" class="btn btn-primary">
                 Добавить выбранные в черновик
             </button>
+        </div>
+
+        <div class="payment-registry-workflow-note">
+            Выгрузка Excel и 1C TXT выполняется из текущего черновика реестра после проверки.
+            В этом блоке выбираются только счета для добавления.
         </div>
 
 <table class="table registry-table">

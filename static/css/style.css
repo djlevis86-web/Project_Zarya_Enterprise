@@ -4644,3 +4644,290 @@ select {
     font-weight: 800 !important;
     white-space: nowrap !important;
 }
+
+/* === Payment registry tables readability fix === */
+
+.payment-registry-check-panel {
+    padding: 18px !important;
+}
+
+.payment-registry-check-list {
+    margin-top: 16px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border-radius: 16px !important;
+}
+
+.payment-registry-check-list h4 {
+    margin: 0 !important;
+    padding: 16px 18px !important;
+    border-bottom: 1px solid rgba(248, 113, 113, 0.18) !important;
+    font-size: 15px !important;
+}
+
+.payment-registry-check-row {
+    display: grid !important;
+    grid-template-columns: 120px 160px minmax(0, 1fr) !important;
+    gap: 16px !important;
+    align-items: center !important;
+    padding: 14px 18px !important;
+    border-top: 0 !important;
+    border-bottom: 1px solid rgba(248, 113, 113, 0.14) !important;
+}
+
+.payment-registry-check-row:last-child {
+    border-bottom: 0 !important;
+}
+
+.payment-registry-check-row a {
+    display: inline-flex !important;
+    align-items: center !important;
+    width: max-content !important;
+    max-width: 100% !important;
+    color: #22c55e !important;
+    font-weight: 900 !important;
+    white-space: nowrap !important;
+}
+
+.payment-registry-check-row span {
+    color: #cbd5e1 !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+}
+
+.payment-registry-check-row strong {
+    color: #f8fafc !important;
+    font-weight: 900 !important;
+    line-height: 1.45 !important;
+}
+
+/* Общий вид таблиц реестра */
+
+.payment-registry-draft-table,
+.payment-registry-detail-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+.payment-registry-draft-table thead th,
+.payment-registry-detail-table thead th {
+    padding: 14px 16px !important;
+    background: rgba(15, 23, 42, 0.52) !important;
+    color: #cbd5e1 !important;
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.16) !important;
+}
+
+.payment-registry-draft-table tbody td,
+.payment-registry-detail-table tbody td {
+    padding: 14px 16px !important;
+    vertical-align: middle !important;
+    color: #f8fafc !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.10) !important;
+}
+
+.payment-registry-draft-table tbody tr:hover td,
+.payment-registry-detail-table tbody tr:hover td {
+    background: rgba(34, 197, 94, 0.06) !important;
+}
+
+.payment-registry-draft-table tbody tr:last-child td,
+.payment-registry-detail-table tbody tr:last-child td {
+    border-bottom: 0 !important;
+}
+
+/* Колонки таблицы черновика */
+
+.payment-registry-draft-table th:nth-child(1),
+.payment-registry-draft-table td:nth-child(1) {
+    width: 140px !important;
+}
+
+.payment-registry-draft-table th:nth-child(2),
+.payment-registry-draft-table td:nth-child(2) {
+    width: auto !important;
+    white-space: normal !important;
+}
+
+.payment-registry-draft-table th:nth-child(3),
+.payment-registry-draft-table td:nth-child(3) {
+    width: 150px !important;
+    text-align: right !important;
+}
+
+.payment-registry-draft-table th:nth-child(4),
+.payment-registry-draft-table td:nth-child(4) {
+    width: 150px !important;
+}
+
+.payment-registry-draft-table th:nth-child(5),
+.payment-registry-draft-table td:nth-child(5) {
+    width: 140px !important;
+}
+
+.payment-registry-draft-table th:nth-child(6),
+.payment-registry-draft-table td:nth-child(6) {
+    width: 120px !important;
+    text-align: right !important;
+}
+
+/* Колонки детальной таблицы */
+
+.payment-registry-detail-table th:nth-child(1),
+.payment-registry-detail-table td:nth-child(1) {
+    width: 140px !important;
+}
+
+.payment-registry-detail-table th:nth-child(2),
+.payment-registry-detail-table td:nth-child(2) {
+    width: auto !important;
+    white-space: normal !important;
+}
+
+.payment-registry-detail-table th:nth-child(3),
+.payment-registry-detail-table td:nth-child(3) {
+    width: 160px !important;
+    text-align: right !important;
+}
+
+.payment-registry-detail-table th:nth-child(4),
+.payment-registry-detail-table td:nth-child(4) {
+    width: 150px !important;
+}
+
+.payment-registry-detail-table th:nth-child(5),
+.payment-registry-detail-table td:nth-child(5) {
+    width: 150px !important;
+}
+
+.payment-registry-detail-table th:nth-child(6),
+.payment-registry-detail-table td:nth-child(6) {
+    width: 140px !important;
+}
+
+.payment-registry-draft-table a,
+.payment-registry-detail-table a {
+    color: #22c55e !important;
+    font-weight: 900 !important;
+    text-decoration: none !important;
+}
+
+.payment-registry-draft-table a:hover,
+.payment-registry-detail-table a:hover {
+    text-decoration: underline !important;
+}
+
+.payment-registry-draft-table .muted,
+.payment-registry-detail-table .muted {
+    margin-top: 4px !important;
+    color: #94a3b8 !important;
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+}
+
+.payment-registry-draft-table td strong,
+.payment-registry-detail-table td strong {
+    color: #f8fafc !important;
+    font-weight: 900 !important;
+}
+
+.payment-registry-draft-table td:nth-child(3) strong,
+.payment-registry-detail-table td:nth-child(3) strong {
+    color: #86efac !important;
+}
+
+.payment-registry-draft-table .status-badge,
+.payment-registry-detail-table .status-badge {
+    display: inline-flex !important;
+    justify-content: center !important;
+    min-width: 96px !important;
+}
+
+.payment-registry-remove-form .btn {
+    background: rgba(127, 29, 29, 0.72) !important;
+    border: 1px solid rgba(248, 113, 113, 0.35) !important;
+    color: #fecaca !important;
+}
+
+.payment-registry-remove-form .btn:hover {
+    background: rgba(185, 28, 28, 0.88) !important;
+    color: #ffffff !important;
+}
+
+/* Мобильная и средняя ширина */
+
+@media (max-width: 1300px) {
+    .payment-registry-draft-table,
+    .payment-registry-detail-table {
+        min-width: 1050px !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .payment-registry-check-row {
+        grid-template-columns: 1fr !important;
+        gap: 6px !important;
+        align-items: start !important;
+    }
+
+    .payment-registry-check-row span {
+        white-space: normal !important;
+    }
+}
+
+/* === Payment registry paid disabled visibility === */
+
+.payment-registry-detail-actions .btn[disabled] {
+    opacity: 0.55 !important;
+    cursor: not-allowed !important;
+    border-color: rgba(148, 163, 184, 0.28) !important;
+}
+
+/* === Payment registry workflow note === */
+
+.payment-registry-workflow-note {
+    margin: 0 0 16px !important;
+    padding: 12px 14px !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(59, 130, 246, 0.26) !important;
+    background: rgba(30, 64, 175, 0.12) !important;
+    color: #bfdbfe !important;
+    font-size: 13px !important;
+    line-height: 1.45 !important;
+    font-weight: 700 !important;
+}
+
+/* === Payment registry draft export buttons visibility === */
+
+.payment-registry-draft-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+}
+
+.payment-registry-export-form,
+.payment-registry-check-form {
+    margin: 0 !important;
+}
+
+.payment-registry-export-form .btn,
+.payment-registry-check-form .btn,
+.payment-registry-draft-actions > .btn[disabled] {
+    min-height: 42px !important;
+    border-radius: 12px !important;
+    padding: 10px 18px !important;
+    font-weight: 900 !important;
+    white-space: nowrap !important;
+}
+
+.payment-registry-draft-actions > .btn[disabled] {
+    opacity: 0.55 !important;
+    cursor: not-allowed !important;
+}

@@ -1,0 +1,308 @@
+/*
+ * ERP Zarya35 — layout / sidebar
+ *
+ * Стили скопированы из legacy style.css.
+ * На этом этапе style.css ещё не очищаем.
+ */
+
+body.light-theme {
+    --z-bg: #eef2ef;
+    --z-bg-2: #f6f8f6;
+    --z-sidebar: #ffffff;
+    --z-surface: #ffffff;
+    --z-surface-2: #f7faf8;
+    --z-surface-3: #edf6f0;
+    --z-border: rgba(8, 30, 20, .12);
+    --z-text: #111a15;
+    --z-muted: #64746b;
+    --z-muted-2: #7b8b82;
+    background: #eef2ef;
+}
+
+/* =========================================================
+   Layout
+========================================================= */
+
+.layout,
+.app-shell,
+.app-layout {
+    display: grid;
+    grid-template-columns: var(--z-sidebar-width) minmax(0, 1fr);
+    min-height: 100vh;
+    width: 100%;
+}
+
+.sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 24px;
+    overflow-y: auto;
+    padding: 22px 18px;
+    background: var(--z-sidebar);
+    border-right: 1px solid var(--z-border);
+    z-index: 30;
+}
+
+.sidebar::-webkit-scrollbar,
+.table-scroll::-webkit-scrollbar,
+#pdf-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.table-scroll::-webkit-scrollbar-thumb,
+#pdf-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, .14);
+    border-radius: 999px;
+}
+
+.sidebar-logo,
+.brand,
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 26px;
+}
+
+.sidebar-logo {
+    color: var(--z-accent-2);
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.brand-icon,
+.sidebar-logo::before {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #25bf68, #15803d);
+    color: #ffffff;
+    font-weight: 950;
+    box-shadow: 0 10px 34px rgba(39, 174, 96, .24);
+}
+
+.sidebar-logo::before {
+    content: "З";
+}
+
+.brand-title,
+.sidebar-title {
+    color: var(--z-accent-2);
+    font-size: 17px;
+    line-height: 1.1;
+    font-weight: 900;
+}
+
+.brand-subtitle,
+.sidebar-subtitle {
+    color: var(--z-muted);
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+.sidebar-nav,
+.nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sidebar-section,
+.nav-group {
+    margin-bottom: 22px;
+}
+
+.sidebar-section-title,
+.nav-group-title {
+    margin: 0 0 8px;
+    padding: 0 8px;
+    color: var(--z-muted-2);
+    font-size: 11px;
+    font-weight: 850;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.sidebar-nav a,
+.nav-link,
+.nav-item {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 12px;
+    border: 1px solid transparent;
+    border-radius: 13px;
+    color: var(--z-text);
+    font-weight: 740;
+    transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+}
+
+.sidebar-nav a:hover,
+.nav-link:hover,
+.nav-item:hover,
+.sidebar-nav a.is-active,
+.nav-link.is-active,
+.nav-item.is-active,
+.sidebar-nav a.active,
+.nav-link.active,
+.nav-item.active {
+    background: rgba(39, 174, 96, .13);
+    border-color: rgba(39, 174, 96, .32);
+    color: #ffffff;
+}
+
+.sidebar-footer {
+    padding-top: 18px;
+}
+
+@media (max-width: 1280px) {
+    :root {
+        --z-sidebar-width: 260px;
+    }
+
+    .stats-grid,
+    .dashboard-stats,
+    .registry-summary,
+    .counterparty-profile-summary,
+    .import-result-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-hero,
+    .dashboard-grid-two,
+    .upload-page-grid,
+    .import-layout,
+    .invoice-detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .invoice-document-card {
+        position: static;
+    }
+
+    #pdf-container {
+        max-height: 760px;
+    }
+
+    .table-scroll-fit {
+        overflow-x: auto;
+    }
+
+    .invoice-table-compact,
+    .schedule-table,
+    .unmatched-table,
+    .missing-requisites-table {
+        min-width: 980px !important;
+    }
+
+    .counterparty-invoices-table {
+        min-width: 880px !important;
+    }
+
+    .invoice-filter-form,
+    .invoice-filter-form-compact,
+    .counterparty-filter-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .requisites-rules {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1100px) {
+    .layout,
+    .app-shell,
+    .app-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: relative;
+        height: auto;
+        max-height: none;
+    }
+
+    .sidebar-nav,
+    .nav-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .directory-info-grid,
+    .counterparty-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .counterparty-list-card {
+        grid-template-columns: 1fr;
+    }
+
+    .counterparty-card-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .counterparty-card-actions .btn {
+        width: auto;
+    }
+
+    .counterparty-title-row,
+    .counterparty-profile-title-row {
+        flex-direction: column;
+    }
+
+    .counterparty-badges,
+    .counterparty-profile-badges {
+        justify-content: flex-start;
+    }
+}
+
+.sidebar-nav a,
+.nav-link,
+.nav-item {
+    font-weight: 720;
+}
+
+strong,
+.sidebar-nav a,
+.nav-link,
+.nav-item,
+.btn,
+.status-badge,
+.form-group label,
+label {
+    font-weight: 650;
+}
+
+.brand-title,
+.sidebar-title,
+.sidebar-logo {
+    font-weight: 750;
+}
+
+/* Sidebar readability */
+
+.sidebar-nav a,
+.nav-link,
+.nav-item {
+    font-size: 14px;
+    letter-spacing: 0;
+}
+
+.sidebar-section-title,
+.nav-group-title {
+    color: #a8b4ae;
+    font-weight: 650;
+}

@@ -1,0 +1,48 @@
+/*
+ * ERP Zarya35 — reset
+ * 
+ * Только безопасные базовые правила.
+ * Агрессивные глобальные стили сюда не добавляем.
+ */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100%;
+    margin: 0;
+}
+
+img,
+svg,
+video,
+canvas {
+    max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+}
+
+table {
+    border-collapse: collapse;
+}

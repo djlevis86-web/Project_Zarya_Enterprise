@@ -1,0 +1,45 @@
+/*
+ * ERP Zarya35 — typography
+ * 
+ * Общая типографика.
+ * Конкретные размеры заголовков страниц пока остаются в legacy style.css.
+ */
+
+body {
+    font-family: var(--font-family-base);
+    color: var(--color-text-main);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    margin-top: 0;
+}
+
+p {
+    color: var(--color-text-soft);
+    line-height: 1.6;
+}
+
+small {
+    color: var(--color-text-muted);
+}
+
+strong {
+    font-weight: 800;
+}
+
+.text-muted {
+    color: var(--color-text-muted);
+}
+
+.text-soft {
+    color: var(--color-text-soft);
+}

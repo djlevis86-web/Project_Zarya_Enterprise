@@ -4525,3 +4525,109 @@ select {
     font-weight: 800 !important;
     white-space: nowrap !important;
 }
+
+/* === Payment registry history table layout fix === */
+
+.payment-registry-history-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+.payment-registry-history-table th,
+.payment-registry-history-table td {
+    padding: 14px 16px !important;
+    vertical-align: middle !important;
+    text-align: left !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12) !important;
+}
+
+.payment-registry-history-table th {
+    color: #cbd5e1 !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.02em !important;
+}
+
+.payment-registry-history-table td {
+    color: #f8fafc !important;
+    font-size: 14px !important;
+}
+
+.payment-registry-history-table th:nth-child(1),
+.payment-registry-history-table td:nth-child(1) {
+    width: 70px !important;
+}
+
+.payment-registry-history-table th:nth-child(2),
+.payment-registry-history-table td:nth-child(2) {
+    width: 300px !important;
+    white-space: normal !important;
+}
+
+.payment-registry-history-table th:nth-child(3),
+.payment-registry-history-table td:nth-child(3) {
+    width: 130px !important;
+}
+
+.payment-registry-history-table th:nth-child(4),
+.payment-registry-history-table td:nth-child(4) {
+    width: 90px !important;
+    text-align: center !important;
+}
+
+.payment-registry-history-table th:nth-child(5),
+.payment-registry-history-table td:nth-child(5) {
+    width: 150px !important;
+    text-align: right !important;
+}
+
+.payment-registry-history-table th:nth-child(6),
+.payment-registry-history-table td:nth-child(6) {
+    width: 120px !important;
+}
+
+.payment-registry-history-table th:nth-child(7),
+.payment-registry-history-table td:nth-child(7) {
+    width: 170px !important;
+}
+
+.payment-registry-history-table th:nth-child(8),
+.payment-registry-history-table td:nth-child(8) {
+    width: 120px !important;
+}
+
+.payment-registry-history-table th:nth-child(9),
+.payment-registry-history-table td:nth-child(9) {
+    width: 170px !important;
+}
+
+.payment-registry-history-table .registry-detail-link,
+.payment-registry-history-table .registry-detail-title {
+    display: inline-block !important;
+    max-width: 100% !important;
+    color: #22c55e !important;
+    font-weight: 900 !important;
+    text-decoration: none !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.payment-registry-history-table .registry-detail-title {
+    white-space: normal !important;
+}
+
+.payment-registry-history-table .status-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 96px !important;
+}
+
+@media (max-width: 1300px) {
+    .payment-registry-history-table {
+        min-width: 1200px !important;
+    }
+}

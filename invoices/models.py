@@ -676,6 +676,29 @@ class PaymentRegistry(models.Model):
             models.Index(fields=("created_by", "created_at")),
         )
 
+        permissions = (
+            (
+                "can_manage_payment_registry",
+                "Может управлять реестрами оплаты",
+            ),
+            (
+                "can_check_payment_registry",
+                "Может проверять реестры оплаты",
+            ),
+            (
+                "can_export_payment_registry",
+                "Может выгружать реестры оплаты",
+            ),
+            (
+                "can_mark_payment_registry_paid",
+                "Может отмечать реестры оплаты оплаченными",
+            ),
+            (
+                "can_cancel_payment_registry",
+                "Может отменять реестры оплаты",
+            ),
+        )
+
     def __str__(self):
         if self.title:
             return self.title

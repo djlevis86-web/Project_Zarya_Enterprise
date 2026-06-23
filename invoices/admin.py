@@ -255,3 +255,35 @@ class PaymentRegistryItemAdmin(admin.ModelAdmin):
         "invoice__counterparty__name",
     )
 
+from .models import InvoicePayment
+
+
+@admin.register(InvoicePayment)
+class InvoicePaymentAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "invoice",
+        "amount",
+        "paid_at",
+        "status",
+        "source",
+        "payment_number",
+        "created_by",
+        "created_at",
+    )
+    list_filter = (
+        "status",
+        "source",
+        "paid_at",
+        "created_at",
+    )
+    search_fields = (
+        "invoice__title",
+        "invoice__original_filename",
+        "payment_number",
+        "comment",
+    )
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+    )

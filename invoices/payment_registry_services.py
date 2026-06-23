@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.db.models import Sum
 
+from .payment_services import get_invoice_payment_summary
 from .models import Invoice, PaymentRegistry, PaymentRegistryItem
 
 
@@ -145,6 +146,14 @@ def add_invoice_to_payment_registry(invoice, registry):
     errors.extend(validation_errors)
     warnings.extend(validation_warnings)
 
+    summary = get_invoice_payment_summary(invoice)
+    remaining_amount = summary["remaining_amount"]
+
+    if remaining_amount <= 0:
+        errors.append(
+            "Счёт уже полностью оплачен или имеет переплату."
+        )
+
     if errors:
         return None, errors, warnings
 
@@ -160,7 +169,7 @@ def add_invoice_to_payment_registry(invoice, registry):
     if existing_item:
         if existing_item.status == PaymentRegistryItem.STATUS_CANCELLED:
             existing_item.status = PaymentRegistryItem.STATUS_ADDED
-            existing_item.amount = invoice.amount or 0
+            existing_item.amount = remaining_amount
             existing_item.planned_payment_date = getattr(
                 invoice,
                 "planned_payment_date",
@@ -191,7 +200,7 @@ def add_invoice_to_payment_registry(invoice, registry):
     item = PaymentRegistryItem.objects.create(
         registry=registry,
         invoice=invoice,
-        amount=invoice.amount or 0,
+        amount=remaining_amount,
         planned_payment_date=getattr(
             invoice,
             "planned_payment_date",

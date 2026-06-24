@@ -1,0 +1,22 @@
+ERP Zarya35 — base/reset cleanup removed blocks
+================================================================================
+
+removed blocks: 2
+skipped candidates: 0
+
+--------------------------------------------------------------------------------
+REMOVED: *
+PROPS: box-sizing
+
+* {
+    box-sizing: border-box;
+}
+
+--------------------------------------------------------------------------------
+REMOVED: a
+PROPS: color, text-decoration
+
+a {
+    color: inherit;
+    text-decoration: none;
+}

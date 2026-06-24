@@ -1,19 +1,7 @@
 ERP Zarya35 — final CSS structure audit
 ====================================================================================================
 
-APP CSS
-----------------------------------------------------------------------------------------------------
-app.css exists: True
-imports style.css active: False
-mentions style.css in comments/text: False
-
-LEGACY STYLE
-----------------------------------------------------------------------------------------------------
-style.css exists: True
-style.css real blocks: 0
-style.css retired marker: True
-
-LEGACY MIGRATION
-----------------------------------------------------------------------------------------------------
-legacy-migration.css exists: True
-legacy-migration blocks: 0
+app_css_exists: True
+style_import_active: False
+style_css_blocks: 0
+legacy_migration_blocks: 0

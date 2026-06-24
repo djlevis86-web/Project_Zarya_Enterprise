@@ -1,0 +1,115 @@
+ERP Zarya35 — base cleanup candidates
+================================================================================
+
+style.css blocks total: 757
+base candidates: 10
+
+ВАЖНО: это только отчёт. style.css не изменён.
+
+--------------------------------------------------------------------------------
+BLOCK #2
+SELECTOR: *
+
+* {
+    box-sizing: border-box;
+}
+
+--------------------------------------------------------------------------------
+BLOCK #3
+SELECTOR: html, body
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    overflow-x: hidden;
+    background: var(--z-bg);
+    color: var(--z-text);
+    font-family: var(--z-font);
+    font-size: 14px;
+    line-height: 1.55;
+    text-rendering: geometricPrecision;
+}
+
+--------------------------------------------------------------------------------
+BLOCK #4
+SELECTOR: body
+
+body {
+    background:
+        radial-gradient(circle at top left, rgba(39, 174, 96, .07), transparent 26rem),
+        linear-gradient(180deg, #060806 0%, #080b09 100%);
+}
+
+--------------------------------------------------------------------------------
+BLOCK #6
+SELECTOR: img, svg, canvas
+
+img,
+svg,
+canvas {
+    max-width: 100%;
+}
+
+--------------------------------------------------------------------------------
+BLOCK #7
+SELECTOR: a
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+--------------------------------------------------------------------------------
+BLOCK #9
+SELECTOR: button, input, select, textarea
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+--------------------------------------------------------------------------------
+BLOCK #10
+SELECTOR: strong
+
+strong {
+    font-weight: 850;
+}
+
+--------------------------------------------------------------------------------
+BLOCK #71
+SELECTOR: textarea
+
+textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+--------------------------------------------------------------------------------
+BLOCK #329
+SELECTOR: body
+
+body {
+    font-size: 15px;
+    line-height: 1.62;
+    letter-spacing: 0;
+}
+
+--------------------------------------------------------------------------------
+BLOCK #351
+SELECTOR: strong, .sidebar-nav a, .nav-link, .nav-item, .btn, .status-badge, .form-group label, label
+
+strong,
+.sidebar-nav a,
+.nav-link,
+.nav-item,
+.btn,
+.status-badge,
+.form-group label,
+label {
+    font-weight: 650;
+}

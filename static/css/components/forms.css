@@ -539,3 +539,16 @@ select {
     color: #ffffff;
     background: rgba(185, 28, 28, 0.72);
 }
+
+
+/* LEGACY-MIGRATION-RECLASSIFIED-START */
+/* Перенесено из features/legacy-migration.css. */
+
+.stat-label,
+.registry-summary-label {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--z-muted);
+    font-size: 13px;
+}
+/* LEGACY-MIGRATION-RECLASSIFIED-END */

@@ -1,5 +1,11 @@
+/*
+ * ERP Zarya35 — temporary legacy migration bucket.
+ *
+ * Здесь остаются только блоки, которые пока не удалось уверенно классифицировать.
+ */
 
-
+/* MIGRATED-LEGACY-START */
+/* Остаток после повторной классификации. */
 
 /* MIGRATED-LEGACY-START */
 /* Перенесено из static/css/style.css при отключении legacy. */
@@ -25,30 +31,6 @@ strong {
     border-top: 1px solid var(--z-border);
     color: var(--z-muted);
     font-size: 12px;
-}
-
-/* =========================================================
-   Common blocks
-========================================================= */
-
-.page-header {
-    min-height: 54px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 18px;
-    margin-bottom: 24px;
-}
-
-.page-title,
-.page-header h1,
-.page-header h2 {
-    margin: 0;
-    color: var(--z-text);
-    font-size: 30px;
-    line-height: 1.1;
-    font-weight: 950;
-    letter-spacing: -.035em;
 }
 
 .muted {
@@ -79,51 +61,6 @@ strong {
     font-weight: 900;
 }
 
-.messages {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 18px;
-}
-
-.alert {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 14px 16px;
-    border-radius: 14px;
-    border: 1px solid rgba(96, 165, 250, .24);
-    background: rgba(96, 165, 250, .12);
-    color: #bfdbfe;
-    font-weight: 650;
-}
-
-.alert-success {
-    background: rgba(34, 197, 94, .12);
-    border-color: rgba(34, 197, 94, .24);
-    color: #bbf7d0;
-}
-
-.alert-success::before { content: "✓"; }
-
-.alert-error,
-.alert-danger {
-    background: rgba(239, 68, 68, .12);
-    border-color: rgba(239, 68, 68, .24);
-    color: #fecaca;
-}
-
-.alert-error::before,
-.alert-danger::before { content: "!"; }
-
-.alert-warning {
-    background: rgba(245, 158, 11, .12);
-    border-color: rgba(245, 158, 11, .26);
-    color: #fde68a;
-}
-
-.alert-warning::before { content: "!"; }
-
 .stat-link {
     display: block;
     color: inherit;
@@ -132,14 +69,6 @@ strong {
 .stat-link:hover {
     background: rgba(39, 174, 96, .045);
     border-color: rgba(39, 174, 96, .36);
-}
-
-.stat-label,
-.registry-summary-label {
-    display: block;
-    margin-bottom: 12px;
-    color: var(--z-muted);
-    font-size: 13px;
 }
 
 .process-item {
@@ -333,21 +262,10 @@ strong {
     font-size: 13px;
 }
 
-.queue-message-error {
-    color: #fca5a5;
-}
-
 body {
     font-size: 15px;
     line-height: 1.62;
     letter-spacing: 0;
-}
-
-.page-title,
-.page-header h1,
-.page-header h2 {
-    font-weight: 850;
-    letter-spacing: -0.02em;
 }
 
 .amount-main {

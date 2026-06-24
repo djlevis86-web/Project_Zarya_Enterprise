@@ -122,3 +122,39 @@
     border-collapse: separate !important;
     border-spacing: 0 !important;
 }
+
+
+/* LEGACY-MIGRATION-RECLASSIFIED-START */
+/* Перенесено из features/legacy-migration.css. */
+
+/* =========================================================
+   Common blocks
+========================================================= */
+
+.page-header {
+    min-height: 54px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.page-title,
+.page-header h1,
+.page-header h2 {
+    margin: 0;
+    color: var(--z-text);
+    font-size: 30px;
+    line-height: 1.1;
+    font-weight: 950;
+    letter-spacing: -.035em;
+}
+
+.page-title,
+.page-header h1,
+.page-header h2 {
+    font-weight: 850;
+    letter-spacing: -0.02em;
+}
+/* LEGACY-MIGRATION-RECLASSIFIED-END */

@@ -1,0 +1,779 @@
+/*
+ * ERP Zarya35 — features / OCR
+ *
+ * Стили скопированы из legacy style.css.
+ * На этом этапе style.css ещё не очищаем.
+ */
+
+.topbar {
+    min-height: var(--z-topbar-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 14px 36px;
+    background: rgba(7, 9, 8, .94);
+    border-bottom: 1px solid var(--z-border);
+    backdrop-filter: blur(18px);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.topbar-actions,
+.registry-actions,
+.registry-filter-actions,
+.table-actions,
+.dashboard-hero-actions,
+.upload-actions-row,
+.import-actions,
+.comment-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.amount-ocr {
+    margin-top: 3px;
+    color: var(--z-muted);
+    font-size: 12px;
+}
+
+.quick-action-card,
+.process-item,
+.upload-step {
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--z-border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .025);
+}
+
+.quick-action-icon,
+.process-item > span,
+.upload-step > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: rgba(39, 174, 96, .14);
+    color: var(--z-accent-2);
+    font-weight: 950;
+}
+
+.process-list,
+.upload-steps,
+.upload-note-list,
+.comment-list,
+.timeline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.process-item > span,
+.upload-step > span {
+    width: 38px;
+    height: 38px;
+}
+
+.quick-action-card p,
+.process-item p,
+.upload-step p {
+    margin: 0;
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+/* =========================================================
+   Upload and import
+========================================================= */
+
+.upload-page-grid,
+.import-layout {
+    display: grid;
+    grid-template-columns: minmax(460px, 720px) minmax(320px, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.upload-main-card,
+.import-card,
+.import-help-card,
+.import-next-card,
+.upload-help-card,
+.requisites-info-card {
+    padding: 24px;
+}
+
+.upload-form,
+.import-form,
+.upload-side,
+.import-side {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.upload-dropzone,
+.import-dropzone {
+    display: grid;
+    grid-template-columns: 54px 1fr;
+    gap: 16px;
+    align-items: center;
+    padding: 20px;
+    border: 1px dashed rgba(39, 174, 96, .42);
+    border-radius: 18px;
+    background: rgba(39, 174, 96, .055);
+}
+
+.upload-dropzone-icon {
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: rgba(39, 174, 96, .18);
+    color: var(--z-accent-2);
+    font-size: 28px;
+    font-weight: 950;
+}
+
+.upload-dropzone p,
+.import-dropzone p {
+    margin: 4px 0 12px;
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.upload-dropzone input[type="file"],
+.import-dropzone input[type="file"],
+.upload-file-input {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 54px;
+    display: block;
+    padding: 10px;
+    overflow: visible;
+    white-space: nowrap;
+}
+
+.upload-dropzone input[type="file"]::file-selector-button,
+.import-dropzone input[type="file"]::file-selector-button {
+    min-width: 170px;
+    height: 36px;
+    padding: 8px 16px;
+    margin-right: 14px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.upload-note {
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(245, 158, 11, .09);
+    border: 1px solid rgba(245, 158, 11, .22);
+    color: #f8d38a;
+    font-size: 13px;
+}
+
+.invoice-file-link {
+    display: block;
+    max-width: 100%;
+    margin-top: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ocr-inline {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 6px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.ocr-inline-ok { background: rgba(34, 197, 94, .14); color: #86efac; }
+
+.ocr-inline-error { background: rgba(239, 68, 68, .14); color: #fca5a5; }
+
+.ocr-result-card,
+.ocr-comment-box {
+    padding: 13px 14px;
+    border-radius: 13px;
+    border: 1px solid var(--z-border);
+    font-weight: 760;
+}
+
+.ocr-result-success { background: rgba(34, 197, 94, .12); color: #86efac; border-color: rgba(34, 197, 94, .24); }
+
+.ocr-result-warning { background: rgba(245, 158, 11, .12); color: #fbbf24; border-color: rgba(245, 158, 11, .24); }
+
+.ocr-result-muted { background: rgba(255, 255, 255, .035); color: var(--z-muted); }
+
+.ocr-comment-box { margin-top: 12px; background: rgba(96, 165, 250, .10); border-color: rgba(96, 165, 250, .20); color: #bfdbfe; font-size: 13px; }
+
+@media (max-width: 1280px) {
+    :root {
+        --z-sidebar-width: 260px;
+    }
+
+    .stats-grid,
+    .dashboard-stats,
+    .registry-summary,
+    .counterparty-profile-summary,
+    .import-result-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-hero,
+    .dashboard-grid-two,
+    .upload-page-grid,
+    .import-layout,
+    .invoice-detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .invoice-document-card {
+        position: static;
+    }
+
+    #pdf-container {
+        max-height: 760px;
+    }
+
+    .table-scroll-fit {
+        overflow-x: auto;
+    }
+
+    .invoice-table-compact,
+    .schedule-table,
+    .unmatched-table,
+    .missing-requisites-table {
+        min-width: 980px !important;
+    }
+
+    .counterparty-invoices-table {
+        min-width: 880px !important;
+    }
+
+    .invoice-filter-form,
+    .invoice-filter-form-compact,
+    .counterparty-filter-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .requisites-rules {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .stats-grid,
+    .dashboard-stats,
+    .registry-summary,
+    .counterparty-profile-summary,
+    .import-result-summary,
+    .requisites-summary,
+    .requisites-rules,
+    .quick-action-grid,
+    .import-columns-list,
+    .invoice-filter-form,
+    .invoice-filter-form-compact,
+    .counterparty-filter-form,
+    .counterparty-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-hero h2 {
+        font-size: 28px;
+    }
+
+    .upload-dropzone,
+    .import-dropzone {
+        grid-template-columns: 1fr;
+    }
+
+    .registry-actions,
+    .topbar-actions,
+    .upload-actions-row,
+    .import-actions,
+    .registry-filter-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .registry-actions .btn,
+    .topbar-actions .btn,
+    .upload-actions-row .btn,
+    .import-actions .btn,
+    .registry-filter-actions .btn {
+        width: 100%;
+    }
+
+    .sidebar-nav,
+    .nav-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================================
+   ZARYA UI PATCH v15 — upload result
+========================================================= */
+
+.upload-result-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.upload-result-main-card {
+    padding: 24px;
+}
+
+.upload-result-status {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 18px;
+    border-radius: 18px;
+    border: 1px solid var(--z-border);
+}
+
+.upload-result-status h3 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.upload-result-status p {
+    margin: 0;
+    color: var(--z-muted);
+    line-height: 1.55;
+}
+
+.upload-result-status-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.upload-result-status-success {
+    background: rgba(34, 197, 94, .08);
+    border-color: rgba(34, 197, 94, .22);
+}
+
+.upload-result-status-success .upload-result-status-icon {
+    background: rgba(34, 197, 94, .16);
+    color: #86efac;
+}
+
+.upload-result-status-warning {
+    background: rgba(245, 158, 11, .08);
+    border-color: rgba(245, 158, 11, .22);
+}
+
+.upload-result-status-warning .upload-result-status-icon {
+    background: rgba(245, 158, 11, .16);
+    color: #fbbf24;
+}
+
+.upload-result-table {
+    min-width: 620px;
+}
+
+.upload-result-table th:first-child,
+.upload-result-table td:first-child {
+    width: 80px;
+}
+
+.upload-result-actions-card {
+    padding: 20px;
+}
+
+.upload-result-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 760px) {
+    .upload-result-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .upload-result-status {
+        grid-template-columns: 1fr;
+    }
+
+    .upload-result-actions .btn {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   ZARYA UI PATCH v16 — upload duplicate links
+========================================================= */
+
+.upload-result-duplicate-table {
+    min-width: 820px;
+}
+
+.upload-result-duplicate-table th:nth-child(1),
+.upload-result-duplicate-table td:nth-child(1) {
+    width: 70px;
+}
+
+.upload-result-duplicate-table th:nth-child(2),
+.upload-result-duplicate-table td:nth-child(2) {
+    width: 34%;
+}
+
+.upload-result-duplicate-table th:nth-child(3),
+.upload-result-duplicate-table td:nth-child(3) {
+    width: 36%;
+}
+
+.upload-result-duplicate-table th:nth-child(4),
+.upload-result-duplicate-table td:nth-child(4) {
+    width: 150px;
+}
+
+.upload-result-file-name {
+    color: var(--z-text);
+    overflow-wrap: anywhere;
+}
+
+.upload-result-existing {
+    color: var(--z-muted);
+    overflow-wrap: anywhere;
+}
+
+.upload-result-existing span {
+    color: var(--z-text-soft);
+}
+
+/* =========================================================
+   ZARYA UI PATCH v17 — upload submit lock
+========================================================= */
+
+.btn:disabled,
+.btn.is-loading {
+    opacity: .68;
+    cursor: wait;
+    pointer-events: none;
+}
+
+/* =========================================================
+   ZARYA UI PATCH — upload batches
+========================================================= */
+
+.upload-batches-table {
+    min-width: 980px;
+}
+
+.upload-batches-table th:nth-child(1),
+.upload-batches-table td:nth-child(1) {
+    width: 70px;
+}
+
+.upload-batches-table th:nth-child(2),
+.upload-batches-table td:nth-child(2) {
+    width: 140px;
+}
+
+.upload-batches-table th:nth-child(3),
+.upload-batches-table td:nth-child(3) {
+    width: 150px;
+}
+
+.upload-batches-table th:nth-child(4),
+.upload-batches-table td:nth-child(4) {
+    width: 170px;
+}
+
+.upload-batches-table th:nth-child(5),
+.upload-batches-table td:nth-child(5),
+.upload-batches-table th:nth-child(6),
+.upload-batches-table td:nth-child(6),
+.upload-batches-table th:nth-child(7),
+.upload-batches-table td:nth-child(7),
+.upload-batches-table th:nth-child(8),
+.upload-batches-table td:nth-child(8) {
+    width: 100px;
+}
+
+.upload-batches-table th:nth-child(9),
+.upload-batches-table td:nth-child(9) {
+    width: 120px;
+}
+
+.upload-batch-summary {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.upload-batch-invoices-table {
+    min-width: 920px;
+}
+
+@media (max-width: 900px) {
+    .upload-batch-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .upload-batch-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================================
+   ZARYA UI PATCH — upload batch statuses
+========================================================= */
+
+.status-completed {
+    background: rgba(34, 197, 94, .14);
+    color: #86efac;
+    border-color: rgba(34, 197, 94, .25);
+}
+
+/* =========================================================
+   ZARYA UI PATCH — latest uploads on upload page
+========================================================= */
+
+.latest-upload-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.latest-upload-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 13px;
+    border-radius: 14px;
+    border: 1px solid var(--z-border);
+    background: rgba(255, 255, 255, .025);
+    transition: .18s ease;
+}
+
+.latest-upload-item:hover {
+    background: rgba(39, 174, 96, .07);
+    border-color: rgba(39, 174, 96, .28);
+}
+
+.latest-upload-item strong {
+    display: block;
+    color: var(--z-text);
+    margin-bottom: 3px;
+}
+
+.latest-upload-item span {
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.latest-upload-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+}
+
+.latest-upload-meta small {
+    color: var(--z-muted);
+    font-size: 12px;
+}
+
+/* =========================================================
+   Repeat OCR action
+========================================================= */
+
+.registry-action-form {
+    display: inline-flex;
+    margin: 0;
+}
+
+/* =========================================================
+   Bulk OCR actions
+========================================================= */
+
+.bulk-ocr-form {
+    margin: 0;
+}
+
+/* =========================================================
+   OCR queue
+========================================================= */
+
+.ocr-queue-command pre {
+    margin: 0;
+    padding: 14px 16px;
+    border: 1px solid var(--z-border);
+    border-radius: 14px;
+    background: rgba(0, 0, 0, .26);
+    color: var(--z-accent-2);
+    overflow-x: auto;
+    font-weight: 850;
+}
+
+.ocr-queue-table {
+    min-width: 1120px;
+}
+
+.ocr-queue-table th:nth-child(1),
+.ocr-queue-table td:nth-child(1) {
+    width: 70px;
+}
+
+.ocr-queue-table th:nth-child(2),
+.ocr-queue-table td:nth-child(2) {
+    width: 130px;
+}
+
+.ocr-queue-table th:nth-child(3),
+.ocr-queue-table td:nth-child(3) {
+    width: 260px;
+}
+
+.ocr-queue-table th:nth-child(4),
+.ocr-queue-table td:nth-child(4) {
+    width: 130px;
+}
+
+.ocr-queue-table th:nth-child(5),
+.ocr-queue-table td:nth-child(5) {
+    width: 150px;
+}
+
+.ocr-queue-table th:nth-child(6),
+.ocr-queue-table td:nth-child(6) {
+    width: 90px;
+}
+
+/* =========================================================
+   OCR worker help
+========================================================= */
+
+.ocr-worker-help-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.ocr-worker-help-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid var(--z-border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .025);
+}
+
+.ocr-worker-help-card strong {
+    color: var(--z-text);
+    font-size: 14px;
+}
+
+.ocr-worker-help-card span {
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.ocr-worker-help-card pre {
+    margin: 0;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, .28);
+    color: var(--z-accent-2);
+    overflow-x: auto;
+    font-size: 12px;
+    font-weight: 850;
+}
+
+.ocr-worker-note {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border: 1px solid rgba(245, 158, 11, .22);
+    border-radius: 14px;
+    background: rgba(245, 158, 11, .08);
+    color: #fde68a;
+    font-size: 13px;
+    font-weight: 760;
+}
+
+@media (max-width: 900px) {
+    .ocr-worker-help-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ocr-comment-box,
+.queue-message,
+.comment-text,
+.timeline-text {
+    font-size: 14px;
+    line-height: 1.58;
+}
+
+/* OCR queue command blocks */
+
+.ocr-worker-help-card strong,
+.ocr-queue-command strong {
+    font-weight: 650;
+}
+
+.ocr-worker-help-card pre,
+.ocr-queue-command pre {
+    font-size: 13px;
+    font-weight: 650;
+}
+
+/* Better compact cards */
+
+.quick-action-card,
+.process-item,
+.upload-step,
+.info-row,
+.comment-item,
+.timeline-item {
+    background: rgba(255, 255, 255, .018);
+}
+
+/* Legacy upload blocks */
+.upload-wrapper {
+    width: 100%;
+}
+
+.upload-card {
+    padding: 24px;
+    border: 1px solid var(--z-border);
+    border-radius: var(--z-radius);
+    background: rgba(18, 25, 21, .96);
+}
+
+.upload-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Light theme compatibility */
+.light-theme .upload-card {
+    background: #ffffff;
+}

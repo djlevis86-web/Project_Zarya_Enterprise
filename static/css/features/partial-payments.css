@@ -1,0 +1,156 @@
+/*
+ * ERP Zarya35 — features / partial payments
+ *
+ * Стили скопированы из legacy style.css.
+ * На этом этапе style.css ещё не очищаем.
+ */
+
+.status-partial {
+    background: rgba(245, 158, 11, .14);
+    color: #fbbf24;
+    border-color: rgba(245, 158, 11, .25);
+}
+
+.status-badge.status-partially_paid {
+    background: rgba(168, 85, 247, 0.16) !important;
+    color: #e9d5ff !important;
+    border: 1px solid rgba(192, 132, 252, 0.30) !important;
+}
+
+/* === Invoice partial payments UI === */
+
+.invoice-payment-panel {
+    margin-top: 24px;
+    padding: 22px;
+    border-radius: 22px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(15, 23, 42, 0.72);
+}
+
+.invoice-payment-form {
+    margin: 18px 0;
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(2, 6, 23, 0.34);
+    border: 1px solid rgba(34, 197, 94, 0.18);
+}
+
+.invoice-payment-table-wrap {
+    overflow-x: auto;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.invoice-payment-table {
+    width: 100%;
+    min-width: 880px;
+    border-collapse: collapse;
+}
+
+.invoice-payment-table th,
+.invoice-payment-table td {
+    padding: 13px 14px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.10);
+    color: #e5e7eb;
+    vertical-align: top;
+}
+
+.invoice-payment-table th {
+    background: rgba(15, 23, 42, 0.88);
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.invoice-payment-table tr:last-child td {
+    border-bottom: 0;
+}
+
+/* === Invoice payment left card === */
+
+.invoice-payment-left-panel {
+    grid-column: 1;
+    width: 100%;
+    margin-top: 14px;
+    padding: 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(15, 23, 42, 0.72);
+}
+
+/* === Invoice payment left column placement fix === */
+
+.invoice-info .invoice-payment-left-panel {
+    grid-column: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.invoice-preview .invoice-payment-left-panel {
+    display: none !important;
+}
+
+/* === Payment mini status in tables === */
+
+.payment-mini {
+    display: grid;
+    gap: 6px;
+    min-width: 150px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    background: rgba(15, 23, 42, 0.34);
+}
+
+.payment-mini-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.payment-mini-row span {
+    color: #94a3b8;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.payment-mini-row strong {
+    color: #e5e7eb;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.payment-mini-status {
+    display: inline-flex;
+    width: fit-content;
+    padding: 4px 8px;
+    border-radius: 999px;
+    color: #cbd5e1;
+    font-size: 11px;
+    font-weight: 900;
+    background: rgba(148, 163, 184, 0.14);
+}
+
+.payment-mini-paid .payment-mini-status {
+    color: #bbf7d0;
+    background: rgba(22, 163, 74, 0.20);
+}
+
+.payment-mini-partial .payment-mini-status {
+    color: #fde68a;
+    background: rgba(202, 138, 4, 0.20);
+}
+
+.payment-mini-unpaid .payment-mini-status {
+    color: #fecaca;
+    background: rgba(185, 28, 28, 0.18);
+}
+
+.payment-mini-overpaid .payment-mini-status {
+    color: #bfdbfe;
+    background: rgba(37, 99, 235, 0.20);
+}

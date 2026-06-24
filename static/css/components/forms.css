@@ -565,3 +565,95 @@ select {
     font-size: 13px;
 }
 /* LEGACY-MIGRATION-FINAL-END */
+
+/* VISUAL-STABILIZE-START */
+/*
+ * Forms visual stabilization after legacy CSS removal.
+ */
+
+label,
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #bdd7ff;
+    font-size: 13px;
+    font-weight: 850;
+}
+
+input,
+textarea,
+select,
+.form-control {
+    width: 100%;
+    min-height: 46px;
+    padding: 12px 14px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.36);
+    color: #ffffff;
+    outline: none;
+}
+
+textarea {
+    min-height: 112px;
+    resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+.form-control:focus {
+    border-color: rgba(39, 174, 96, 0.65);
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.12);
+}
+
+.form-grid,
+.filter-grid,
+.filters-grid {
+    display: grid;
+    gap: 16px;
+}
+/* VISUAL-STABILIZE-END */
+
+/* CHECKBOX-SIZE-FIX-START */
+/*
+ * Checkbox/radio reset.
+ * Общие стили input не должны раздувать чекбоксы.
+ */
+
+input[type="checkbox"],
+input[type="radio"] {
+    width: 18px !important;
+    min-width: 18px !important;
+    max-width: 18px !important;
+    height: 18px !important;
+    min-height: 18px !important;
+    max-height: 18px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline-block !important;
+    flex: 0 0 auto !important;
+    vertical-align: middle !important;
+    accent-color: var(--z-accent-2);
+}
+
+table input[type="checkbox"],
+table input[type="radio"],
+.data-table input[type="checkbox"],
+.list-table input[type="checkbox"],
+.payment-registry-page input[type="checkbox"],
+.invoice-list-page input[type="checkbox"] {
+    width: 16px !important;
+    min-width: 16px !important;
+    max-width: 16px !important;
+    height: 16px !important;
+    min-height: 16px !important;
+    max-height: 16px !important;
+}
+
+/* Large upload/file inputs must not inherit checkbox sizing */
+input[type="file"] {
+    width: auto;
+    max-width: 100%;
+}
+/* CHECKBOX-SIZE-FIX-END */

@@ -777,3 +777,49 @@
 .light-theme .upload-card {
     background: #ffffff;
 }
+
+
+/* LEGACY-MIGRATION-FINAL-START */
+/* Финальная переклассификация из features/legacy-migration.css. */
+
+.process-item {
+    grid-template-columns: 38px 1fr;
+}
+
+.import-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.import-columns-list,
+.requisites-rules {
+    display: grid;
+    gap: 10px;
+}
+
+.import-columns-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.import-columns-list div,
+.requisite-rule {
+    padding: 10px 12px;
+    border: 1px solid var(--z-border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .03);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.requisites-rules {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.requisite-rule {
+    text-align: center;
+    background: rgba(39, 174, 96, .08);
+    border-color: rgba(39, 174, 96, .22);
+    color: var(--z-accent-2);
+}
+/* LEGACY-MIGRATION-FINAL-END */

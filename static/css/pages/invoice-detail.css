@@ -31,3 +31,35 @@
     flex-direction: column;
     gap: 18px;
 }
+
+
+/* LEGACY-MIGRATION-FINAL-START */
+/* Финальная переклассификация из features/legacy-migration.css. */
+
+.comment-actions {
+    margin-top: 10px;
+}
+
+.comment-item,
+.timeline-item {
+    padding: 13px 14px;
+    border: 1px solid var(--z-border);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, .026);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.timeline-date {
+    color: var(--z-muted);
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+/* LEGACY-MIGRATION-FINAL-END */

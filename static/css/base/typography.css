@@ -43,3 +43,67 @@ strong {
 .text-soft {
     color: var(--color-text-soft);
 }
+
+
+/* LEGACY-MIGRATION-FINAL-START */
+/* Финальная переклассификация из features/legacy-migration.css. */
+
+body {
+    background:
+        radial-gradient(circle at top left, rgba(39, 174, 96, .07), transparent 26rem),
+        linear-gradient(180deg, #060806 0%, #080b09 100%);
+}
+
+a:hover {
+    color: var(--z-accent-2);
+}
+
+strong {
+    font-weight: 850;
+}
+
+.muted {
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.text-success,
+.amount-main {
+    color: var(--z-accent-2) !important;
+}
+
+.text-warning,
+.summary-warning {
+    color: #fbbf24 !important;
+}
+
+.text-danger,
+.summary-danger {
+    color: #fca5a5 !important;
+}
+
+.text-info {
+    color: #bfdbfe !important;
+}
+
+.amount-main {
+    font-weight: 900;
+}
+
+body {
+    font-size: 15px;
+    line-height: 1.62;
+    letter-spacing: 0;
+}
+
+.amount-main {
+    font-weight: 800;
+}
+
+body {
+    font-family: var(--z-font);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+/* LEGACY-MIGRATION-FINAL-END */

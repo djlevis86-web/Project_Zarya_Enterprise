@@ -1,24 +1,39 @@
-ERP Zarya35 — final CSS structure audit
+ERP Zarya35 — final legacy-migration reclassification
 ====================================================================================================
 
-APP CSS
-----------------------------------------------------------------------------------------------------
-app.css exists: True
-imports style.css active: False
-mentions style.css in comments/text: True
+blocks before: 89
+blocks moved: 38
+blocks remaining: 51
 
-LEGACY STYLE
-----------------------------------------------------------------------------------------------------
-style.css exists: True
-style.css real blocks: 0
-style.css retired marker: True
+base_animations: 0
+base_typography: 12
+component_alerts: 1
+component_badges: 0
+component_buttons: 1
+component_cards: 7
+component_filters: 0
+component_forms: 3
+component_modals: 0
+component_pagination: 0
+component_tables: 0
+feature_ocr: 7
+feature_partial_payments: 0
+feature_users_roles: 0
+layout_shell: 1
+layout_sidebar: 0
+layout_topbar: 0
+page_counterparties: 0
+page_dashboard: 2
+page_invoice_detail: 4
+page_invoice_list: 0
+page_payment_registry: 0
+page_payment_schedule: 0
+page_profile: 0
 
-LEGACY MIGRATION
-----------------------------------------------------------------------------------------------------
-legacy-migration.css exists: True
-legacy-migration blocks: 51
+====================================================================================================
+REMAINING
+====================================================================================================
 
-LEGACY-MIGRATION REMAINING BLOCKS
 ----------------------------------------------------------------------------------------------------
 BLOCK #1: .schedule-tabs
 .schedule-tabs {
@@ -26,6 +41,7 @@ BLOCK #1: .schedule-tabs
     gap: 10px;
     flex-wrap: wrap;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #2: .schedule-tab
 .schedule-tab {
@@ -39,6 +55,7 @@ BLOCK #2: .schedule-tab
     color: var(--z-text);
     font-weight: 800;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #3: .schedule-tab:hover, .schedule-tab.is-active
 .schedule-tab:hover,
@@ -47,12 +64,14 @@ BLOCK #3: .schedule-tab:hover, .schedule-tab.is-active
     border-color: rgba(39, 174, 96, .35);
     color: #ffffff;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #4: .invoice-number-list
 .invoice-number-list {
     color: var(--z-text);
     line-height: 1.6;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #5: .unmatched-invoice-item
 .unmatched-invoice-item {
@@ -65,6 +84,7 @@ BLOCK #5: .unmatched-invoice-item
     border-radius: 10px;
     background: rgba(255, 255, 255, .025);
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #6: .directory-info-grid
 .directory-info-grid {
@@ -72,6 +92,7 @@ BLOCK #6: .directory-info-grid
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #7: .directory-info-item p
 .directory-info-item p {
@@ -79,11 +100,13 @@ BLOCK #7: .directory-info-item p
     color: var(--z-muted);
     font-size: 13px;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #8: .system-version-value
 .system-version-value {
     font-size: 26px;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #9: .system-page-grid
 .system-page-grid {
@@ -93,6 +116,7 @@ BLOCK #9: .system-page-grid
     align-items: start;
     margin-bottom: 24px;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #10: .system-kv-grid
 .system-kv-grid {
@@ -100,6 +124,7 @@ BLOCK #10: .system-kv-grid
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #11: .system-kv-item
 .system-kv-item {
@@ -113,6 +138,7 @@ BLOCK #11: .system-kv-item
     border-radius: 14px;
     background: rgba(255, 255, 255, .022);
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #12: .system-kv-item strong
 .system-kv-item strong {
@@ -121,23 +147,27 @@ BLOCK #12: .system-kv-item strong
     font-weight: 650;
     overflow-wrap: anywhere;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #13: .system-kv-wide
 .system-kv-wide {
     grid-column: 1 / -1;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #14: .system-actions-grid
 .system-actions-grid {
     display: grid;
     gap: 12px;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #15: .system-changelog-list
 .system-changelog-list {
     display: grid;
     gap: 10px;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #16: .system-changelog-item
 .system-changelog-item {
@@ -148,11 +178,13 @@ BLOCK #16: .system-changelog-item
     color: var(--z-muted);
     line-height: 1.55;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #17: .system-inner-stats
 .system-inner-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #18: .system-file-name, .system-code
 .system-file-name,
@@ -161,33 +193,39 @@ BLOCK #18: .system-file-name, .system-code
     font-weight: 650;
     overflow-wrap: anywhere;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #19: .system-update-success
 .system-update-success {
     background: rgba(34, 197, 94, .10);
     border-color: rgba(34, 197, 94, .24);
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #20: .system-update-success strong
 .system-update-success strong {
     color: #bbf7d0;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #21: .system-update-warning
 .system-update-warning {
     background: rgba(245, 158, 11, .10);
     border-color: rgba(245, 158, 11, .24);
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #22: .system-update-warning strong
 .system-update-warning strong {
     color: #fde68a;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #23: .system-kv-grid-single
 .system-kv-grid-single {
     grid-template-columns: 1fr;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #24: .system-maintenance-grid
 .system-maintenance-grid {
@@ -196,6 +234,7 @@ BLOCK #24: .system-maintenance-grid
     gap: 24px;
     align-items: stretch;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #25: .system-maintenance-actions
 .system-maintenance-actions {
@@ -204,6 +243,7 @@ BLOCK #25: .system-maintenance-actions
     flex-wrap: wrap;
     margin-top: auto;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #26: .audit-page
 .audit-page {
@@ -211,6 +251,7 @@ BLOCK #26: .audit-page
     flex-direction: column;
     gap: 20px;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #27: .audit-muted, .audit-object-repr
 .audit-muted,
@@ -218,6 +259,7 @@ BLOCK #27: .audit-muted, .audit-object-repr
     color: var(--muted-text, #64748b);
     font-size: 13px;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #28: .audit-empty
 .audit-empty {
@@ -225,21 +267,25 @@ BLOCK #28: .audit-empty
     color: var(--muted-text, #64748b);
     padding: 28px;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #29: .payment-summary-link.is-danger strong
 .payment-summary-link.is-danger strong {
     color: #dc2626;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #30: .payment-summary-link.is-muted strong
 .payment-summary-link.is-muted strong {
     color: #64748b;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #31: .payment-date-open:hover
 .payment-date-open:hover {
     background: #1f2937 !important;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #32: .payment-date-tools
 .payment-date-tools {
@@ -249,6 +295,7 @@ BLOCK #32: .payment-date-tools
     gap: 8px !important;
     flex-wrap: wrap !important;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #33: .payment-date-preset
 .payment-date-preset {
@@ -262,6 +309,7 @@ BLOCK #33: .payment-date-preset
     font-weight: 800 !important;
     cursor: pointer !important;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #34: .payment-date-preset:hover
 .payment-date-preset:hover {
@@ -269,12 +317,14 @@ BLOCK #34: .payment-date-preset:hover
     border-color: rgba(39, 174, 96, 0.75) !important;
     color: #ffffff !important;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #35: .payment-date-tools, .payment-date-open
 .payment-date-tools,
 .payment-date-open {
     display: none !important;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #36: .registry-detail-link, .registry-detail-title
 .registry-detail-link,
@@ -283,12 +333,14 @@ BLOCK #36: .registry-detail-link, .registry-detail-title
     font-weight: 900 !important;
     text-decoration: none !important;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #37: .registry-detail-link:hover, .registry-detail-title:hover
 .registry-detail-link:hover,
 .registry-detail-title:hover {
     text-decoration: underline !important;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #38: .payment-summary-grid
 .payment-summary-grid {
@@ -297,6 +349,7 @@ BLOCK #38: .payment-summary-grid
     gap: 14px;
     margin-bottom: 18px;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #39: .payment-left-header h3
 .payment-left-header h3 {
@@ -305,6 +358,7 @@ BLOCK #39: .payment-left-header h3
     font-size: 18px;
     font-weight: 900;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #40: .payment-left-header p
 .payment-left-header p {
@@ -313,6 +367,7 @@ BLOCK #40: .payment-left-header p
     font-size: 13px;
     line-height: 1.35;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #41: .payment-left-summary
 .payment-left-summary {
@@ -320,6 +375,7 @@ BLOCK #41: .payment-left-summary
     gap: 8px;
     margin-bottom: 16px;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #42: .payment-left-summary > div
 .payment-left-summary > div {
@@ -332,12 +388,14 @@ BLOCK #42: .payment-left-summary > div
     border: 1px solid rgba(148, 163, 184, 0.14);
     background: rgba(2, 6, 23, 0.22);
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #43: .payment-left-summary span
 .payment-left-summary span {
     color: #cbd5e1;
     font-size: 13px;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #44: .payment-left-summary strong
 .payment-left-summary strong {
@@ -346,6 +404,7 @@ BLOCK #44: .payment-left-summary strong
     font-weight: 900;
     text-align: right;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #45: .payment-left-complete, .payment-left-empty
 .payment-left-complete,
@@ -357,11 +416,13 @@ BLOCK #45: .payment-left-complete, .payment-left-empty
     font-weight: 800;
     font-size: 13px;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #46: .payment-left-history
 .payment-left-history {
     margin-top: 16px;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #47: .payment-left-history h4
 .payment-left-history h4 {
@@ -370,6 +431,7 @@ BLOCK #47: .payment-left-history h4
     font-size: 15px;
     font-weight: 900;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #48: .payment-left-history-item
 .payment-left-history-item {
@@ -378,17 +440,20 @@ BLOCK #48: .payment-left-history-item
     padding: 10px 0;
     border-bottom: 1px solid rgba(148, 163, 184, 0.12);
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #49: .payment-left-history-item:last-child
 .payment-left-history-item:last-child {
     border-bottom: 0;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #50: .payment-left-history-item strong
 .payment-left-history-item strong {
     color: #22c55e;
     font-weight: 900;
 }
+
 ----------------------------------------------------------------------------------------------------
 BLOCK #51: .payment-left-history-item span, .payment-left-history-item small
 .payment-left-history-item span,
@@ -396,33 +461,3 @@ BLOCK #51: .payment-left-history-item span, .payment-left-history-item small
     color: #cbd5e1;
     font-size: 12px;
 }
-
-MODULE STATS
-----------------------------------------------------------------------------------------------------
-static\css\base\animations.css: blocks=1, migrated=True, final_reclassified=False
-static\css\base\reset.css: blocks=8, migrated=False, final_reclassified=False
-static\css\base\typography.css: blocks=19, migrated=False, final_reclassified=True
-static\css\base\variables.css: blocks=1, migrated=False, final_reclassified=False
-static\css\layout\shell.css: blocks=14, migrated=False, final_reclassified=True
-static\css\layout\sidebar.css: blocks=24, migrated=False, final_reclassified=False
-static\css\layout\topbar.css: blocks=11, migrated=False, final_reclassified=False
-static\css\components\alerts.css: blocks=1, migrated=False, final_reclassified=True
-static\css\components\badges.css: blocks=47, migrated=False, final_reclassified=False
-static\css\components\buttons.css: blocks=33, migrated=False, final_reclassified=True
-static\css\components\cards.css: blocks=69, migrated=False, final_reclassified=True
-static\css\components\filters.css: blocks=61, migrated=False, final_reclassified=False
-static\css\components\forms.css: blocks=72, migrated=False, final_reclassified=True
-static\css\components\modals.css: blocks=0, migrated=False, final_reclassified=False
-static\css\components\pagination.css: blocks=1, migrated=False, final_reclassified=False
-static\css\components\tables.css: blocks=259, migrated=False, final_reclassified=False
-static\css\pages\counterparties.css: blocks=34, migrated=False, final_reclassified=False
-static\css\pages\dashboard.css: blocks=31, migrated=False, final_reclassified=True
-static\css\pages\invoice-detail.css: blocks=8, migrated=False, final_reclassified=True
-static\css\pages\invoice-list.css: blocks=20, migrated=False, final_reclassified=False
-static\css\pages\payment-registry.css: blocks=157, migrated=False, final_reclassified=False
-static\css\pages\payment-schedule.css: blocks=50, migrated=False, final_reclassified=False
-static\css\pages\profile.css: blocks=22, migrated=False, final_reclassified=False
-static\css\features\legacy-migration.css: blocks=51, migrated=True, final_reclassified=False
-static\css\features\ocr.css: blocks=103, migrated=False, final_reclassified=True
-static\css\features\partial-payments.css: blocks=21, migrated=False, final_reclassified=False
-static\css\features\users-roles.css: blocks=1, migrated=False, final_reclassified=False

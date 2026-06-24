@@ -420,3 +420,49 @@
 .invoice-preview .invoice-payment-left-panel {
     display: none !important;
 }
+
+
+/* LEGACY-MIGRATION-FINAL-START */
+/* Финальная переклассификация из features/legacy-migration.css. */
+
+.info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: center;
+    padding: 13px 14px;
+    border: 1px solid var(--z-border);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, .026);
+}
+
+.info-row > span {
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.info-row > strong,
+.info-row > div {
+    text-align: right;
+}
+
+.info-row-vertical {
+    align-items: flex-start;
+}
+
+.info-row > span {
+    color: var(--z-muted);
+    font-size: 14px;
+}
+
+.info-row > strong,
+.info-row > div {
+    font-size: 14px;
+}
+/* LEGACY-MIGRATION-FINAL-END */

@@ -223,3 +223,18 @@ body {
 .timeline-item {
     background: rgba(255, 255, 255, .018);
 }
+
+
+/* LEGACY-MIGRATION-FINAL-START */
+/* Финальная переклассификация из features/legacy-migration.css. */
+
+.stat-link {
+    display: block;
+    color: inherit;
+}
+
+.stat-link:hover {
+    background: rgba(39, 174, 96, .045);
+    border-color: rgba(39, 174, 96, .36);
+}
+/* LEGACY-MIGRATION-FINAL-END */

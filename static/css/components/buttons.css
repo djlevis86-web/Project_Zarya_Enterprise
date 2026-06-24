@@ -229,3 +229,15 @@
     opacity: 0.55 !important;
     cursor: not-allowed !important;
 }
+
+
+/* LEGACY-MIGRATION-FINAL-START */
+/* Финальная переклассификация из features/legacy-migration.css. */
+
+.pdf-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+/* LEGACY-MIGRATION-FINAL-END */

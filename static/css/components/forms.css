@@ -541,14 +541,27 @@ select {
 }
 
 
-/* LEGACY-MIGRATION-RECLASSIFIED-START */
-/* Перенесено из features/legacy-migration.css. */
+/* LEGACY-MIGRATION-FINAL-START */
+/* Финальная переклассификация из features/legacy-migration.css. */
 
-.stat-label,
-.registry-summary-label {
+.check-row {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 12px;
+    align-items: start;
+    padding: 14px;
+    border: 1px solid var(--z-border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .025);
+}
+
+.check-row strong,
+.check-row small {
     display: block;
-    margin-bottom: 12px;
+}
+
+.check-row small {
     color: var(--z-muted);
     font-size: 13px;
 }
-/* LEGACY-MIGRATION-RECLASSIFIED-END */
+/* LEGACY-MIGRATION-FINAL-END */

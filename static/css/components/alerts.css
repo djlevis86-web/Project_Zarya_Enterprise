@@ -1,55 +1,13 @@
 
 
 
-/* LEGACY-MIGRATION-RECLASSIFIED-START */
-/* Перенесено из features/legacy-migration.css. */
+/* LEGACY-MIGRATION-FINAL-START */
+/* Финальная переклассификация из features/legacy-migration.css. */
 
-.messages {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 18px;
+.pdf-error {
+    padding: 30px;
+    color: #b91c1c;
+    text-align: center;
+    font-weight: 900;
 }
-
-.alert {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 14px 16px;
-    border-radius: 14px;
-    border: 1px solid rgba(96, 165, 250, .24);
-    background: rgba(96, 165, 250, .12);
-    color: #bfdbfe;
-    font-weight: 650;
-}
-
-.alert-success {
-    background: rgba(34, 197, 94, .12);
-    border-color: rgba(34, 197, 94, .24);
-    color: #bbf7d0;
-}
-
-.alert-success::before { content: "✓"; }
-
-.alert-error,
-.alert-danger {
-    background: rgba(239, 68, 68, .12);
-    border-color: rgba(239, 68, 68, .24);
-    color: #fecaca;
-}
-
-.alert-error::before,
-.alert-danger::before { content: "!"; }
-
-.alert-warning {
-    background: rgba(245, 158, 11, .12);
-    border-color: rgba(245, 158, 11, .26);
-    color: #fde68a;
-}
-
-.alert-warning::before { content: "!"; }
-
-.queue-message-error {
-    color: #fca5a5;
-}
-/* LEGACY-MIGRATION-RECLASSIFIED-END */
+/* LEGACY-MIGRATION-FINAL-END */

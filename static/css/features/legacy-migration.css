@@ -1,214 +1,10 @@
 /*
  * ERP Zarya35 — temporary legacy migration bucket.
  *
- * Здесь остаются только блоки, которые пока не удалось уверенно классифицировать.
+ * Должен быть пустым перед завершением CSS-рефакторинга.
  */
 
 /* MIGRATED-LEGACY-START */
-/* Остаток после повторной классификации. */
-
-/* MIGRATED-LEGACY-START */
-/* Перенесено из static/css/style.css при отключении legacy. */
-
-body {
-    background:
-        radial-gradient(circle at top left, rgba(39, 174, 96, .07), transparent 26rem),
-        linear-gradient(180deg, #060806 0%, #080b09 100%);
-}
-
-a:hover {
-    color: var(--z-accent-2);
-}
-
-strong {
-    font-weight: 850;
-}
-
-.app-footer,
-.footer {
-    margin-top: auto;
-    padding: 18px 36px;
-    border-top: 1px solid var(--z-border);
-    color: var(--z-muted);
-    font-size: 12px;
-}
-
-.muted {
-    color: var(--z-muted);
-    font-size: 13px;
-}
-
-.text-success,
-.amount-main {
-    color: var(--z-accent-2) !important;
-}
-
-.text-warning,
-.summary-warning {
-    color: #fbbf24 !important;
-}
-
-.text-danger,
-.summary-danger {
-    color: #fca5a5 !important;
-}
-
-.text-info {
-    color: #bfdbfe !important;
-}
-
-.amount-main {
-    font-weight: 900;
-}
-
-.stat-link {
-    display: block;
-    color: inherit;
-}
-
-.stat-link:hover {
-    background: rgba(39, 174, 96, .045);
-    border-color: rgba(39, 174, 96, .36);
-}
-
-.process-item {
-    grid-template-columns: 38px 1fr;
-}
-
-.import-options {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.check-row {
-    display: grid;
-    grid-template-columns: 22px 1fr;
-    gap: 12px;
-    align-items: start;
-    padding: 14px;
-    border: 1px solid var(--z-border);
-    border-radius: 14px;
-    background: rgba(255, 255, 255, .025);
-}
-
-.check-row strong,
-.check-row small {
-    display: block;
-}
-
-.check-row small {
-    color: var(--z-muted);
-    font-size: 13px;
-}
-
-.import-columns-list,
-.requisites-rules {
-    display: grid;
-    gap: 10px;
-}
-
-.import-columns-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.import-columns-list div,
-.requisite-rule {
-    padding: 10px 12px;
-    border: 1px solid var(--z-border);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, .03);
-    font-size: 13px;
-    font-weight: 800;
-}
-
-.requisites-rules {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.requisite-rule {
-    text-align: center;
-    background: rgba(39, 174, 96, .08);
-    border-color: rgba(39, 174, 96, .22);
-    color: var(--z-accent-2);
-}
-
-.info-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 18px;
-    align-items: center;
-    padding: 13px 14px;
-    border: 1px solid var(--z-border);
-    border-radius: 13px;
-    background: rgba(255, 255, 255, .026);
-}
-
-.info-row > span {
-    color: var(--z-muted);
-    font-size: 13px;
-}
-
-.info-row > strong,
-.info-row > div {
-    text-align: right;
-}
-
-.info-row-vertical {
-    align-items: flex-start;
-}
-
-.comment-actions {
-    margin-top: 10px;
-}
-
-.comment-item,
-.timeline-item {
-    padding: 13px 14px;
-    border: 1px solid var(--z-border);
-    border-radius: 13px;
-    background: rgba(255, 255, 255, .026);
-}
-
-.comment-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 8px;
-    color: var(--z-muted);
-    font-size: 13px;
-}
-
-.timeline-date {
-    color: var(--z-muted);
-    font-size: 12px;
-    margin-bottom: 4px;
-}
-
-.pdf-toolbar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
-}
-
-.pdf-error {
-    padding: 30px;
-    color: #b91c1c;
-    text-align: center;
-    font-weight: 900;
-}
-
-/* =========================================================
-   Payment schedule, registry, unmatched, requisites
-========================================================= */
-
 .schedule-tabs {
     display: flex;
     gap: 10px;
@@ -260,35 +56,6 @@ strong {
     margin: 0;
     color: var(--z-muted);
     font-size: 13px;
-}
-
-body {
-    font-size: 15px;
-    line-height: 1.62;
-    letter-spacing: 0;
-}
-
-.amount-main {
-    font-weight: 800;
-}
-
-.info-row > span {
-    color: var(--z-muted);
-    font-size: 14px;
-}
-
-.info-row > strong,
-.info-row > div {
-    font-size: 14px;
-}
-
-/* Global typography softening */
-
-body {
-    font-family: var(--z-font);
-    font-weight: 400;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
 }
 
 .system-version-value {
@@ -398,8 +165,6 @@ body {
     margin-top: auto;
 }
 
-/* === Audit log page === */
-
 .audit-page {
     display: flex;
     flex-direction: column;
@@ -455,8 +220,6 @@ body {
     border-color: rgba(39, 174, 96, 0.75) !important;
     color: #ffffff !important;
 }
-
-/* === Payment schedule duplicate controls cleanup === */
 
 .payment-date-tools,
 .payment-date-open {

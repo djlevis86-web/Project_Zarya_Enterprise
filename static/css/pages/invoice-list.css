@@ -1,0 +1,103 @@
+/*
+ * ERP Zarya35 — pages / invoice list
+ *
+ * Стили скопированы из legacy style.css.
+ * На этом этапе style.css ещё не очищаем.
+ */
+
+.unmatched-invoice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* =========================================================
+   Column widths for compact tables
+========================================================= */
+
+.invoice-table-compact th:nth-child(1),
+.invoice-table-compact td:nth-child(1) { width: 70px; }
+
+.invoice-table-compact th:nth-child(2),
+.invoice-table-compact td:nth-child(2) { width: 26%; }
+
+.invoice-table-compact th:nth-child(3),
+.invoice-table-compact td:nth-child(3) { width: 29%; }
+
+.invoice-table-compact th:nth-child(4),
+.invoice-table-compact td:nth-child(4) { width: 110px; }
+
+.invoice-table-compact th:nth-child(5),
+.invoice-table-compact td:nth-child(5) { width: 150px; }
+
+.invoice-table-compact th:nth-child(6),
+.invoice-table-compact td:nth-child(6) { width: 145px; }
+
+.invoice-table-compact th:nth-child(7),
+.invoice-table-compact td:nth-child(7) { width: 120px; }
+
+/* Fix invoice table after checkbox column was added */
+
+.invoice-table-compact {
+    table-layout: fixed;
+}
+
+.invoice-table-compact th:nth-child(1),
+.invoice-table-compact td:nth-child(1) {
+    width: 44px;
+}
+
+.invoice-table-compact th:nth-child(2),
+.invoice-table-compact td:nth-child(2) {
+    width: 72px;
+}
+
+.invoice-table-compact th:nth-child(3),
+.invoice-table-compact td:nth-child(3) {
+    width: 28%;
+}
+
+.invoice-table-compact th:nth-child(4),
+.invoice-table-compact td:nth-child(4) {
+    width: 26%;
+}
+
+.invoice-table-compact th:nth-child(5),
+.invoice-table-compact td:nth-child(5) {
+    width: 110px;
+}
+
+.invoice-table-compact th:nth-child(6),
+.invoice-table-compact td:nth-child(6) {
+    width: 160px;
+}
+
+.invoice-table-compact th:nth-child(7),
+.invoice-table-compact td:nth-child(7) {
+    width: 125px;
+}
+
+.invoice-table-compact th:nth-child(8),
+.invoice-table-compact td:nth-child(8) {
+    width: 100px;
+}
+
+.invoice-table-compact td:nth-child(4),
+.invoice-table-compact td:nth-child(5) {
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.invoice-table-compact .btn-sm {
+    min-width: 74px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* Mobile/tablet keeps horizontal scroll instead of broken columns */
+
+@media (max-width: 1280px) {
+    .invoice-table-compact {
+        min-width: 1120px !important;
+    }
+}

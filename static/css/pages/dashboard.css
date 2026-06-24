@@ -1,0 +1,225 @@
+/*
+ * ERP Zarya35 — pages / dashboard
+ *
+ * Стили скопированы из legacy style.css.
+ * На этом этапе style.css ещё не очищаем.
+ */
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    overflow-x: hidden;
+    background: var(--z-bg);
+    color: var(--z-text);
+    font-family: var(--z-font);
+    font-size: 14px;
+    line-height: 1.55;
+    text-rendering: geometricPrecision;
+}
+
+.card,
+.content-card,
+.stat-card,
+.registry-summary-card {
+    background: rgba(16, 21, 18, .94);
+    border: 1px solid var(--z-border);
+    border-radius: var(--z-radius);
+    box-shadow: none;
+}
+
+.light-theme .card,
+.light-theme .content-card,
+.light-theme .stat-card,
+.light-theme .registry-summary-card {
+    background: #ffffff;
+}
+
+.card:hover,
+.content-card:hover,
+.stat-card:hover {
+    border-color: rgba(255, 255, 255, .16);
+}
+
+/* =========================================================
+   Stats and summaries
+========================================================= */
+
+.stats-grid,
+.dashboard-stats,
+.registry-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.stat-card,
+.registry-summary-card {
+    padding: 22px;
+}
+
+/* =========================================================
+   Dashboard
+========================================================= */
+
+.dashboard-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.dashboard-hero-main,
+.dashboard-hero-side {
+    border: 1px solid var(--z-border);
+    border-radius: 20px;
+    background: radial-gradient(circle at top left, rgba(39, 174, 96, .13), transparent 28rem), rgba(16, 18, 17, .96);
+}
+
+.dashboard-hero-main {
+    padding: 28px;
+}
+
+.dashboard-kicker {
+    display: inline-flex;
+    margin-bottom: 12px;
+    color: var(--z-accent-2);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.dashboard-hero h2 {
+    max-width: 760px;
+    margin: 0;
+    font-size: 34px;
+    line-height: 1.1;
+    font-weight: 950;
+    letter-spacing: -.035em;
+}
+
+.dashboard-hero p {
+    max-width: 760px;
+    margin: 12px 0 0;
+    color: var(--z-muted);
+}
+
+.dashboard-hero-actions {
+    justify-content: flex-start;
+    margin-top: 20px;
+}
+
+.dashboard-hero-side {
+    display: grid;
+    gap: 1px;
+    overflow: hidden;
+}
+
+.hero-metric {
+    padding: 22px;
+    background: rgba(255, 255, 255, .025);
+}
+
+.hero-metric span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.hero-metric strong {
+    font-size: 36px;
+    line-height: 1;
+    font-weight: 950;
+}
+
+.dashboard-grid-two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin-bottom: 22px;
+}
+
+.quick-action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.quick-action-card,
+.process-item,
+.upload-step {
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--z-border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .025);
+}
+
+.quick-action-card {
+    grid-template-columns: 42px 1fr;
+}
+
+.quick-action-card:hover {
+    background: rgba(39, 174, 96, .08);
+    border-color: rgba(39, 174, 96, .28);
+}
+
+.quick-action-icon,
+.process-item > span,
+.upload-step > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: rgba(39, 174, 96, .14);
+    color: var(--z-accent-2);
+    font-weight: 950;
+}
+
+.quick-action-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+}
+
+.quick-action-card p,
+.process-item p,
+.upload-step p {
+    margin: 0;
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.dashboard-latest-table {
+    min-width: 780px;
+}
+
+.card,
+.content-card,
+.stat-card,
+.registry-summary-card {
+    background: rgba(18, 25, 21, .96);
+}
+
+.stat-value,
+.registry-summary-card strong,
+.hero-metric strong {
+    font-weight: 760;
+    text-shadow: none;
+}
+
+/* Better compact cards */
+
+.quick-action-card,
+.process-item,
+.upload-step,
+.info-row,
+.comment-item,
+.timeline-item {
+    background: rgba(255, 255, 255, .018);
+}

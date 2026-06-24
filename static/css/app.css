@@ -37,6 +37,8 @@
 @import url("./pages/payment-registry.css");
 @import url("./pages/counterparties.css");
 @import url("./pages/profile.css");
+@import url("./pages/system.css");
+@import url("./pages/audit.css");
 
 /* Features */
 @import url("./features/partial-payments.css");

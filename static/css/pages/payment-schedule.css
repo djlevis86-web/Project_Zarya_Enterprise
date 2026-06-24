@@ -352,3 +352,38 @@
     margin-top: 0 !important;
     clear: both !important;
 }
+
+
+/* LEGACY-MIGRATION-MANUAL-START */
+/* Финально перенесено из features/legacy-migration.css. */
+
+.schedule-tabs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.schedule-tab {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 14px;
+    border: 1px solid var(--z-border);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .035);
+    color: var(--z-text);
+    font-weight: 800;
+}
+
+.schedule-tab:hover,
+.schedule-tab.is-active {
+    background: rgba(39, 174, 96, .14);
+    border-color: rgba(39, 174, 96, .35);
+    color: #ffffff;
+}
+
+.invoice-number-list {
+    color: var(--z-text);
+    line-height: 1.6;
+}
+/* LEGACY-MIGRATION-MANUAL-END */

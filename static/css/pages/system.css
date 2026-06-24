@@ -1,0 +1,113 @@
+
+
+
+/* LEGACY-MIGRATION-MANUAL-START */
+/* Финально перенесено из features/legacy-migration.css. */
+
+.system-version-value {
+    font-size: 26px;
+}
+
+.system-page-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(320px, .8fr);
+    gap: 24px;
+    align-items: start;
+    margin-bottom: 24px;
+}
+
+.system-kv-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.system-kv-item {
+    min-height: 76px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid var(--z-border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .022);
+}
+
+.system-kv-item strong {
+    color: var(--z-text);
+    font-size: 14px;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+}
+
+.system-kv-wide {
+    grid-column: 1 / -1;
+}
+
+.system-actions-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.system-changelog-list {
+    display: grid;
+    gap: 10px;
+}
+
+.system-changelog-item {
+    padding: 12px 14px;
+    border: 1px solid var(--z-border);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, .022);
+    color: var(--z-muted);
+    line-height: 1.55;
+}
+
+.system-inner-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.system-file-name,
+.system-code {
+    color: var(--z-accent-2);
+    font-weight: 650;
+    overflow-wrap: anywhere;
+}
+
+.system-update-success {
+    background: rgba(34, 197, 94, .10);
+    border-color: rgba(34, 197, 94, .24);
+}
+
+.system-update-success strong {
+    color: #bbf7d0;
+}
+
+.system-update-warning {
+    background: rgba(245, 158, 11, .10);
+    border-color: rgba(245, 158, 11, .24);
+}
+
+.system-update-warning strong {
+    color: #fde68a;
+}
+
+.system-kv-grid-single {
+    grid-template-columns: 1fr;
+}
+
+.system-maintenance-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    align-items: stretch;
+}
+
+.system-maintenance-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: auto;
+}
+/* LEGACY-MIGRATION-MANUAL-END */

@@ -1,0 +1,24 @@
+
+
+
+/* LEGACY-MIGRATION-MANUAL-START */
+/* Финально перенесено из features/legacy-migration.css. */
+
+.audit-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.audit-muted,
+.audit-object-repr {
+    color: var(--muted-text, #64748b);
+    font-size: 13px;
+}
+
+.audit-empty {
+    text-align: center;
+    color: var(--muted-text, #64748b);
+    padding: 28px;
+}
+/* LEGACY-MIGRATION-MANUAL-END */

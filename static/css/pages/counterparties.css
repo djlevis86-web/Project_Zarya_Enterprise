@@ -259,3 +259,31 @@
     letter-spacing: -0.015em;
     text-shadow: none;
 }
+
+
+/* LEGACY-MIGRATION-MANUAL-START */
+/* Финально перенесено из features/legacy-migration.css. */
+
+.unmatched-invoice-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px;
+    border: 1px solid var(--z-border);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .025);
+}
+
+.directory-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.directory-info-item p {
+    margin: 0;
+    color: var(--z-muted);
+    font-size: 13px;
+}
+/* LEGACY-MIGRATION-MANUAL-END */

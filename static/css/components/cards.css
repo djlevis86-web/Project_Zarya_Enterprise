@@ -1,0 +1,422 @@
+/*
+ * ERP Zarya35 — components / cards
+ *
+ * Стили скопированы из legacy style.css.
+ * На этом этапе style.css ещё не очищаем.
+ */
+
+* {
+    box-sizing: border-box;
+}
+
+.card,
+.content-card,
+.stat-card,
+.registry-summary-card {
+    background: rgba(16, 21, 18, .94);
+    border: 1px solid var(--z-border);
+    border-radius: var(--z-radius);
+    box-shadow: none;
+}
+
+.light-theme .card,
+.light-theme .content-card,
+.light-theme .stat-card,
+.light-theme .registry-summary-card {
+    background: #ffffff;
+}
+
+.card,
+.content-card {
+    padding: 24px;
+}
+
+.card:hover,
+.content-card:hover,
+.stat-card:hover {
+    border-color: rgba(255, 255, 255, .16);
+}
+
+.stat-card,
+.registry-summary-card {
+    padding: 22px;
+}
+
+.stat-value,
+.registry-summary-card strong {
+    display: block;
+    color: var(--z-text);
+    font-size: 32px;
+    line-height: 1;
+    font-weight: 950;
+    letter-spacing: -.03em;
+}
+
+.quick-action-card,
+.process-item,
+.upload-step {
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--z-border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .025);
+}
+
+.quick-action-card {
+    grid-template-columns: 42px 1fr;
+}
+
+.quick-action-card:hover {
+    background: rgba(39, 174, 96, .08);
+    border-color: rgba(39, 174, 96, .28);
+}
+
+.quick-action-card p,
+.process-item p,
+.upload-step p {
+    margin: 0;
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.upload-main-card,
+.import-card,
+.import-help-card,
+.import-next-card,
+.upload-help-card,
+.requisites-info-card {
+    padding: 24px;
+}
+
+.invoice-section-card,
+.invoice-document-card,
+.counterparty-section-card {
+    padding: 22px;
+}
+
+.invoice-document-card {
+    position: sticky;
+    top: 96px;
+}
+
+.ocr-result-card,
+.ocr-comment-box {
+    padding: 13px 14px;
+    border-radius: 13px;
+    border: 1px solid var(--z-border);
+    font-weight: 760;
+}
+
+.ocr-comment-box { margin-top: 12px; background: rgba(96, 165, 250, .10); border-color: rgba(96, 165, 250, .20); color: #bfdbfe; font-size: 13px; }
+
+/* =========================================================
+   Counterparties
+========================================================= */
+
+.directory-info-card {
+    padding: 22px;
+}
+
+.counterparty-list-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 150px;
+    gap: 18px;
+    padding: 16px;
+    border: 1px solid var(--z-border);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, .018);
+    transition: .18s ease;
+}
+
+.counterparty-list-card:hover {
+    background: rgba(39, 174, 96, .045);
+    border-color: rgba(39, 174, 96, .24);
+}
+
+.counterparty-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-self: center;
+}
+
+.upload-result-main-card {
+    padding: 24px;
+}
+
+.upload-result-actions-card {
+    padding: 20px;
+}
+
+.ocr-worker-help-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid var(--z-border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .025);
+}
+
+.ocr-worker-help-card strong {
+    color: var(--z-text);
+    font-size: 14px;
+}
+
+.ocr-worker-help-card span {
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.ocr-worker-help-card pre {
+    margin: 0;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, .28);
+    color: var(--z-accent-2);
+    overflow-x: auto;
+    font-size: 12px;
+    font-weight: 850;
+}
+
+.card,
+.content-card,
+.stat-card,
+.registry-summary-card {
+    background: rgba(18, 25, 21, .96);
+}
+
+.ocr-comment-box,
+.queue-message,
+.comment-text,
+.timeline-text {
+    font-size: 14px;
+    line-height: 1.58;
+}
+
+.stat-value,
+.registry-summary-card strong,
+.hero-metric strong {
+    font-weight: 760;
+    text-shadow: none;
+}
+
+.profile-card,
+.system-card,
+.card {
+    color: var(--z-text);
+}
+
+.card p,
+.content-card p {
+    line-height: 1.62;
+}
+
+.card ul,
+.content-card ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.card li,
+.content-card li {
+    margin: 6px 0;
+    color: var(--z-muted);
+}
+
+/* OCR queue command blocks */
+
+.ocr-worker-help-card strong,
+.ocr-queue-command strong {
+    font-weight: 650;
+}
+
+.ocr-worker-help-card pre,
+.ocr-queue-command pre {
+    font-size: 13px;
+    font-weight: 650;
+}
+
+/* Better compact cards */
+
+.quick-action-card,
+.process-item,
+.upload-step,
+.info-row,
+.comment-item,
+.timeline-item {
+    background: rgba(255, 255, 255, .018);
+}
+
+.system-action-card strong {
+    color: var(--z-text);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.system-action-card span {
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+/* =========================================================
+   ZARYA UI SYSTEM INNER PAGES PASS v1
+========================================================= */
+
+.system-inner-card {
+    padding: 24px;
+}
+
+.system-maintenance-card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 24px;
+}
+
+.system-maintenance-card h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 750;
+}
+
+.system-maintenance-card p {
+    margin: 0;
+    color: var(--z-muted);
+    line-height: 1.58;
+}
+
+.upload-card {
+    padding: 24px;
+    border: 1px solid var(--z-border);
+    border-radius: var(--z-radius);
+    background: rgba(18, 25, 21, .96);
+}
+
+/* Light theme compatibility */
+.light-theme .upload-card {
+    background: #ffffff;
+}
+
+/* === Payment registry draft panel === */
+
+.payment-registry-draft-card {
+    margin-bottom: 22px !important;
+    padding: 22px !important;
+    border: 1px solid rgba(39, 174, 96, 0.22) !important;
+    background: linear-gradient(
+        135deg,
+        rgba(15, 23, 42, 0.98),
+        rgba(13, 92, 47, 0.18)
+    ) !important;
+}
+
+/* === Payment registry check panel === */
+
+.payment-registry-check-panel {
+    margin: 18px 0 20px !important;
+    padding: 16px !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(148, 163, 184, 0.18) !important;
+    background: rgba(2, 6, 23, 0.28) !important;
+}
+
+.payment-registry-check-cards {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    margin-bottom: 14px !important;
+}
+
+.payment-registry-check-card {
+    padding: 14px 16px !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(148, 163, 184, 0.18) !important;
+    background: rgba(15, 23, 42, 0.62) !important;
+}
+
+.payment-registry-check-card span {
+    display: block !important;
+    margin-bottom: 8px !important;
+    color: #9ca3af !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+}
+
+.payment-registry-check-card strong {
+    display: block !important;
+    color: #f8fafc !important;
+    font-size: 26px !important;
+    line-height: 1 !important;
+}
+
+.payment-registry-check-card.is-ready strong {
+    color: #22c55e !important;
+}
+
+.payment-registry-check-card.is-error strong {
+    color: #ef4444 !important;
+}
+
+.payment-registry-check-card.is-warning strong {
+    color: #f59e0b !important;
+}
+
+.payment-registry-detail-card {
+    margin-bottom: 22px !important;
+    padding: 22px !important;
+}
+
+/* === Invoice partial payments UI === */
+
+.invoice-payment-panel {
+    margin-top: 24px;
+    padding: 22px;
+    border-radius: 22px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(15, 23, 42, 0.72);
+}
+
+.payment-panel-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.payment-panel-header h2 {
+    margin: 0 0 6px;
+    color: #f8fafc;
+    font-size: 22px;
+}
+
+.payment-panel-header p {
+    margin: 0;
+    color: #94a3b8;
+}
+
+.payment-summary-card {
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.payment-summary-card span {
+    display: block;
+    margin-bottom: 8px;
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.payment-summary-card strong {
+    color: #f8fafc;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.invoice-preview .invoice-payment-left-panel {
+    display: none !important;
+}

@@ -1,0 +1,1697 @@
+/*
+ * ERP Zarya35 — components / tables
+ *
+ * Стили скопированы из legacy style.css.
+ * На этом этапе style.css ещё не очищаем.
+ */
+
+/* =========================================================
+   Project Zarya Enterprise — clean unified UI stylesheet
+   Replace: D:\Project_Zarya\static\css\style.css
+   No Tailwind output, no inline-style dependencies.
+========================================================= */
+
+:root {
+    --z-bg: #070908;
+    --z-bg-2: #0b0f0d;
+    --z-sidebar: #0e1512;
+    --z-surface: #101512;
+    --z-surface-2: #141a17;
+    --z-surface-3: #18211c;
+    --z-border: rgba(255, 255, 255, .105);
+    --z-border-2: rgba(39, 174, 96, .28);
+    --z-text: #f4f7f5;
+    --z-muted: #9ca8a1;
+    --z-muted-2: #6f7d75;
+    --z-accent: #27ae60;
+    --z-accent-2: #2ee878;
+    --z-warning: #f59e0b;
+    --z-danger: #ef4444;
+    --z-info: #60a5fa;
+    --z-radius: 18px;
+    --z-radius-sm: 12px;
+    --z-shadow: 0 18px 60px rgba(0, 0, 0, .32);
+    --z-sidebar-width: 280px;
+    --z-topbar-height: 72px;
+    --z-font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    overflow-x: hidden;
+    background: var(--z-bg);
+    color: var(--z-text);
+    font-family: var(--z-font);
+    font-size: 14px;
+    line-height: 1.55;
+    text-rendering: geometricPrecision;
+}
+
+img,
+svg,
+canvas {
+    max-width: 100%;
+}
+
+/* =========================================================
+   Layout
+========================================================= */
+
+.layout,
+.app-shell,
+.app-layout {
+    display: grid;
+    grid-template-columns: var(--z-sidebar-width) minmax(0, 1fr);
+    min-height: 100vh;
+    width: 100%;
+}
+
+.sidebar::-webkit-scrollbar,
+.table-scroll::-webkit-scrollbar,
+#pdf-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.table-scroll::-webkit-scrollbar-thumb,
+#pdf-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, .14);
+    border-radius: 999px;
+}
+
+.brand-icon,
+.sidebar-logo::before {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #25bf68, #15803d);
+    color: #ffffff;
+    font-weight: 950;
+    box-shadow: 0 10px 34px rgba(39, 174, 96, .24);
+}
+
+.nav-icon {
+    width: 18px;
+    color: var(--z-accent-2);
+    text-align: center;
+}
+
+.main,
+.main-content,
+.app-main {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.page,
+.content-area,
+.page-content {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 36px;
+}
+
+.page-subtitle,
+.page-header p {
+    max-width: 920px;
+    margin: 10px 0 0;
+    color: var(--z-muted);
+    font-size: 15px;
+}
+
+.strong-link,
+.file-link,
+.invoice-id-link,
+.table a:not(.btn) {
+    color: var(--z-accent-2);
+    font-weight: 800;
+}
+
+.strong-link:hover,
+.file-link:hover,
+.invoice-id-link:hover,
+.table a:not(.btn):hover {
+    text-decoration: underline;
+}
+
+.section-title-row,
+.registry-table-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.section-title-row h3,
+.registry-table-header h3 {
+    margin: 0;
+    color: var(--z-text);
+    font-size: 17px;
+    line-height: 1.25;
+    font-weight: 900;
+}
+
+.section-title-row span,
+.registry-table-header span {
+    display: block;
+    margin-top: 4px;
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.empty-state,
+.empty-table {
+    padding: 28px;
+    color: var(--z-muted);
+    text-align: center;
+    border: 1px dashed var(--z-border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .025);
+}
+
+.empty-table {
+    min-height: 84px;
+}
+
+.form-control,
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 14px;
+    border: 1px solid var(--z-border);
+    border-radius: 12px;
+    background: var(--z-surface-2);
+    color: var(--z-text);
+    outline: none;
+    transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+}
+
+input[type="file"]::file-selector-button {
+    min-width: 160px;
+    height: 36px;
+    padding: 8px 14px;
+    margin-right: 14px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--z-accent);
+    color: #ffffff;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+.alert::before {
+    content: "i";
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .12);
+    font-weight: 900;
+}
+
+.table-scroll-fit {
+    overflow-x: hidden;
+}
+
+.table,
+.registry-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--z-text);
+}
+
+.registry-table th {
+    padding: 13px 14px;
+    background: rgba(255, 255, 255, .045);
+    color: var(--z-muted);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.registry-table td {
+    padding: 16px 14px;
+    border-top: 1px solid var(--z-border);
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+}
+
+.registry-table tbody tr:hover td {
+    background: rgba(255, 255, 255, .018);
+}
+
+.dashboard-hero h2 {
+    max-width: 760px;
+    margin: 0;
+    font-size: 34px;
+    line-height: 1.1;
+    font-weight: 950;
+    letter-spacing: -.035em;
+}
+
+.dashboard-hero p {
+    max-width: 760px;
+    margin: 12px 0 0;
+    color: var(--z-muted);
+}
+
+.quick-action-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+}
+
+.process-item > span,
+.upload-step > span {
+    width: 38px;
+    height: 38px;
+}
+
+.dashboard-latest-table {
+    min-width: 780px;
+}
+
+.upload-dropzone-icon {
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: rgba(39, 174, 96, .18);
+    color: var(--z-accent-2);
+    font-size: 28px;
+    font-weight: 950;
+}
+
+.upload-dropzone input[type="file"],
+.import-dropzone input[type="file"],
+.upload-file-input {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 54px;
+    display: block;
+    padding: 10px;
+    overflow: visible;
+    white-space: nowrap;
+}
+
+.upload-dropzone input[type="file"]::file-selector-button,
+.import-dropzone input[type="file"]::file-selector-button {
+    min-width: 170px;
+    height: 36px;
+    padding: 8px 16px;
+    margin-right: 14px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   Invoice list and detail
+========================================================= */
+
+.invoice-table-compact,
+.schedule-table,
+.unmatched-table,
+.missing-requisites-table,
+.counterparty-invoices-table {
+    min-width: 0 !important;
+    table-layout: fixed;
+}
+
+.invoice-file-link {
+    display: block;
+    max-width: 100%;
+    margin-top: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.table-actions-vertical {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.table-actions-vertical .btn {
+    width: 100%;
+}
+
+.invoice-detail-left,
+.invoice-detail-right {
+    min-width: 0;
+}
+
+.info-row-vertical > div,
+.info-row-vertical > strong {
+    max-width: 68%;
+}
+
+#zoom-value {
+    min-width: 64px;
+    text-align: center;
+    font-weight: 900;
+}
+
+#pdf-container {
+    width: 100%;
+    max-height: calc(100vh - 210px);
+    overflow: auto;
+    padding: 18px;
+    border: 1px solid var(--z-border);
+    border-radius: 16px;
+    background: #f3f4f2;
+}
+
+#pdf-container canvas {
+    display: block;
+    max-width: 100%;
+    height: auto !important;
+    margin: 0 auto 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, .18);
+}
+
+.preview-image {
+    width: 100%;
+    border: 1px solid var(--z-border);
+    border-radius: 16px;
+}
+
+.schedule-row-overdue td { background: rgba(239, 68, 68, .045); }
+
+.schedule-row-today td { background: rgba(245, 158, 11, .045); }
+
+.missing-requisites-table th:nth-child(1),
+.missing-requisites-table td:nth-child(1) { width: 28%; }
+
+.missing-requisites-table th:nth-child(2),
+.missing-requisites-table td:nth-child(2) { width: 16%; }
+
+.missing-requisites-table th:nth-child(3),
+.missing-requisites-table td:nth-child(3) { width: 22%; }
+
+.missing-requisites-table th:nth-child(4),
+.missing-requisites-table td:nth-child(4) { width: 110px; }
+
+.missing-requisites-table th:nth-child(5),
+.missing-requisites-table td:nth-child(5) { width: 170px; }
+
+.missing-requisites-table th:nth-child(6),
+.missing-requisites-table td:nth-child(6) { width: 90px; }
+
+.missing-requisites-table th:nth-child(7),
+.missing-requisites-table td:nth-child(7) { width: 140px; }
+
+.counterparty-card-actions .btn {
+    width: 100%;
+}
+
+.counterparty-invoices-table th:nth-child(1),
+.counterparty-invoices-table td:nth-child(1) { width: 72px; }
+
+.counterparty-invoices-table th:nth-child(2),
+.counterparty-invoices-table td:nth-child(2) { width: 34%; }
+
+.counterparty-invoices-table th:nth-child(3),
+.counterparty-invoices-table td:nth-child(3) { width: 150px; }
+
+.counterparty-invoices-table th:nth-child(4),
+.counterparty-invoices-table td:nth-child(4) { width: 150px; }
+
+.counterparty-invoices-table th:nth-child(5),
+.counterparty-invoices-table td:nth-child(5) { width: 150px; }
+
+.counterparty-invoices-table th:nth-child(6),
+.counterparty-invoices-table td:nth-child(6) { width: 180px; }
+
+/* =========================================================
+   Column widths for compact tables
+========================================================= */
+
+.invoice-table-compact th:nth-child(1),
+.invoice-table-compact td:nth-child(1) { width: 70px; }
+
+.invoice-table-compact th:nth-child(2),
+.invoice-table-compact td:nth-child(2) { width: 26%; }
+
+.invoice-table-compact th:nth-child(3),
+.invoice-table-compact td:nth-child(3) { width: 29%; }
+
+.invoice-table-compact th:nth-child(4),
+.invoice-table-compact td:nth-child(4) { width: 110px; }
+
+.invoice-table-compact th:nth-child(5),
+.invoice-table-compact td:nth-child(5) { width: 150px; }
+
+.invoice-table-compact th:nth-child(6),
+.invoice-table-compact td:nth-child(6) { width: 145px; }
+
+.invoice-table-compact th:nth-child(7),
+.invoice-table-compact td:nth-child(7) { width: 120px; }
+
+.schedule-table th:nth-child(1),
+.schedule-table td:nth-child(1) { width: 70px; }
+
+.schedule-table th:nth-child(2),
+.schedule-table td:nth-child(2) { width: 30%; }
+
+.schedule-table th:nth-child(3),
+.schedule-table td:nth-child(3) { width: 140px; }
+
+.schedule-table th:nth-child(4),
+.schedule-table td:nth-child(4) { width: 150px; }
+
+.schedule-table th:nth-child(5),
+.schedule-table td:nth-child(5) { width: 160px; }
+
+.schedule-table th:nth-child(6),
+.schedule-table td:nth-child(6) { width: 100px; }
+
+.schedule-table th:nth-child(7),
+.schedule-table td:nth-child(7) { width: 140px; }
+
+.schedule-table th:nth-child(8),
+.schedule-table td:nth-child(8) { width: 120px; }
+
+.unmatched-table th:nth-child(1),
+.unmatched-table td:nth-child(1) { width: 34%; }
+
+.unmatched-table th:nth-child(2),
+.unmatched-table td:nth-child(2) { width: 90px; }
+
+.unmatched-table th:nth-child(3),
+.unmatched-table td:nth-child(3) { width: 160px; }
+
+.unmatched-table th:nth-child(4),
+.unmatched-table td:nth-child(4) { width: 22%; }
+
+.unmatched-table th:nth-child(5),
+.unmatched-table td:nth-child(5) { width: 28%; }
+
+/* =========================================================
+   Responsive
+========================================================= */
+
+@media (max-width: 1400px) {
+    .counterparty-details-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .counterparty-detail-wide {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 860px) {
+    .topbar {
+        height: auto;
+        min-height: 74px;
+        padding-top: 14px;
+        padding-bottom: 14px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .page,
+    .content-area,
+    .page-content {
+        padding: 22px;
+    }
+
+    .page-header,
+    .section-title-row,
+    .registry-table-header,
+    .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .info-row > strong,
+    .info-row > div,
+    .info-row-vertical > div,
+    .info-row-vertical > strong {
+        max-width: 100%;
+        text-align: left;
+    }
+}
+
+@media (max-width: 520px) {
+    .page,
+    .content-area,
+    .page-content {
+        padding: 16px;
+    }
+
+    .card,
+    .content-card {
+        padding: 18px;
+    }
+}
+
+.upload-result-table {
+    min-width: 620px;
+}
+
+.upload-result-table th:first-child,
+.upload-result-table td:first-child {
+    width: 80px;
+}
+
+/* =========================================================
+   ZARYA UI PATCH v16 — upload duplicate links
+========================================================= */
+
+.upload-result-duplicate-table {
+    min-width: 820px;
+}
+
+.upload-result-duplicate-table th:nth-child(1),
+.upload-result-duplicate-table td:nth-child(1) {
+    width: 70px;
+}
+
+.upload-result-duplicate-table th:nth-child(2),
+.upload-result-duplicate-table td:nth-child(2) {
+    width: 34%;
+}
+
+.upload-result-duplicate-table th:nth-child(3),
+.upload-result-duplicate-table td:nth-child(3) {
+    width: 36%;
+}
+
+.upload-result-duplicate-table th:nth-child(4),
+.upload-result-duplicate-table td:nth-child(4) {
+    width: 150px;
+}
+
+.btn.is-loading::after {
+    content: "";
+    width: 12px;
+    height: 12px;
+    margin-left: 8px;
+    display: inline-block;
+    border-radius: 999px;
+    border: 2px solid rgba(255, 255, 255, .45);
+    border-top-color: #ffffff;
+    animation: zarya-spin .75s linear infinite;
+}
+
+/* =========================================================
+   ZARYA UI PATCH — upload batches
+========================================================= */
+
+.upload-batches-table {
+    min-width: 980px;
+}
+
+.upload-batches-table th:nth-child(1),
+.upload-batches-table td:nth-child(1) {
+    width: 70px;
+}
+
+.upload-batches-table th:nth-child(2),
+.upload-batches-table td:nth-child(2) {
+    width: 140px;
+}
+
+.upload-batches-table th:nth-child(3),
+.upload-batches-table td:nth-child(3) {
+    width: 150px;
+}
+
+.upload-batches-table th:nth-child(4),
+.upload-batches-table td:nth-child(4) {
+    width: 170px;
+}
+
+.upload-batches-table th:nth-child(5),
+.upload-batches-table td:nth-child(5),
+.upload-batches-table th:nth-child(6),
+.upload-batches-table td:nth-child(6),
+.upload-batches-table th:nth-child(7),
+.upload-batches-table td:nth-child(7),
+.upload-batches-table th:nth-child(8),
+.upload-batches-table td:nth-child(8) {
+    width: 100px;
+}
+
+.upload-batches-table th:nth-child(9),
+.upload-batches-table td:nth-child(9) {
+    width: 120px;
+}
+
+.upload-batch-invoices-table {
+    min-width: 920px;
+}
+
+@media (max-width: 900px) {
+    .upload-batch-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .upload-batch-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+.bulk-select-column {
+    width: 44px;
+    min-width: 44px;
+    text-align: center;
+}
+
+.bulk-select-column input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.registry-table-header .registry-actions button {
+    white-space: nowrap;
+}
+
+.ocr-queue-table {
+    min-width: 1120px;
+}
+
+.ocr-queue-table th:nth-child(1),
+.ocr-queue-table td:nth-child(1) {
+    width: 70px;
+}
+
+.ocr-queue-table th:nth-child(2),
+.ocr-queue-table td:nth-child(2) {
+    width: 130px;
+}
+
+.ocr-queue-table th:nth-child(3),
+.ocr-queue-table td:nth-child(3) {
+    width: 260px;
+}
+
+.ocr-queue-table th:nth-child(4),
+.ocr-queue-table td:nth-child(4) {
+    width: 130px;
+}
+
+.ocr-queue-table th:nth-child(5),
+.ocr-queue-table td:nth-child(5) {
+    width: 150px;
+}
+
+.ocr-queue-table th:nth-child(6),
+.ocr-queue-table td:nth-child(6) {
+    width: 90px;
+}
+
+.queue-message {
+    max-width: 420px;
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+@media (max-width: 900px) {
+    .ocr-worker-help-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================================
+   ZARYA UI READABILITY PASS v1
+   Better font readability, contrast and table density
+========================================================= */
+
+:root {
+    --z-font: "Segoe UI", Inter, Arial, sans-serif;
+    --z-text: #f7faf8;
+    --z-muted: #b7c2bc;
+    --z-muted-2: #8f9d95;
+}
+
+.page-subtitle,
+.page-header p,
+.topbar-subtitle,
+.muted,
+.registry-table-header span,
+.section-title-row span {
+    color: var(--z-muted);
+}
+
+.registry-table th {
+    color: #c8d2cc;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .035em;
+}
+
+.registry-table td {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.registry-table td strong {
+    font-weight: 760;
+}
+
+@media (max-width: 1280px) {
+    body {
+        font-size: 14px;
+    }
+}
+
+/* =========================================================
+   ZARYA UI POLISH PASS v2
+   Font weight, table columns, profile/system readability
+========================================================= */
+
+:root {
+    --z-font: "Segoe UI", Arial, sans-serif;
+    --z-text: #f2f6f3;
+    --z-muted: #b8c4bd;
+    --z-muted-2: #98a79f;
+}
+
+.section-title-row h3,
+.registry-table-header h3,
+.card h3,
+.content-card h3 {
+    font-weight: 750;
+}
+
+/* Tables: readable and not too heavy */
+
+.registry-table th {
+    color: #c8d4ce;
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: .025em;
+}
+
+.registry-table td {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.registry-table td strong {
+    font-weight: 650;
+}
+
+/* Fix invoice table after checkbox column was added */
+
+.invoice-table-compact {
+    table-layout: fixed;
+}
+
+.invoice-table-compact th:nth-child(1),
+.invoice-table-compact td:nth-child(1) {
+    width: 44px;
+}
+
+.invoice-table-compact th:nth-child(2),
+.invoice-table-compact td:nth-child(2) {
+    width: 72px;
+}
+
+.invoice-table-compact th:nth-child(3),
+.invoice-table-compact td:nth-child(3) {
+    width: 28%;
+}
+
+.invoice-table-compact th:nth-child(4),
+.invoice-table-compact td:nth-child(4) {
+    width: 26%;
+}
+
+.invoice-table-compact th:nth-child(5),
+.invoice-table-compact td:nth-child(5) {
+    width: 110px;
+}
+
+.invoice-table-compact th:nth-child(6),
+.invoice-table-compact td:nth-child(6) {
+    width: 160px;
+}
+
+.invoice-table-compact th:nth-child(7),
+.invoice-table-compact td:nth-child(7) {
+    width: 125px;
+}
+
+.invoice-table-compact th:nth-child(8),
+.invoice-table-compact td:nth-child(8) {
+    width: 100px;
+}
+
+.invoice-table-compact td:nth-child(4),
+.invoice-table-compact td:nth-child(5) {
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.invoice-table-compact .btn-sm {
+    min-width: 74px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* Muted text should be readable, not dim */
+
+.muted,
+.page-subtitle,
+.page-header p,
+.topbar-subtitle,
+.registry-table-header span,
+.section-title-row span,
+.card p {
+    color: var(--z-muted);
+}
+
+/* Profile / System pages: make raw content look closer to app style */
+
+.page-content > form,
+.content-area > form,
+.main-content > form {
+    max-width: 100%;
+}
+
+/* Reduce oversized white visual weight */
+
+.text-success,
+.amount-main,
+.strong-link,
+.file-link,
+.invoice-id-link,
+.table a:not(.btn) {
+    font-weight: 650;
+}
+
+/* Mobile/tablet keeps horizontal scroll instead of broken columns */
+
+@media (max-width: 1280px) {
+    .invoice-table-compact {
+        min-width: 1120px !important;
+    }
+}
+
+.profile-avatar {
+    width: 64px;
+    height: 64px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #27ae60, #15803d);
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.profile-form-fields input,
+.profile-form-fields select,
+.profile-form-fields textarea {
+    width: 100%;
+}
+
+@media (max-width: 1280px) {
+    .profile-page-grid,
+    .system-page-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    .system-kv-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-avatar-block {
+        grid-template-columns: 1fr;
+    }
+}
+
+.system-backups-table {
+    min-width: 860px;
+}
+
+.system-backups-table th:nth-child(1),
+.system-backups-table td:nth-child(1) {
+    width: auto;
+}
+
+.system-backups-table th:nth-child(2),
+.system-backups-table td:nth-child(2) {
+    width: 140px;
+}
+
+.system-backups-table th:nth-child(3),
+.system-backups-table td:nth-child(3) {
+    width: 230px;
+}
+
+.system-versions-table {
+    min-width: 820px;
+}
+
+.system-versions-table th:nth-child(1),
+.system-versions-table td:nth-child(1) {
+    width: 120px;
+}
+
+.system-versions-table th:nth-child(2),
+.system-versions-table td:nth-child(2) {
+    width: 150px;
+}
+
+.system-maintenance-icon {
+    width: 56px;
+    height: 56px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: rgba(39, 174, 96, .14);
+    border: 1px solid rgba(39, 174, 96, .24);
+    color: var(--z-accent-2);
+    font-weight: 800;
+}
+
+@media (max-width: 1280px) {
+    .system-maintenance-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .system-inner-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .system-maintenance-actions .btn {
+        width: 100%;
+    }
+}
+
+/* Legacy tables used by older templates */
+.zarya-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--z-text);
+}
+
+.zarya-table th {
+    padding: 13px 14px;
+    background: rgba(255, 255, 255, .045);
+    color: #c8d4ce;
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: .025em;
+    text-transform: uppercase;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.zarya-table td {
+    padding: 16px 14px;
+    border-top: 1px solid var(--z-border);
+    vertical-align: middle;
+    font-size: 14px;
+    font-weight: 400;
+    overflow-wrap: anywhere;
+}
+
+.zarya-table tbody tr:hover td {
+    background: rgba(255, 255, 255, .018);
+}
+
+/* Legacy upload blocks */
+.upload-wrapper {
+    width: 100%;
+}
+
+.audit-table-wrap {
+    overflow-x: auto;
+}
+
+.audit-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.audit-table th,
+.audit-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    text-align: left;
+    vertical-align: top;
+    font-size: 14px;
+}
+
+.audit-table th {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted-text, #64748b);
+    background: rgba(148, 163, 184, 0.08);
+}
+
+.audit-table,
+.audit-table td,
+.audit-table strong {
+    color: #0f172a;
+}
+
+.audit-table th {
+    color: #475569;
+}
+
+.audit-table td {
+    background: #ffffff;
+}
+
+.audit-table tbody tr:hover td {
+    background: #f8fafc;
+}
+
+.payment-schedule-table th,
+.payment-schedule-table td {
+    vertical-align: top;
+}
+
+.schedule-row-overdue td {
+    background: #fff1f2;
+}
+
+.schedule-row-today td {
+    background: #fffbeb;
+}
+
+.payment-schedule-summary .registry-summary-card {
+    min-width: 0 !important;
+}
+
+.payment-schedule-table th,
+.payment-schedule-table td {
+    white-space: nowrap;
+}
+
+.payment-schedule-table td:nth-child(2),
+.payment-schedule-table td:nth-child(3) {
+    white-space: normal;
+    min-width: 220px;
+}
+
+.payment-date-control .form-control {
+    min-width: 0 !important;
+}
+
+.payment-date-open {
+    width: 46px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(148, 163, 184, 0.35) !important;
+    background: rgba(15, 23, 42, 0.92) !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    font-size: 16px !important;
+}
+
+@media (max-width: 1400px) {
+    .payment-date-tools {
+        grid-column: span 4 !important;
+    }
+}
+
+/* === Payment schedule overdue dark theme fix === */
+
+.payment-schedule-table .schedule-row-overdue td {
+    background: rgba(127, 29, 29, 0.26) !important;
+    color: #f8fafc !important;
+    border-bottom-color: rgba(248, 113, 113, 0.22) !important;
+}
+
+.payment-schedule-table .schedule-row-overdue td:first-child {
+    border-left: 4px solid #ef4444 !important;
+}
+
+.payment-schedule-table .schedule-row-overdue a,
+.payment-schedule-table .schedule-row-overdue strong,
+.payment-schedule-table .schedule-row-overdue .muted,
+.payment-schedule-table .schedule-row-overdue .amount-main {
+    color: #f8fafc !important;
+}
+
+.payment-schedule-table .schedule-row-overdue .amount-main {
+    color: #86efac !important;
+}
+
+.payment-schedule-table .schedule-row-overdue:hover td {
+    background: rgba(127, 29, 29, 0.38) !important;
+}
+
+.payment-schedule-table .schedule-row-today td {
+    background: rgba(146, 64, 14, 0.22) !important;
+    color: #f8fafc !important;
+}
+
+.payment-schedule-table .schedule-row-today td:first-child {
+    border-left: 4px solid #f59e0b !important;
+}
+
+.payment-schedule-table .schedule-row-today a,
+.payment-schedule-table .schedule-row-today strong,
+.payment-schedule-table .schedule-row-today .muted,
+.payment-schedule-table .schedule-row-today .amount-main {
+    color: #f8fafc !important;
+}
+
+.payment-schedule-table .schedule-row-today .amount-main {
+    color: #86efac !important;
+}
+
+.payment-schedule-table .schedule-row-today:hover td {
+    background: rgba(146, 64, 14, 0.32) !important;
+}
+
+.registry-page-header > div:first-child {
+    min-width: 0 !important;
+    max-width: 860px !important;
+}
+
+.payment-schedule-summary {
+    margin-top: 0 !important;
+    clear: both !important;
+}
+
+@media (max-width: 1100px) {
+    .registry-page-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .registry-page-header .registry-actions {
+        justify-content: flex-start !important;
+        margin-top: 0 !important;
+    }
+}
+
+.registry-table-header {
+    gap: 20px !important;
+}
+
+.registry-table-header .registry-actions {
+    display: flex !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+}
+
+.registry-table-header .registry-actions .btn {
+    min-height: 42px !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+}
+
+.payment-registry-add-form .btn {
+    width: 100% !important;
+}
+
+.payment-registry-draft-table-wrap {
+    overflow-x: auto !important;
+}
+
+.payment-registry-draft-table th,
+.payment-registry-draft-table td {
+    white-space: nowrap !important;
+}
+
+.payment-registry-draft-table td:nth-child(2) {
+    white-space: normal !important;
+    min-width: 240px !important;
+}
+
+@media (max-width: 900px) {
+    .payment-registry-draft-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .payment-registry-draft-actions {
+        justify-content: flex-start !important;
+    }
+
+    .payment-registry-bulk-actions .btn {
+        width: 100% !important;
+    }
+}
+
+.payment-registry-draft-table th:last-child,
+.payment-registry-draft-table td:last-child {
+    text-align: right !important;
+}
+
+@media (max-width: 1000px) {
+    .payment-registry-check-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .payment-registry-check-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .payment-registry-check-cards {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.payment-registry-history-table th,
+.payment-registry-history-table td {
+    white-space: nowrap !important;
+}
+
+.payment-registry-history-table td:nth-child(2) {
+    white-space: normal !important;
+    min-width: 260px !important;
+}
+
+.payment-registry-detail-table th,
+.payment-registry-detail-table td {
+    white-space: nowrap !important;
+}
+
+.payment-registry-detail-table td:nth-child(2) {
+    white-space: normal !important;
+    min-width: 280px !important;
+}
+
+@media (max-width: 1200px) {
+    .payment-registry-detail-summary,
+    .payment-registry-meta-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 700px) {
+    .payment-registry-detail-summary,
+    .payment-registry-meta-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .payment-registry-detail-head {
+        flex-direction: column !important;
+    }
+
+    .payment-registry-detail-actions {
+        justify-content: flex-start !important;
+    }
+}
+
+/* === Payment registry history table layout fix === */
+
+.payment-registry-history-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+.payment-registry-history-table th,
+.payment-registry-history-table td {
+    padding: 14px 16px !important;
+    vertical-align: middle !important;
+    text-align: left !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12) !important;
+}
+
+.payment-registry-history-table th {
+    color: #cbd5e1 !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.02em !important;
+}
+
+.payment-registry-history-table td {
+    color: #f8fafc !important;
+    font-size: 14px !important;
+}
+
+.payment-registry-history-table th:nth-child(1),
+.payment-registry-history-table td:nth-child(1) {
+    width: 70px !important;
+}
+
+.payment-registry-history-table th:nth-child(2),
+.payment-registry-history-table td:nth-child(2) {
+    width: 300px !important;
+    white-space: normal !important;
+}
+
+.payment-registry-history-table th:nth-child(3),
+.payment-registry-history-table td:nth-child(3) {
+    width: 130px !important;
+}
+
+.payment-registry-history-table th:nth-child(4),
+.payment-registry-history-table td:nth-child(4) {
+    width: 90px !important;
+    text-align: center !important;
+}
+
+.payment-registry-history-table th:nth-child(5),
+.payment-registry-history-table td:nth-child(5) {
+    width: 150px !important;
+    text-align: right !important;
+}
+
+.payment-registry-history-table th:nth-child(6),
+.payment-registry-history-table td:nth-child(6) {
+    width: 120px !important;
+}
+
+.payment-registry-history-table th:nth-child(7),
+.payment-registry-history-table td:nth-child(7) {
+    width: 170px !important;
+}
+
+.payment-registry-history-table th:nth-child(8),
+.payment-registry-history-table td:nth-child(8) {
+    width: 120px !important;
+}
+
+.payment-registry-history-table th:nth-child(9),
+.payment-registry-history-table td:nth-child(9) {
+    width: 170px !important;
+}
+
+.payment-registry-history-table .registry-detail-link,
+.payment-registry-history-table .registry-detail-title {
+    display: inline-block !important;
+    max-width: 100% !important;
+    color: #22c55e !important;
+    font-weight: 900 !important;
+    text-decoration: none !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.payment-registry-history-table .registry-detail-title {
+    white-space: normal !important;
+}
+
+@media (max-width: 1300px) {
+    .payment-registry-history-table {
+        min-width: 1200px !important;
+    }
+}
+
+/* === Payment registry tables readability fix === */
+
+.payment-registry-check-panel {
+    padding: 18px !important;
+}
+
+.payment-registry-check-row a {
+    display: inline-flex !important;
+    align-items: center !important;
+    width: max-content !important;
+    max-width: 100% !important;
+    color: #22c55e !important;
+    font-weight: 900 !important;
+    white-space: nowrap !important;
+}
+
+/* Общий вид таблиц реестра */
+
+.payment-registry-draft-table,
+.payment-registry-detail-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+.payment-registry-draft-table thead th,
+.payment-registry-detail-table thead th {
+    padding: 14px 16px !important;
+    background: rgba(15, 23, 42, 0.52) !important;
+    color: #cbd5e1 !important;
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.16) !important;
+}
+
+.payment-registry-draft-table tbody td,
+.payment-registry-detail-table tbody td {
+    padding: 14px 16px !important;
+    vertical-align: middle !important;
+    color: #f8fafc !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.10) !important;
+}
+
+.payment-registry-draft-table tbody tr:hover td,
+.payment-registry-detail-table tbody tr:hover td {
+    background: rgba(34, 197, 94, 0.06) !important;
+}
+
+.payment-registry-draft-table tbody tr:last-child td,
+.payment-registry-detail-table tbody tr:last-child td {
+    border-bottom: 0 !important;
+}
+
+/* Колонки таблицы черновика */
+
+.payment-registry-draft-table th:nth-child(1),
+.payment-registry-draft-table td:nth-child(1) {
+    width: 140px !important;
+}
+
+.payment-registry-draft-table th:nth-child(2),
+.payment-registry-draft-table td:nth-child(2) {
+    width: auto !important;
+    white-space: normal !important;
+}
+
+.payment-registry-draft-table th:nth-child(3),
+.payment-registry-draft-table td:nth-child(3) {
+    width: 150px !important;
+    text-align: right !important;
+}
+
+.payment-registry-draft-table th:nth-child(4),
+.payment-registry-draft-table td:nth-child(4) {
+    width: 150px !important;
+}
+
+.payment-registry-draft-table th:nth-child(5),
+.payment-registry-draft-table td:nth-child(5) {
+    width: 140px !important;
+}
+
+.payment-registry-draft-table th:nth-child(6),
+.payment-registry-draft-table td:nth-child(6) {
+    width: 120px !important;
+    text-align: right !important;
+}
+
+/* Колонки детальной таблицы */
+
+.payment-registry-detail-table th:nth-child(1),
+.payment-registry-detail-table td:nth-child(1) {
+    width: 140px !important;
+}
+
+.payment-registry-detail-table th:nth-child(2),
+.payment-registry-detail-table td:nth-child(2) {
+    width: auto !important;
+    white-space: normal !important;
+}
+
+.payment-registry-detail-table th:nth-child(3),
+.payment-registry-detail-table td:nth-child(3) {
+    width: 160px !important;
+    text-align: right !important;
+}
+
+.payment-registry-detail-table th:nth-child(4),
+.payment-registry-detail-table td:nth-child(4) {
+    width: 150px !important;
+}
+
+.payment-registry-detail-table th:nth-child(5),
+.payment-registry-detail-table td:nth-child(5) {
+    width: 150px !important;
+}
+
+.payment-registry-detail-table th:nth-child(6),
+.payment-registry-detail-table td:nth-child(6) {
+    width: 140px !important;
+}
+
+.payment-registry-draft-table a,
+.payment-registry-detail-table a {
+    color: #22c55e !important;
+    font-weight: 900 !important;
+    text-decoration: none !important;
+}
+
+.payment-registry-draft-table a:hover,
+.payment-registry-detail-table a:hover {
+    text-decoration: underline !important;
+}
+
+.payment-registry-draft-table .muted,
+.payment-registry-detail-table .muted {
+    margin-top: 4px !important;
+    color: #94a3b8 !important;
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+}
+
+.payment-registry-draft-table td strong,
+.payment-registry-detail-table td strong {
+    color: #f8fafc !important;
+    font-weight: 900 !important;
+}
+
+.payment-registry-draft-table td:nth-child(3) strong,
+.payment-registry-detail-table td:nth-child(3) strong {
+    color: #86efac !important;
+}
+
+/* Мобильная и средняя ширина */
+
+@media (max-width: 1300px) {
+    .payment-registry-draft-table,
+    .payment-registry-detail-table {
+        min-width: 1050px !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .payment-registry-check-row {
+        grid-template-columns: 1fr !important;
+        gap: 6px !important;
+        align-items: start !important;
+    }
+
+    .payment-registry-check-row span {
+        white-space: normal !important;
+    }
+}
+
+.invoice-payment-table-wrap {
+    overflow-x: auto;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.invoice-payment-table {
+    width: 100%;
+    min-width: 880px;
+    border-collapse: collapse;
+}
+
+.invoice-payment-table th,
+.invoice-payment-table td {
+    padding: 13px 14px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.10);
+    color: #e5e7eb;
+    vertical-align: top;
+}
+
+.invoice-payment-table th {
+    background: rgba(15, 23, 42, 0.88);
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.invoice-payment-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.payment-complete-note,
+.table-empty {
+    padding: 14px;
+    color: #bfdbfe;
+    background: rgba(30, 64, 175, 0.12);
+    border-radius: 14px;
+    font-weight: 800;
+}
+
+@media (max-width: 1100px) {
+    .payment-summary-grid,
+    .payment-form-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    .payment-summary-grid,
+    .payment-form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* === Invoice payment left card === */
+
+.invoice-payment-left-panel {
+    grid-column: 1;
+    width: 100%;
+    margin-top: 14px;
+    padding: 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(15, 23, 42, 0.72);
+}
+
+.payment-left-form input,
+.payment-left-form textarea,
+.payment-left-form select {
+    width: 100%;
+}
+
+.payment-left-submit {
+    width: 100%;
+    justify-content: center;
+}
+
+/* === Invoice payment left column placement fix === */
+
+.invoice-info .invoice-payment-left-panel {
+    grid-column: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}

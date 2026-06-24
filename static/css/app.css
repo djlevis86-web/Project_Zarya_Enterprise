@@ -11,6 +11,7 @@
 @import url("./base/variables.css");
 @import url("./base/reset.css");
 @import url("./base/typography.css");
+@import url("./base/animations.css");
 
 /* Layout */
 @import url("./layout/shell.css");
@@ -39,9 +40,12 @@
 @import url("./features/partial-payments.css");
 @import url("./features/ocr.css");
 @import url("./features/users-roles.css");
+@import url("./features/legacy-migration.css");
 
 /*
  * Legacy CSS.
  * Временно оставляем последним, чтобы ничего визуально не сломать.
  */
-@import url("./style.css");
+/* Legacy style.css disabled during full CSS cleanup */
+/* /* Legacy style.css retired */
+/* @import url("./style.css"); */ */

@@ -1,0 +1,12 @@
+
+
+
+/* MIGRATED-LEGACY-START */
+/* Перенесено из static/css/style.css при отключении legacy. */
+
+@keyframes zarya-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+/* MIGRATED-LEGACY-END */

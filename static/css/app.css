@@ -3,8 +3,8 @@
  *
  * Правило:
  * 1. Новые стили пишем только в модульные файлы.
- * 2. Старый style.css временно остаётся как legacy.
- * 3. Постепенно переносим блоки из style.css в модули.
+ * 2. Старый legacy stylesheet временно остаётся как legacy.
+ * 3. Постепенно переносим блоки из legacy stylesheet в модули.
  */
 
 /* Base */
@@ -50,5 +50,5 @@
  * Legacy CSS.
  * Временно оставляем последним, чтобы ничего визуально не сломать.
  */
-/* Legacy style.css disabled during full CSS cleanup */
-/* /* Legacy style.css retired. Import removed intentionally. */ */
+/* Legacy legacy stylesheet disabled during full CSS cleanup */
+/* /* Legacy legacy stylesheet retired. Import removed intentionally. */ */

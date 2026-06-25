@@ -47,6 +47,7 @@
 @import url("./features/legacy-migration.css");
 @import url("./features/table-clean-baseline.css");
 @import url("./features/ui-polish-actions.css");
+@import url("./features/ui-polish-badges.css");
 /* DISABLED 20260625_075613: @import url("./features/visual-stabilizer.css"); */
 
 /*

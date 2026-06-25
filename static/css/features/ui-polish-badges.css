@@ -1,0 +1,234 @@
+
+/* =========================================================
+   ERP Zarya35 — UI polish badges v1
+   Цель:
+   - единая геометрия бейджей статусов;
+   - аккуратные карточки оплаты;
+   - одинаковые размеры "Новый", "Подтвержден", "Не оплачен",
+     "Частично оплачен", "совпадает", "отличается".
+   ========================================================= */
+
+:root {
+    --z-badge-height: 26px;
+    --z-badge-radius: 999px;
+    --z-badge-pad-x: 10px;
+    --z-badge-font-size: 12px;
+    --z-badge-font-weight: 850;
+
+    --z-payment-card-radius: 14px;
+    --z-payment-card-pad-y: 12px;
+    --z-payment-card-pad-x: 14px;
+}
+
+/* ---------- Общая геометрия бейджей ---------- */
+
+.badge,
+.status-badge,
+.payment-badge,
+.ocr-badge,
+.match-badge,
+.invoice-badge,
+.registry-badge,
+.priority-badge {
+    min-height: var(--z-badge-height);
+    width: max-content;
+    max-width: 100%;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    padding: 4px var(--z-badge-pad-x);
+    border-radius: var(--z-badge-radius);
+
+    font-size: var(--z-badge-font-size);
+    font-weight: var(--z-badge-font-weight);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+
+    white-space: nowrap;
+}
+
+/* ---------- Состояния счетов ---------- */
+
+.status-new,
+.badge-new,
+.status-badge.status-new {
+    color: #bfdbfe;
+    background: rgba(59, 130, 246, 0.18);
+    border-color: rgba(59, 130, 246, 0.22);
+}
+
+.status-approved,
+.status-confirmed,
+.status-badge.status-approved,
+.status-badge.status-confirmed {
+    color: #bbf7d0;
+    background: rgba(34, 197, 94, 0.18);
+    border-color: rgba(34, 197, 94, 0.22);
+}
+
+.status-rejected,
+.status-error,
+.status-badge.status-rejected,
+.status-badge.status-error {
+    color: #fecaca;
+    background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(239, 68, 68, 0.24);
+}
+
+/* ---------- Оплата ---------- */
+
+.payment-status-unpaid,
+.payment-unpaid,
+.badge-unpaid,
+.badge-danger,
+.status-unpaid {
+    color: #fecaca;
+    background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(239, 68, 68, 0.24);
+}
+
+.payment-status-partial,
+.payment-partial,
+.badge-partial,
+.badge-warning,
+.status-partial {
+    color: #fde68a;
+    background: rgba(245, 158, 11, 0.20);
+    border-color: rgba(245, 158, 11, 0.24);
+}
+
+.payment-status-paid,
+.payment-paid,
+.badge-paid,
+.badge-success,
+.status-paid {
+    color: #bbf7d0;
+    background: rgba(34, 197, 94, 0.18);
+    border-color: rgba(34, 197, 94, 0.22);
+}
+
+/* ---------- OCR ---------- */
+
+.ocr-match,
+.ocr-ok,
+.badge-match,
+.badge-ok,
+.match-ok {
+    color: #bbf7d0;
+    background: rgba(34, 197, 94, 0.18);
+    border-color: rgba(34, 197, 94, 0.22);
+}
+
+.ocr-mismatch,
+.ocr-error,
+.badge-mismatch,
+.badge-error,
+.match-error {
+    color: #fecaca;
+    background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(239, 68, 68, 0.24);
+}
+
+/* ---------- Карточки оплаты ---------- */
+
+.payment-mini,
+.payment-mini-list,
+.payment-mini-schedule,
+.payment-mini-registry,
+.payment-status-card {
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: var(--z-payment-card-radius);
+    background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.58), rgba(15, 23, 42, 0.38));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.03),
+        0 10px 24px rgba(0, 0, 0, 0.14);
+
+    padding: var(--z-payment-card-pad-y) var(--z-payment-card-pad-x);
+
+    display: grid;
+    gap: 7px;
+}
+
+.payment-mini-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: 10px;
+    align-items: baseline;
+}
+
+.payment-mini-row span {
+    color: rgba(226, 232, 240, 0.78);
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.payment-mini-row strong {
+    color: #f8fafc;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.payment-mini .badge,
+.payment-mini-list .badge,
+.payment-mini-schedule .badge,
+.payment-mini-registry .badge,
+.payment-status-card .badge,
+.payment-mini .payment-badge,
+.payment-mini-list .payment-badge,
+.payment-mini-schedule .payment-badge,
+.payment-mini-registry .payment-badge,
+.payment-status-card .payment-badge {
+    margin-top: 2px;
+}
+
+/* ---------- Табличная плотность ---------- */
+
+.invoice-table-compact .status-badge,
+.payment-schedule-table .status-badge,
+.payment-registry-draft-table .status-badge,
+.payment-registry-source-table .status-badge,
+.invoice-table-compact .badge,
+.payment-schedule-table .badge,
+.payment-registry-draft-table .badge,
+.payment-registry-source-table .badge {
+    min-height: 24px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+/* ---------- 15" ---------- */
+
+@media (max-width: 1599px) {
+    :root {
+        --z-badge-height: 24px;
+        --z-badge-pad-x: 9px;
+        --z-badge-font-size: 11px;
+
+        --z-payment-card-pad-y: 11px;
+        --z-payment-card-pad-x: 12px;
+    }
+
+    .payment-mini,
+    .payment-mini-list,
+    .payment-mini-schedule,
+    .payment-mini-registry,
+    .payment-status-card {
+        gap: 6px;
+    }
+
+    .payment-mini-row {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+
+    .payment-mini-row span,
+    .payment-mini-row strong {
+        display: block;
+    }
+}

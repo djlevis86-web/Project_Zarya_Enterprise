@@ -264,11 +264,22 @@
 
     </div>
 
-    <div class="table-scroll table-scroll-fit">
+    <div class="table-scroll table-scroll-fit invoice-table-wrap">
+<table class="table registry-table invoice-table invoice-table-compact">
 
-        <table class="table registry-table invoice-table invoice-table-compact">
+            
 
-            <thead>
+<colgroup>
+    <col class="col-select">
+    <col class="col-id">
+    <col class="col-document">
+    <col class="col-counterparty">
+    <col class="col-amount">
+    <col class="col-status">
+    <col class="col-payment-action">
+</colgroup>
+
+<thead>
                 <tr>
                     <th class="bulk-select-column">
                         <input
@@ -279,37 +290,27 @@
                         >
                     </th>
 
-                    <th>
+                        <th>
                         ID
                     </th>
 
-                    <th>
+                        <th>
                         Документ
                     </th>
 
-                    <th>
+                        <th>
                         Поставщик / Контрагент
                     </th>
 
-                    <th>
-                        Пользователь
-                    </th>
-
-                    <th>
+                        <th>
                         Сумма / OCR
                     </th>
 
-                    <th>
+                        <th>
                         Статус
                     </th>
 
-                    <th>
-                        Оплата
-                    </th>
-
-                    <th>
-                        Действия
-                    </th>
+                        <th class="invoice-payment-action-head">Оплата / действие</th>
                 </tr>
             </thead>
 
@@ -328,13 +329,15 @@
                             >
                         </td>
 
-                        <td>
-                            <a href="{% url 'invoice_detail' invoice.id %}">
-                                #{{ invoice.id }}
-                            </a>
-                        </td>
+                            <td class="invoice-id-cell">
 
-                        <td>
+
+                                <span class="invoice-id-text">#{{ invoice.id }}</span>
+
+
+                            </td>
+
+                            <td class="invoice-document-cell">
                             <strong>
                                 {{ invoice.title }}
                             </strong>
@@ -349,9 +352,10 @@
                                 <a
                                     href="{{ invoice.file.url }}"
                                     target="_blank"
-                                    class="file-link invoice-file-link"
+                                    class="file-link invoice-file-link invoice-file-link-compact"
+                                    title="{{ invoice.original_filename }}"
                                 >
-                                    {{ invoice.original_filename|default:"Открыть файл" }}
+                                    Файл
                                 </a>
                             {% endif %}
 
@@ -360,7 +364,7 @@
                             </div>
                         </td>
 
-                        <td>
+                            <td class="invoice-counterparty-cell">
                             {% if invoice.counterparty %}
                                 <strong>
                                     {{ invoice.counterparty.name }}
@@ -384,11 +388,7 @@
                             {% endif %}
                         </td>
 
-                        <td>
-                            {{ invoice.user.username }}
-                        </td>
-
-                        <td>
+                            <td>
                             <div class="amount-main">
                                 {{ invoice.amount|floatformat:2 }} ₽
                             </div>
@@ -414,14 +414,15 @@
                             {% endif %}
                         </td>
 
-                        <td>
+                            <td>
                             <span class="status-badge status-{{ invoice.status }}">
                                 {{ invoice.get_status_display }}
                             </span>
                         </td>
-
-                        <td>
-                            <div class="payment-mini payment-mini-list payment-mini-{{ invoice.payment_status_code }}">
+<td class="invoice-payment-action-cell">
+    <div class="invoice-payment-action-wrap">
+        <div class="invoice-payment-side">
+            <div class="payment-mini payment-mini-list payment-mini-{{ invoice.payment_status_code }}">
                                 <div class="payment-mini-row">
                                     <span>Оплачено</span>
                                     <strong>{{ invoice.payment_paid_amount|floatformat:2 }} ₽</strong>
@@ -436,10 +437,10 @@
                                     {{ invoice.payment_status_label }}
                                 </div>
                             </div>
-                        </td>
+        </div>
 
-                        <td>
-                            <div class="table-actions table-actions-vertical">
+        <div class="invoice-action-side">
+            <div class="table-actions table-actions-vertical">
                                 <a
                                     href="{% url 'invoice_detail' invoice.id %}"
                                     class="btn btn-primary btn-sm"
@@ -456,13 +457,15 @@
                                     </a>
                                 {% endif %}
                             </div>
-                        </td>
+        </div>
+    </div>
+</td>
                     </tr>
 
                 {% empty %}
 
                     <tr>
-                        <td colspan="9" class="empty-table">
+                        <td colspan="8" class="empty-table">
                             Документы отсутствуют.
                         </td>
                     </tr>
@@ -472,8 +475,7 @@
             </tbody>
 
         </table>
-
-    </div>
+</div>
 
     </form>
 

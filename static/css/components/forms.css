@@ -1,558 +1,267 @@
 /*
- * ERP Zarya35 — components / forms
+ * ERP Zarya35 — forms component.
  *
- * Стили скопированы из legacy style.css.
- * На этом этапе style.css ещё не очищаем.
+ * Здесь живёт базовая система форм:
+ * input, select, textarea, label, checkbox, radio, file, filter forms.
+ * Страничные CSS-файлы должны управлять только расположением блоков,
+ * но не внешним видом полей.
  */
 
-button,
-input,
-select,
-textarea {
-    font: inherit;
+/* Base form containers */
+
+form {
+    margin: 0;
 }
 
-.sidebar-section-title,
-.nav-group-title {
-    margin: 0 0 8px;
-    padding: 0 8px;
-    color: var(--z-muted-2);
-    font-size: 11px;
-    font-weight: 850;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-}
-
-.sidebar-nav a,
-.nav-link,
-.nav-item {
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 11px 12px;
-    border: 1px solid transparent;
-    border-radius: 13px;
-    color: var(--z-text);
-    font-weight: 740;
-    transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
-}
-
-/* =========================================================
-   Buttons, forms, messages
-========================================================= */
-
-.btn {
-    min-height: 40px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border: 1px solid var(--z-border);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, .045);
-    color: var(--z-text);
-    font-weight: 850;
-    line-height: 1;
-    cursor: pointer;
-    transition: background .16s ease, border-color .16s ease, transform .16s ease, color .16s ease;
-}
-
-.btn:hover {
-    transform: translateY(-1px);
-    color: #ffffff;
-}
-
-.form-group {
+.form-group,
+.field-group,
+.form-field {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.form-group label,
-label {
-    color: var(--z-text);
+label,
+.form-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    color: var(--z-muted-2, #b7c8bf);
     font-size: 13px;
     font-weight: 850;
+    line-height: 1.35;
 }
 
+/* Text fields */
+
+.form-control,
+input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]),
+select,
 textarea {
-    min-height: 110px;
+    width: 100%;
+    min-height: 46px;
+
+    padding: 0 14px;
+    border: 1px solid var(--z-border, rgba(255, 255, 255, .14));
+    border-radius: 13px;
+
+    background: rgba(255, 255, 255, .035);
+    color: var(--z-text, #ffffff);
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 650;
+    line-height: 1.4;
+
+    outline: none;
+    box-sizing: border-box;
+
+    transition:
+        border-color .16s ease,
+        background-color .16s ease,
+        box-shadow .16s ease;
+}
+
+textarea.form-control,
+textarea {
+    min-height: 120px;
+    padding-top: 13px;
+    padding-bottom: 13px;
     resize: vertical;
 }
 
+.form-control::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: rgba(220, 235, 226, .48);
+    font-weight: 500;
+}
+
 .form-control:focus,
-input:focus,
+input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]):focus,
 select:focus,
 textarea:focus {
-    border-color: rgba(39, 174, 96, .55);
-    box-shadow: 0 0 0 4px rgba(39, 174, 96, .12);
+    border-color: rgba(34, 197, 94, .58);
+    background: rgba(255, 255, 255, .05);
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, .08);
 }
 
-input[type="file"] {
-    min-height: 52px;
-    padding: 10px;
+/* Select */
+
+select,
+select.form-control {
+    cursor: pointer;
+    padding-right: 38px;
 }
 
-.form-error {
-    padding: 10px 12px;
-    border: 1px solid rgba(239, 68, 68, .28);
-    border-radius: 12px;
-    background: rgba(239, 68, 68, .10);
-    color: #fecaca;
-    font-size: 13px;
+/* Date inputs */
+
+input[type="date"] {
+    min-width: 190px;
 }
 
-.inline-form {
-    display: inline-flex;
-    margin: 0;
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: .72;
+    filter: invert(1);
 }
 
-.dashboard-kicker {
-    display: inline-flex;
-    margin-bottom: 12px;
-    color: var(--z-accent-2);
-    font-size: 12px;
-    font-weight: 900;
-    letter-spacing: .08em;
-    text-transform: uppercase;
+/* Hidden inputs */
+
+input[type="hidden"] {
+    display: none !important;
 }
 
-.upload-form,
-.import-form,
-.upload-side,
-.import-side {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
+/* Checkbox / radio */
+
+input[type="checkbox"],
+input[type="radio"] {
+    width: 16px !important;
+    min-width: 16px !important;
+    max-width: 16px !important;
+
+    height: 16px !important;
+    min-height: 16px !important;
+    max-height: 16px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: inline-block !important;
+    flex: 0 0 auto !important;
+    vertical-align: middle !important;
+
+    accent-color: var(--z-accent, #22c55e);
+    cursor: pointer;
 }
 
-.check-row input {
-    margin-top: 3px;
+.bulk-select-all,
+.invoice-bulk-checkbox,
+.upload-batch-bulk-checkbox {
+    width: 16px !important;
+    height: 16px !important;
 }
 
-.comment-form-clean {
-    margin-bottom: 16px;
+/* File input */
+
+input[type="file"],
+.upload-file-input {
+    min-height: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--z-text, #ffffff);
+    box-shadow: none;
 }
 
-.directory-info-item span,
-.counterparty-detail-item span {
-    display: block;
-    margin-bottom: 6px;
-    color: var(--z-muted);
-    font-size: 12px;
+input[type="file"]::file-selector-button {
+    min-height: 42px;
+    margin-right: 14px;
+    padding: 0 18px;
+
+    border: 1px solid rgba(34, 197, 94, .72);
+    border-radius: 13px;
+
+    background: var(--z-accent, #22c55e);
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 14px;
     font-weight: 850;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-}
 
-.counterparty-profile-kicker {
-    margin-bottom: 8px;
-    color: var(--z-accent-2);
-    font-size: 12px;
-    font-weight: 900;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-}
-
-/* =========================================================
-   Repeat OCR action
-========================================================= */
-
-.registry-action-form {
-    display: inline-flex;
-    margin: 0;
-}
-
-.registry-action-form .btn {
-    white-space: nowrap;
-}
-
-/* =========================================================
-   Bulk OCR actions
-========================================================= */
-
-.bulk-ocr-form {
-    margin: 0;
-}
-
-.form-group label,
-label {
-    font-weight: 760;
-    color: #e7eee9;
-}
-
-.form-control,
-input[type="text"],
-input[type="number"],
-input[type="date"],
-input[type="email"],
-input[type="password"],
-select,
-textarea {
-    font-size: 14px;
-    color: #f8faf9;
-}
-
-/* Buttons: remove excessive boldness */
-
-.btn,
-button,
-input[type="submit"],
-input[type="button"] {
-    font-weight: 650;
-    letter-spacing: 0;
-}
-
-button:not(.btn),
-input[type="submit"],
-input[type="button"] {
-    min-height: 40px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 16px;
-    border: 1px solid var(--z-border);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, .045);
-    color: var(--z-text);
     cursor: pointer;
 }
 
-button:not(.btn):hover,
-input[type="submit"]:hover,
-input[type="button"]:hover {
-    background: rgba(255, 255, 255, .075);
-    color: #ffffff;
+/* Form actions */
+
+.form-actions,
+.filter-actions,
+.inline-actions,
+.upload-actions,
+.registry-actions,
+.payment-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-/* Form readability */
+/* Inline forms */
 
-.form-control,
-input[type="text"],
-input[type="number"],
-input[type="date"],
-input[type="email"],
-input[type="password"],
-select,
-textarea {
-    font-size: 14px;
-    font-weight: 400;
-    color: #f4f7f5;
+.inline-form,
+.registry-action-form,
+.payment-cancel-form,
+.payment-registry-remove-form,
+.payment-registry-cancel-form,
+.payment-registry-paid-form,
+.payment-registry-export-form,
+.payment-registry-check-form,
+.payment-registry-add-form {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.form-group label,
-label {
-    color: #dce6e0;
+/* Filter forms */
+
+.invoice-filter-form,
+.registry-filter-form,
+.payment-schedule-filter-form,
+.counterparty-filter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
-/* Inputs on profile page should not look too heavy */
-
-select.form-control,
-select {
-    font-weight: 400;
+.invoice-filter-form-compact {
+    gap: 13px;
 }
 
-.profile-form {
+.invoice-filter-form .form-control,
+.registry-filter-form .form-control,
+.payment-schedule-filter-form .form-control,
+.counterparty-filter-form .form-control {
+    min-height: 46px;
+}
+
+/* Upload form */
+
+.upload-form {
     display: flex;
     flex-direction: column;
     gap: 18px;
 }
 
-.profile-form-fields {
-    display: grid;
-    gap: 16px;
-}
-
-.profile-form-fields p {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin: 0;
-}
-
-.profile-form-fields label {
-    color: #dce6e0;
-    font-size: 13px;
-    font-weight: 650;
-}
-
-.profile-form-fields .helptext {
-    color: var(--z-muted);
-    font-size: 12px;
-    line-height: 1.45;
-}
-
-.profile-form-fields ul.errorlist {
-    margin: 0;
-    padding: 10px 12px;
-    border: 1px solid rgba(239, 68, 68, .26);
-    border-radius: 12px;
-    background: rgba(239, 68, 68, .10);
-    color: #fecaca;
-    list-style: none;
-    font-size: 13px;
-}
-
-.system-kv-item span {
-    color: var(--z-muted);
-    font-size: 12px;
-    font-weight: 650;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-}
-
-.system-action-card {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-    padding: 14px;
-    border: 1px solid var(--z-border);
-    border-radius: 14px;
-    background: rgba(255, 255, 255, .024);
-    transition: background .16s ease, border-color .16s ease, transform .16s ease;
-}
-
-.system-action-card:hover {
-    transform: translateY(-1px);
-    border-color: rgba(39, 174, 96, .32);
-    background: rgba(39, 174, 96, .075);
-    color: var(--z-text);
-}
-
-/* =========================================================
-   ZARYA CSS CLEANUP PASS v1
-   Legacy class compatibility + duplicate cleanup
-========================================================= */
-
-/* Legacy buttons used by older templates */
-.primary-btn {
-    min-height: 40px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border: 1px solid rgba(39, 174, 96, .9);
-    border-radius: 12px;
-    background: var(--z-accent);
-    color: #ffffff;
-    font-weight: 650;
-    line-height: 1;
-    cursor: pointer;
-    transition: background .16s ease, border-color .16s ease, transform .16s ease, color .16s ease;
-}
-
-.primary-btn:hover {
-    transform: translateY(-1px);
-    background: #2bc971;
-    color: #ffffff;
-}
-
-.secondary-btn:hover {
-    transform: translateY(-1px);
-    background: rgba(255, 255, 255, .075);
-    color: #ffffff;
-}
-
-.danger-btn:hover {
-    transform: translateY(-1px);
-    background: rgba(239, 68, 68, .22);
-    color: #ffffff;
-}
-
-.payment-summary-link {
-    color: inherit;
-    text-decoration: none;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-}
-
-.payment-summary-link:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
-}
-
-.payment-summary-link.is-active,
-.payment-summary-selected {
-    border-color: #27ae60;
-    box-shadow: 0 0 0 1px rgba(39, 174, 96, 0.25);
-}
-
-/* === Payment registry add button === */
-
-.payment-registry-add-form {
-    margin: 0 !important;
-}
-
-.payment-registry-bulk-form {
-    margin: 0 !important;
-}
-
-/* === Payment registry remove from draft === */
-
-.payment-registry-remove-form {
-    margin: 0 !important;
-}
-
-.payment-registry-remove-form .btn {
-    min-height: 36px !important;
-    padding: 8px 14px !important;
-    border-radius: 10px !important;
-    font-weight: 800 !important;
-    white-space: nowrap !important;
-}
-
-/* === Payment registry check action === */
-
-.payment-registry-check-form {
-    margin: 0 !important;
-}
-
-.payment-registry-check-form .btn {
-    min-height: 42px !important;
-    border-radius: 12px !important;
-    font-weight: 800 !important;
-    white-space: nowrap !important;
-}
-
-/* === Payment registry export actions === */
-
-.payment-registry-export-form {
-    margin: 0 !important;
-}
-
-.payment-registry-export-form .btn,
-.payment-registry-draft-actions .btn[disabled] {
-    min-height: 42px !important;
-    border-radius: 12px !important;
-    font-weight: 800 !important;
-    white-space: nowrap !important;
-}
-
-/* === Payment registry paid action === */
-
-.payment-registry-paid-form {
-    margin: 0 !important;
-}
-
-.payment-registry-paid-form .btn {
-    min-height: 42px !important;
-    border-radius: 12px !important;
-    font-weight: 800 !important;
-    white-space: nowrap !important;
-}
-
-/* === Payment registry cancel action === */
-
-.payment-registry-cancel-form {
-    margin: 0 !important;
-}
-
-.payment-registry-cancel-form .btn {
-    min-height: 42px !important;
-    border-radius: 12px !important;
-    font-weight: 800 !important;
-    white-space: nowrap !important;
-}
-
-.payment-registry-remove-form .btn {
-    background: rgba(127, 29, 29, 0.72) !important;
-    border: 1px solid rgba(248, 113, 113, 0.35) !important;
-    color: #fecaca !important;
-}
-
-.payment-registry-remove-form .btn:hover {
-    background: rgba(185, 28, 28, 0.88) !important;
-    color: #ffffff !important;
-}
-
-.payment-registry-export-form,
-.payment-registry-check-form {
-    margin: 0 !important;
-}
-
-.payment-registry-export-form .btn,
-.payment-registry-check-form .btn,
-.payment-registry-draft-actions > .btn[disabled] {
-    min-height: 42px !important;
-    border-radius: 12px !important;
-    padding: 10px 18px !important;
-    font-weight: 900 !important;
-    white-space: nowrap !important;
-}
-
-.invoice-payment-form {
-    margin: 18px 0;
-    padding: 18px;
+.upload-dropzone,
+.upload-file-zone,
+.file-dropzone {
+    border: 1px dashed rgba(34, 197, 94, .48);
     border-radius: 18px;
-    background: rgba(2, 6, 23, 0.34);
-    border: 1px solid rgba(34, 197, 94, 0.18);
+    background: rgba(34, 197, 94, .045);
 }
 
-.payment-form-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(180px, 1fr));
-    gap: 14px;
-    margin-bottom: 14px;
-}
-
-.payment-form-comment {
-    grid-column: 1 / -1;
-}
-
-.payment-left-form {
-    display: grid;
-    gap: 12px;
-    margin-top: 14px;
-    padding: 14px;
-    border-radius: 16px;
-    border: 1px solid rgba(34, 197, 94, 0.16);
-    background: rgba(2, 6, 23, 0.28);
-}
-
-.payment-left-form label {
-    display: block;
-    margin-bottom: 6px;
-    color: #cbd5e1;
+.upload-help,
+.form-help,
+.help-text {
+    color: var(--z-muted, #8fa59a);
     font-size: 13px;
-    font-weight: 800;
+    line-height: 1.5;
 }
 
-/* === Invoice payment cancel button === */
-
-.payment-cancel-form {
-    margin-top: 8px;
-}
-
-.payment-cancel-form .btn {
-    min-height: 30px;
-    padding: 6px 10px;
-    border-radius: 10px;
-    font-size: 12px;
-    color: #fecaca;
-    border-color: rgba(248, 113, 113, 0.28);
-    background: rgba(127, 29, 29, 0.32);
-}
-
-.payment-cancel-form .btn:hover {
-    color: #ffffff;
-    background: rgba(185, 28, 28, 0.72);
-}
-
-
-/* LEGACY-MIGRATION-FINAL-START */
-/* Финальная переклассификация из features/legacy-migration.css. */
+/* Check rows */
 
 .check-row {
     display: grid;
-    grid-template-columns: 22px 1fr;
+    grid-template-columns: 18px 1fr;
     gap: 12px;
-    align-items: start;
+    align-items: flex-start;
+
     padding: 14px;
-    border: 1px solid var(--z-border);
+    border: 1px solid var(--z-border, rgba(255, 255, 255, .14));
     border-radius: 14px;
-    background: rgba(255, 255, 255, .025);
+
+    background: rgba(255, 255, 255, .026);
 }
 
 .check-row strong,
@@ -561,99 +270,65 @@ select {
 }
 
 .check-row small {
-    color: var(--z-muted);
+    color: var(--z-muted, #8fa59a);
     font-size: 13px;
-}
-/* LEGACY-MIGRATION-FINAL-END */
-
-/* VISUAL-STABILIZE-START */
-/*
- * Forms visual stabilization after legacy CSS removal.
- */
-
-label,
-.form-label {
-    display: block;
-    margin-bottom: 8px;
-    color: #bdd7ff;
-    font-size: 13px;
-    font-weight: 850;
+    line-height: 1.45;
 }
 
-input,
-textarea,
-select,
-.form-control {
-    width: 100%;
-    min-height: 46px;
-    padding: 12px 14px;
-    border: 1px solid rgba(148, 163, 184, 0.22);
+/* Errors */
+
+.form-error,
+.errorlist {
+    margin: 6px 0 0;
+    padding: 10px 12px;
+
+    border: 1px solid rgba(248, 113, 113, .34);
     border-radius: 12px;
-    background: rgba(15, 23, 42, 0.36);
-    color: #ffffff;
-    outline: none;
+
+    background: rgba(127, 29, 29, .22);
+    color: #fecaca;
+
+    font-size: 13px;
+    line-height: 1.45;
 }
 
-textarea {
-    min-height: 112px;
-    resize: vertical;
+.errorlist {
+    list-style: none;
 }
 
-input:focus,
-textarea:focus,
-select:focus,
-.form-control:focus {
-    border-color: rgba(39, 174, 96, 0.65);
-    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.12);
+/* Disabled */
+
+.form-control:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+    opacity: .58;
+    cursor: not-allowed;
 }
 
-.form-grid,
-.filter-grid,
-.filters-grid {
-    display: grid;
-    gap: 16px;
-}
-/* VISUAL-STABILIZE-END */
+/* Mobile */
 
-/* CHECKBOX-SIZE-FIX-START */
-/*
- * Checkbox/radio reset.
- * Общие стили input не должны раздувать чекбоксы.
- */
+@media (max-width: 760px) {
+    .form-actions,
+    .filter-actions,
+    .inline-actions,
+    .upload-actions,
+    .registry-actions,
+    .payment-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
 
-input[type="checkbox"],
-input[type="radio"] {
-    width: 18px !important;
-    min-width: 18px !important;
-    max-width: 18px !important;
-    height: 18px !important;
-    min-height: 18px !important;
-    max-height: 18px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    display: inline-block !important;
-    flex: 0 0 auto !important;
-    vertical-align: middle !important;
-    accent-color: var(--z-accent-2);
+    .form-actions .btn,
+    .filter-actions .btn,
+    .upload-actions .btn,
+    .registry-actions .btn,
+    .payment-actions .btn,
+    .form-actions .button,
+    .filter-actions .button,
+    .upload-actions .button,
+    .registry-actions .button,
+    .payment-actions .button {
+        width: 100%;
+    }
 }
-
-table input[type="checkbox"],
-table input[type="radio"],
-.data-table input[type="checkbox"],
-.list-table input[type="checkbox"],
-.payment-registry-page input[type="checkbox"],
-.invoice-list-page input[type="checkbox"] {
-    width: 16px !important;
-    min-width: 16px !important;
-    max-width: 16px !important;
-    height: 16px !important;
-    min-height: 16px !important;
-    max-height: 16px !important;
-}
-
-/* Large upload/file inputs must not inherit checkbox sizing */
-input[type="file"] {
-    width: auto;
-    max-width: 100%;
-}
-/* CHECKBOX-SIZE-FIX-END */

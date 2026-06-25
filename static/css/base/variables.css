@@ -56,3 +56,38 @@
     --space-6: 24px;
     --space-8: 32px;
 }
+
+/* VISUAL-BASELINE-START */
+/*
+ * ERP Zarya35 — visual compatibility tokens.
+ * Эти переменные оставлены для старых классов, перенесённых из legacy CSS.
+ */
+
+:root {
+    --z-bg: #060806;
+    --z-bg-deep: #020617;
+    --z-surface: rgba(15, 23, 42, 0.72);
+    --z-surface-soft: rgba(255, 255, 255, 0.035);
+    --z-surface-card: rgba(15, 23, 42, 0.62);
+
+    --z-text: #f8fafc;
+    --z-text-soft: #cbd5e1;
+    --z-muted: #94a3b8;
+
+    --z-border: rgba(148, 163, 184, 0.18);
+    --z-border-strong: rgba(148, 163, 184, 0.35);
+
+    --z-accent: #27ae60;
+    --z-accent-2: #22c55e;
+    --z-accent-soft: rgba(39, 174, 96, 0.14);
+
+    --z-danger: #ef4444;
+    --z-warning: #f59e0b;
+    --z-info: #3b82f6;
+
+    --muted-text: var(--z-muted);
+    --surface-card: var(--z-surface-card);
+    --border-color: var(--z-border);
+}
+
+/* VISUAL-BASELINE-END */

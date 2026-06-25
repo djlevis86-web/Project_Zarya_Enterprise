@@ -466,3 +466,44 @@
     font-size: 14px;
 }
 /* LEGACY-MIGRATION-FINAL-END */
+
+/* VISUAL-STABILIZE-START */
+/*
+ * Cards visual stabilization after legacy CSS removal.
+ */
+
+.card,
+.panel,
+.content-card,
+.stat-card,
+.metric-card,
+.table-card,
+.form-card,
+.info-card,
+.dashboard-card {
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 18px;
+    background: rgba(15, 23, 42, 0.38);
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.16);
+}
+
+.card,
+.panel,
+.content-card,
+.table-card,
+.form-card,
+.info-card {
+    padding: 24px;
+}
+
+.stat-card,
+.metric-card {
+    padding: 22px 24px;
+}
+
+.card + .card,
+.panel + .panel,
+.content-card + .content-card {
+    margin-top: 24px;
+}
+/* VISUAL-STABILIZE-END */

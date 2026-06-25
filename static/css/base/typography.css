@@ -107,3 +107,95 @@ body {
     text-rendering: optimizeLegibility;
 }
 /* LEGACY-MIGRATION-FINAL-END */
+
+/* VISUAL-BASELINE-START */
+/*
+ * ERP Zarya35 — global visual baseline.
+ * Общий фон и текст приложения после отключения legacy style.css.
+ */
+
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    background:
+        radial-gradient(circle at top left, rgba(39, 174, 96, 0.07), transparent 26rem),
+        linear-gradient(180deg, #060806 0%, #080b09 100%);
+    color: var(--z-text);
+}
+
+a:hover {
+    color: var(--z-accent-2);
+}
+
+strong {
+    font-weight: 850;
+}
+
+.muted {
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.text-success,
+.amount-main {
+    color: var(--z-accent-2) !important;
+}
+
+.text-warning,
+.summary-warning {
+    color: #fbbf24 !important;
+}
+
+.text-danger,
+.summary-danger {
+    color: #fca5a5 !important;
+}
+
+.text-info {
+    color: #bfdbfe !important;
+}
+
+.amount-main {
+    font-weight: 900;
+}
+
+/* VISUAL-BASELINE-END */
+
+/* VISUAL-STABILIZE-3-START */
+/*
+ * Final link reset after legacy stylesheet removal.
+ */
+
+a,
+a:visited,
+a:hover,
+a:focus,
+a:active {
+    text-decoration: none !important;
+}
+
+.content-card a,
+.panel a,
+.card a,
+table a,
+.sidebar a,
+.app-sidebar a,
+.side-nav a,
+aside a {
+    text-decoration: none !important;
+}
+
+.content-card a:hover,
+.panel a:hover,
+.card a:hover,
+table a:hover,
+.sidebar a:hover,
+.app-sidebar a:hover,
+.side-nav a:hover,
+aside a:hover {
+    text-decoration: none !important;
+}
+/* VISUAL-STABILIZE-3-END */

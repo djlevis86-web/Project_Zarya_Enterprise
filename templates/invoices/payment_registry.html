@@ -266,9 +266,20 @@
             </div>
         {% endif %}
 
-        <div class="payment-registry-draft-table-wrap">
-            <table class="table payment-registry-draft-table">
-                <thead>
+        <div class="table-scroll table-scroll-fit payment-registry-draft-table-wrap">
+<table class="table payment-registry-draft-table">
+                
+
+<colgroup>
+    <col class="col-invoice">
+    <col class="col-counterparty">
+    <col class="col-amount">
+    <col class="col-date">
+    <col class="col-payment">
+    <col class="col-actions">
+</colgroup>
+
+<thead>
                     <tr>
                         <th>
                             Счёт
@@ -284,10 +295,6 @@
 
                         <th>
                             План оплаты
-                        </th>
-
-                        <th>
-                            Статус строки
                         </th>
 
                         <th class="payment-registry-draft-payment-column">
@@ -334,6 +341,16 @@
                             </td>
 
                             <td>
+                                {% if item.planned_payment_date %}
+                                    {{ item.planned_payment_date }}
+                                {% else %}
+                                    <span class="muted">
+                                        Не указана
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
                                 <div class="payment-mini payment-mini-registry payment-mini-{{ item.invoice.payment_status_code }}">
                                     <div class="payment-mini-row">
                                         <span>Счёт</span>
@@ -357,22 +374,6 @@
                             </td>
 
                             <td>
-                                {% if item.planned_payment_date %}
-                                    {{ item.planned_payment_date }}
-                                {% else %}
-                                    <span class="muted">
-                                        Не указана
-                                    </span>
-                                {% endif %}
-                            </td>
-
-                            <td>
-                                <span class="status-badge status-{{ item.status }}">
-                                    {{ item.get_status_display }}
-                                </span>
-                            </td>
-
-                            <td>
                                 <form
                                     method="post"
                                     action="{% url 'remove_from_payment_registry_item' item.id %}"
@@ -392,7 +393,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="7" class="empty-table">
+                            <td colspan="6" class="empty-table">
                                 В черновике пока нет счетов.
                             </td>
                         </tr>
@@ -544,9 +545,7 @@
 
     </div>
 
-    <div class="table-scroll">
-
-        <form
+    <form
         method="post"
         action="{% url 'add_to_payment_registry' %}"
         class="payment-registry-bulk-form"
@@ -564,48 +563,54 @@
             В этом блоке выбираются только счета для добавления.
         </div>
 
-<table class="table registry-table">
+<div class="table-scroll table-scroll-fit payment-registry-source-table-wrap">
+<table class="table registry-table payment-registry-source-table">
 
-            <thead>
+            
+
+<colgroup>
+    <col class="col-select">
+    <col class="col-id">
+    <col class="col-counterparty">
+    <col class="col-invoice">
+    <col class="col-invoice-date">
+    <col class="col-amount">
+    <col class="col-plan-date">
+    <col class="col-payment">
+</colgroup>
+
+<thead>
                 <tr>
                     <th>
                         #
                     </th>
 
-                    <th>
+                        <th>
                         ID
                     </th>
 
-                    <th>
+                        <th>
                         Контрагент
                     </th>
 
-                    <th>
+                        <th>
                         Счет
                     </th>
 
-                    <th>
+                        <th>
                         Дата счета
                     </th>
 
-                    <th>
+                        <th>
                         Сумма
                     </th>
 
-                    <th>
+                        <th>
                         План оплаты
                     </th>
 
-                    <th>
-                        Приоритет
-                    </th>
-
-                    <th class="payment-registry-source-payment-column">
+                        <th class="payment-registry-source-payment-column">
                         Оплата
-                    </th>
-
-                    <th>
-                        Статус
                     </th>
                 </tr>
             </thead>
@@ -623,13 +628,13 @@
                             >
                         </td>
 
-                        <td>
+                            <td>
                             <a href="{% url 'invoice_detail' invoice.id %}">
                                 #{{ invoice.id }}
                             </a>
                         </td>
 
-                        <td>
+                            <td>
                             {% if invoice.counterparty %}
                                 <strong>
                                     {{ invoice.counterparty.name }}
@@ -647,7 +652,7 @@
                             {% endif %}
                         </td>
 
-                        <td>
+                            <td>
                             {% if invoice.invoice_number %}
                                 {{ invoice.invoice_number }}
                             {% else %}
@@ -655,7 +660,7 @@
                             {% endif %}
                         </td>
 
-                        <td>
+                            <td>
                             {% if invoice.invoice_date %}
                                 {{ invoice.invoice_date }}
                             {% else %}
@@ -663,13 +668,23 @@
                             {% endif %}
                         </td>
 
-                        <td>
+                            <td>
                             <strong class="amount-main">
                                 {{ invoice.amount|floatformat:2 }} ₽
                             </strong>
                         </td>
 
-                        <td>
+                            <td>
+                            {% if invoice.planned_payment_date %}
+                                {{ invoice.planned_payment_date|date:"d.m.Y" }}
+                            {% else %}
+                                <span class="muted">
+                                    Не указана
+                                </span>
+                            {% endif %}
+                        </td>
+
+                            <td>
                             <div class="payment-mini payment-mini-registry-source payment-mini-{{ invoice.payment_status_code }}">
                                 <div class="payment-mini-row">
                                     <span>Оплачено</span>
@@ -686,32 +701,12 @@
                                 </div>
                             </div>
                         </td>
-
-                        <td>
-                            {% if invoice.planned_payment_date %}
-                                {{ invoice.planned_payment_date|date:"d.m.Y" }}
-                            {% else %}
-                                <span class="muted">
-                                    Не указана
-                                </span>
-                            {% endif %}
-                        </td>
-
-                        <td>
-                            {{ invoice.payment_priority }}
-                        </td>
-
-                        <td>
-                            <span class="status-badge status-{{ invoice.status }}">
-                                {{ invoice.get_status_display }}
-                            </span>
-                        </td>
                     </tr>
 
                 {% empty %}
 
                     <tr>
-                        <td colspan="9" class="empty-table">
+                        <td colspan="8" class="empty-table">
                             Нет счетов для выбранных условий.
                             Для проверки выбери статус «Все кроме оплаченных» или переведи нужные счета в статус «Подтвержден».
                         </td>
@@ -722,6 +717,7 @@
             </tbody>
 
         </table>
+</div>
 
     </form>
 

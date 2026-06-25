@@ -387,3 +387,53 @@
     line-height: 1.6;
 }
 /* LEGACY-MIGRATION-MANUAL-END */
+
+/* VISUAL-TABLES-AUTO-FINAL-START */
+/*
+ * Payment schedule — final wide table layout.
+ */
+
+.payment-schedule-page .content-card,
+.payment-schedule-page .table-card,
+.payment-schedule-page .panel:has(table) {
+    overflow-x: auto !important;
+}
+
+.payment-schedule-page table {
+    min-width: 1500px !important;
+    width: 100%;
+    table-layout: auto !important;
+}
+
+.payment-schedule-page th:nth-last-child(1),
+.payment-schedule-page td:nth-last-child(1) {
+    width: 145px !important;
+    min-width: 145px !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+}
+
+.payment-schedule-page th:nth-last-child(2),
+.payment-schedule-page td:nth-last-child(2) {
+    width: 125px !important;
+    min-width: 125px !important;
+    white-space: nowrap !important;
+}
+
+.payment-schedule-page th:nth-last-child(3),
+.payment-schedule-page td:nth-last-child(3) {
+    width: 130px !important;
+    min-width: 130px !important;
+    white-space: nowrap !important;
+}
+
+.payment-schedule-page td:last-child a,
+.payment-schedule-page td:last-child button,
+.payment-schedule-page td:last-child .btn,
+.payment-schedule-page td:last-child .button,
+.payment-schedule-page td:last-child .action-button {
+    width: 108px !important;
+    min-width: 108px !important;
+    max-width: 108px !important;
+}
+/* VISUAL-TABLES-AUTO-FINAL-END */

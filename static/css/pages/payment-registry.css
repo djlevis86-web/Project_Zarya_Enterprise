@@ -1157,3 +1157,46 @@
     text-decoration: underline !important;
 }
 /* LEGACY-MIGRATION-MANUAL-END */
+
+/* VISUAL-TABLES-AUTO-FINAL-START */
+/*
+ * Payment registry — final wide table layout.
+ */
+
+.payment-registry-page .content-card,
+.payment-registry-page .table-card,
+.payment-registry-page .panel:has(table) {
+    overflow-x: auto !important;
+}
+
+.payment-registry-page table {
+    min-width: 1500px !important;
+    width: 100%;
+    table-layout: auto !important;
+}
+
+.payment-registry-page th:nth-last-child(1),
+.payment-registry-page td:nth-last-child(1) {
+    width: 145px !important;
+    min-width: 145px !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+}
+
+.payment-registry-page th:nth-last-child(2),
+.payment-registry-page td:nth-last-child(2) {
+    width: 125px !important;
+    min-width: 125px !important;
+    white-space: nowrap !important;
+}
+
+.payment-registry-page td:last-child a,
+.payment-registry-page td:last-child button,
+.payment-registry-page td:last-child .btn,
+.payment-registry-page td:last-child .button,
+.payment-registry-page td:last-child .action-button {
+    width: 108px !important;
+    min-width: 108px !important;
+    max-width: 108px !important;
+}
+/* VISUAL-TABLES-AUTO-FINAL-END */

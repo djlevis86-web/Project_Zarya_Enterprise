@@ -1,0 +1,157 @@
+
+/* =========================================================
+   ERP Zarya35 — UI polish actions v1
+   Цель:
+   - верхние кнопки на страницах выглядят одинаково;
+   - кнопки не раздувают шапку;
+   - на 15" переносятся аккуратно;
+   - табличные кнопки "Открыть / В реестр / Убрать" не ломаем.
+   ========================================================= */
+
+:root {
+    --z-action-height: 42px;
+    --z-action-radius: 12px;
+    --z-action-padding-x: 18px;
+    --z-action-gap: 10px;
+}
+
+/* ---------- Верхние зоны действий ---------- */
+
+.page-actions,
+.invoice-actions,
+.bulk-actions,
+.registry-actions,
+.payment-registry-actions,
+.payment-toolbar,
+.registry-toolbar,
+.actions-row,
+.panel-actions,
+.card-actions,
+.section-actions,
+.toolbar-actions,
+.header-actions,
+.page-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--z-action-gap);
+}
+
+/* Частые варианты шапок карточек/секций */
+.card-header,
+.section-header,
+.panel-header,
+.page-titlebar,
+.content-header {
+    gap: 14px;
+}
+
+/* Кнопки только в верхних панелях, не в строках таблиц */
+.page-actions .btn,
+.invoice-actions .btn,
+.bulk-actions .btn,
+.registry-actions .btn,
+.payment-registry-actions .btn,
+.payment-toolbar .btn,
+.registry-toolbar .btn,
+.actions-row .btn,
+.panel-actions .btn,
+.card-actions .btn,
+.section-actions .btn,
+.toolbar-actions .btn,
+.header-actions .btn,
+.page-header-actions .btn {
+    min-height: var(--z-action-height);
+    height: var(--z-action-height);
+    padding: 0 var(--z-action-padding-x);
+
+    border-radius: var(--z-action-radius);
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    white-space: nowrap;
+}
+
+/* Кнопки в верхней зоне, которые стоят рядом с заголовком */
+.card-header > .btn,
+.section-header > .btn,
+.panel-header > .btn,
+.page-titlebar > .btn,
+.content-header > .btn {
+    min-height: var(--z-action-height);
+    height: var(--z-action-height);
+    padding: 0 var(--z-action-padding-x);
+    border-radius: var(--z-action-radius);
+    font-size: 14px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* Не трогаем кнопки внутри таблиц */
+.table-actions-vertical .btn,
+.invoice-payment-action-wrap .btn,
+.payment-registry-draft-table .btn,
+.payment-registry-source-table .btn,
+.payment-schedule-table .btn,
+.invoice-table-compact .btn {
+    height: auto;
+}
+
+/* ---------- Ноутбук 15" ---------- */
+
+@media (max-width: 1599px) {
+    :root {
+        --z-action-height: 40px;
+        --z-action-padding-x: 15px;
+        --z-action-gap: 8px;
+    }
+
+    .page-actions .btn,
+    .invoice-actions .btn,
+    .bulk-actions .btn,
+    .registry-actions .btn,
+    .payment-registry-actions .btn,
+    .payment-toolbar .btn,
+    .registry-toolbar .btn,
+    .actions-row .btn,
+    .panel-actions .btn,
+    .card-actions .btn,
+    .section-actions .btn,
+    .toolbar-actions .btn,
+    .header-actions .btn,
+    .page-header-actions .btn,
+    .card-header > .btn,
+    .section-header > .btn,
+    .panel-header > .btn,
+    .page-titlebar > .btn,
+    .content-header > .btn {
+        font-size: 13px;
+    }
+}
+
+/* ---------- Узкие экраны ---------- */
+
+@media (max-width: 900px) {
+    .page-actions,
+    .invoice-actions,
+    .bulk-actions,
+    .registry-actions,
+    .payment-registry-actions,
+    .payment-toolbar,
+    .registry-toolbar,
+    .actions-row,
+    .panel-actions,
+    .card-actions,
+    .section-actions,
+    .toolbar-actions,
+    .header-actions,
+    .page-header-actions {
+        justify-content: flex-start;
+    }
+}

@@ -906,3 +906,20 @@
         grid-template-columns: 1fr;
     }
 }
+
+.ocr-result-card strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.ocr-result-card span {
+    display: block;
+    line-height: 1.45;
+}
+
+.ocr-amount-warning-text {
+    color: #991b1b;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.25;
+}

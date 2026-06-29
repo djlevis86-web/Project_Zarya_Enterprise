@@ -145,6 +145,13 @@ PAYMENT_STATUS_FILTER_CHOICES = (
 )
 
 
+OCR_STATUS_FILTER_CHOICES = (
+    ("", "Все OCR-статусы"),
+    ("verified", "Сумма подтверждена"),
+    ("unverified", "Сумма требует проверки"),
+)
+
+
 def apply_payment_status_filter(queryset, payment_status):
     if not payment_status:
         return queryset
@@ -182,6 +189,20 @@ def apply_payment_status_filter(queryset, payment_status):
     if payment_status == "overpaid":
         return queryset.filter(
             payment_paid_sum__gt=F("amount")
+        )
+
+    return queryset
+
+
+def apply_ocr_status_filter(queryset, ocr_status):
+    if ocr_status == "verified":
+        return queryset.filter(
+            amount_verified=True
+        )
+
+    if ocr_status == "unverified":
+        return queryset.filter(
+            amount_verified=False
         )
 
     return queryset
@@ -3467,6 +3488,11 @@ def payment_registry(request):
         ''
     )
 
+    ocr_status_filter = request.GET.get(
+        'ocr_status',
+        ''
+    )
+
     search_query = request.GET.get(
         'q',
         ''
@@ -3559,6 +3585,11 @@ def payment_registry(request):
     invoices = apply_payment_status_filter(
         invoices,
         registry_payment_status_filter
+    )
+
+    invoices = apply_ocr_status_filter(
+        invoices,
+        ocr_status_filter
     )
 
     if search_query:
@@ -3658,6 +3689,8 @@ def payment_registry(request):
             'selected_counterparty': selected_counterparty,
             'registry_payment_status_filter': registry_payment_status_filter,
             'payment_status_choices': PAYMENT_STATUS_FILTER_CHOICES,
+            'ocr_status_filter': ocr_status_filter,
+            'ocr_status_choices': OCR_STATUS_FILTER_CHOICES,
             'search_query': search_query,
             'date_from': date_from,
             'date_to': date_to,

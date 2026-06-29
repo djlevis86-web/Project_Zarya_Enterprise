@@ -349,7 +349,7 @@
 
         <div class="table-scroll table-scroll-fit payment-registry-draft-table-wrap">
 <table class="table payment-registry-draft-table">
-                
+
 
 <colgroup>
     <col class="col-invoice">
@@ -512,9 +512,9 @@
 
 </div>
 
-<div class="card registry-filter-card">
+<div class="card registry-filter-card" id="registry-filter-card">
 
-    <form method="get" class="registry-filter-form">
+    <form method="get" action="{% url 'payment_registry' %}#registry-filter-card" class="registry-filter-form">
 
         <div class="form-group">
             <label>
@@ -594,6 +594,27 @@
         </div>
 
         <div class="form-group">
+            <label for="ocr_status">
+                OCR-проверка
+            </label>
+
+            <select
+                id="ocr_status"
+                name="ocr_status"
+                class="form-control"
+            >
+                {% for value, label in ocr_status_choices %}
+                    <option
+                        value="{{ value }}"
+                        {% if ocr_status_filter == value %}selected{% endif %}
+                    >
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
             <label>
                 Оплата с
             </label>
@@ -624,7 +645,7 @@
                 Применить
             </button>
 
-            <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
+            <a href="{% url 'payment_registry' %}#registry-filter-card" class="btn btn-secondary">
                 Сбросить
             </a>
         </div>
@@ -647,7 +668,7 @@
             </span>
         </div>
 
-        
+
 
 
     </div>
@@ -673,7 +694,7 @@
 <div class="table-scroll table-scroll-fit payment-registry-source-table-wrap">
 <table class="table registry-table payment-registry-source-table">
 
-            
+
 
 <colgroup>
     <col class="col-select">

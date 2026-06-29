@@ -1,8 +1,8 @@
-from decimal import Decimal
 import traceback
 
 from .log_service import create_invoice_log
 from .models import Invoice
+from .ocr_verification_service import apply_ocr_amount_to_invoice
 
 from ocr.services import (
     extract_text_from_image,
@@ -122,64 +122,12 @@ def run_invoice_ocr_processing(invoice, user, log_action):
             'vendor'
         )
 
-        amount = parsed.get(
-            'amount'
+        amount_warning = apply_ocr_amount_to_invoice(
+            invoice,
+            parsed.get(
+                'amount'
+            )
         )
-
-        amount_warning = ''
-
-        if amount:
-
-            try:
-
-                ocr_amount = Decimal(
-                    str(amount).replace(
-                        ',',
-                        '.'
-                    )
-                )
-
-                invoice.ocr_amount = ocr_amount
-
-                current_amount = invoice.amount or Decimal(
-                    '0.00'
-                )
-
-                if current_amount == Decimal(
-                    '0.00'
-                ):
-
-                    invoice.amount = ocr_amount
-                    invoice.amount_verified = True
-                    invoice.ocr_verified = True
-
-                else:
-
-                    invoice.amount_verified = (
-                        Decimal(str(current_amount))
-                        ==
-                        ocr_amount
-                    )
-
-                    invoice.ocr_verified = invoice.amount_verified
-
-            except Exception:
-
-                invoice.ocr_amount = None
-                invoice.amount_verified = False
-                invoice.ocr_verified = False
-
-                amount_warning = (
-                    'OCR нашел сумму, но не удалось преобразовать ее в число.'
-                )
-
-        else:
-
-            invoice.ocr_amount = None
-            invoice.amount_verified = False
-            invoice.ocr_verified = False
-
-            amount_warning = 'OCR сумма не определена.'
 
         ocr_comments = [
             log_action

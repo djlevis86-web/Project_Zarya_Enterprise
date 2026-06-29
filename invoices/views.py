@@ -48,7 +48,10 @@ from .ocr_processing_service import (
     read_and_parse_invoice_file,
     run_invoice_ocr_processing,
 )
-from .ocr_verification_service import sync_invoice_amount_verification
+from .ocr_verification_service import (
+    apply_ocr_amount_to_invoice,
+    sync_invoice_amount_verification,
+)
 from .payment_registry_services import get_active_registry_items_for_invoice
 
 from audit.models import AuditLog
@@ -648,46 +651,12 @@ def upload_invoice(request):
                     'vendor'
                 )
 
-                amount = parsed.get(
-                    'amount'
+                apply_ocr_amount_to_invoice(
+                    invoice,
+                    parsed.get(
+                        'amount'
+                    )
                 )
-
-                if amount:
-
-                    try:
-
-                        invoice.ocr_amount = float(
-                            str(amount).replace(
-                                ',',
-                                '.'
-                            )
-                        )
-
-                        if (
-                            invoice.amount is None
-                            or
-                            float(invoice.amount) == 0
-                        ):
-
-                            invoice.amount = invoice.ocr_amount
-                            invoice.amount_verified = True
-                            invoice.ocr_verified = True
-
-                        else:
-
-                            invoice.amount_verified = (
-                                float(invoice.amount)
-                                ==
-                                float(invoice.ocr_amount)
-                            )
-
-                            invoice.ocr_verified = (
-                                invoice.amount_verified
-                            )
-
-                    except Exception:
-
-                        invoice.amount_verified = False
 
                 invoice.save()
 

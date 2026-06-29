@@ -61,6 +61,80 @@
 
 </div>
 
+<div class="ocr-registry-summary">
+    <div class="ocr-registry-summary-header">
+        <div>
+            <span class="registry-summary-label">
+                OCR-контроль реестра
+            </span>
+
+            <strong>
+                Проверка сумм перед оплатой
+            </strong>
+        </div>
+
+        {% if ocr_registry_errors_count %}
+            <span class="ocr-badge ocr-badge-error">
+                Требует внимания
+            </span>
+        {% elif ocr_registry_items_count %}
+            <span class="ocr-badge ocr-badge-ok">
+                Ошибок нет
+            </span>
+        {% else %}
+            <span class="ocr-badge ocr-badge-warning">
+                Не проверено
+            </span>
+        {% endif %}
+    </div>
+
+    <div class="ocr-registry-summary-grid">
+        <div class="ocr-registry-summary-card">
+            <span>
+                Всего строк
+            </span>
+
+            <strong>
+{{ ocr_registry_items_count }}
+            </strong>
+        </div>
+
+        <div class="ocr-registry-summary-card is-ready">
+            <span>
+                Готово к оплате
+            </span>
+
+            <strong>
+{{ ocr_registry_ready_count }}
+            </strong>
+        </div>
+
+        <div class="ocr-registry-summary-card is-error">
+            <span>
+                Требуют проверки
+            </span>
+
+            <strong>
+{{ ocr_registry_errors_count }}
+            </strong>
+        </div>
+    </div>
+
+    {% if ocr_registry_errors_count %}
+        <div class="ocr-registry-summary-alert">
+            Есть счета с ошибками проверки. Оплата и выгрузка заблокированы до исправления.
+        </div>
+    {% elif ocr_registry_items_count %}
+        <div class="ocr-registry-summary-ok">
+            Критических ошибок не найдено. Реестр можно выгружать.
+        </div>
+    {% else %}
+        <div class="ocr-registry-summary-muted">
+            Нажмите “Проверить реестр”, чтобы увидеть результат OCR-контроля перед оплатой.
+        </div>
+    {% endif %}
+</div>
+
 <div class="card payment-registry-draft-card">
 
     <div class="payment-registry-draft-header">

@@ -3620,6 +3620,33 @@ def payment_registry(request):
         'id'
     )
 
+    # OCR_REGISTRY_SUMMARY_CONTEXT_V3
+    ocr_registry_draft_items = list(draft_registry_items or [])
+    draft_registry_items = ocr_registry_draft_items
+
+    ocr_registry_invoice_map = {}
+
+    for item in ocr_registry_draft_items:
+        if item.invoice_id:
+            ocr_registry_invoice_map[item.invoice_id] = item.invoice
+
+    for invoice in list(invoices or []):
+        if invoice.id:
+            ocr_registry_invoice_map[invoice.id] = invoice
+
+    ocr_registry_invoices = list(ocr_registry_invoice_map.values())
+    ocr_registry_items_count = len(ocr_registry_invoices)
+    ocr_registry_ready_count = sum(
+        1
+        for invoice in ocr_registry_invoices
+        if invoice.amount_verified
+    )
+    ocr_registry_errors_count = sum(
+        1
+        for invoice in ocr_registry_invoices
+        if not invoice.amount_verified
+    )
+
     return render(
         request,
         'invoices/payment_registry.html',
@@ -3637,6 +3664,9 @@ def payment_registry(request):
             'status_choices': Invoice.STATUS_CHOICES,
             'draft_registry': draft_registry,
             'draft_registry_items': draft_registry_items,
+            "ocr_registry_items_count": ocr_registry_items_count,
+            "ocr_registry_ready_count": ocr_registry_ready_count,
+            "ocr_registry_errors_count": ocr_registry_errors_count,
             'draft_registry_items_count': draft_registry.items_count if draft_registry else 0,
             'draft_registry_total_amount': draft_registry.total_amount if draft_registry else 0,
             'draft_registry_check_result': draft_registry_check_result,

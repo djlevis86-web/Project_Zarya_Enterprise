@@ -44,15 +44,12 @@ from .models import (
     OCRJob,
 )
 from .one_c_import_service import import_counterparties_from_file
-from .ocr_processing_service import run_invoice_ocr_processing
+from .ocr_processing_service import (
+    read_and_parse_invoice_file,
+    run_invoice_ocr_processing,
+)
 from .ocr_verification_service import sync_invoice_amount_verification
 from .payment_registry_services import get_active_registry_items_for_invoice
-
-from ocr.services import (
-    extract_text_from_image,
-    extract_text_from_pdf,
-    parse_invoice_data,
-)
 
 from audit.models import AuditLog
 from audit.services import log_action
@@ -595,25 +592,11 @@ def upload_invoice(request):
                     file_path
                 )
 
-                if file_path.lower().endswith(
-                    '.pdf'
-                ):
-
-                    text = extract_text_from_pdf(
-                        file_path
-                    )
-
-                else:
-
-                    text = extract_text_from_image(
-                        file_path
-                    )
+                text, parsed = read_and_parse_invoice_file(
+                    file_path
+                )
 
                 invoice.ocr_text = text
-
-                parsed = parse_invoice_data(
-                    text
-                )
 
                 invoice.invoice_number = parsed.get(
                     'invoice_number'

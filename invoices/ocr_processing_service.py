@@ -11,6 +11,27 @@ from ocr.services import (
 )
 
 
+def read_and_parse_invoice_file(file_path):
+    file_path = str(file_path)
+
+    if file_path.lower().endswith(
+        ".pdf"
+    ):
+        text = extract_text_from_pdf(
+            file_path
+        )
+    else:
+        text = extract_text_from_image(
+            file_path
+        )
+
+    parsed = parse_invoice_data(
+        text
+    )
+
+    return text, parsed
+
+
 def run_invoice_ocr_processing(invoice, user, log_action):
 
     if not invoice.file:

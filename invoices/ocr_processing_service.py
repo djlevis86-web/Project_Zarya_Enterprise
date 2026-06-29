@@ -33,6 +33,35 @@ def read_and_parse_invoice_file(file_path):
 
 
 
+
+def get_duplicate_invoice_by_ocr_identity(invoice, parsed):
+    parsed_invoice_number = parsed.get(
+        'invoice_number'
+    )
+
+    parsed_invoice_date = parsed.get(
+        'invoice_date'
+    )
+
+    if not parsed_invoice_number or not parsed_invoice_date:
+        return None
+
+    return (
+        Invoice.objects
+        .filter(
+            invoice_number=parsed_invoice_number,
+            invoice_date=parsed_invoice_date,
+        )
+        .exclude(
+            id=invoice.id
+        )
+        .exclude(
+            status=Invoice.STATUS_REJECTED
+        )
+        .first()
+    )
+
+
 def apply_ocr_identity_to_invoice(invoice, parsed):
     """
     Применяет к счету номер, дату и поставщика из OCR.
@@ -53,19 +82,9 @@ def apply_ocr_identity_to_invoice(invoice, parsed):
 
     if parsed_invoice_number and parsed_invoice_date:
 
-        duplicate_invoice = (
-            Invoice.objects
-            .filter(
-                invoice_number=parsed_invoice_number,
-                invoice_date=parsed_invoice_date,
-            )
-            .exclude(
-                id=invoice.id
-            )
-            .exclude(
-                status=Invoice.STATUS_REJECTED
-            )
-            .first()
+        duplicate_invoice = get_duplicate_invoice_by_ocr_identity(
+            invoice,
+            parsed
         )
 
         if duplicate_invoice:

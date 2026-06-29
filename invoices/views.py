@@ -45,6 +45,8 @@ from .models import (
 )
 from .one_c_import_service import import_counterparties_from_file
 from .ocr_processing_service import (
+    apply_ocr_identity_to_invoice,
+    get_duplicate_invoice_by_ocr_identity,
     read_and_parse_invoice_file,
     run_invoice_ocr_processing,
 )
@@ -601,54 +603,32 @@ def upload_invoice(request):
 
                 invoice.ocr_text = text
 
-                invoice.invoice_number = parsed.get(
-                    'invoice_number'
+                duplicate_invoice = get_duplicate_invoice_by_ocr_identity(
+                    invoice,
+                    parsed
                 )
 
-                invoice.invoice_date = parsed.get(
-                    'invoice_date'
-                )
+                if duplicate_invoice:
 
-                if invoice.invoice_number and invoice.invoice_date:
+                    invoice.delete()
 
-                    exists_invoice = (
-                        Invoice.objects
-                        .filter(
-                            invoice_number=invoice.invoice_number,
-                            invoice_date=invoice.invoice_date,
-                        )
-                        .exclude(
-                            id=invoice.id
-                        )
-                        .exclude(
-                            status=Invoice.STATUS_REJECTED
-                        )
-                        .order_by(
-                            'id'
-                        )
-                        .first()
+                    duplicate_files.append(
+                        {
+                            'filename': uploaded_file.name,
+                            'invoice_id': duplicate_invoice.id,
+                            'invoice_title': duplicate_invoice.title,
+                            'duplicate_reason': (
+                                'Найден существующий счёт с таким же '
+                                'номером и датой.'
+                            ),
+                        }
                     )
 
-                    if exists_invoice:
+                    continue
 
-                        invoice.delete()
-
-                        duplicate_files.append(
-                            {
-                                'filename': uploaded_file.name,
-                                'invoice_id': exists_invoice.id,
-                                'invoice_title': exists_invoice.title,
-                                'duplicate_reason': (
-                                    'Найден существующий счёт с таким же '
-                                    'номером и датой.'
-                                ),
-                            }
-                        )
-
-                        continue
-
-                invoice.vendor = parsed.get(
-                    'vendor'
+                apply_ocr_identity_to_invoice(
+                    invoice,
+                    parsed
                 )
 
                 apply_ocr_amount_to_invoice(

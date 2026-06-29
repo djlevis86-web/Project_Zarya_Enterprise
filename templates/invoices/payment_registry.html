@@ -342,7 +342,7 @@
                             </td>
 
                             <td>
-                                <div class="ocr-amount-cell">
+                                <div class="ocr-amount-cell {% if not item.invoice.amount_verified %}ocr-amount-cell-danger{% endif %}">
                                     <strong class="amount-main">
                                         {{ item.amount|money_ru }}
                                     </strong>
@@ -702,7 +702,7 @@
                         </td>
 
                             <td>
-                            <div class="ocr-amount-cell">
+                            <div class="ocr-amount-cell {% if not invoice.amount_verified %}ocr-amount-cell-danger{% endif %}">
                                 <strong class="amount-main">
                                     {{ invoice.amount|money_ru }}
                                 </strong>

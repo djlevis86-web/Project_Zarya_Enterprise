@@ -923,3 +923,12 @@
     font-weight: 700;
     line-height: 1.25;
 }
+
+.ocr-amount-cell-danger {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid rgba(220, 38, 38, 0.28);
+    border-left: 4px solid #dc2626;
+    border-radius: 10px;
+    background: rgba(220, 38, 38, 0.08);
+}

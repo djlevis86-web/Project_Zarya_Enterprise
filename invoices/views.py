@@ -44,6 +44,7 @@ from .models import (
     OCRJob,
 )
 from .one_c_import_service import import_counterparties_from_file
+from .ocr_verification_service import sync_invoice_amount_verification
 
 from ocr.services import (
     extract_text_from_image,
@@ -2161,13 +2162,38 @@ def edit_invoice(request, invoice_id):
 
         if form.is_valid():
 
-            form.save()
+            amount_changed = 'amount' in form.changed_data
+
+            invoice = form.save()
+
+            verification_changed, verification_message = sync_invoice_amount_verification(
+                invoice,
+                source_label='редактирования счёта'
+            )
 
             create_invoice_log(
                 invoice,
                 request.user,
                 'Счет отредактирован'
             )
+
+            if amount_changed or verification_changed:
+                create_invoice_log(
+                    invoice,
+                    request.user,
+                    verification_message
+                )
+
+                if invoice.amount_verified:
+                    messages.success(
+                        request,
+                        'Сумма подтверждена: совпадает с OCR-суммой.'
+                    )
+                else:
+                    messages.warning(
+                        request,
+                        'Сумма требует проверки: отличается от OCR-суммы.'
+                    )
 
             messages.success(
                 request,

@@ -124,6 +124,99 @@ from .payment_registry_permissions import (
     user_can_mark_payment_registry_paid,
 )
 
+
+def get_payment_registry_permission_context(user):
+    return {
+        "can_manage_payment_registry": user_can_manage_payment_registry(user),
+        "can_check_payment_registry": user_can_check_payment_registry(user),
+        "can_export_payment_registry": user_can_export_payment_registry(user),
+        "can_mark_payment_registry_paid": user_can_mark_payment_registry_paid(user),
+        "can_cancel_payment_registry": user_can_cancel_payment_registry(user),
+    }
+
+
+
+PAYMENT_STATUS_FILTER_CHOICES = (
+    ("", "Все оплаты"),
+    ("unpaid", "Не оплачен"),
+    ("partial", "Частично оплачен"),
+    ("paid", "Оплачен"),
+    ("overpaid", "Переплата"),
+)
+
+
+def apply_payment_status_filter(queryset, payment_status):
+    if not payment_status:
+        return queryset
+
+    from django.db.models import F
+    from .models import InvoicePayment
+
+    queryset = queryset.annotate(
+        payment_paid_sum=Sum(
+            "payments__amount",
+            filter=Q(
+                payments__status=InvoicePayment.STATUS_POSTED
+            )
+        )
+    )
+
+    if payment_status == "unpaid":
+        return queryset.filter(
+            Q(payment_paid_sum__isnull=True)
+            |
+            Q(payment_paid_sum__lte=0)
+        )
+
+    if payment_status == "partial":
+        return queryset.filter(
+            payment_paid_sum__gt=0,
+            payment_paid_sum__lt=F("amount")
+        )
+
+    if payment_status == "paid":
+        return queryset.filter(
+            payment_paid_sum=F("amount")
+        )
+
+    if payment_status == "overpaid":
+        return queryset.filter(
+            payment_paid_sum__gt=F("amount")
+        )
+
+    return queryset
+
+
+def apply_positive_payment_balance_filter(queryset):
+    from decimal import Decimal
+    from django.db.models import DecimalField, F, Value
+    from django.db.models.functions import Coalesce
+
+    from .models import InvoicePayment
+
+    queryset = queryset.annotate(
+        payment_paid_sum=Coalesce(
+            Sum(
+                "payments__amount",
+                filter=Q(
+                    payments__status=InvoicePayment.STATUS_POSTED
+                )
+            ),
+            Value(
+                Decimal("0.00"),
+                output_field=DecimalField(
+                    max_digits=12,
+                    decimal_places=2
+                )
+            )
+        )
+    )
+
+    return queryset.filter(
+        payment_paid_sum__lt=F("amount")
+    )
+
+
 @login_required
 def invoice_list(request):
 
@@ -155,6 +248,11 @@ def invoice_list(request):
 
     user_filter = request.GET.get(
         'user',
+        ''
+    )
+
+    payment_status_filter = request.GET.get(
+        'payment_status',
         ''
     )
 
@@ -192,6 +290,11 @@ def invoice_list(request):
         invoices = invoices.filter(
             user_id=user_filter
         )
+
+    invoices = apply_payment_status_filter(
+        invoices,
+        payment_status_filter
+    )
 
     allowed_sorts = [
         'id',
@@ -268,6 +371,8 @@ def invoice_list(request):
             'status': status,
             'sort': sort,
             'user_filter': user_filter,
+            'payment_status_filter': payment_status_filter,
+            'payment_status_choices': PAYMENT_STATUS_FILTER_CHOICES,
             'statuses': Invoice.STATUS_CHOICES,
             'users': users,
             'total_count': total_count,
@@ -490,15 +595,26 @@ def upload_invoice(request):
                     'invoice_number'
                 )
 
-                if invoice.invoice_number:
+                invoice.invoice_date = parsed.get(
+                    'invoice_date'
+                )
+
+                if invoice.invoice_number and invoice.invoice_date:
 
                     exists_invoice = (
                         Invoice.objects
                         .filter(
-                            invoice_number=invoice.invoice_number
+                            invoice_number=invoice.invoice_number,
+                            invoice_date=invoice.invoice_date,
                         )
                         .exclude(
                             id=invoice.id
+                        )
+                        .exclude(
+                            status=Invoice.STATUS_REJECTED
+                        )
+                        .order_by(
+                            'id'
                         )
                         .first()
                     )
@@ -512,14 +628,14 @@ def upload_invoice(request):
                                 'filename': uploaded_file.name,
                                 'invoice_id': exists_invoice.id,
                                 'invoice_title': exists_invoice.title,
+                                'duplicate_reason': (
+                                    'Найден существующий счёт с таким же '
+                                    'номером и датой.'
+                                ),
                             }
                         )
 
                         continue
-
-                invoice.invoice_date = parsed.get(
-                    'invoice_date'
-                )
 
                 invoice.vendor = parsed.get(
                     'vendor'
@@ -790,6 +906,30 @@ def invoice_detail(request, invoice_id):
 
         raise PermissionDenied
 
+    from .forms import InvoicePaymentForm
+    from .models import InvoicePayment
+    from .payment_services import get_invoice_payment_summary
+
+    payment_summary = get_invoice_payment_summary(
+        invoice
+    )
+
+    payments = (
+        invoice.payments
+        .filter(
+            status=InvoicePayment.STATUS_POSTED
+        )
+        .select_related(
+            "created_by"
+        )
+        .order_by(
+            "-paid_at",
+            "-created_at"
+        )
+    )
+
+    payment_form = InvoicePaymentForm()
+
     comments = (
         InvoiceComment.objects
         .filter(
@@ -813,6 +953,9 @@ def invoice_detail(request, invoice_id):
             'logs': invoice.logs.all(),
             'comments': comments,
             'comment_form': comment_form,
+            'payment_summary': payment_summary,
+            'payments': payments,
+            'payment_form': payment_form,
         }
     )
 
@@ -880,17 +1023,25 @@ def repeat_ocr(request, invoice_id):
             'invoice_number'
         )
 
+        parsed_invoice_date = parsed.get(
+            'invoice_date'
+        )
+
         number_warning = ''
 
-        if parsed_invoice_number:
+        if parsed_invoice_number and parsed_invoice_date:
 
             duplicate_invoice = (
                 Invoice.objects
                 .filter(
-                    invoice_number=parsed_invoice_number
+                    invoice_number=parsed_invoice_number,
+                    invoice_date=parsed_invoice_date,
                 )
                 .exclude(
                     id=invoice.id
+                )
+                .exclude(
+                    status=Invoice.STATUS_REJECTED
                 )
                 .first()
             )
@@ -898,8 +1049,9 @@ def repeat_ocr(request, invoice_id):
             if duplicate_invoice:
 
                 number_warning = (
-                    f'OCR нашел номер {parsed_invoice_number}, '
-                    f'но такой номер уже есть у счета #{duplicate_invoice.id}. '
+                    f'OCR нашел номер {parsed_invoice_number} '
+                    f'от {parsed_invoice_date}, '
+                    f'но такой счет уже есть: #{duplicate_invoice.id}. '
                     'Номер текущего счета не изменен.'
                 )
 
@@ -907,13 +1059,15 @@ def repeat_ocr(request, invoice_id):
 
                 invoice.invoice_number = parsed_invoice_number
 
+        elif parsed_invoice_number:
+
+            invoice.invoice_number = parsed_invoice_number
+
         else:
 
             invoice.invoice_number = None
 
-        invoice.invoice_date = parsed.get(
-            'invoice_date'
-        )
+        invoice.invoice_date = parsed_invoice_date
 
         invoice.vendor = parsed.get(
             'vendor'
@@ -1128,17 +1282,25 @@ def run_invoice_ocr_processing(invoice, user, log_action):
             'invoice_number'
         )
 
+        parsed_invoice_date = parsed.get(
+            'invoice_date'
+        )
+
         number_warning = ''
 
-        if parsed_invoice_number:
+        if parsed_invoice_number and parsed_invoice_date:
 
             duplicate_invoice = (
                 Invoice.objects
                 .filter(
-                    invoice_number=parsed_invoice_number
+                    invoice_number=parsed_invoice_number,
+                    invoice_date=parsed_invoice_date,
                 )
                 .exclude(
                     id=invoice.id
+                )
+                .exclude(
+                    status=Invoice.STATUS_REJECTED
                 )
                 .first()
             )
@@ -1146,8 +1308,9 @@ def run_invoice_ocr_processing(invoice, user, log_action):
             if duplicate_invoice:
 
                 number_warning = (
-                    f'OCR нашел номер {parsed_invoice_number}, '
-                    f'но такой номер уже есть у счета #{duplicate_invoice.id}. '
+                    f'OCR нашел номер {parsed_invoice_number} '
+                    f'от {parsed_invoice_date}, '
+                    f'но такой счет уже есть: #{duplicate_invoice.id}. '
                     'Номер текущего счета не изменен.'
                 )
 
@@ -1155,13 +1318,15 @@ def run_invoice_ocr_processing(invoice, user, log_action):
 
                 invoice.invoice_number = parsed_invoice_number
 
+        elif parsed_invoice_number:
+
+            invoice.invoice_number = parsed_invoice_number
+
         else:
 
             invoice.invoice_number = None
 
-        invoice.invoice_date = parsed.get(
-            'invoice_date'
-        )
+        invoice.invoice_date = parsed_invoice_date
 
         invoice.vendor = parsed.get(
             'vendor'
@@ -1699,6 +1864,161 @@ def ocr_queue(request):
         }
     )
 
+@login_required
+def cancel_invoice_payment(request, payment_id):
+    from .models import InvoicePayment
+    from .payment_services import get_invoice_payment_summary
+
+    payment = get_object_or_404(
+        InvoicePayment.objects.select_related(
+            "invoice"
+        ),
+        id=payment_id
+    )
+
+    invoice = payment.invoice
+
+    if (
+        not request.user.is_staff
+        and not request.user.is_superuser
+        and invoice.user_id != request.user.id
+    ):
+        raise PermissionDenied
+
+    if request.method != "POST":
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id
+        )
+
+    if payment.status == InvoicePayment.STATUS_CANCELLED:
+        messages.warning(
+            request,
+            "Эта оплата уже отменена."
+        )
+
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id
+        )
+
+    payment.status = InvoicePayment.STATUS_CANCELLED
+    payment.comment = (
+        (payment.comment or "")
+        + "\nОтменено пользователем: "
+        + request.user.get_username()
+    ).strip()
+
+    payment.save(
+        update_fields=[
+            "status",
+            "comment",
+            "updated_at",
+        ]
+    )
+
+    create_invoice_log(
+        invoice,
+        request.user,
+        f"Отменена оплата по счёту: {payment.amount}"
+    )
+
+    get_invoice_payment_summary(
+        invoice
+    )
+
+    messages.success(
+        request,
+        "Оплата отменена. Остаток по счёту пересчитан."
+    )
+
+    return redirect(
+        "invoice_detail",
+        invoice_id=invoice.id
+    )
+
+
+@login_required
+def add_invoice_payment(request, invoice_id):
+    invoice = get_object_or_404(
+        Invoice,
+        id=invoice_id
+    )
+
+    if (
+        not request.user.is_staff
+        and not request.user.is_superuser
+        and invoice.user_id != request.user.id
+    ):
+        raise PermissionDenied
+
+    if request.method != "POST":
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id
+        )
+
+    from .forms import InvoicePaymentForm
+    from .payment_services import create_invoice_payment
+
+    form = InvoicePaymentForm(
+        request.POST
+    )
+
+    if not form.is_valid():
+        messages.error(
+            request,
+            "Проверьте данные оплаты."
+        )
+
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id
+        )
+
+    try:
+        payment, updated_summary = create_invoice_payment(
+            invoice=invoice,
+            amount=form.cleaned_data["amount"],
+            user=request.user,
+            paid_at=form.cleaned_data["paid_at"],
+            payment_number=form.cleaned_data.get("payment_number") or "",
+            comment=form.cleaned_data.get("comment") or "",
+        )
+    except ValueError as error:
+        messages.error(
+            request,
+            str(error)
+        )
+
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id
+        )
+
+    create_invoice_log(
+        invoice,
+        request.user,
+        f"Внесена оплата по счёту: {payment.amount}"
+    )
+
+    if updated_summary["remaining_amount"] <= 0:
+        create_invoice_log(
+            invoice,
+            request.user,
+            "Счёт полностью закрыт по оплате"
+        )
+
+    messages.success(
+        request,
+        "Оплата успешно внесена."
+    )
+
+    return redirect(
+        "invoice_detail",
+        invoice_id=invoice.id
+    )
+
 @staff_member_required
 def change_invoice_status(request, invoice_id, status):
 
@@ -1877,6 +2197,11 @@ def payment_schedule(request):
         ''
     )
 
+    schedule_payment_status_filter = request.GET.get(
+        'payment_status',
+        ''
+    )
+
     date_from = request.GET.get(
         'date_from',
         ''
@@ -2002,6 +2327,11 @@ def payment_schedule(request):
             payment_priority=selected_priority
         )
 
+    invoices = apply_payment_status_filter(
+        invoices,
+        schedule_payment_status_filter
+    )
+
     if parsed_date_from and filter_type != 'no_date':
 
         invoices = invoices.filter(
@@ -2074,6 +2404,10 @@ def payment_schedule(request):
             )
         ]
 
+    invoices = apply_positive_payment_balance_filter(
+        invoices
+    )
+
     invoices = invoices.order_by(
         'planned_payment_date',
         '-payment_priority',
@@ -2093,6 +2427,8 @@ def payment_schedule(request):
             'search_query': search_query,
             'selected_status': selected_status,
             'selected_priority': selected_priority,
+            'schedule_payment_status_filter': schedule_payment_status_filter,
+            'payment_status_choices': PAYMENT_STATUS_FILTER_CHOICES,
             'date_from': date_from,
             'date_to': date_to,
             'status_choices': Invoice.STATUS_CHOICES,
@@ -2542,9 +2878,9 @@ def export_payment_registry_draft_excel(request, registry_id):
                 getattr(counterparty, 'inn', '') if counterparty else '',
                 getattr(counterparty, 'kpp', '') if counterparty else '',
                 getattr(counterparty, 'bank_name', '') if counterparty else '',
-                getattr(counterparty, 'bank_account', '') if counterparty else '',
+                getattr(counterparty, 'account_number', '') if counterparty else '',
                 getattr(counterparty, 'bik', '') if counterparty else '',
-                getattr(counterparty, 'corr_account', '') if counterparty else '',
+                getattr(counterparty, 'correspondent_account', '') if counterparty else '',
                 float(amount),
                 payment_date.strftime('%d.%m.%Y') if payment_date else '',
                 purpose,
@@ -2750,9 +3086,9 @@ def export_payment_registry_draft_1c(request, registry_id):
                 getattr(counterparty, 'inn', '') if counterparty else '',
                 getattr(counterparty, 'kpp', '') if counterparty else '',
                 getattr(counterparty, 'bank_name', '') if counterparty else '',
-                getattr(counterparty, 'bank_account', '') if counterparty else '',
+                getattr(counterparty, 'account_number', '') if counterparty else '',
                 getattr(counterparty, 'bik', '') if counterparty else '',
-                getattr(counterparty, 'corr_account', '') if counterparty else '',
+                getattr(counterparty, 'correspondent_account', '') if counterparty else '',
                 str(item.amount).replace('.', ','),
                 payment_date.strftime('%d.%m.%Y') if payment_date else '',
                 purpose,
@@ -2801,84 +3137,53 @@ def export_payment_registry_draft_1c(request, registry_id):
     'Нет прав на отметку реестра оплаченным.',
 )
 def mark_payment_registry_paid(request, registry_id):
-
-    if request.method != 'POST':
-
-        messages.warning(
-            request,
-            'Отметить реестр оплаченным можно только из формы.'
-        )
-
-        return redirect(
-            'payment_registry_detail',
-            registry_id=registry_id,
-        )
-
-    from .models import PaymentRegistry
-    from .payment_registry_services import mark_payment_registry_as_paid
-
-    registry = (
-        PaymentRegistry.objects
-        .filter(
-            id=registry_id,
-        )
-        .first()
+    registry = get_object_or_404(
+        PaymentRegistry,
+        id=registry_id
     )
 
-    if not registry:
+    if (
+        not request.user.is_staff
+        and not request.user.is_superuser
+        and registry.created_by_id != request.user.id
+    ):
+        raise PermissionDenied
 
-        messages.warning(
+    if request.method != "POST":
+        return redirect(
+            "payment_registry_detail",
+            registry_id=registry.id
+        )
+
+    try:
+        result = mark_payment_registry_as_paid(
+            registry,
+            user=request.user
+        )
+    except ValueError as error:
+        messages.error(
             request,
-            'Реестр оплаты не найден.'
+            str(error)
         )
 
         return redirect(
-            'payment_registry_history'
+            "payment_registry_detail",
+            registry_id=registry.id
         )
-
-    if not request.user.is_staff and registry.created_by_id != request.user.id:
-
-        messages.warning(
-            request,
-            'Нет доступа к этому реестру.'
-        )
-
-        return redirect(
-            'payment_registry_history'
-        )
-
-    allowed_statuses = (
-        PaymentRegistry.STATUS_EXPORTED,
-        PaymentRegistry.STATUS_PARTIALLY_PAID,
-    )
-
-    if registry.status not in allowed_statuses:
-
-        messages.warning(
-            request,
-            'Оплаченным можно отметить только выгруженный реестр.'
-        )
-
-        return redirect(
-            'payment_registry_detail',
-            registry_id=registry.id,
-        )
-
-    mark_payment_registry_as_paid(
-        registry,
-        user=request.user,
-    )
 
     messages.success(
         request,
-        f'Реестр оплаты №{registry.id} отмечен как оплаченный.'
+        (
+            "Реестр отмечен оплаченным. "
+            f"Создано оплат: {result.get('paid_count', 0)}. "
+            f"Пропущено закрытых счетов: {result.get('skipped_count', 0)}."
+        )
     )
 
     return redirect(
-        'payment_registry_detail',
-        registry_id=registry.id,
+        "payment_registry_detail",
+        registry_id=registry.id
     )
-
 
 @login_required
 @require_payment_registry_permission(
@@ -3157,6 +3462,11 @@ def payment_registry(request):
         ''
     )
 
+    registry_payment_status_filter = request.GET.get(
+        'payment_status',
+        ''
+    )
+
     search_query = request.GET.get(
         'q',
         ''
@@ -3175,17 +3485,11 @@ def payment_registry(request):
     from .models import PaymentRegistry, PaymentRegistryItem
     from .payment_registry_services import ACTIVE_REGISTRY_STATUSES, check_payment_registry
 
-    draft_registry = (
-        PaymentRegistry.objects
-        .filter(
-            status=PaymentRegistry.STATUS_DRAFT,
-            created_by=request.user,
-        )
-        .order_by(
-            '-created_at'
-        )
-        .first()
+    from .payment_registry_services import (
+        get_or_create_draft_payment_registry,
     )
+
+    draft_registry, draft_registry_created = get_or_create_draft_payment_registry(request.user)
 
     draft_registry_items = PaymentRegistryItem.objects.none()
     draft_registry_check_result = None
@@ -3252,6 +3556,11 @@ def payment_registry(request):
             counterparty_id=selected_counterparty
         )
 
+    invoices = apply_payment_status_filter(
+        invoices,
+        registry_payment_status_filter
+    )
+
     if search_query:
 
         invoices = invoices.filter(
@@ -3277,6 +3586,10 @@ def payment_registry(request):
         invoices = invoices.filter(
             planned_payment_date__lte=date_to
         )
+
+    invoices = apply_positive_payment_balance_filter(
+        invoices
+    )
 
     total_amount = (
         invoices.aggregate(
@@ -3316,6 +3629,8 @@ def payment_registry(request):
             'total_amount': total_amount,
             'selected_status': selected_status,
             'selected_counterparty': selected_counterparty,
+            'registry_payment_status_filter': registry_payment_status_filter,
+            'payment_status_choices': PAYMENT_STATUS_FILTER_CHOICES,
             'search_query': search_query,
             'date_from': date_from,
             'date_to': date_to,
@@ -3843,7 +4158,7 @@ def export_payment_registry_1c(request):
 
         counterparty = invoice.counterparty
 
-        amount = invoice.amount or invoice.ocr_amount or 0
+        amount = invoice.amount or 0
 
         payment_date = invoice.planned_payment_date or date.today()
 

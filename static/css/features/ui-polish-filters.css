@@ -1,0 +1,576 @@
+
+/* =========================================================
+   ERP Zarya35 — UI polish filters v1
+   Цель:
+   - компактные фильтры;
+   - ровные верхние служебные блоки;
+   - одинаковые info/warning/error-плашки;
+   - не трогаем таблицы.
+   ========================================================= */
+
+:root {
+    --z-panel-radius: 16px;
+    --z-panel-border: rgba(148, 163, 184, 0.16);
+    --z-panel-bg: rgba(15, 23, 42, 0.28);
+    --z-panel-bg-strong: rgba(15, 23, 42, 0.46);
+
+    --z-field-height: 42px;
+    --z-field-radius: 12px;
+}
+
+/* ---------- Верхние панели / фильтры ---------- */
+
+.filters,
+.filters-panel,
+.filters-card,
+.filter-form,
+.invoice-filters,
+.registry-filters,
+.schedule-filters,
+.payment-filters,
+.search-filters {
+    border: 1px solid var(--z-panel-border);
+    border-radius: var(--z-panel-radius);
+    background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.22));
+    padding: 16px;
+}
+
+.filters-grid,
+.filter-grid,
+.invoice-filters-grid,
+.registry-filters-grid,
+.schedule-filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    align-items: end;
+}
+
+.filter-field,
+.form-filter,
+.filters .form-group,
+.filters-panel .form-group,
+.filter-form .form-group,
+.invoice-filters .form-group,
+.registry-filters .form-group,
+.schedule-filters .form-group {
+    display: grid;
+    gap: 6px;
+}
+
+.filter-field label,
+.form-filter label,
+.filters label,
+.filters-panel label,
+.filter-form label,
+.invoice-filters label,
+.registry-filters label,
+.schedule-filters label {
+    color: rgba(226, 232, 240, 0.72);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+}
+
+.filters input,
+.filters select,
+.filters-panel input,
+.filters-panel select,
+.filter-form input,
+.filter-form select,
+.invoice-filters input,
+.invoice-filters select,
+.registry-filters input,
+.registry-filters select,
+.schedule-filters input,
+.schedule-filters select {
+    min-height: var(--z-field-height);
+    border-radius: var(--z-field-radius);
+}
+
+/* ---------- Служебные плашки ---------- */
+
+.notice,
+.info-box,
+.warning-box,
+.error-box,
+.alert,
+.alert-info,
+.alert-warning,
+.alert-danger,
+.registry-info,
+.registry-warning,
+.registry-errors,
+.export-info,
+.validation-summary {
+    border-radius: 14px;
+    padding: 13px 16px;
+    line-height: 1.45;
+}
+
+.info-box,
+.alert-info,
+.registry-info,
+.export-info {
+    border: 1px solid rgba(59, 130, 246, 0.32);
+    background: rgba(59, 130, 246, 0.10);
+    color: #bfdbfe;
+}
+
+.warning-box,
+.alert-warning,
+.registry-warning {
+    border: 1px solid rgba(245, 158, 11, 0.32);
+    background: rgba(245, 158, 11, 0.10);
+    color: #fde68a;
+}
+
+.error-box,
+.alert-danger,
+.registry-errors,
+.validation-summary {
+    border: 1px solid rgba(239, 68, 68, 0.34);
+    background: rgba(127, 29, 29, 0.22);
+    color: #fecaca;
+}
+
+/* ---------- Summary cards ---------- */
+
+.summary-grid,
+.stats-grid,
+.registry-summary-grid,
+.payment-summary-grid,
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.summary-card,
+.stat-card,
+.registry-summary-card,
+.payment-summary-card {
+    border: 1px solid var(--z-panel-border);
+    border-radius: 14px;
+    background: var(--z-panel-bg-strong);
+    padding: 16px;
+    min-height: 86px;
+}
+
+.summary-card .label,
+.stat-card .label,
+.registry-summary-card .label,
+.payment-summary-card .label {
+    color: rgba(226, 232, 240, 0.68);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.summary-card .value,
+.stat-card .value,
+.registry-summary-card .value,
+.payment-summary-card .value {
+    margin-top: 6px;
+    font-size: 26px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+/* ---------- Tabs / small navigation pills ---------- */
+
+.tabs,
+.tab-list,
+.registry-tabs,
+.payment-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.tabs .btn,
+.tab-list .btn,
+.registry-tabs .btn,
+.payment-tabs .btn {
+    min-height: 38px;
+    border-radius: 12px;
+    padding-left: 14px;
+    padding-right: 14px;
+}
+
+/* ---------- 15" ---------- */
+
+@media (max-width: 1599px) {
+    .filters,
+    .filters-panel,
+    .filters-card,
+    .filter-form,
+    .invoice-filters,
+    .registry-filters,
+    .schedule-filters,
+    .payment-filters,
+    .search-filters {
+        padding: 14px;
+    }
+
+    .summary-grid,
+    .stats-grid,
+    .registry-summary-grid,
+    .payment-summary-grid,
+    .dashboard-stats {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+
+    .summary-card,
+    .stat-card,
+    .registry-summary-card,
+    .payment-summary-card {
+        padding: 14px;
+        min-height: 78px;
+    }
+
+    .summary-card .value,
+    .stat-card .value,
+    .registry-summary-card .value,
+    .payment-summary-card .value {
+        font-size: 24px;
+    }
+}
+
+/* UI-POLISH-FILTERS-COMPACT-V2-START */
+/*
+ * UI polish filters compact v2.
+ * Цель:
+ * - фильтры на странице "Счета" не должны занимать половину экрана;
+ * - поля фильтров выстраиваются сеткой;
+ * - кнопки "Применить / Сбросить" остаются в одной строке;
+ * - таблицы не трогаем.
+ */
+
+/* =========================================================
+   1. Общая компактность фильтров
+   ========================================================= */
+
+.filters,
+.filters-panel,
+.filters-card,
+.filter-form,
+.invoice-filters,
+.registry-filters,
+.schedule-filters,
+.payment-filters,
+.search-filters {
+    padding: 16px 20px !important;
+    margin-bottom: 24px;
+}
+
+/* Формы фильтров часто идут без отдельного grid-wrapper.
+   Поэтому превращаем саму форму/панель в сетку. */
+.filters form,
+.filters-panel form,
+.filters-card form,
+.filter-form,
+.invoice-filters form,
+.registry-filters form,
+.schedule-filters form,
+.payment-filters form,
+.search-filters form {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
+    gap: 14px 16px;
+    align-items: end;
+}
+
+/* Поиск обычно должен быть шире остальных фильтров */
+.filters form > .search-field,
+.filters-panel form > .search-field,
+.filters-card form > .search-field,
+.filter-form > .search-field,
+.invoice-filters form > .search-field,
+.registry-filters form > .search-field,
+.schedule-filters form > .search-field,
+.payment-filters form > .search-field,
+.search-filters form > .search-field {
+    grid-column: span 2;
+}
+
+/* Если поля размечены просто div/form-group */
+.filters .form-group,
+.filters-panel .form-group,
+.filters-card .form-group,
+.filter-form .form-group,
+.invoice-filters .form-group,
+.registry-filters .form-group,
+.schedule-filters .form-group,
+.payment-filters .form-group,
+.search-filters .form-group,
+.filters .filter-field,
+.filters-panel .filter-field,
+.filters-card .filter-field,
+.filter-form .filter-field {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+/* Растягивание полей внутри своей колонки */
+.filters input,
+.filters select,
+.filters-panel input,
+.filters-panel select,
+.filters-card input,
+.filters-card select,
+.filter-form input,
+.filter-form select,
+.invoice-filters input,
+.invoice-filters select,
+.registry-filters input,
+.registry-filters select,
+.schedule-filters input,
+.schedule-filters select,
+.payment-filters input,
+.payment-filters select,
+.search-filters input,
+.search-filters select {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px !important;
+}
+
+/* =========================================================
+   2. Кнопки фильтров
+   ========================================================= */
+
+.filters .form-actions,
+.filters-panel .form-actions,
+.filters-card .form-actions,
+.filter-form .form-actions,
+.invoice-filters .form-actions,
+.registry-filters .form-actions,
+.schedule-filters .form-actions,
+.payment-filters .form-actions,
+.search-filters .form-actions,
+.filters .filter-actions,
+.filters-panel .filter-actions,
+.filters-card .filter-actions,
+.filter-form .filter-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Если кнопки лежат прямо в форме без wrapper-а */
+.filters form > button,
+.filters form > .btn,
+.filters-panel form > button,
+.filters-panel form > .btn,
+.filters-card form > button,
+.filters-card form > .btn,
+.filter-form > button,
+.filter-form > .btn,
+.invoice-filters form > button,
+.invoice-filters form > .btn,
+.registry-filters form > button,
+.registry-filters form > .btn,
+.schedule-filters form > button,
+.schedule-filters form > .btn,
+.payment-filters form > button,
+.payment-filters form > .btn,
+.search-filters form > button,
+.search-filters form > .btn {
+    min-height: 40px;
+    height: 40px;
+    align-self: end;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   3. Служебные карточки сверху
+   ========================================================= */
+
+.summary-grid,
+.stats-grid,
+.registry-summary-grid,
+.payment-summary-grid,
+.dashboard-stats {
+    margin-bottom: 24px;
+}
+
+.summary-card,
+.stat-card,
+.registry-summary-card,
+.payment-summary-card {
+    min-height: 82px;
+    padding: 15px 16px;
+}
+
+/* =========================================================
+   4. Реестр: блок проверки не должен быть слишком рыхлым
+   ========================================================= */
+
+.registry-info,
+.registry-warning,
+.registry-errors,
+.validation-summary,
+.export-info {
+    margin-top: 14px;
+    margin-bottom: 14px;
+}
+
+/* =========================================================
+   5. Ноутбук
+   ========================================================= */
+
+@media (max-width: 1599px) {
+    .filters form,
+    .filters-panel form,
+    .filters-card form,
+    .filter-form,
+    .invoice-filters form,
+    .registry-filters form,
+    .schedule-filters form,
+    .payment-filters form,
+    .search-filters form {
+        grid-template-columns: repeat(3, minmax(170px, 1fr));
+    }
+
+    .filters,
+    .filters-panel,
+    .filters-card,
+    .filter-form,
+    .invoice-filters,
+    .registry-filters,
+    .schedule-filters,
+    .payment-filters,
+    .search-filters {
+        padding: 14px 16px !important;
+    }
+}
+
+@media (max-width: 1100px) {
+    .filters form,
+    .filters-panel form,
+    .filters-card form,
+    .filter-form,
+    .invoice-filters form,
+    .registry-filters form,
+    .schedule-filters form,
+    .payment-filters form,
+    .search-filters form {
+        grid-template-columns: repeat(2, minmax(160px, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .filters form,
+    .filters-panel form,
+    .filters-card form,
+    .filter-form,
+    .invoice-filters form,
+    .registry-filters form,
+    .schedule-filters form,
+    .payment-filters form,
+    .search-filters form {
+        grid-template-columns: 1fr;
+    }
+}
+/* UI-POLISH-FILTERS-COMPACT-V2-END */
+
+/* INVOICE-FILTER-CLEAN-V5-START */
+/*
+ * Счета: чистая сетка фильтра после repair HTML.
+ * Больше не используем v3/v4.
+ */
+
+.registry-filter-card:has(.invoice-filter-clean-v5) {
+    padding: 18px 20px !important;
+}
+
+.invoice-filter-clean-v5 {
+    display: grid !important;
+    grid-template-columns:
+        minmax(320px, 2fr)
+        minmax(180px, 1fr)
+        minmax(180px, 1fr)
+        minmax(180px, 1fr)
+        minmax(180px, 1fr);
+    gap: 14px 16px !important;
+    align-items: end !important;
+}
+
+.invoice-filter-clean-v5 .filter-field {
+    display: grid !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+}
+
+.invoice-filter-clean-v5 label {
+    margin: 0 !important;
+    color: rgba(226, 232, 240, 0.72) !important;
+    font-size: 12px !important;
+    font-weight: 850 !important;
+    line-height: 1.2 !important;
+}
+
+.invoice-filter-clean-v5 input,
+.invoice-filter-clean-v5 select,
+.invoice-filter-clean-v5 .form-control {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 40px !important;
+    height: 40px !important;
+}
+
+.invoice-filter-clean-v5 .invoice-filter-actions-v5 {
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    align-items: center !important;
+    margin-top: 2px !important;
+}
+
+.invoice-filter-clean-v5 .invoice-filter-actions-v5 .btn,
+.invoice-filter-clean-v5 .invoice-filter-actions-v5 button,
+.invoice-filter-clean-v5 .invoice-filter-actions-v5 a {
+    min-height: 40px !important;
+    height: 40px !important;
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+@media (max-width: 1599px) {
+    .invoice-filter-clean-v5 {
+        grid-template-columns:
+            minmax(280px, 2fr)
+            minmax(170px, 1fr)
+            minmax(170px, 1fr);
+    }
+}
+
+@media (max-width: 1100px) {
+    .invoice-filter-clean-v5 {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .invoice-filter-clean-v5 .filter-field-search-v5 {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 720px) {
+    .invoice-filter-clean-v5 {
+        grid-template-columns: 1fr;
+    }
+
+    .invoice-filter-clean-v5 .filter-field-search-v5 {
+        grid-column: auto;
+    }
+}
+/* INVOICE-FILTER-CLEAN-V5-END */

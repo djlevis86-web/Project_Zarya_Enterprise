@@ -7,6 +7,8 @@ from .views import (
     upload_batches,
     upload_batch_detail,
     invoice_detail,
+    add_invoice_payment,
+    cancel_invoice_payment,
     repeat_ocr,
     bulk_repeat_ocr,
     enqueue_ocr_jobs,
@@ -227,6 +229,19 @@ urlpatterns = [
         invoice_detail,
         name='invoice_detail'
     ),
+
+    path(
+        '<int:invoice_id>/payments/add/',
+        add_invoice_payment,
+        name='add_invoice_payment'
+    ),
+
+    path(
+        'payments/<int:payment_id>/cancel/',
+        cancel_invoice_payment,
+        name='cancel_invoice_payment'
+    ),
+
 
     path(
         '<int:invoice_id>/repeat-ocr/',

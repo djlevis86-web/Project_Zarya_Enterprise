@@ -1,0 +1,437 @@
+/*
+ * ERP Zarya35 — forms component.
+ *
+ * Здесь живёт базовая система форм:
+ * input, select, textarea, label, checkbox, radio, file, filter forms.
+ * Страничные CSS-файлы должны управлять только расположением блоков,
+ * но не внешним видом полей.
+ */
+
+/* Base form containers */
+
+form {
+    margin: 0;
+}
+
+.form-group,
+.field-group,
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+label,
+.form-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    color: var(--z-muted-2, #b7c8bf);
+    font-size: 13px;
+    font-weight: 850;
+    line-height: 1.35;
+}
+
+/* Text fields */
+
+.form-control,
+input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]),
+select,
+textarea {
+    width: 100%;
+    min-height: 46px;
+
+    padding: 0 14px;
+    border: 1px solid var(--z-border, rgba(255, 255, 255, .14));
+    border-radius: 13px;
+
+    background: rgba(255, 255, 255, .035);
+    color: var(--z-text, #ffffff);
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 650;
+    line-height: 1.4;
+
+    outline: none;
+    box-sizing: border-box;
+
+    transition:
+        border-color .16s ease,
+        background-color .16s ease,
+        box-shadow .16s ease;
+}
+
+textarea.form-control,
+textarea {
+    min-height: 120px;
+    padding-top: 13px;
+    padding-bottom: 13px;
+    resize: vertical;
+}
+
+.form-control::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: rgba(220, 235, 226, .48);
+    font-weight: 500;
+}
+
+.form-control:focus,
+input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]):focus,
+select:focus,
+textarea:focus {
+    border-color: rgba(34, 197, 94, .58);
+    background: rgba(255, 255, 255, .05);
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, .08);
+}
+
+/* Select */
+
+select,
+select.form-control {
+    cursor: pointer;
+    padding-right: 38px;
+}
+
+/* Date inputs */
+
+input[type="date"] {
+    min-width: 190px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: .72;
+    filter: invert(1);
+}
+
+/* Hidden inputs */
+
+input[type="hidden"] {
+    display: none !important;
+}
+
+/* Checkbox / radio */
+
+input[type="checkbox"],
+input[type="radio"] {
+    width: 16px !important;
+    min-width: 16px !important;
+    max-width: 16px !important;
+
+    height: 16px !important;
+    min-height: 16px !important;
+    max-height: 16px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: inline-block !important;
+    flex: 0 0 auto !important;
+    vertical-align: middle !important;
+
+    accent-color: var(--z-accent, #22c55e);
+    cursor: pointer;
+}
+
+.bulk-select-all,
+.invoice-bulk-checkbox,
+.upload-batch-bulk-checkbox {
+    width: 16px !important;
+    height: 16px !important;
+}
+
+/* File input */
+
+input[type="file"],
+.upload-file-input {
+    min-height: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--z-text, #ffffff);
+    box-shadow: none;
+}
+
+input[type="file"]::file-selector-button {
+    min-height: 42px;
+    margin-right: 14px;
+    padding: 0 18px;
+
+    border: 1px solid rgba(34, 197, 94, .72);
+    border-radius: 13px;
+
+    background: var(--z-accent, #22c55e);
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 850;
+
+    cursor: pointer;
+}
+
+/* Form actions */
+
+.form-actions,
+.filter-actions,
+.inline-actions,
+.upload-actions,
+.registry-actions,
+.payment-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Inline forms */
+
+.inline-form,
+.registry-action-form,
+.payment-cancel-form,
+.payment-registry-remove-form,
+.payment-registry-cancel-form,
+.payment-registry-paid-form,
+.payment-registry-export-form,
+.payment-registry-check-form,
+.payment-registry-add-form {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Filter forms */
+
+.invoice-filter-form,
+.registry-filter-form,
+.payment-schedule-filter-form,
+.counterparty-filter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.invoice-filter-form-compact {
+    gap: 13px;
+}
+
+.invoice-filter-form .form-control,
+.registry-filter-form .form-control,
+.payment-schedule-filter-form .form-control,
+.counterparty-filter-form .form-control {
+    min-height: 46px;
+}
+
+/* Upload form */
+
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.upload-dropzone,
+.upload-file-zone,
+.file-dropzone {
+    border: 1px dashed rgba(34, 197, 94, .48);
+    border-radius: 18px;
+    background: rgba(34, 197, 94, .045);
+}
+
+.upload-help,
+.form-help,
+.help-text {
+    color: var(--z-muted, #8fa59a);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Check rows */
+
+.check-row {
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    gap: 12px;
+    align-items: flex-start;
+
+    padding: 14px;
+    border: 1px solid var(--z-border, rgba(255, 255, 255, .14));
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, .026);
+}
+
+.check-row strong,
+.check-row small {
+    display: block;
+}
+
+.check-row small {
+    color: var(--z-muted, #8fa59a);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+/* Errors */
+
+.form-error,
+.errorlist {
+    margin: 6px 0 0;
+    padding: 10px 12px;
+
+    border: 1px solid rgba(248, 113, 113, .34);
+    border-radius: 12px;
+
+    background: rgba(127, 29, 29, .22);
+    color: #fecaca;
+
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.errorlist {
+    list-style: none;
+}
+
+/* Disabled */
+
+.form-control:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+    opacity: .58;
+    cursor: not-allowed;
+}
+
+/* Mobile */
+
+@media (max-width: 760px) {
+    .form-actions,
+    .filter-actions,
+    .inline-actions,
+    .upload-actions,
+    .registry-actions,
+    .payment-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .form-actions .btn,
+    .filter-actions .btn,
+    .upload-actions .btn,
+    .registry-actions .btn,
+    .payment-actions .btn,
+    .form-actions .button,
+    .filter-actions .button,
+    .upload-actions .button,
+    .registry-actions .button,
+    .payment-actions .button {
+        width: 100%;
+    }
+}
+
+/* FORM-SELECT-COMPONENT-STABLE-V1-START */
+/*
+   Универсальный select для интерфейса ERP.
+   Работает на всех страницах приложения:
+   - Счета;
+   - График платежей;
+   - Реестр оплаты;
+   - Справочники;
+   - OCR / загрузки;
+   - формы редактирования.
+*/
+
+.main select,
+.page select,
+.registry-page select,
+.form-card select,
+.card select,
+.filters-card select,
+.filter-card select,
+.filter-panel select,
+.form-group select,
+.field-group select {
+    min-height: 42px !important;
+
+    width: 100%;
+
+    padding: 0 38px 0 14px !important;
+
+    border: 1px solid rgba(148, 163, 184, .24) !important;
+    border-radius: 12px !important;
+
+    background-color: rgba(12, 22, 17, .98) !important;
+    color: #f8fafc !important;
+
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+
+    outline: none !important;
+
+    box-shadow: none !important;
+
+    cursor: pointer;
+}
+
+.main select:hover,
+.page select:hover,
+.registry-page select:hover,
+.form-card select:hover,
+.card select:hover,
+.filters-card select:hover,
+.filter-card select:hover,
+.filter-panel select:hover,
+.form-group select:hover,
+.field-group select:hover {
+    border-color: rgba(34, 197, 94, .38) !important;
+}
+
+.main select:focus,
+.page select:focus,
+.registry-page select:focus,
+.form-card select:focus,
+.card select:focus,
+.filters-card select:focus,
+.filter-card select:focus,
+.filter-panel select:focus,
+.form-group select:focus,
+.field-group select:focus {
+    border-color: rgba(34, 197, 94, .72) !important;
+    box-shadow: 0 0 0focus {
+    border-color: rgba(34, 197, 94, .72) !important;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, .12) !important;
+}
+
+.main select option,
+.page select option,
+.registry-page select option,
+.form-card select option,
+.card select option,
+.filters-card select option,
+.filter-card select option,
+.filter-panel select option,
+.form-group select option,
+.field-group select option {
+    background-color: #0b1510 !important;
+    color: #f8fafc !important;
+}
+
+.main select:disabled,
+.page select:disabled,
+.registry-page select:disabled,
+.form-card select:disabled,
+.card select:disabled,
+.filters-card select:disabled,
+.filter-card select:disabled,
+.filter-panel select:disabled,
+.form-group select:disabled,
+.field-group select:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+/* FORM-SELECT-COMPONENT-STABLE-V1-END */

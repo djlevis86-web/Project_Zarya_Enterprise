@@ -15,13 +15,9 @@
     </div>
 
     <div class="registry-actions">
-        <a href="{% url 'upload_invoice' %}" class="btn btn-primary">
-            Загрузить счет
-        </a>
+        
 
-        <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
-            Все счета
-        </a>
+        
     </div>
 
 </div>
@@ -47,6 +43,10 @@
                 Загрузить новый счет
             </a>
 
+                <a href="{% url 'invoice_list' %}" class="btn btn-secondary dashboard-hero-all-invoices">
+                    Все счета
+                </a>
+
             <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
                 Перейти в реестр оплаты
             </a>
@@ -58,7 +58,7 @@
 
         <div class="hero-metric">
             <span>
-                Всего счетов
+                Всего в базе
             </span>
 
             <strong>
@@ -84,15 +84,15 @@
 
     <a href="{% url 'invoice_list' %}" class="stat-card stat-link">
         <div class="stat-label">
-            Всего счетов
+            Счетов за месяц
         </div>
 
         <div class="stat-value">
-            {{ total_count }}
+            {{ month_count }}
         </div>
 
         <div class="muted">
-            Все загруженные документы
+            Создано в текущем месяце
         </div>
     </a>
 
@@ -142,12 +142,36 @@
 
 <div class="dashboard-grid-two">
 
-    <div class="card">
+    <section class="dashboard-attention-v1">
+    <div class="dashboard-attention-header-v1">
+        <div>
+            <h2>Требуют внимания</h2>
+            <p>Короткая сводка по счетам, с которыми нужно работать</p>
+        </div>
+    </div>
+
+    <div class="dashboard-attention-grid-v1">
+        {% for item in attention_items %}
+            <a href="{% url item.url_name %}" class="dashboard-attention-item-v1">
+                <span class="dashboard-attention-value-v1">
+                    {{ item.value }}
+                </span>
+
+                <span class="dashboard-attention-content-v1">
+                    <strong>{{ item.label }}</strong>
+                    <small>{{ item.hint }}</small>
+                </span>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+
+<div class="card">
 
         <div class="registry-table-header">
             <div>
                 <h3>
-                    Быстрые действия
+                    <span class="dashboard-quick-title-v1">Быстрые действия</span>
                 </h3>
 
                 <span>
@@ -231,7 +255,7 @@
         <div class="registry-table-header">
             <div>
                 <h3>
-                    Рабочий процесс
+                    <span class="dashboard-workflow-title-v1">Рабочий процесс</span>
                 </h3>
 
                 <span>
@@ -310,15 +334,13 @@
 
     </div>
 
-</div>
-
-<div class="card">
+</div><div class="card">
 
     <div class="registry-table-header">
 
         <div>
             <h3>
-                Последние счета
+                <span class="dashboard-latest-title-v1">Последние счета</span>
             </h3>
 
             <span>

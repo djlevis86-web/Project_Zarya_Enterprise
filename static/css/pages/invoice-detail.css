@@ -1,0 +1,65 @@
+/*
+ * ERP Zarya35 — pages / invoice detail
+ *
+ * Стили скопированы из legacy style.css.
+ * На этом этапе style.css ещё не очищаем.
+ */
+
+.invoice-file-link {
+    display: block;
+    max-width: 100%;
+    margin-top: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.invoice-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(360px, 520px) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.invoice-detail-left,
+.invoice-detail-right {
+    min-width: 0;
+}
+
+.invoice-detail-left {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+
+/* LEGACY-MIGRATION-FINAL-START */
+/* Финальная переклассификация из features/legacy-migration.css. */
+
+.comment-actions {
+    margin-top: 10px;
+}
+
+.comment-item,
+.timeline-item {
+    padding: 13px 14px;
+    border: 1px solid var(--z-border);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, .026);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.timeline-date {
+    color: var(--z-muted);
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+/* LEGACY-MIGRATION-FINAL-END */

@@ -1,0 +1,439 @@
+/*
+ * ERP Zarya35 — pages / payment schedule
+ *
+ * Стили скопированы из legacy style.css.
+ * На этом этапе style.css ещё не очищаем.
+ */
+
+/* =========================================================
+   Invoice list and detail
+========================================================= */
+
+.invoice-table-compact,
+.schedule-table,
+.unmatched-table,
+.missing-requisites-table,
+.counterparty-invoices-table {
+    min-width: 0 !important;
+    table-layout: fixed;
+}
+
+.schedule-row-overdue td { background: rgba(239, 68, 68, .045); }
+
+.schedule-row-today td { background: rgba(245, 158, 11, .045); }
+
+.schedule-table th:nth-child(1),
+.schedule-table td:nth-child(1) { width: 70px; }
+
+.schedule-table th:nth-child(2),
+.schedule-table td:nth-child(2) { width: 30%; }
+
+.schedule-table th:nth-child(3),
+.schedule-table td:nth-child(3) { width: 140px; }
+
+.schedule-table th:nth-child(4),
+.schedule-table td:nth-child(4) { width: 150px; }
+
+.schedule-table th:nth-child(5),
+.schedule-table td:nth-child(5) { width: 160px; }
+
+.schedule-table th:nth-child(6),
+.schedule-table td:nth-child(6) { width: 100px; }
+
+.schedule-table th:nth-child(7),
+.schedule-table td:nth-child(7) { width: 140px; }
+
+.schedule-table th:nth-child(8),
+.schedule-table td:nth-child(8) { width: 120px; }
+
+@media (max-width: 1280px) {
+    :root {
+        --z-sidebar-width: 260px;
+    }
+
+    .stats-grid,
+    .dashboard-stats,
+    .registry-summary,
+    .counterparty-profile-summary,
+    .import-result-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-hero,
+    .dashboard-grid-two,
+    .upload-page-grid,
+    .import-layout,
+    .invoice-detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .invoice-document-card {
+        position: static;
+    }
+
+    #pdf-container {
+        max-height: 760px;
+    }
+
+    .table-scroll-fit {
+        overflow-x: auto;
+    }
+
+    .invoice-table-compact,
+    .schedule-table,
+    .unmatched-table,
+    .missing-requisites-table {
+        min-width: 980px !important;
+    }
+
+    .counterparty-invoices-table {
+        min-width: 880px !important;
+    }
+
+    .invoice-filter-form,
+    .invoice-filter-form-compact,
+    .counterparty-filter-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .requisites-rules {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* === Payment schedule V1 === */
+
+.payment-schedule-summary {
+    grid-template-columns: repeat(6, minmax(140px, 1fr));
+}
+
+.payment-schedule-filter-form {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(150px, 1fr));
+    gap: 16px;
+    align-items: end;
+}
+
+.payment-schedule-filter-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.payment-schedule-filter-form label {
+    font-size: 13px;
+    font-weight: 800;
+    color: #475569;
+}
+
+.payment-schedule-filter-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.payment-schedule-table th,
+.payment-schedule-table td {
+    vertical-align: top;
+}
+
+.schedule-row-overdue td {
+    background: #fff1f2;
+}
+
+.schedule-row-today td {
+    background: #fffbeb;
+}
+
+@media (max-width: 1280px) {
+    .payment-schedule-summary {
+        grid-template-columns: repeat(3, minmax(140px, 1fr));
+    }
+
+    .payment-schedule-filter-form {
+        grid-template-columns: repeat(3, minmax(150px, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .payment-schedule-summary,
+    .payment-schedule-filter-form {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-filter-search {
+        grid-column: auto;
+    }
+}
+
+/* === Payment schedule compact layout fix === */
+
+.payment-schedule-summary {
+    display: grid !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+}
+
+.payment-schedule-summary .registry-summary-card {
+    min-width: 0 !important;
+}
+
+.payment-schedule-filter-form {
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+    align-items: end !important;
+}
+
+.payment-schedule-filter-form > .form-group {
+    grid-column: span 3 !important;
+    min-width: 0 !important;
+    width: 100% !important;
+}
+
+.payment-schedule-filter-form .form-control {
+    width: 100% !important;
+    min-height: 44px !important;
+}
+
+.payment-schedule-filter-actions {
+    grid-column: span 3 !important;
+    display: flex !important;
+    gap: 10px !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+}
+
+.payment-schedule-filter-actions .btn {
+    min-height: 44px !important;
+    padding: 10px 18px !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+}
+
+.payment-schedule-table th,
+.payment-schedule-table td {
+    white-space: nowrap;
+}
+
+.payment-schedule-table td:nth-child(2),
+.payment-schedule-table td:nth-child(3) {
+    white-space: normal;
+    min-width: 220px;
+}
+
+@media (max-width: 1400px) {
+    .payment-schedule-summary {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .payment-schedule-filter-form > .form-group {
+        grid-column: span 4 !important;
+    }
+
+    .payment-filter-search {
+        grid-column: span 8 !important;
+    }
+
+    .payment-schedule-filter-actions {
+        grid-column: span 4 !important;
+    }
+}
+
+@media (max-width: 800px) {
+    .payment-schedule-summary,
+    .payment-schedule-filter-form {
+        grid-template-columns: 1fr !important;
+    }
+
+    .payment-schedule-filter-form > .form-group,
+    .payment-filter-search,
+    .payment-schedule-filter-actions {
+        grid-column: auto !important;
+    }
+}
+
+.payment-schedule-filter-actions {
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    gap: 12px !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    margin-top: 4px !important;
+}
+
+.payment-schedule-filter-actions .btn {
+    min-width: 130px !important;
+}
+
+@media (max-width: 800px) {
+    .payment-date-tools {
+        grid-column: auto !important;
+    }
+
+    .payment-schedule-filter-actions .btn {
+        width: 100% !important;
+    }
+}
+
+.payment-schedule-filter-form input[type="date"] {
+    cursor: pointer !important;
+}
+
+.payment-schedule-filter-actions {
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    gap: 12px !important;
+    justify-content: flex-start !important;
+    margin-top: 2px !important;
+}
+
+/* === Payment schedule overdue dark theme fix === */
+
+.payment-schedule-table .schedule-row-overdue td {
+    background: rgba(127, 29, 29, 0.26) !important;
+    color: #f8fafc !important;
+    border-bottom-color: rgba(248, 113, 113, 0.22) !important;
+}
+
+.payment-schedule-table .schedule-row-overdue td:first-child {
+    border-left: 4px solid #ef4444 !important;
+}
+
+.payment-schedule-table .schedule-row-overdue a,
+.payment-schedule-table .schedule-row-overdue strong,
+.payment-schedule-table .schedule-row-overdue .muted,
+.payment-schedule-table .schedule-row-overdue .amount-main {
+    color: #f8fafc !important;
+}
+
+.payment-schedule-table .schedule-row-overdue .amount-main {
+    color: #86efac !important;
+}
+
+.payment-schedule-table .schedule-row-overdue .status-badge.status-rejected {
+    background: rgba(239, 68, 68, 0.22) !important;
+    color: #fecaca !important;
+    border: 1px solid rgba(248, 113, 113, 0.35) !important;
+}
+
+.payment-schedule-table .schedule-row-overdue:hover td {
+    background: rgba(127, 29, 29, 0.38) !important;
+}
+
+.payment-schedule-table .schedule-row-today td {
+    background: rgba(146, 64, 14, 0.22) !important;
+    color: #f8fafc !important;
+}
+
+.payment-schedule-table .schedule-row-today td:first-child {
+    border-left: 4px solid #f59e0b !important;
+}
+
+.payment-schedule-table .schedule-row-today a,
+.payment-schedule-table .schedule-row-today strong,
+.payment-schedule-table .schedule-row-today .muted,
+.payment-schedule-table .schedule-row-today .amount-main {
+    color: #f8fafc !important;
+}
+
+.payment-schedule-table .schedule-row-today .amount-main {
+    color: #86efac !important;
+}
+
+.payment-schedule-table .schedule-row-today:hover td {
+    background: rgba(146, 64, 14, 0.32) !important;
+}
+
+.payment-schedule-summary {
+    margin-top: 0 !important;
+    clear: both !important;
+}
+
+
+/* LEGACY-MIGRATION-MANUAL-START */
+/* Финально перенесено из features/legacy-migration.css. */
+
+.schedule-tabs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.schedule-tab {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 14px;
+    border: 1px solid var(--z-border);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .035);
+    color: var(--z-text);
+    font-weight: 800;
+}
+
+.schedule-tab:hover,
+.schedule-tab.is-active {
+    background: rgba(39, 174, 96, .14);
+    border-color: rgba(39, 174, 96, .35);
+    color: #ffffff;
+}
+
+.invoice-number-list {
+    color: var(--z-text);
+    line-height: 1.6;
+}
+/* LEGACY-MIGRATION-MANUAL-END */
+
+/* VISUAL-TABLES-AUTO-FINAL-START */
+/*
+ * Payment schedule — final wide table layout.
+ */
+
+.payment-schedule-page .content-card,
+.payment-schedule-page .table-card,
+.payment-schedule-page .panel:has(table) {
+    overflow-x: auto !important;
+}
+
+.payment-schedule-page table {
+    min-width: 1500px !important;
+    width: 100%;
+    table-layout: auto !important;
+}
+
+.payment-schedule-page th:nth-last-child(1),
+.payment-schedule-page td:nth-last-child(1) {
+    width: 145px !important;
+    min-width: 145px !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+}
+
+.payment-schedule-page th:nth-last-child(2),
+.payment-schedule-page td:nth-last-child(2) {
+    width: 125px !important;
+    min-width: 125px !important;
+    white-space: nowrap !important;
+}
+
+.payment-schedule-page th:nth-last-child(3),
+.payment-schedule-page td:nth-last-child(3) {
+    width: 130px !important;
+    min-width: 130px !important;
+    white-space: nowrap !important;
+}
+
+.payment-schedule-page td:last-child a,
+.payment-schedule-page td:last-child button,
+.payment-schedule-page td:last-child .btn,
+.payment-schedule-page td:last-child .button,
+.payment-schedule-page td:last-child .action-button {
+    width: 108px !important;
+    min-width: 108px !important;
+    max-width: 108px !important;
+}
+/* VISUAL-TABLES-AUTO-FINAL-END */

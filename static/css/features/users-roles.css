@@ -1,0 +1,12 @@
+/*
+ * ERP Zarya35 — features / users and roles
+ *
+ * Стили скопированы из legacy style.css.
+ * На этом этапе style.css ещё не очищаем.
+ */
+
+.profile-role {
+    margin-top: 4px;
+    color: var(--z-muted);
+    font-size: 14px;
+}

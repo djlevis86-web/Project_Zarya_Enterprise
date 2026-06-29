@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load money %}
 
 {% load static %}
 
@@ -290,7 +291,7 @@
                     </span>
 
                     <strong class="amount-main">
-                        {{ invoice.amount|floatformat:2 }} ₽
+                        {{ invoice.amount|money_ru }}
                     </strong>
                 </div>
 
@@ -301,7 +302,7 @@
 
                     <strong>
                         {% if invoice.ocr_amount %}
-                            {{ invoice.ocr_amount|floatformat:2 }} ₽
+                            {{ invoice.ocr_amount|money_ru }}
                         {% else %}
                             —
                         {% endif %}
@@ -349,6 +350,121 @@
             </div>
 
         </div>
+
+<section class="invoice-payment-left-panel">
+    <div class="payment-left-header">
+        <div>
+            <h3>Оплаты по счёту</h3>
+            <p>Частичная оплата, остаток и история платежей.</p>
+        </div>
+    </div>
+
+    <div class="payment-left-summary">
+        <div>
+            <span>Сумма счёта</span>
+            <strong>{{ payment_summary.invoice_amount|money_ru }}</strong>
+        </div>
+
+        <div>
+            <span>Оплачено</span>
+            <strong>{{ payment_summary.paid_amount|money_ru }}</strong>
+        </div>
+
+        <div>
+            <span>Остаток</span>
+            <strong>{{ payment_summary.remaining_amount|money_ru }}</strong>
+        </div>
+
+        <div>
+            <span>Статус оплаты</span>
+            <strong>{{ payment_summary.payment_status_label }}</strong>
+        </div>
+    </div>
+
+    {% if payment_summary.remaining_amount > 0 %}
+        <form
+            method="post"
+            action="{% url 'add_invoice_payment' invoice.id %}"
+            class="payment-left-form"
+        >
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ payment_form.amount.id_for_label }}">Сумма оплаты</label>
+                {{ payment_form.amount }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ payment_form.paid_at.id_for_label }}">Дата оплаты</label>
+                {{ payment_form.paid_at }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ payment_form.payment_number.id_for_label }}">Платёжный документ</label>
+                {{ payment_form.payment_number }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ payment_form.comment.id_for_label }}">Комментарий</label>
+                {{ payment_form.comment }}
+            </div>
+
+            <button type="submit" class="btn btn-primary payment-left-submit">
+                Внести оплату
+            </button>
+        </form>
+    {% else %}
+        <div class="payment-left-complete">
+            Счёт закрыт по оплате.
+        </div>
+    {% endif %}
+
+    <div class="payment-left-history">
+        <h4>История оплат</h4>
+
+        {% for payment in payments %}
+            <div class="payment-left-history-item">
+                <div>
+                    <strong>{{ payment.amount|money_ru }}</strong>
+                    <span>{{ payment.paid_at|date:"d.m.Y" }}</span>
+                </div>
+
+                <div>
+                    <span>{{ payment.payment_number|default:"Без номера" }}</span>
+                    <small>
+                        {% if payment.created_by %}
+                            {{ payment.created_by.get_username }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </small>
+
+                    <form
+                        method="post"
+                        action="{% url 'cancel_invoice_payment' payment.id %}"
+                        class="payment-cancel-form"
+                    >
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="btn btn-secondary btn-xs"
+                            onclick="return confirm('Отменить эту оплату? Остаток по счёту будет пересчитан.');"
+                        >
+                            Отменить
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% empty %}
+            <div class="payment-left-empty">
+                Оплат по этому счёту пока нет.
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+
 
         <div class="card invoice-section-card">
 
@@ -526,7 +642,7 @@
 
             <div class="section-title-row">
                 <div>
-                    <h3>
+<h3>
                         Просмотр документа
                     </h3>
 
@@ -726,5 +842,4 @@ renderPdf();
 </script>
 
 {% endif %}
-
 {% endblock %}

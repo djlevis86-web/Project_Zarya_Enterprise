@@ -1,0 +1,621 @@
+
+/* =========================================================
+   ERP Zarya35 — fixed sidebar stable v1
+   Реальная разметка:
+   .app-shell > .sidebar + .main
+   Цель: меню всегда слева, без сломанного вида и без floating-эффектов.
+   ========================================================= */
+
+@media (min-width: 981px) {
+    :root {
+        --z-sidebar-width: 280px;
+    }
+
+    html,
+    body {
+        min-height: 100%;
+    }
+
+    body {
+        overflow-x: hidden;
+    }
+
+    .app-shell {
+        display: block !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+    }
+
+    .sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+
+        width: var(--z-sidebar-width) !important;
+        min-width: var(--z-sidebar-width) !important;
+        max-width: var(--z-sidebar-width) !important;
+
+        height: 100vh !important;
+        max-height: 100vh !important;
+
+        padding: 0 !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+
+        overflow: hidden !important;
+
+        background:
+            linear-gradient(180deg, rgba(7, 20, 14, .98), rgba(5, 14, 10, .98)) !important;
+        border-right: 1px solid rgba(148, 163, 184, 0.18) !important;
+
+        z-index: 1000 !important;
+    }
+
+    .sidebar-top {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+
+        padding: 24px 18px 14px !important;
+
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+
+        scrollbar-width: none !important;
+    }
+
+    .sidebar-top::-webkit-scrollbar {
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    .sidebar-brand {
+        margin: 0 0 34px !important;
+        padding: 0 !important;
+    }
+
+    .sidebar-nav {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 18px !important;
+
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .sidebar-nav .nav-section {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .sidebar-nav .nav-section-title {
+        margin: 0 0 8px !important;
+        padding: 0 6px !important;
+
+        color: #d8f5e4 !important;
+        font-size: 13px !important;
+        font-weight: 850 !important;
+        line-height: 1.2 !important;
+    }
+
+    .sidebar .nav-link,
+    .sidebar-nav a.nav-link {
+        width: 100% !important;
+        min-height: 42px !important;
+
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+
+        padding: 9px 14px !important;
+        margin: 0 0 4px !important;
+
+        border: 1px solid transparent !important;
+        border-radius: 14px !important;
+
+        background: transparent !important;
+        color: #e5f7ec !important;
+
+        font-size: 14px !important;
+        font-weight: 760 !important;
+        line-height: 1.2 !important;
+        text-decoration: none !important;
+
+        box-shadow: none !important;
+
+        transition:
+            background-color .16s ease,
+            border-color .16s ease,
+            color .16s ease,
+            transform .16s ease,
+            box-shadow .16s ease !important;
+    }
+
+    .sidebar .nav-link > span:last-child {
+        min-width: 0 !important;
+    }
+
+    .sidebar .nav-link:hover {
+        background: rgba(34, 197, 94, .09) !important;
+        border-color: rgba(34, 197, 94, .24) !important;
+        color: #ffffff !important;
+        transform: translateX(1px) !important;
+    }
+
+    .sidebar .nav-link.is-active,
+    .sidebar .nav-link.active,
+    .sidebar .nav-link[aria-current="page"] {
+        background: rgba(34, 197, 94, .16) !important;
+        border-color: rgba(34, 197, 94, .46) !important;
+        color: #ffffff !important;
+        box-shadow: inset 0 0 0 1px rgba(34, 197, 94, .05) !important;
+    }
+
+    .sidebar .nav-icon {
+        width: 18px !important;
+        min-width: 18px !important;
+
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        color: currentColor !important;
+        opacity: .95 !important;
+    }
+
+    .sidebar-footer {
+        flex: 0 0 auto !important;
+
+        padding: 12px 18px 18px !important;
+        margin: 0 !important;
+
+        background:
+            linear-gradient(180deg, rgba(7, 20, 14, .92), rgba(5, 14, 10, .99)) !important;
+        border-top: 1px solid rgba(148, 163, 184, 0.12) !important;
+    }
+
+    .sidebar-footer .nav-link {
+        margin: 0 !important;
+    }
+
+    .main {
+        width: calc(100% - var(--z-sidebar-width)) !important;
+        min-width: 0 !important;
+        min-height: 100vh !important;
+
+        margin-left: var(--z-sidebar-width) !important;
+    }
+
+    .topbar {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 50 !important;
+    }
+}
+
+@media (max-width: 980px) {
+    .app-shell {
+        display: block !important;
+    }
+
+    .sidebar {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        bottom: auto !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+
+        height: auto !important;
+        max-height: none !important;
+
+        padding: 0 !important;
+
+        display: block !important;
+        overflow: visible !important;
+    }
+
+    .sidebar-top,
+    .sidebar-footer {
+        overflow: visible !important;
+    }
+
+    .main {
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+}
+
+/* SIDEBAR-MOVING-HIGHLIGHT-V1-START */
+/*
+   Плавная подсветка меню.
+   Работает только когда JS добавил .sidebar-nav-highlight-ready.
+   Без JS остаётся обычное активное выделение из fixed sidebar stable.
+*/
+
+@media (min-width: 981px) {
+    .sidebar-nav {
+        position: relative !important;
+        isolation: isolate !important;
+    }
+
+    .sidebar-moving-highlight {
+        position: absolute;
+        left: 0;
+        top: 0;
+
+        width: 100%;
+        height: 42px;
+
+        border: 1px solid rgba(34, 197, 94, .48);
+        border-radius: 14px;
+
+        background:
+            linear-gradient(90deg, rgba(34, 197, 94, .18), rgba(34, 197, 94, .09));
+
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, .04),
+            0 10px 24px rgba(34, 197, 94, .10);
+
+        opacity: 0;
+        pointer-events: none;
+        z-index: 0;
+
+        transform: translate3d(0, 0, 0);
+
+        transition:
+            transform 230ms cubic-bezier(.2, .8, .2, 1),
+            height 230ms cubic-bezier(.2, .8, .2, 1),
+            opacity 150ms ease;
+    }
+
+    .sidebar-nav.sidebar-nav-highlight-ready .sidebar-moving-highlight {
+        opacity: 1;
+    }
+
+    .sidebar-nav.sidebar-nav-highlight-ready .nav-section {
+        position: relative;
+        z-index: 1;
+    }
+
+    .sidebar-nav.sidebar-nav-highlight-ready .nav-link {
+        position: relative !important;
+        z-index: 2 !important;
+
+        background: transparent !important;
+        border-color: transparent !important;
+
+        transition:
+            color .16s ease,
+            text-shadow .16s ease,
+            transform .16s ease !important;
+    }
+
+    .sidebar-nav.sidebar-nav-highlight-ready .nav-link:hover,
+    .sidebar-nav.sidebar-nav-highlight-ready .nav-link.is-active,
+    .sidebar-nav.sidebar-nav-highlight-ready .nav-link.active {
+        color: #ffffff !important;
+        text-shadow: 0 0 14px rgba(46, 232, 120, .18) !important;
+    }
+
+    .sidebar-nav.sidebar-nav-highlight-ready .nav-link:hover .nav-icon,
+    .sidebar-nav.sidebar-nav-highlight-ready .nav-link.is-active .nav-icon,
+    .sidebar-nav.sidebar-nav-highlight-ready .nav-link.active .nav-icon {
+        color: #2ee878 !important;
+    }
+
+    .sidebar-nav.sidebar-nav-highlight-ready .nav-link:hover {
+        transform: translateX(2px) !important;
+    }
+}
+/* SIDEBAR-MOVING-HIGHLIGHT-V1-END */
+
+/* SIDEBAR-ACCOUNT-CARD-V2-START */
+/*
+   Нижняя карточка пользователя в sidebar.
+   Профиль перенесён из обычного меню вниз.
+*/
+
+@media (min-width: 981px) {
+    .sidebar-account-card {
+        flex: 0 0 auto !important;
+
+        padding: 12px 16px 16px !important;
+        margin: 0 !important;
+
+        background:
+            linear-gradient(180deg, rgba(13, 24, 19, .94), rgba(6, 15, 10, .99)) !important;
+
+        border-top: 1px solid rgba(148, 163, 184, .14) !important;
+    }
+
+    .sidebar-user-card {
+        display: grid !important;
+        grid-template-columns: 42px minmax(0, 1fr) !important;
+        gap: 12px !important;
+        align-items: center !important;
+
+        padding: 12px !important;
+
+        border: 1px solid rgba(148, 163, 184, .18) !important;
+        border-bottom: 0 !important;
+        border-radius: 16px 16px 0 0 !important;
+
+        background: rgba(255, 255, 255, .055) !important;
+    }
+
+    .sidebar-user-avatar {
+        width: 42px !important;
+        height: 42px !important;
+
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        border-radius: 12px !important;
+
+        background: linear-gradient(135deg, rgba(99, 102, 241, .95), rgba(79, 70, 229, .78)) !important;
+        color: #ffffff !important;
+
+        font-size: 15px !important;
+        font-weight: 900 !important;
+        line-height: 1 !important;
+    }
+
+    .sidebar-user-meta {
+        min-width: 0 !important;
+    }
+
+    .sidebar-user-name {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+
+        color: #ffffff !important;
+        font-size: 14px !important;
+        font-weight: 850 !important;
+        line-height: 1.25 !important;
+    }
+
+    .sidebar-user-email {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+
+        margin-top: 2px !important;
+
+        color: rgba(226, 232, 240, .52) !important;
+        font-size: 12px !important;
+        font-weight: 650 !important;
+        line-height: 1.25 !important;
+    }
+
+    .sidebar-user-actions {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+
+        padding: 0 12px 12px !important;
+
+        border: 1px solid rgba(148, 163, 184, .18) !important;
+        border-top: 0 !important;
+        border-radius: 0 0 16px 16px !important;
+
+        background: rgba(255, 255, 255, .055) !important;
+    }
+
+    .sidebar-user-action {
+        min-height: 40px !important;
+
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+
+        padding: 8px 10px !important;
+
+        border: 1px solid rgba(148, 163, 184, .16) !important;
+        border-radius: 10px !important;
+
+        background: rgba(255, 255, 255, .045) !important;
+        color: rgba(226, 232, 240, .84) !important;
+
+        font-size: 13px !important;
+        font-weight: 800 !important;
+        line-height: 1 !important;
+        text-decoration: none !important;
+
+        transition:
+            background-color .16s ease,
+            border-color .16s ease,
+            color .16s ease,
+            transform .16s ease !important;
+    }
+
+    .sidebar-user-action:hover,
+    .sidebar-user-action.is-active {
+        background: rgba(34, 197, 94, .12) !important;
+        border-color: rgba(34, 197, 94, .32) !important;
+        color: #ffffff !important;
+        transform: translateY(-1px) !important;
+    }
+
+    .sidebar-user-action-danger {
+        color: rgba(248, 113, 113, .90) !important;
+        border-color: rgba(248, 113, 113, .20) !important;
+    }
+
+    .sidebar-user-action-danger:hover {
+        background: rgba(248, 113, 113, .10) !important;
+        border-color: rgba(248, 113, 113, .34) !important;
+        color: #fecaca !important;
+    }
+}
+
+@media (max-width: 980px) {
+    .sidebar-account-card {
+        padding: 14px !important;
+    }
+
+    .sidebar-user-card {
+        display: grid !important;
+        grid-template-columns: 42px minmax(0, 1fr) !important;
+        gap: 12px !important;
+        align-items: center !important;
+    }
+
+    .sidebar-user-actions {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        margin-top: 10px !important;
+    }
+}
+/* SIDEBAR-ACCOUNT-CARD-V2-END */
+
+/* SIDEBAR-STRUCTURE-V1-START */
+/*
+   Sidebar structure:
+   - brand сверху;
+   - меню прокручивается отдельно;
+   - account-card снизу всегда видна.
+*/
+
+@media (min-width: 981px) {
+    .sidebar {
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+    }
+
+    .sidebar-brand-area {
+        flex: 0 0 auto !important;
+
+        padding: 24px 18px 20px !important;
+
+        background:
+            linear-gradient(180deg, rgba(7, 20, 14, .99), rgba(7, 20, 14, .94)) !important;
+
+        border-bottom: 1px solid rgba(148, 163, 184, .10) !important;
+    }
+
+    .sidebar-brand-area .sidebar-brand {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .sidebar-scroll {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+
+        padding: 18px 18px 16px !important;
+
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+
+        scrollbar-width: thin !important;
+        scrollbar-color: rgba(148, 163, 184, .24) transparent !important;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar {
+        width: 6px !important;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, .22) !important;
+        border-radius: 999px !important;
+    }
+
+    .sidebar-scroll:hover::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, .34) !important;
+    }
+
+    .sidebar-scroll .sidebar-nav {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .sidebar-top {
+        display: contents !important;
+    }
+
+    .sidebar-account-card {
+        flex: 0 0 auto !important;
+    }
+}
+
+@media (max-width: 980px) {
+    .sidebar-brand-area,
+    .sidebar-scroll {
+        padding: 14px !important;
+    }
+
+    .sidebar-scroll {
+        overflow: visible !important;
+    }
+}
+/* SIDEBAR-STRUCTURE-V1-END */
+
+/* SIDEBAR-SCROLL-POLISH-V1-START */
+/*
+   Аккуратный scrollbar только для центрального меню sidebar.
+   Логотип и нижняя карточка не прокручиваются.
+*/
+
+@media (min-width: 981px) {
+    .sidebar-scroll {
+        scrollbar-width: thin !important;
+        scrollbar-color: rgba(148, 163, 184, .12) transparent !important;
+    }
+
+    .sidebar-scroll:hover {
+        scrollbar-color: rgba(148, 163, 184, .32) transparent !important;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-track {
+        background: transparent !important;
+        border: 0 !important;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+        min-height: 44px !important;
+        border-radius: 999px !important;
+        background: rgba(148, 163, 184, .10) !important;
+        border: 0 !important;
+    }
+
+    .sidebar-scroll:hover::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, .34) !important;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+        background: rgba(148, 163, 184, .46) !important;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-button {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-corner {
+        background: transparent !important;
+    }
+
+    .sidebar-scroll .sidebar-nav {
+        padding-right: 2px !important;
+    }
+}
+/* SIDEBAR-SCROLL-POLISH-V1-END */

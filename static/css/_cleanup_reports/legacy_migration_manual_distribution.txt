@@ -1,0 +1,198 @@
+ERP Zarya35 — manual legacy-migration distribution
+====================================================================================================
+
+blocks before: 51
+blocks moved: 30
+blocks remaining: 21
+
+audit: 3
+components_badges: 0
+components_cards: 0
+components_tables: 0
+counterparties: 3
+features_ocr: 0
+payment_registry: 2
+payment_schedule: 4
+system: 18
+
+====================================================================================================
+REMAINING
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+BLOCK #1: .payment-summary-link.is-danger strong
+.payment-summary-link.is-danger strong {
+    color: #dc2626;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #2: .payment-summary-link.is-muted strong
+.payment-summary-link.is-muted strong {
+    color: #64748b;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #3: .payment-date-open:hover
+.payment-date-open:hover {
+    background: #1f2937 !important;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #4: .payment-date-tools
+.payment-date-tools {
+    grid-column: span 3 !important;
+    display: flex !important;
+    align-items: end !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #5: .payment-date-preset
+.payment-date-preset {
+    min-height: 38px !important;
+    padding: 9px 12px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(148, 163, 184, 0.35) !important;
+    background: rgba(15, 23, 42, 0.7) !important;
+    color: #e5e7eb !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #6: .payment-date-preset:hover
+.payment-date-preset:hover {
+    background: rgba(39, 174, 96, 0.18) !important;
+    border-color: rgba(39, 174, 96, 0.75) !important;
+    color: #ffffff !important;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #7: .payment-date-tools, .payment-date-open
+.payment-date-tools,
+.payment-date-open {
+    display: none !important;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #8: .payment-summary-grid
+.payment-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #9: .payment-left-header h3
+.payment-left-header h3 {
+    margin: 0 0 4px;
+    color: #f8fafc;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #10: .payment-left-header p
+.payment-left-header p {
+    margin: 0 0 14px;
+    color: #94a3b8;
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #11: .payment-left-summary
+.payment-left-summary {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #12: .payment-left-summary > div
+.payment-left-summary > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    background: rgba(2, 6, 23, 0.22);
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #13: .payment-left-summary span
+.payment-left-summary span {
+    color: #cbd5e1;
+    font-size: 13px;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #14: .payment-left-summary strong
+.payment-left-summary strong {
+    color: #22c55e;
+    font-size: 14px;
+    font-weight: 900;
+    text-align: right;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #15: .payment-left-complete, .payment-left-empty
+.payment-left-complete,
+.payment-left-empty {
+    padding: 12px 14px;
+    border-radius: 14px;
+    color: #bfdbfe;
+    background: rgba(30, 64, 175, 0.12);
+    font-weight: 800;
+    font-size: 13px;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #16: .payment-left-history
+.payment-left-history {
+    margin-top: 16px;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #17: .payment-left-history h4
+.payment-left-history h4 {
+    margin: 0 0 10px;
+    color: #f8fafc;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #18: .payment-left-history-item
+.payment-left-history-item {
+    display: grid;
+    gap: 4px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #19: .payment-left-history-item:last-child
+.payment-left-history-item:last-child {
+    border-bottom: 0;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #20: .payment-left-history-item strong
+.payment-left-history-item strong {
+    color: #22c55e;
+    font-weight: 900;
+}
+
+----------------------------------------------------------------------------------------------------
+BLOCK #21: .payment-left-history-item span, .payment-left-history-item small
+.payment-left-history-item span,
+.payment-left-history-item small {
+    color: #cbd5e1;
+    font-size: 12px;
+}

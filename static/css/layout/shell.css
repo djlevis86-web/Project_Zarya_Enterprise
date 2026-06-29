@@ -1,0 +1,154 @@
+/*
+ * ERP Zarya35 — layout / shell
+ *
+ * Стили скопированы из legacy style.css.
+ * На этом этапе style.css ещё не очищаем.
+ */
+
+.main,
+.main-content,
+.app-main {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.page,
+.content-area,
+.page-content {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 36px;
+}
+
+/* =========================================================
+   Upload and import
+========================================================= */
+
+.upload-page-grid,
+.import-layout {
+    display: grid;
+    grid-template-columns: minmax(460px, 720px) minmax(320px, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+/* =========================================================
+   Invoice list and detail
+========================================================= */
+
+.invoice-table-compact,
+.schedule-table,
+.unmatched-table,
+.missing-requisites-table,
+.counterparty-invoices-table {
+    min-width: 0 !important;
+    table-layout: fixed;
+}
+
+.invoice-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(360px, 520px) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 520px) {
+    .page,
+    .content-area,
+    .page-content {
+        padding: 16px;
+    }
+
+    .card,
+    .content-card {
+        padding: 18px;
+    }
+}
+
+/* Fix invoice table after checkbox column was added */
+
+.invoice-table-compact {
+    table-layout: fixed;
+}
+
+/* Profile / System pages: make raw content look closer to app style */
+
+.page-content > form,
+.content-area > form,
+.main-content > form {
+    max-width: 100%;
+}
+
+/* === Payment schedule compact layout fix === */
+
+.payment-schedule-summary {
+    display: grid !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+}
+
+/* === Payment schedule date picker and button layout === */
+
+.payment-date-control {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 46px !important;
+    gap: 8px !important;
+    align-items: center !important;
+}
+
+/* === Payment registry compact layout === */
+
+.registry-filter-card {
+    padding: 20px 22px !important;
+}
+
+/* === Payment registry history table layout fix === */
+
+.payment-registry-history-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+/* Общий вид таблиц реестра */
+
+.payment-registry-draft-table,
+.payment-registry-detail-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+
+/* LEGACY-MIGRATION-FINAL-START */
+/* Финальная переклассификация из features/legacy-migration.css. */
+
+.app-footer,
+.footer {
+    margin-top: auto;
+    padding: 18px 36px;
+    border-top: 1px solid var(--z-border);
+    color: var(--z-muted);
+    font-size: 12px;
+}
+/* LEGACY-MIGRATION-FINAL-END */
+
+/* VISUAL-BASELINE-START */
+/*
+ * ERP Zarya35 — shell visual baseline.
+ */
+
+.app-footer,
+.footer {
+    margin-top: auto;
+    padding: 18px 36px;
+    border-top: 1px solid var(--z-border);
+    color: var(--z-muted);
+    font-size: 12px;
+}
+
+/* VISUAL-BASELINE-END */

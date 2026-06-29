@@ -190,56 +190,158 @@ def normalize_for_search(value):
     return value.strip()
 
 
-def extract_inn(text):
+def normalize_requisite_text(text):
 
     if not text:
 
-        return None
+        return ''
 
     text = str(text)
 
-    text = text.replace(
-        'AHH',
-        'ИНН'
+    replacements = {
+        'AHH': 'ИНН',
+        'UHH': 'ИНН',
+        'WHH': 'ИНН',
+        'ИННН': 'ИНН',
+    }
+
+    for old, new in replacements.items():
+
+        text = text.replace(
+            old,
+            new
+        )
+
+    return text
+
+
+def extract_requisite_candidates(text):
+
+    text = normalize_requisite_text(
+        text
     )
 
-    text = text.replace(
-        'UHH',
-        'ИНН'
+    if not text:
+
+        return []
+
+    candidates = []
+
+    lines = [
+        line.strip()
+        for line in text.splitlines()
+        if line.strip()
+    ]
+
+    for line_number, line in enumerate(lines, start=1):
+
+        combined_matches = re.finditer(
+            r'ИНН\s*/\s*КПП\s*[:№]?\s*(\d{12}|\d{10})\s*/\s*(\d{9})',
+            line,
+            re.IGNORECASE
+        )
+
+        for match in combined_matches:
+
+            candidates.append(
+                {
+                    'inn': match.group(1),
+                    'kpp': match.group(2),
+                    'line_number': line_number,
+                    'line': line,
+                    'source': 'combined_inn_kpp',
+                }
+            )
+
+        inline_matches = re.finditer(
+            r'ИНН\s*[:№]?\s*(\d{12}|\d{10})(?:\s*/\s*(\d{9}))?',
+            line,
+            re.IGNORECASE
+        )
+
+        for match in inline_matches:
+
+            inn = match.group(1)
+            kpp = match.group(2)
+
+            if not kpp:
+
+                tail = line[match.end():]
+
+                kpp_match = re.search(
+                    r'КПП\s*[:№]?\s*(\d{9})',
+                    tail,
+                    re.IGNORECASE
+                )
+
+                if kpp_match:
+
+                    kpp = kpp_match.group(1)
+
+            candidates.append(
+                {
+                    'inn': inn,
+                    'kpp': kpp,
+                    'line_number': line_number,
+                    'line': line,
+                    'source': 'inline_inn',
+                }
+            )
+
+    return candidates
+
+
+def select_supplier_requisite_candidate(text):
+
+    own_inn = '3507012256'
+
+    candidates = extract_requisite_candidates(
+        text
     )
 
-    match = re.search(
-        r'ИНН\s*[:№]?\s*(\d{10,12})',
-        text,
-        re.IGNORECASE
-    )
+    for candidate in candidates:
 
-    if match:
+        if candidate.get(
+            'inn'
+        ) != own_inn:
 
-        return match.group(1)
+            return candidate
+
+    if candidates:
+
+        return candidates[0]
 
     return None
+
+
+def extract_inn(text):
+
+    candidate = select_supplier_requisite_candidate(
+        text
+    )
+
+    if not candidate:
+
+        return None
+
+    return candidate.get(
+        'inn'
+    )
 
 
 def extract_kpp(text):
 
-    if not text:
+    candidate = select_supplier_requisite_candidate(
+        text
+    )
+
+    if not candidate:
 
         return None
 
-    text = str(text)
-
-    match = re.search(
-        r'КПП\s*[:№]?\s*(\d{9})',
-        text,
-        re.IGNORECASE
+    return candidate.get(
+        'kpp'
     )
-
-    if match:
-
-        return match.group(1)
-
-    return None
 
 
 def extract_requisites_near_vendor(text, vendor_name):
@@ -418,39 +520,32 @@ def find_counterparty_by_name(vendor_name):
 
 def get_or_create_counterparty_from_invoice(invoice):
 
-    vendor_name = normalize_counterparty_name(
-        invoice.vendor
+    source_text = invoice.ocr_text or ''
+
+    inn = extract_inn(
+        source_text
     )
 
-    if not vendor_name:
+    kpp = extract_kpp(
+        source_text
+    )
+
+    if not inn:
 
         invoice.counterparty_match_status = (
             Invoice.COUNTERPARTY_MATCH_NOT_FOUND
         )
 
         invoice.counterparty_match_comment = (
-            'OCR не определил корректного поставщика'
+            'OCR не определил ИНН поставщика'
         )
 
         return None
-
-    source_text = invoice.ocr_text or ''
-
-    inn, kpp = extract_requisites_near_vendor(
-        source_text,
-        vendor_name
-    )
 
     counterparty = find_counterparty_by_requisites(
         inn,
         kpp
     )
-
-    if not counterparty:
-
-        counterparty = find_counterparty_by_name(
-            vendor_name
-        )
 
     if counterparty:
 
@@ -459,7 +554,7 @@ def get_or_create_counterparty_from_invoice(invoice):
         )
 
         invoice.counterparty_match_comment = (
-            'Контрагент найден в справочнике 1С/ручном справочнике'
+            f'Контрагент найден в справочнике 1С/ручном справочнике по ИНН {inn}'
         )
 
         return counterparty
@@ -468,8 +563,16 @@ def get_or_create_counterparty_from_invoice(invoice):
         Invoice.COUNTERPARTY_MATCH_NOT_FOUND
     )
 
-    invoice.counterparty_match_comment = (
-        f'Контрагент не найден в справочнике 1С: {vendor_name}'
-    )
+    if kpp:
+
+        invoice.counterparty_match_comment = (
+            f'Контрагент не найден в справочнике 1С/ручном справочнике по ИНН {inn}, КПП {kpp}'
+        )
+
+    else:
+
+        invoice.counterparty_match_comment = (
+            f'Контрагент не найден в справочнике 1С/ручном справочнике по ИНН {inn}'
+        )
 
     return None

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load money %}
 
 {% block content %}
 
@@ -31,7 +32,7 @@
     <a href="{% url 'payment_schedule' %}?filter=all" class="registry-summary-card payment-summary-link {% if filter_type == 'all' %}is-active{% endif %}">
         <span>Всего к оплате</span>
         <strong>{{ total_count }}</strong>
-        <small>{{ total_amount|floatformat:2 }} ₽</small>
+        <small>{{ total_amount|money_ru }}</small>
     </a>
 
     <a href="{% url 'payment_schedule' %}?filter=today" class="registry-summary-card payment-summary-link {% if filter_type == 'today' %}is-active{% endif %}">
@@ -61,7 +62,7 @@
     <div class="registry-summary-card payment-summary-selected">
         <span>Отобрано</span>
         <strong>{{ filtered_count }}</strong>
-        <small>{{ filtered_amount|floatformat:2 }} ₽</small>
+        <small>{{ filtered_amount|money_ru }}</small>
     </div>
 
 </div>
@@ -131,21 +132,25 @@
         </div>
 
         <div class="form-group">
-            <label>
-                Приоритет
-            </label>
+<div class="filter-field">
+                <label for="payment_status">Оплата</label>
 
-            <select name="priority" class="form-control">
-                <option value="">
-                    Все приоритеты
-                </option>
+                <select
+                    id="payment_status"
+                    name="payment_status"
+                    class="form-control"
+                >
+                    {% for value, label in payment_status_choices %}
+                        <option
+                            value="{{ value }}"
+                            {% if schedule_payment_status_filter == value %}selected{% endif %}
+                        >
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-                {% for value, label in priority_choices %}
-                    <option value="{{ value }}" {% if selected_priority == value|stringformat:"s" %}selected{% endif %}>
-                        {{ label }}
-                    </option>
-                {% endfor %}
-            </select>
         </div>
 
         <div class="form-group payment-filter-search">
@@ -186,7 +191,7 @@
             </h3>
 
             <span>
-                Отобрано счетов: {{ filtered_count }} · сумма: {{ filtered_amount|floatformat:2 }} ₽
+                Отобрано счетов: {{ filtered_count }} · сумма: {{ filtered_amount|money_ru }}
             </span>
         </div>
 
@@ -198,21 +203,39 @@
 
     </div>
 
-    <div class="table-scroll table-scroll-fit">
+    <div class="table-scroll table-scroll-fit payment-schedule-table-wrap">
+<table class="table registry-table schedule-table payment-schedule-table">
 
-        <table class="table registry-table schedule-table payment-schedule-table">
+            
 
-            <thead>
+<colgroup>
+    <col class="col-id">
+    <col class="col-counterparty">
+    <col class="col-invoice">
+    <col class="col-amount">
+    <col class="col-date">
+    <col class="col-payment">
+    <col class="col-status">
+    <col class="col-actions">
+</colgroup>
+
+<thead>
                 <tr>
                     <th>ID</th>
-                    <th>Контрагент</th>
-                    <th>Счет</th>
-                    <th>Сумма</th>
-                    <th>Дата оплаты</th>
-                    <th>Приоритет</th>
-                    <th>Статус</th>
-                    <th>Ответственный</th>
-                    <th>Действия</th>
+
+                        <th>Контрагент</th>
+
+                        <th>Счет</th>
+
+                        <th>Сумма</th>
+
+                        <th>Дата оплаты</th>
+
+                        <th class="payment-schedule-remaining-column">Остаток</th>
+
+                        <th>Статус</th>
+
+                        <th>Действия</th>
                 </tr>
             </thead>
 
@@ -233,7 +256,7 @@
                             </a>
                         </td>
 
-                        <td>
+                            <td>
                             {% if invoice.counterparty %}
                                 <strong>{{ invoice.counterparty.name }}</strong>
                             {% elif invoice.vendor %}
@@ -243,7 +266,7 @@
                             {% endif %}
                         </td>
 
-                        <td>
+                            <td>
                             {% if invoice.invoice_number %}
                                 № {{ invoice.invoice_number }}
                             {% else %}
@@ -257,13 +280,13 @@
                             {% endif %}
                         </td>
 
-                        <td>
+                            <td>
                             <strong class="amount-main">
-                                {{ invoice.amount|floatformat:2 }} ₽
+                                {{ invoice.amount|money_ru }}
                             </strong>
                         </td>
 
-                        <td>
+                            <td>
                             {% if invoice.planned_payment_date %}
                                 <strong>
                                     {{ invoice.planned_payment_date|date:"d.m.Y" }}
@@ -289,27 +312,33 @@
                             {% endif %}
                         </td>
 
-                        <td>
-                            <span class="priority-badge priority-{{ invoice.payment_priority }}">
-                                {{ invoice.payment_priority }}
-                            </span>
+                            <td>
+                            <div class="payment-mini payment-mini-schedule payment-mini-{{ invoice.payment_status_code }}">
+                                <div class="payment-mini-row">
+                                    <span>Оплачено</span>
+                                    <strong>{{ invoice.payment_paid_amount|money_ru }}</strong>
+                                </div>
+
+                                <div class="payment-mini-row">
+                                    <span>Остаток</span>
+                                    <strong>{{ invoice.payment_remaining_amount|money_ru }}</strong>
+                                </div>
+
+                                <div class="payment-mini-status">
+                                    {{ invoice.payment_status_label }}
+                                </div>
+                            </div>
                         </td>
 
-                        <td>
+                            <td>
                             <span class="status-badge status-{{ invoice.status }}">
                                 {{ invoice.get_status_display }}
                             </span>
                         </td>
 
-                        <td>
-                            {% if invoice.user %}
-                                {{ invoice.user.username }}
-                            {% else %}
-                                <span class="muted">—</span>
-                            {% endif %}
-                        </td>
+                            
 
-                        <td>
+                            <td>
                             <div class="table-actions table-actions-vertical">
                                 <a href="{% url 'invoice_detail' invoice.id %}" class="btn btn-primary btn-sm">
                                     Открыть
@@ -345,7 +374,7 @@
                 {% empty %}
 
                     <tr>
-                        <td colspan="9" class="empty-table">
+                        <td colspan="8" class="empty-table">
                             Для выбранных условий платежей нет.
                         </td>
                     </tr>
@@ -355,8 +384,7 @@
             </tbody>
 
         </table>
-
-    </div>
+</div>
 
 </div>
 {% endblock %}

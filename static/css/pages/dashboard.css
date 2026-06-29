@@ -1,0 +1,843 @@
+/*
+ * ERP Zarya35 — pages / dashboard
+ *
+ * Стили скопированы из legacy style.css.
+ * На этом этапе style.css ещё не очищаем.
+ */
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    overflow-x: hidden;
+    background: var(--z-bg);
+    color: var(--z-text);
+    font-family: var(--z-font);
+    font-size: 14px;
+    line-height: 1.55;
+    text-rendering: geometricPrecision;
+}
+
+.card,
+.content-card,
+.stat-card,
+.registry-summary-card {
+    background: rgba(16, 21, 18, .94);
+    border: 1px solid var(--z-border);
+    border-radius: var(--z-radius);
+    box-shadow: none;
+}
+
+.light-theme .card,
+.light-theme .content-card,
+.light-theme .stat-card,
+.light-theme .registry-summary-card {
+    background: #ffffff;
+}
+
+.card:hover,
+.content-card:hover,
+.stat-card:hover {
+    border-color: rgba(255, 255, 255, .16);
+}
+
+/* =========================================================
+   Stats and summaries
+========================================================= */
+
+.stats-grid,
+.dashboard-stats,
+.registry-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.stat-card,
+.registry-summary-card {
+    padding: 22px;
+}
+
+/* =========================================================
+   Dashboard
+========================================================= */
+
+.dashboard-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.dashboard-hero-main,
+.dashboard-hero-side {
+    border: 1px solid var(--z-border);
+    border-radius: 20px;
+    background: radial-gradient(circle at top left, rgba(39, 174, 96, .13), transparent 28rem), rgba(16, 18, 17, .96);
+}
+
+.dashboard-hero-main {
+    padding: 28px;
+}
+
+.dashboard-kicker {
+    display: inline-flex;
+    margin-bottom: 12px;
+    color: var(--z-accent-2);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.dashboard-hero h2 {
+    max-width: 760px;
+    margin: 0;
+    font-size: 34px;
+    line-height: 1.1;
+    font-weight: 950;
+    letter-spacing: -.035em;
+}
+
+.dashboard-hero p {
+    max-width: 760px;
+    margin: 12px 0 0;
+    color: var(--z-muted);
+}
+
+.dashboard-hero-actions {
+    justify-content: flex-start;
+    margin-top: 20px;
+}
+
+.dashboard-hero-side {
+    display: grid;
+    gap: 1px;
+    overflow: hidden;
+}
+
+.hero-metric {
+    padding: 22px;
+    background: rgba(255, 255, 255, .025);
+}
+
+.hero-metric span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.hero-metric strong {
+    font-size: 36px;
+    line-height: 1;
+    font-weight: 950;
+}
+
+.dashboard-grid-two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin-bottom: 22px;
+}
+
+.quick-action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.quick-action-card,
+.process-item,
+.upload-step {
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--z-border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .025);
+}
+
+.quick-action-card {
+    grid-template-columns: 42px 1fr;
+}
+
+.quick-action-card:hover {
+    background: rgba(39, 174, 96, .08);
+    border-color: rgba(39, 174, 96, .28);
+}
+
+.quick-action-icon,
+.process-item > span,
+.upload-step > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: rgba(39, 174, 96, .14);
+    color: var(--z-accent-2);
+    font-weight: 950;
+}
+
+.quick-action-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+}
+
+.quick-action-card p,
+.process-item p,
+.upload-step p {
+    margin: 0;
+    color: var(--z-muted);
+    font-size: 13px;
+}
+
+.dashboard-latest-table {
+    min-width: 780px;
+}
+
+.card,
+.content-card,
+.stat-card,
+.registry-summary-card {
+    background: rgba(18, 25, 21, .96);
+}
+
+.stat-value,
+.registry-summary-card strong,
+.hero-metric strong {
+    font-weight: 760;
+    text-shadow: none;
+}
+
+/* Better compact cards */
+
+.quick-action-card,
+.process-item,
+.upload-step,
+.info-row,
+.comment-item,
+.timeline-item {
+    background: rgba(255, 255, 255, .018);
+}
+
+
+/* LEGACY-MIGRATION-FINAL-START */
+/* Финальная переклассификация из features/legacy-migration.css. */
+
+.stat-link {
+    display: block;
+    color: inherit;
+}
+
+.stat-link:hover {
+    background: rgba(39, 174, 96, .045);
+    border-color: rgba(39, 174, 96, .36);
+}
+/* LEGACY-MIGRATION-FINAL-END */
+
+/* DASHBOARD-ACTIONS-POLISH-V1-START */
+/*
+   Dashboard hero actions:
+   основные действия собраны в одном месте.
+*/
+
+.dashboard-hero-all-invoices {
+    white-space: nowrap;
+}
+/* DASHBOARD-ACTIONS-POLISH-V1-END */
+
+/* DASHBOARD-COMPACT-V2-START */
+/*
+   Dashboard compact v2:
+   - НЕ растягиваем "Быстрые действия" и "Рабочий процесс" по высоте;
+   - только выравниваем верх карточек;
+   - уплотняем внутренние элементы среднего ряда;
+   - "Последние счета" оставляем компактными: первые 5 строк.
+*/
+
+@media (min-width: 981px) {
+    /*
+     * Контейнер, где лежат "Быстрые действия" и "Рабочий процесс":
+     * верх ровный, но высоту не растягиваем.
+     */
+    main :is(
+        .dashboard-grid,
+        .dashboard-main-grid,
+        .dashboard-content-grid,
+        .dashboard-panels,
+        .dashboard-row,
+        .cards-grid,
+        .grid
+    ):has(.dashboard-quick-title-v1):has(.dashboard-workflow-title-v1) {
+        align-items: start !important;
+    }
+
+    /*
+     * Карточки среднего ряда не должны тянуться до одинаковой большой высоты.
+     */
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-quick-title-v1),
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-workflow-title-v1) {
+        height: auto !important;
+        min-height: 0 !important;
+        align-self: start !important;
+        margin-top: 0 !important;
+        padding-top: 22px !important;
+        padding-bottom: 22px !important;
+    }
+
+    /*
+     * Уплотняем внутренние карточки быстрых действий и шагов процесса.
+     */
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-quick-title-v1) :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card,
+        .quick-action,
+        .quick-action-card,
+        .action-card,
+        .workflow-item,
+        .workflow-step
+    ),
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-workflow-title-v1) :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card,
+        .quick-action,
+        .quick-action-card,
+        .action-card,
+        .workflow-item,
+        .workflow-step
+    ) {
+        min-height: 0 !important;
+    }
+
+    /*
+     * Уменьшаем вертикальные зазоры внутри этих двух блоков.
+     */
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-quick-title-v1) :is(.grid, .cards-grid, .dashboard-grid),
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-workflow-title-v1) :is(.grid, .cards-grid, .dashboard-grid) {
+        gap: 12px !important;
+    }
+}
+
+/*
+ * Последние счета: dashboard показывает только 5 строк.
+ */
+main :is(
+    .card,
+    .dashboard-card,
+    .dashboard-panel,
+    .panel,
+    .section-card,
+    .content-card,
+    .glass-card
+):has(.dashboard-latest-title-v1) tbody tr:nth-child(n + 6) {
+    display: none !important;
+}
+
+main :is(
+    .card,
+    .dashboard-card,
+    .dashboard-panel,
+    .panel,
+    .section-card,
+    .content-card,
+    .glass-card
+):has(.dashboard-latest-title-v1) tbody tr {
+    height: 54px !important;
+}
+
+main :is(
+    .card,
+    .dashboard-card,
+    .dashboard-panel,
+    .panel,
+    .section-card,
+    .content-card,
+    .glass-card
+):has(.dashboard-latest-title-v1) td,
+main :is(
+    .card,
+    .dashboard-card,
+    .dashboard-panel,
+    .panel,
+    .section-card,
+    .content-card,
+    .glass-card
+):has(.dashboard-latest-title-v1) th {
+    padding-top: 9px !important;
+    padding-bottom: 9px !important;
+}
+
+.dashboard-quick-title-v1,
+.dashboard-workflow-title-v1,
+.dashboard-latest-title-v1 {
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+}
+/* DASHBOARD-COMPACT-V2-END */
+
+/* DASHBOARD-FIRST-SCREEN-V1-START */
+/*
+   Dashboard first screen polish:
+   цель — поднять "Последние счета" выше без перестановки блоков.
+*/
+
+@media (min-width: 981px) {
+    /*
+     * Hero-блок с основными действиями.
+     */
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-hero-all-invoices) {
+        min-height: 0 !important;
+        padding-top: 28px !important;
+        padding-bottom: 28px !important;
+    }
+
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-hero-all-invoices) h1,
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-hero-all-invoices) h2 {
+        margin-bottom: 12px !important;
+        line-height: 1.08 !important;
+    }
+
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-hero-all-invoices) p {
+        margin-bottom: 18px !important;
+    }
+
+    /*
+     * Средний ряд: делаем карточки плотнее,
+     * но не растягиваем их по высоте.
+     */
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-quick-title-v1),
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-workflow-title-v1) {
+        padding-top: 20px !important;
+        padding-bottom: 20px !important;
+    }
+
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-quick-title-v1) h2,
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-workflow-title-v1) h2,
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-quick-title-v1) h3,
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-workflow-title-v1) h3 {
+        margin-bottom: 6px !important;
+    }
+
+    /*
+     * Внутренние элементы быстрых действий / процесса.
+     */
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-quick-title-v1) :is(a, .quick-action, .quick-action-card, .action-card),
+    main :is(
+        .card,
+        .dashboard-card,
+        .dashboard-panel,
+        .panel,
+        .section-card,
+        .content-card,
+        .glass-card
+    ):has(.dashboard-workflow-title-v1) :is(.workflow-item, .workflow-step, .step-card, .process-step) {
+        min-height: 0 !important;
+    }
+
+    /*
+     * Общий вертикальный ритм dashboard.
+     */
+    main :is(
+        .dashboard-grid,
+        .dashboard-main-grid,
+        .dashboard-content-grid,
+        .dashboard-panels,
+        .dashboard-row,
+        .cards-grid,
+        .grid
+    ) {
+        row-gap: 18px !important;
+    }
+}
+/* DASHBOARD-FIRST-SCREEN-V1-END */
+
+/* DASHBOARD-ATTENTION-V1-START */
+/*
+   Dashboard attention block:
+   показывает, что требует действий прямо сейчас.
+*/
+
+.dashboard-attention-v1 {
+    margin-top: 18px;
+    padding: 22px;
+
+    border: 1px solid rgba(148, 163, 184, .18);
+    border-radius: 18px;
+
+    background:
+        linear-gradient(180deg, rgba(13, 28, 20, .94), rgba(9, 20, 15, .96));
+}
+
+.dashboard-attention-header-v1 {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+
+    margin-bottom: 16px;
+}
+
+.dashboard-attention-header-v1 h2 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    line-height: 1.2;
+}
+
+.dashboard-attention-header-v1 p {
+    margin: 0;
+    color: rgba(226, 232, 240, .72);
+    font-size: 13px;
+}
+
+.dashboard-attention-grid-v1 {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.dashboard-attention-item-v1 {
+    min-height: 78px;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 14px;
+
+    border: 1px solid rgba(148, 163, 184, .16);
+    border-radius: 16px;
+
+    background: rgba(255, 255, 255, .035);
+    color: inherit;
+    text-decoration: none;
+
+    transition:
+        transform .16s ease,
+        border-color .16s ease,
+        background-color .16s ease;
+}
+
+.dashboard-attention-item-v1:hover {
+    transform: translateY(-1px);
+    border-color: rgba(34, 197, 94, .34);
+    background: rgba(34, 197, 94, .075);
+}
+
+.dashboard-attention-value-v1 {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: rgba(34, 197, 94, .14);
+    color: #2ee878;
+
+    font-size: 22px;
+    font-weight: 950;
+    line-height: 1;
+}
+
+.dashboard-attention-content-v1 {
+    min-width: 0;
+
+    display: grid;
+    gap: 4px;
+}
+
+.dashboard-attention-content-v1 strong {
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+.dashboard-attention-content-v1 small {
+    color: rgba(226, 232, 240, .68);
+    font-size: 12px;
+    line-height: 1.25;
+}
+
+@media (max-width: 1400px) {
+    .dashboard-attention-grid-v1 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .dashboard-attention-grid-v1 {
+        grid-template-columns: 1fr;
+    }
+}
+/* DASHBOARD-ATTENTION-V1-END */
+
+/* DASHBOARD-ATTENTION-QUEUE-V2-START */
+/*
+   Attention block v2:
+   блок стал рабочей очередью, а не дублем KPI.
+*/
+
+.dashboard-attention-v1 {
+    margin-top: 16px !important;
+    padding: 18px 20px !important;
+}
+
+.dashboard-attention-header-v1 {
+    margin-bottom: 12px !important;
+}
+
+.dashboard-attention-header-v1 h2 {
+    font-size: 17px !important;
+}
+
+.dashboard-attention-grid-v1 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+}
+
+.dashboard-attention-item-v1 {
+    min-height: 66px !important;
+    padding: 12px 14px !important;
+}
+
+.dashboard-attention-value-v1 {
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 40px !important;
+    border-radius: 13px !important;
+    font-size: 20px !important;
+}
+
+@media (max-width: 1200px) {
+    .dashboard-attention-grid-v1 {
+        grid-template-columns: 1fr !important;
+    }
+}
+/* DASHBOARD-ATTENTION-QUEUE-V2-END */
+
+/* DASHBOARD-ATTENTION-FULLWIDTH-V1-START */
+/*
+   Требуют внимания:
+   делаем блок широкой компактной рабочей полосой под KPI.
+*/
+
+@media (min-width: 981px) {
+    .dashboard-attention-v1 {
+        grid-column: 1 / -1 !important;
+
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+
+        padding: 16px 20px !important;
+        min-height: 0 !important;
+    }
+
+    .dashboard-attention-header-v1 {
+        margin-bottom: 12px !important;
+    }
+
+    .dashboard-attention-header-v1 h2 {
+        margin-bottom: 3px !important;
+        font-size: 17px !important;
+        line-height: 1.2 !important;
+    }
+
+    .dashboard-attention-header-v1 p {
+        font-size: 12px !important;
+        line-height: 1.25 !important;
+    }
+
+    .dashboard-attention-grid-v1 {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+    }
+
+    .dashboard-attention-item-v1 {
+        min-height: 58px !important;
+        padding: 10px 14px !important;
+        border-radius: 14px !important;
+    }
+
+    .dashboard-attention-value-v1 {
+        width: 38px !important;
+        min-width: 38px !important;
+        height: 38px !important;
+
+        border-radius: 12px !important;
+
+        font-size: 19px !important;
+    }
+
+    .dashboard-attention-content-v1 {
+        gap: 2px !important;
+    }
+
+    .dashboard-attention-content-v1 strong {
+        font-size: 13px !important;
+    }
+
+    .dashboard-attention-content-v1 small {
+        font-size: 11px !important;
+    }
+}
+
+@media (max-width: 1200px) {
+    .dashboard-attention-grid-v1 {
+        grid-template-columns: 1fr !important;
+    }
+}
+/* DASHBOARD-ATTENTION-FULLWIDTH-V1-END */

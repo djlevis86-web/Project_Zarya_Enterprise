@@ -358,58 +358,94 @@ def extract_text_from_image(image_path):
 def clean_invoice_number(value):
 
     if not value:
+
         return None
 
     value = str(value)
 
+    value = value.replace(
+        "№",
+        ""
+    )
+
+    value = value.replace(
+        "N",
+        ""
+    )
+
+    value = value.replace(
+        "n",
+        ""
+    )
+
+    value = value.replace(
+        "\\u00a0",
+        " "
+    )
+
+    value = value.replace(
+        "\u00a0",
+        " "
+    )
+
     value = value.strip()
 
-    value = value.replace(
-        '№',
-        ''
-    )
-
-    value = value.replace(
-        'N',
-        ''
-    )
-
-    value = value.strip(
-        ' ,.;:'
-    )
-
     value = re.sub(
-        r'[^A-Za-zА-Яа-я0-9\-\/]',
-        '',
+        r"\s+",
+        " ",
         value
     )
 
+    value = re.sub(
+        r"[^0-9A-Za-zА-Яа-яЁё.\-/ ]",
+        "",
+        value
+    )
+
+    value = value.strip(
+        " .,-/"
+    )
+
     if not value:
+
         return None
 
     if len(value) > 40:
-        return None
+
+        value = value[:40].strip()
 
     return value
 
 
 def parse_invoice_number(text):
 
+    if not text:
+
+        return None
+
+    text = str(text)
+
     patterns = [
 
-        r'Счет\s+на\s+оплату\s*№\s*([A-Za-zА-Яа-я0-9\-\/]+)',
+        r"Сч[её]т\s+на\s+оплату\s*№\s*(.+?)\s+от\s+\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4}",
 
-        r'Сч[её]т\s*№\s*([A-Za-zА-Яа-я0-9\-\/]+)',
+        r"СЧЕТ\s*№\s*(.+?)\s+от\s+\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4}",
 
-        r'СЧЕТ\s*№\s*([A-Za-zА-Яа-я0-9\-\/]+)',
+        r"СЧЁТ\s*№\s*(.+?)\s+от\s+\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4}",
 
-        r'СЧЁТ\s*№\s*([A-Za-zА-Яа-я0-9\-\/]+)',
+        r"Сч[её]т\s*№\s*(.+?)\s+от\s+\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4}",
 
-        r'№\s*([A-Za-zА-Яа-я0-9\-\/]+)\s+от\s+\d{1,2}',
+        r"Сч[её]т\s+на\s+оплату\s*№\s*(.+?)\s+от\s+\d{1,2}[./-]\d{1,2}[./-]\d{4}",
 
-        r'заказу\s+клиента\s*№?\s*([A-Za-zА-Яа-я0-9\-\/]+)',
+        r"Сч[её]т\s*№\s*(.+?)\s+от\s+\d{1,2}[./-]\d{1,2}[./-]\d{4}",
 
-        r'реализации\s+товаров\s+и\s+услуг\s*№\s*([A-Za-zА-Яа-я0-9\-\/]+)',
+        r"№\s*(.+?)\s+от\s+\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4}",
+
+        r"№\s*(.+?)\s+от\s+\d{1,2}[./-]\d{1,2}[./-]\d{4}",
+
+        r"заказу\s+клиента\s*№?\s*([A-Za-zА-Яа-яЁё0-9.\-/ ]+)",
+
+        r"реализации\s+товаров\s+и\s+услуг\s*№\s*([A-Za-zА-Яа-яЁё0-9.\-/ ]+)",
 
     ]
 
@@ -421,17 +457,20 @@ def parse_invoice_number(text):
             re.IGNORECASE
         )
 
-        if match:
+        if not match:
 
-            number = clean_invoice_number(
-                match.group(1)
-            )
+            continue
 
-            if number:
+        number = clean_invoice_number(
+            match.group(1)
+        )
 
-                return number
+        if number:
+
+            return number
 
     return None
+
 
 
 def normalize_invoice_date(value):
@@ -954,7 +993,75 @@ def normalize_amount(value):
 
 def parse_amount(text):
 
-    money = r'(\d{1,3}(?:[\s\u00a0]\d{3})*[,.]\d{2}|\d+[,.]\d{2})'
+    if not text:
+
+        return None
+
+    text = str(text)
+
+    text = text.replace(
+        '\\u00a0',
+        ' '
+    )
+
+    text = text.replace(
+        '\u00a0',
+        ' '
+    )
+
+    text = text.replace(
+        '‚',
+        ','
+    )
+
+    def prepare_money_value(value):
+
+        if not value:
+
+            return None
+
+        value = str(value)
+
+        value = value.replace(
+            "'",
+            ""
+        )
+
+        value = value.replace(
+            " ",
+            ""
+        )
+
+        value = value.replace(
+            "\\u00a0",
+            ""
+        )
+
+        value = value.replace(
+            "\u00a0",
+            ""
+        )
+
+        value = value.replace(
+            "‚",
+            ","
+        )
+
+        value = re.sub(
+            r'(?<=\d)-(?=\d{2}$)',
+            '.',
+            value
+        )
+
+        return normalize_amount(
+            value
+        )
+
+    money = (
+        r"(\d{1,3}(?:[\s\u00a0']\d{3})+[,.]\d{2}"
+        r"|\d{4,}[,.\-]\d{2}"
+        r"|\d+[,.]\d{2})"
+    )
 
     patterns = [
 
@@ -963,6 +1070,8 @@ def parse_amount(text):
         rf'Итого\s+к\s+оплате[:\s]*{money}',
 
         rf'Итого\s+с\s+НДС[:\s]*{money}',
+
+        rf'Итого\s+с\s+Hic[;:\s]*{money}',
 
         rf'Всего[:\s]*{money}',
 
@@ -976,15 +1085,21 @@ def parse_amount(text):
 
     for pattern in patterns:
 
-        match = re.search(
-            pattern,
-            text,
-            re.IGNORECASE
+        matches = list(
+            re.finditer(
+                pattern,
+                text,
+                re.IGNORECASE
+            )
         )
 
-        if match:
+        if not matches:
 
-            amount = normalize_amount(
+            continue
+
+        for match in reversed(matches):
+
+            amount = prepare_money_value(
                 match.group(1)
             )
 
@@ -1001,11 +1116,12 @@ def parse_amount(text):
 
     for candidate in candidates:
 
-        amount = normalize_amount(
+        amount = prepare_money_value(
             candidate
         )
 
         if not amount:
+
             continue
 
         try:
@@ -1019,9 +1135,11 @@ def parse_amount(text):
             continue
 
         if numeric <= 0:
+
             continue
 
         if numeric > 1_000_000_000:
+
             continue
 
         values.append(
@@ -1033,6 +1151,7 @@ def parse_amount(text):
         return f'{max(values):.2f}'
 
     return None
+
 
 
 def extract_inn(text):
@@ -1358,21 +1477,11 @@ def parse_invoice_data(text):
 
                 amount = None
 
-    print("---------------")
-    print("VENDOR:", vendor)
-    print("NUMBER:", invoice_number)
-    print("DATE:", invoice_date)
-    print("AMOUNT:", amount)
-    print("---------------")
     invoice_number = parse_invoice_number(
         text
     )
 
     invoice_date = parse_invoice_date(
-        text
-    )
-
-    vendor = parse_vendor(
         text
     )
 
@@ -1388,20 +1497,11 @@ def parse_invoice_data(text):
         text
     )
 
-    print('---------------')
-    print('VENDOR:', vendor)
-    print('NUMBER:', invoice_number)
-    print('DATE:', invoice_date)
-    print('AMOUNT:', amount)
-    print('INN:', inn)
-    print('KPP:', kpp)
-    print('---------------')
-
     return {
         'amount': amount,
         'invoice_number': invoice_number,
         'invoice_date': invoice_date,
-        'vendor': vendor,
+        'vendor': None,
         'inn': inn,
         'kpp': kpp,
     }

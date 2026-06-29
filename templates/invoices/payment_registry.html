@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load money %}
 
 {% block content %}
 
@@ -54,7 +55,7 @@
         </span>
 
         <strong>
-            {{ total_amount|floatformat:2 }} ₽
+            {{ total_amount|money_ru }}
         </strong>
     </div>
 
@@ -68,53 +69,25 @@
                 Текущий черновик
             </span>
 
-            {% if draft_registry %}
-                <h3>
-                    Реестр оплаты №{{ draft_registry.id }}
-                </h3>
+            {% if draft_registry and draft_registry.id %}
+                <form
+                    method="post"
+                    action="{% url 'check_payment_registry' draft_registry.id %}"
+                    class="payment-registry-check-form"
+                >
+                    {% csrf_token %}
 
-                <p class="muted">
-                    Создан {{ draft_registry.created_at|date:"d.m.Y H:i" }}
-                    · счетов: {{ draft_registry_items_count }}
-                    · сумма: {{ draft_registry_total_amount|floatformat:2 }} ₽
-                </p>
-            {% else %}
-                <h3>
-                    Черновик реестра пока пуст
-                </h3>
-
-                <p class="muted">
-                    Добавь счета из графика платежей или выбери счета ниже.
-                </p>
-            {% endif %}
-        </div>
-
-        <div class="payment-registry-draft-actions">
-            {% if draft_registry %}
-                {% if can_check_payment_registry %}
-                    <form
-                        method="post"
-                        action="{% url 'check_payment_registry' draft_registry.id %}"
-                        class="payment-registry-check-form"
-                    >
-                        {% csrf_token %}
-
-                        <button type="submit" class="btn btn-primary">
-                            Проверить реестр
-                        </button>
-                    </form>
-                {% else %}
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        disabled
-                        title="Нет прав на проверку реестра"
-                    >
-                        Проверка недоступна
+                    <button type="submit" class="btn btn-primary">
+                        Проверить реестр
                     </button>
-                {% endif %}
+                </form>
+            {% else %}
+                <button type="button" class="btn btn-secondary" disabled>
+                    Черновик не создан
+                </button>
+            {% endif %}
 
-                {% if can_export_payment_registry and draft_registry_check_result.items_count and not draft_registry_check_result.errors_count %}
+                {% if draft_registry_check_result.items_count and not draft_registry_check_result.errors_count %}
                     <form
                         method="post"
                         action="{% url 'export_payment_registry_draft_excel' draft_registry.id %}"
@@ -139,7 +112,7 @@
                         </button>
                     </form>
                 {% else %}
-                    {% if not can_export_payment_registry %}
+                    {% if not request.user.is_staff and not request.user.is_superuser and not request.user.is_authenticated %}
                         <button
                             type="button"
                             class="btn btn-secondary"
@@ -181,7 +154,6 @@
                 <span class="status-badge status-draft">
                     {{ draft_registry.get_status_display }}
                 </span>
-            {% endif %}
 
             <a href="{% url 'payment_schedule' %}" class="btn btn-secondary">
                 График платежей
@@ -301,9 +273,20 @@
             </div>
         {% endif %}
 
-        <div class="payment-registry-draft-table-wrap">
-            <table class="table payment-registry-draft-table">
-                <thead>
+        <div class="table-scroll table-scroll-fit payment-registry-draft-table-wrap">
+<table class="table payment-registry-draft-table">
+                
+
+<colgroup>
+    <col class="col-invoice">
+    <col class="col-counterparty">
+    <col class="col-amount">
+    <col class="col-date">
+    <col class="col-payment">
+    <col class="col-actions">
+</colgroup>
+
+<thead>
                     <tr>
                         <th>
                             Счёт
@@ -321,8 +304,8 @@
                             План оплаты
                         </th>
 
-                        <th>
-                            Статус строки
+                        <th class="payment-registry-draft-payment-column">
+                            Оплата
                         </th>
 
                         <th>
@@ -360,7 +343,7 @@
 
                             <td>
                                 <strong>
-                                    {{ item.amount|floatformat:2 }} ₽
+                                    {{ item.amount|money_ru }}
                                 </strong>
                             </td>
 
@@ -375,9 +358,26 @@
                             </td>
 
                             <td>
-                                <span class="status-badge status-{{ item.status }}">
-                                    {{ item.get_status_display }}
-                                </span>
+                                <div class="payment-mini payment-mini-registry payment-mini-{{ item.invoice.payment_status_code }}">
+                                    <div class="payment-mini-row">
+                                        <span>Счёт</span>
+                                        <strong>{{ item.invoice.amount|money_ru }}</strong>
+                                    </div>
+
+                                    <div class="payment-mini-row">
+                                        <span>Оплачено</span>
+                                        <strong>{{ item.invoice.payment_paid_amount|money_ru }}</strong>
+                                    </div>
+
+                                    <div class="payment-mini-row">
+                                        <span>Остаток</span>
+                                        <strong>{{ item.invoice.payment_remaining_amount|money_ru }}</strong>
+                                    </div>
+
+                                    <div class="payment-mini-status">
+                                        {{ item.invoice.payment_status_label }}
+                                    </div>
+                                </div>
                             </td>
 
                             <td>
@@ -471,6 +471,26 @@
                 {% endfor %}
 
             </select>
+
+            <div class="filter-field">
+                <label for="payment_status">Оплата</label>
+
+                <select
+                    id="payment_status"
+                    name="payment_status"
+                    class="form-control"
+                >
+                    {% for value, label in payment_status_choices %}
+                        <option
+                            value="{{ value }}"
+                            {% if registry_payment_status_filter == value %}selected{% endif %}
+                        >
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
         </div>
 
         <div class="form-group">
@@ -532,9 +552,7 @@
 
     </div>
 
-    <div class="table-scroll">
-
-        <form
+    <form
         method="post"
         action="{% url 'add_to_payment_registry' %}"
         class="payment-registry-bulk-form"
@@ -542,20 +560,9 @@
         {% csrf_token %}
 
         <div class="payment-registry-bulk-actions">
-            {% if can_manage_payment_registry %}
-                <button type="submit" class="btn btn-primary">
-                    Добавить выбранные в черновик
-                </button>
-            {% else %}
-                <button
-                    type="button"
-                    class="btn btn-secondary"
-                    disabled
-                    title="Нет прав на управление реестром оплаты"
-                >
-                    Добавление недоступно
-                </button>
-            {% endif %}
+            <button type="submit" class="btn btn-primary">
+                Добавить выбранные в черновик
+            </button>
         </div>
 
         <div class="payment-registry-workflow-note">
@@ -563,44 +570,54 @@
             В этом блоке выбираются только счета для добавления.
         </div>
 
-<table class="table registry-table">
+<div class="table-scroll table-scroll-fit payment-registry-source-table-wrap">
+<table class="table registry-table payment-registry-source-table">
 
-            <thead>
+            
+
+<colgroup>
+    <col class="col-select">
+    <col class="col-id">
+    <col class="col-counterparty">
+    <col class="col-invoice">
+    <col class="col-invoice-date">
+    <col class="col-amount">
+    <col class="col-plan-date">
+    <col class="col-payment">
+</colgroup>
+
+<thead>
                 <tr>
                     <th>
                         #
                     </th>
 
-                    <th>
+                        <th>
                         ID
                     </th>
 
-                    <th>
+                        <th>
                         Контрагент
                     </th>
 
-                    <th>
+                        <th>
                         Счет
                     </th>
 
-                    <th>
+                        <th>
                         Дата счета
                     </th>
 
-                    <th>
+                        <th>
                         Сумма
                     </th>
 
-                    <th>
+                        <th>
                         План оплаты
                     </th>
 
-                    <th>
-                        Приоритет
-                    </th>
-
-                    <th>
-                        Статус
+                        <th class="payment-registry-source-payment-column">
+                        Оплата
                     </th>
                 </tr>
             </thead>
@@ -618,13 +635,13 @@
                             >
                         </td>
 
-                        <td>
+                            <td>
                             <a href="{% url 'invoice_detail' invoice.id %}">
                                 #{{ invoice.id }}
                             </a>
                         </td>
 
-                        <td>
+                            <td>
                             {% if invoice.counterparty %}
                                 <strong>
                                     {{ invoice.counterparty.name }}
@@ -642,7 +659,7 @@
                             {% endif %}
                         </td>
 
-                        <td>
+                            <td>
                             {% if invoice.invoice_number %}
                                 {{ invoice.invoice_number }}
                             {% else %}
@@ -650,7 +667,7 @@
                             {% endif %}
                         </td>
 
-                        <td>
+                            <td>
                             {% if invoice.invoice_date %}
                                 {{ invoice.invoice_date }}
                             {% else %}
@@ -658,13 +675,13 @@
                             {% endif %}
                         </td>
 
-                        <td>
+                            <td>
                             <strong class="amount-main">
-                                {{ invoice.amount|floatformat:2 }} ₽
+                                {{ invoice.amount|money_ru }}
                             </strong>
                         </td>
 
-                        <td>
+                            <td>
                             {% if invoice.planned_payment_date %}
                                 {{ invoice.planned_payment_date|date:"d.m.Y" }}
                             {% else %}
@@ -674,21 +691,29 @@
                             {% endif %}
                         </td>
 
-                        <td>
-                            {{ invoice.payment_priority }}
-                        </td>
+                            <td>
+                            <div class="payment-mini payment-mini-registry-source payment-mini-{{ invoice.payment_status_code }}">
+                                <div class="payment-mini-row">
+                                    <span>Оплачено</span>
+                                    <strong>{{ invoice.payment_paid_amount|money_ru }}</strong>
+                                </div>
 
-                        <td>
-                            <span class="status-badge status-{{ invoice.status }}">
-                                {{ invoice.get_status_display }}
-                            </span>
+                                <div class="payment-mini-row">
+                                    <span>Остаток</span>
+                                    <strong>{{ invoice.payment_remaining_amount|money_ru }}</strong>
+                                </div>
+
+                                <div class="payment-mini-status">
+                                    {{ invoice.payment_status_label }}
+                                </div>
+                            </div>
                         </td>
                     </tr>
 
                 {% empty %}
 
                     <tr>
-                        <td colspan="9" class="empty-table">
+                        <td colspan="8" class="empty-table">
                             Нет счетов для выбранных условий.
                             Для проверки выбери статус «Все кроме оплаченных» или переведи нужные счета в статус «Подтвержден».
                         </td>
@@ -699,6 +724,7 @@
             </tbody>
 
         </table>
+</div>
 
     </form>
 

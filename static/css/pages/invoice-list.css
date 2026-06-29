@@ -1,0 +1,487 @@
+/*
+ * ERP Zarya35 — pages / invoice list
+ *
+ * Стили скопированы из legacy style.css.
+ * На этом этапе style.css ещё не очищаем.
+ */
+
+.unmatched-invoice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* =========================================================
+   Column widths for compact tables
+========================================================= */
+
+.invoice-table-compact th:nth-child(1),
+.invoice-table-compact td:nth-child(1) { width: 70px; }
+
+.invoice-table-compact th:nth-child(2),
+.invoice-table-compact td:nth-child(2) { width: 26%; }
+
+.invoice-table-compact th:nth-child(3),
+.invoice-table-compact td:nth-child(3) { width: 29%; }
+
+.invoice-table-compact th:nth-child(4),
+.invoice-table-compact td:nth-child(4) { width: 110px; }
+
+.invoice-table-compact th:nth-child(5),
+.invoice-table-compact td:nth-child(5) { width: 150px; }
+
+.invoice-table-compact th:nth-child(6),
+.invoice-table-compact td:nth-child(6) { width: 145px; }
+
+.invoice-table-compact th:nth-child(7),
+.invoice-table-compact td:nth-child(7) { width: 120px; }
+
+/* Fix invoice table after checkbox column was added */
+
+.invoice-table-compact {
+    table-layout: fixed;
+}
+
+.invoice-table-compact th:nth-child(1),
+.invoice-table-compact td:nth-child(1) {
+    width: 44px;
+}
+
+.invoice-table-compact th:nth-child(2),
+.invoice-table-compact td:nth-child(2) {
+    width: 72px;
+}
+
+.invoice-table-compact th:nth-child(3),
+.invoice-table-compact td:nth-child(3) {
+    width: 28%;
+}
+
+.invoice-table-compact th:nth-child(4),
+.invoice-table-compact td:nth-child(4) {
+    width: 26%;
+}
+
+.invoice-table-compact th:nth-child(5),
+.invoice-table-compact td:nth-child(5) {
+    width: 110px;
+}
+
+.invoice-table-compact th:nth-child(6),
+.invoice-table-compact td:nth-child(6) {
+    width: 160px;
+}
+
+.invoice-table-compact th:nth-child(7),
+.invoice-table-compact td:nth-child(7) {
+    width: 125px;
+}
+
+.invoice-table-compact th:nth-child(8),
+.invoice-table-compact td:nth-child(8) {
+    width: 100px;
+}
+
+.invoice-table-compact td:nth-child(4),
+.invoice-table-compact td:nth-child(5) {
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.invoice-table-compact .btn-sm {
+    min-width: 74px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* Mobile/tablet keeps horizontal scroll instead of broken columns */
+
+@media (max-width: 1280px) {
+    .invoice-table-compact {
+        min-width: 1120px !important;
+    }
+}
+
+/* VISUAL-TABLES-AUTO-FINAL-START */
+/*
+ * Invoice list — final wide table layout.
+ */
+
+.invoice-list-page .content-card,
+.invoice-list-page .table-card,
+.invoice-list-page .card:has(table),
+.invoices-page .content-card,
+.invoices-page .table-card,
+.invoices-page .card:has(table) {
+    overflow-x: auto !important;
+}
+
+.invoice-list-page table,
+.invoices-page table {
+    min-width: 1580px !important;
+    width: 100%;
+    table-layout: auto !important;
+}
+
+/* checkbox */
+.invoice-list-page th:nth-child(1),
+.invoice-list-page td:nth-child(1),
+.invoices-page th:nth-child(1),
+.invoices-page td:nth-child(1) {
+    width: 48px !important;
+    min-width: 48px !important;
+}
+
+/* ID */
+.invoice-list-page th:nth-child(2),
+.invoice-list-page td:nth-child(2),
+.invoices-page th:nth-child(2),
+.invoices-page td:nth-child(2) {
+    width: 70px !important;
+    min-width: 70px !important;
+    white-space: nowrap !important;
+}
+
+/* Документ */
+.invoice-list-page th:nth-child(3),
+.invoice-list-page td:nth-child(3),
+.invoices-page th:nth-child(3),
+.invoices-page td:nth-child(3) {
+    width: 285px !important;
+    min-width: 285px !important;
+}
+
+/* Поставщик / контрагент */
+.invoice-list-page th:nth-child(4),
+.invoice-list-page td:nth-child(4),
+.invoices-page th:nth-child(4),
+.invoices-page td:nth-child(4) {
+    width: 350px !important;
+    min-width: 350px !important;
+}
+
+/* Пользователь */
+.invoice-list-page th:nth-child(5),
+.invoice-list-page td:nth-child(5),
+.invoices-page th:nth-child(5),
+.invoices-page td:nth-child(5) {
+    width: 90px !important;
+    min-width: 90px !important;
+    white-space: nowrap !important;
+}
+
+/* Сумма / OCR */
+.invoice-list-page th:nth-child(6),
+.invoice-list-page td:nth-child(6),
+.invoices-page th:nth-child(6),
+.invoices-page td:nth-child(6) {
+    width: 145px !important;
+    min-width: 145px !important;
+    white-space: nowrap !important;
+}
+
+/* Статус */
+.invoice-list-page th:nth-child(7),
+.invoice-list-page td:nth-child(7),
+.invoices-page th:nth-child(7),
+.invoices-page td:nth-child(7) {
+    width: 135px !important;
+    min-width: 135px !important;
+    white-space: nowrap !important;
+}
+
+/* Оплата */
+.invoice-list-page th:nth-child(8),
+.invoice-list-page td:nth-child(8),
+.invoices-page th:nth-child(8),
+.invoices-page td:nth-child(8) {
+    width: 175px !important;
+    min-width: 175px !important;
+    max-width: 175px !important;
+    padding-right: 22px !important;
+    overflow: visible !important;
+    white-space: nowrap !important;
+}
+
+/* Действия */
+.invoice-list-page th:nth-child(9),
+.invoice-list-page td:nth-child(9),
+.invoices-page th:nth-child(9),
+.invoices-page td:nth-child(9) {
+    width: 150px !important;
+    min-width: 150px !important;
+    max-width: 150px !important;
+    padding-left: 22px !important;
+    text-align: right !important;
+    overflow: visible !important;
+    white-space: nowrap !important;
+}
+
+.invoice-list-page td:nth-child(8) .payment-mini,
+.invoice-list-page td:nth-child(8) .payment-mini-list,
+.invoice-list-page td:nth-child(8) .invoice-payment-summary,
+.invoices-page td:nth-child(8) .payment-mini,
+.invoices-page td:nth-child(8) .payment-mini-list,
+.invoices-page td:nth-child(8) .invoice-payment-summary {
+    width: 138px !important;
+    min-width: 138px !important;
+    max-width: 138px !important;
+}
+
+.invoice-list-page td:nth-child(9) a,
+.invoice-list-page td:nth-child(9) button,
+.invoice-list-page td:nth-child(9) .btn,
+.invoice-list-page td:nth-child(9) .button,
+.invoice-list-page td:nth-child(9) .action-button,
+.invoices-page td:nth-child(9) a,
+.invoices-page td:nth-child(9) button,
+.invoices-page td:nth-child(9) .btn,
+.invoices-page td:nth-child(9) .button,
+.invoices-page td:nth-child(9) .action-button {
+    width: 108px !important;
+    min-width: 108px !important;
+    max-width: 108px !important;
+    margin-left: auto !important;
+}
+/* VISUAL-TABLES-AUTO-FINAL-END */
+
+/* INVOICE-PAYMENT-ACTION-MERGE-START */
+/*
+ * Invoice list: merged payment + action column.
+ */
+
+.invoice-list-page table,
+.invoices-page table {
+    min-width: 1380px !important;
+    table-layout: fixed !important;
+}
+
+.invoice-payment-action-head,
+.invoice-payment-action-cell {
+    width: 250px !important;
+    min-width: 250px !important;
+    max-width: 250px !important;
+    text-align: right !important;
+    overflow: visible !important;
+}
+
+.invoice-payment-action-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    width: 100%;
+}
+
+.invoice-payment-side {
+    flex: 0 0 138px;
+    width: 138px;
+    min-width: 138px;
+}
+
+.invoice-action-side {
+    flex: 0 0 96px;
+    width: 96px;
+    min-width: 96px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.invoice-payment-action-cell .payment-mini,
+.invoice-payment-action-cell .payment-mini-list,
+.invoice-payment-action-cell .payment-summary-card,
+.invoice-payment-action-cell .invoice-payment-summary {
+    width: 138px !important;
+    min-width: 138px !important;
+    max-width: 138px !important;
+}
+
+.invoice-payment-action-cell .btn,
+.invoice-payment-action-cell .button,
+.invoice-payment-action-cell .action-button,
+.invoice-payment-action-cell a {
+    width: 96px !important;
+    min-width: 96px !important;
+    max-width: 96px !important;
+    margin: 0 !important;
+    position: static !important;
+    transform: none !important;
+    text-decoration: none !important;
+}
+
+.invoice-payment-action-cell .table-actions,
+.invoice-payment-action-cell .row-actions {
+    display: flex !important;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+.invoice-list-page td:nth-child(2),
+.invoice-list-page td:nth-child(2) a,
+.invoices-page td:nth-child(2),
+.invoices-page td:nth-child(2) a {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+}
+/* INVOICE-PAYMENT-ACTION-MERGE-END */
+
+/* INVOICE-PAYMENT-ACTION-STACKED-START */
+/*
+ * Invoice list: payment block with action button below.
+ */
+
+.invoice-payment-action-head {
+    text-align: center !important;
+}
+
+.invoice-payment-action-cell {
+    width: 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
+    text-align: right !important;
+    overflow: visible !important;
+}
+
+.invoice-payment-action-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+}
+
+.invoice-payment-side,
+.invoice-action-side {
+    width: 138px !important;
+    min-width: 138px !important;
+    max-width: 138px !important;
+    flex: 0 0 auto !important;
+}
+
+.invoice-action-side {
+    display: flex !important;
+    justify-content: stretch !important;
+}
+
+.invoice-payment-action-cell .payment-mini,
+.invoice-payment-action-cell .payment-mini-list,
+.invoice-payment-action-cell .payment-summary-card,
+.invoice-payment-action-cell .invoice-payment-summary {
+    width: 138px !important;
+    min-width: 138px !important;
+    max-width: 138px !important;
+}
+
+.invoice-payment-action-cell .btn,
+.invoice-payment-action-cell .button,
+.invoice-payment-action-cell .action-button,
+.invoice-payment-action-cell a {
+    width: 138px !important;
+    min-width: 138px !important;
+    max-width: 138px !important;
+    margin: 0 !important;
+    position: static !important;
+    transform: none !important;
+    text-decoration: none !important;
+}
+
+/* ID should never break as # 6 5 */
+.invoice-list-page td:nth-child(2),
+.invoice-list-page td:nth-child(2) a,
+.invoices-page td:nth-child(2),
+.invoices-page td:nth-child(2) a {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+}
+/* INVOICE-PAYMENT-ACTION-STACKED-END */
+
+
+
+/* INVOICE-LIST-PAYMENT-CELL-STABLE-V1-START */
+/*
+   Только таблица страницы "Счета".
+   Чиним наезд суммы на подпись "Остаток" внутри invoice-payment-action-cell.
+   Не трогаем другие таблицы и другие страницы.
+*/
+
+.invoice-payment-action-cell {
+    width: 190px !important;
+    min-width: 190px !important;
+}
+
+.invoice-payment-action-wrap {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 12px !important;
+    justify-items: stretch !important;
+    align-items: start !important;
+}
+
+.invoice-payment-side,
+.invoice-action-side {
+    min-width: 0 !important;
+    width: 100% !important;
+}
+
+.invoice-payment-action-cell .payment-mini {
+    width: 100% !important;
+    min-width: 170px !important;
+    box-sizing: border-box !important;
+    padding: 12px 14px !important;
+}
+
+.invoice-payment-action-cell .payment-mini-row {
+    display: grid !important;
+    grid-template-columns: max-content minmax(96px, 1fr) !important;
+    column-gap: 10px !important;
+    align-items: baseline !important;
+}
+
+.invoice-payment-action-cell .payment-mini-row span {
+    white-space: nowrap !important;
+    min-width: 0 !important;
+}
+
+.invoice-payment-action-cell .payment-mini-row strong {
+    justify-self: end !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    text-align: right !important;
+    white-space: nowrap !important;
+    line-height: 1.25 !important;
+}
+
+.invoice-payment-action-cell .table-actions,
+.invoice-payment-action-cell .table-actions-vertical {
+    width: 100% !important;
+}
+
+.invoice-payment-action-cell .table-actions .btn,
+.invoice-payment-action-cell .table-actions-vertical .btn {
+    width: 100% !important;
+}
+
+@media (max-width: 1500px) {
+    .invoice-payment-action-cell {
+        width: 180px !important;
+        min-width: 180px !important;
+    }
+
+    .invoice-payment-action-cell .payment-mini {
+        min-width: 160px !important;
+    }
+
+    .invoice-payment-action-cell .payment-mini-row {
+        grid-template-columns: max-content minmax(88px, 1fr) !important;
+    }
+
+    .invoice-payment-action-cell .payment-mini-row strong {
+        font-size: 11px !important;
+    }
+}
+/* INVOICE-LIST-PAYMENT-CELL-STABLE-V1-END */

@@ -1,0 +1,13 @@
+
+
+
+/* LEGACY-MIGRATION-FINAL-START */
+/* Финальная переклассификация из features/legacy-migration.css. */
+
+.pdf-error {
+    padding: 30px;
+    color: #b91c1c;
+    text-align: center;
+    font-weight: 900;
+}
+/* LEGACY-MIGRATION-FINAL-END */

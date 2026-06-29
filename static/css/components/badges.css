@@ -1,0 +1,385 @@
+/*
+ * ERP Zarya35 — components / badges
+ *
+ * Стили скопированы из legacy style.css.
+ * На этом этапе style.css ещё не очищаем.
+ */
+
+/* =========================================================
+   Tables and badges
+========================================================= */
+
+.table-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    border-radius: 14px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 26px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.status-new,
+.status-processing {
+    background: rgba(96, 165, 250, .16);
+    color: #bfdbfe;
+}
+
+.status-review,
+.status-pending {
+    background: rgba(245, 158, 11, .15);
+    color: #fde68a;
+}
+
+.status-approved,
+.status-paid,
+.status-success {
+    background: rgba(34, 197, 94, .16);
+    color: #bbf7d0;
+}
+
+.status-rejected,
+.status-error,
+.status-danger {
+    background: rgba(239, 68, 68, .16);
+    color: #fecaca;
+}
+
+.priority-badge {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--z-border);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .06);
+    font-weight: 950;
+}
+
+.counterparty-badges,
+.counterparty-profile-badges {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 1100px) {
+    .layout,
+    .app-shell,
+    .app-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: relative;
+        height: auto;
+        max-height: none;
+    }
+
+    .sidebar-nav,
+    .nav-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .directory-info-grid,
+    .counterparty-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .counterparty-list-card {
+        grid-template-columns: 1fr;
+    }
+
+    .counterparty-card-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .counterparty-card-actions .btn {
+        width: auto;
+    }
+
+    .counterparty-title-row,
+    .counterparty-profile-title-row {
+        flex-direction: column;
+    }
+
+    .counterparty-badges,
+    .counterparty-profile-badges {
+        justify-content: flex-start;
+    }
+}
+
+.upload-result-status {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 18px;
+    border-radius: 18px;
+    border: 1px solid var(--z-border);
+}
+
+.upload-result-status h3 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.upload-result-status p {
+    margin: 0;
+    color: var(--z-muted);
+    line-height: 1.55;
+}
+
+.upload-result-status-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.upload-result-status-success {
+    background: rgba(34, 197, 94, .08);
+    border-color: rgba(34, 197, 94, .22);
+}
+
+.upload-result-status-success .upload-result-status-icon {
+    background: rgba(34, 197, 94, .16);
+    color: #86efac;
+}
+
+.upload-result-status-warning {
+    background: rgba(245, 158, 11, .08);
+    border-color: rgba(245, 158, 11, .22);
+}
+
+.upload-result-status-warning .upload-result-status-icon {
+    background: rgba(245, 158, 11, .16);
+    color: #fbbf24;
+}
+
+@media (max-width: 760px) {
+    .upload-result-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .upload-result-status {
+        grid-template-columns: 1fr;
+    }
+
+    .upload-result-actions .btn {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   ZARYA UI PATCH — upload batch statuses
+========================================================= */
+
+.status-completed {
+    background: rgba(34, 197, 94, .14);
+    color: #86efac;
+    border-color: rgba(34, 197, 94, .25);
+}
+
+.status-partial {
+    background: rgba(245, 158, 11, .14);
+    color: #fbbf24;
+    border-color: rgba(245, 158, 11, .25);
+}
+
+.status-empty {
+    background: rgba(148, 163, 184, .14);
+    color: #cbd5e1;
+    border-color: rgba(148, 163, 184, .22);
+}
+
+.status-done {
+    background: rgba(34, 197, 94, .16);
+    color: #bbf7d0;
+}
+
+.status-pending {
+    background: rgba(245, 158, 11, .15);
+    color: #fde68a;
+}
+
+.status-badge {
+    font-size: 12px;
+    font-weight: 760;
+    letter-spacing: 0;
+}
+
+strong,
+.sidebar-nav a,
+.nav-link,
+.nav-item,
+.btn,
+.status-badge,
+.form-group label,
+label {
+    font-weight: 650;
+}
+
+/* System page raw key/value blocks */
+
+.system-info,
+.system-status,
+.profile-info {
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.system-info strong,
+.system-status strong,
+.profile-info strong {
+    font-weight: 650;
+}
+
+.profile-summary-card,
+.profile-form-card,
+.system-status-card,
+.system-actions-card,
+.system-changelog-card {
+    padding: 24px;
+}
+
+.system-update-status {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px;
+    border-radius: 16px;
+    border: 1px solid var(--z-border);
+}
+
+.system-update-status strong {
+    font-size: 17px;
+    font-weight: 750;
+}
+
+.system-update-status span {
+    color: var(--z-muted);
+    line-height: 1.55;
+}
+
+.payment-schedule-table .schedule-row-overdue .status-badge.status-rejected {
+    background: rgba(239, 68, 68, 0.22) !important;
+    color: #fecaca !important;
+    border: 1px solid rgba(248, 113, 113, 0.35) !important;
+}
+
+.payment-registry-history-table .status-badge {
+    white-space: nowrap !important;
+}
+
+.status-badge.status-draft {
+    background: rgba(148, 163, 184, 0.16) !important;
+    color: #e5e7eb !important;
+    border: 1px solid rgba(148, 163, 184, 0.28) !important;
+}
+
+.status-badge.status-checked {
+    background: rgba(59, 130, 246, 0.16) !important;
+    color: #bfdbfe !important;
+    border: 1px solid rgba(96, 165, 250, 0.30) !important;
+}
+
+.status-badge.status-exported {
+    background: rgba(245, 158, 11, 0.16) !important;
+    color: #fde68a !important;
+    border: 1px solid rgba(245, 158, 11, 0.30) !important;
+}
+
+.status-badge.status-partially_paid {
+    background: rgba(168, 85, 247, 0.16) !important;
+    color: #e9d5ff !important;
+    border: 1px solid rgba(192, 132, 252, 0.30) !important;
+}
+
+.status-badge.status-paid {
+    background: rgba(34, 197, 94, 0.16) !important;
+    color: #bbf7d0 !important;
+    border: 1px solid rgba(34, 197, 94, 0.30) !important;
+}
+
+.status-badge.status-cancelled {
+    background: rgba(239, 68, 68, 0.16) !important;
+    color: #fecaca !important;
+    border: 1px solid rgba(248, 113, 113, 0.30) !important;
+}
+
+.payment-registry-history-table .status-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 96px !important;
+}
+
+.payment-registry-draft-table .status-badge,
+.payment-registry-detail-table .status-badge {
+    display: inline-flex !important;
+    justify-content: center !important;
+    min-width: 96px !important;
+}
+
+/* === Payment mini status in tables === */
+
+.payment-mini {
+    display: grid;
+    gap: 6px;
+    min-width: 150px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    background: rgba(15, 23, 42, 0.34);
+}
+
+.payment-mini-status {
+    display: inline-flex;
+    width: fit-content;
+    padding: 4px 8px;
+    border-radius: 999px;
+    color: #cbd5e1;
+    font-size: 11px;
+    font-weight: 900;
+    background: rgba(148, 163, 184, 0.14);
+}
+
+.payment-mini-paid .payment-mini-status {
+    color: #bbf7d0;
+    background: rgba(22, 163, 74, 0.20);
+}
+
+.payment-mini-partial .payment-mini-status {
+    color: #fde68a;
+    background: rgba(202, 138, 4, 0.20);
+}
+
+.payment-mini-unpaid .payment-mini-status {
+    color: #fecaca;
+    background: rgba(185, 28, 28, 0.18);
+}
+
+.payment-mini-overpaid .payment-mini-status {
+    color: #bfdbfe;
+    background: rgba(37, 99, 235, 0.20);
+}

@@ -1,0 +1,182 @@
+/*
+ * ERP Zarya35 — pages / profile
+ *
+ * Стили скопированы из legacy style.css.
+ * На этом этапе style.css ещё не очищаем.
+ */
+
+/* =========================================================
+   ZARYA UI POLISH PASS v2
+   Font weight, table columns, profile/system readability
+========================================================= */
+
+:root {
+    --z-font: "Segoe UI", Arial, sans-serif;
+    --z-text: #f2f6f3;
+    --z-muted: #b8c4bd;
+    --z-muted-2: #98a79f;
+}
+
+/* Profile / System pages: make raw content look closer to app style */
+
+.page-content > form,
+.content-area > form,
+.main-content > form {
+    max-width: 100%;
+}
+
+.profile-card,
+.system-card,
+.card {
+    color: var(--z-text);
+}
+
+/* System page raw key/value blocks */
+
+.system-info,
+.system-status,
+.profile-info {
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.system-info strong,
+.system-status strong,
+.profile-info strong {
+    font-weight: 650;
+}
+
+/* Inputs on profile page should not look too heavy */
+
+select.form-control,
+select {
+    font-weight: 400;
+}
+
+/* =========================================================
+   ZARYA UI PROFILE + SYSTEM PASS v1
+========================================================= */
+
+.profile-page-grid {
+    display: grid;
+    grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.profile-summary-card,
+.profile-form-card,
+.system-status-card,
+.system-actions-card,
+.system-changelog-card {
+    padding: 24px;
+}
+
+.profile-avatar-block {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 22px;
+    padding: 16px;
+    border: 1px solid var(--z-border);
+    border-radius: 16px;
+    background: rgba(39, 174, 96, .07);
+}
+
+.profile-avatar {
+    width: 64px;
+    height: 64px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #27ae60, #15803d);
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.profile-name {
+    color: var(--z-text);
+    font-size: 20px;
+    font-weight: 750;
+    line-height: 1.2;
+}
+
+.profile-role {
+    margin-top: 4px;
+    color: var(--z-muted);
+    font-size: 14px;
+}
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.profile-form-fields {
+    display: grid;
+    gap: 16px;
+}
+
+.profile-form-fields p {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+}
+
+.profile-form-fields label {
+    color: #dce6e0;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.profile-form-fields input,
+.profile-form-fields select,
+.profile-form-fields textarea {
+    width: 100%;
+}
+
+.profile-form-fields .helptext {
+    color: var(--z-muted);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.profile-form-fields ul.errorlist {
+    margin: 0;
+    padding: 10px 12px;
+    border: 1px solid rgba(239, 68, 68, .26);
+    border-radius: 12px;
+    background: rgba(239, 68, 68, .10);
+    color: #fecaca;
+    list-style: none;
+    font-size: 13px;
+}
+
+.profile-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 1280px) {
+    .profile-page-grid,
+    .system-page-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    .system-kv-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-avatar-block {
+        grid-template-columns: 1fr;
+    }
+}

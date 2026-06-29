@@ -1,0 +1,1562 @@
+
+/* =========================================================
+   ERP Zarya35 — clean table baseline
+   Цель:
+   - 22" показывает обычные широкие таблицы без карточного режима.
+   - 15" получает горизонтальный скролл внутри блока, а не поломку колонок.
+   - текст переносится аккуратно, без разрыва интерфейса.
+   ========================================================= */
+
+/* ---------- Общая рамка таблиц ---------- */
+
+.table-scroll,
+.table-scroll-fit,
+.invoice-table-wrap,
+.payment-schedule-table-wrap,
+.payment-registry-draft-table-wrap,
+.payment-registry-source-table-wrap {
+    width: 100%;
+    max-width: 100%;
+}
+
+.table-scroll,
+.table-scroll-fit {
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-gutter: stable;
+}
+
+/* Если раньше случайно появились вложенные скроллы — внутренний не должен ломать таблицу */
+.table-scroll .table-scroll,
+.table-scroll-fit .table-scroll-fit {
+    overflow: visible;
+    max-width: none;
+}
+
+/* ---------- Базовая таблица ---------- */
+
+.table,
+.registry-table,
+.invoice-table,
+.invoice-table-compact,
+.payment-schedule-table,
+.payment-registry-draft-table,
+.payment-registry-source-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.table th,
+.table td,
+.registry-table th,
+.registry-table td {
+    vertical-align: middle;
+}
+
+.table th,
+.registry-table th {
+    white-space: nowrap;
+}
+
+.table td,
+.registry-table td {
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+}
+
+/* Убираем агрессивные карточные/липкие режимы прошлых экспериментов */
+.invoice-table-compact tr,
+.payment-schedule-table tr,
+.payment-registry-draft-table tr,
+.payment-registry-source-table tr {
+    display: table-row;
+}
+
+.invoice-table-compact th,
+.invoice-table-compact td,
+.payment-schedule-table th,
+.payment-schedule-table td,
+.payment-registry-draft-table th,
+.payment-registry-draft-table td,
+.payment-registry-source-table th,
+.payment-registry-source-table td {
+    display: table-cell;
+    position: static;
+    left: auto;
+    right: auto;
+    transform: none;
+}
+
+/* ---------- Перенос контрагентов ---------- */
+
+.invoice-counterparty-cell strong,
+.payment-schedule-table td strong,
+.payment-registry-draft-table td strong,
+.payment-registry-source-table td strong {
+    display: block;
+    max-width: 34ch;
+    line-height: 1.35;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: none;
+}
+
+.invoice-counterparty-cell .muted,
+.payment-schedule-table .muted,
+.payment-registry-draft-table .muted,
+.payment-registry-source-table .muted {
+    margin-top: 4px;
+}
+
+/* ---------- ID, файл, документ ---------- */
+
+.invoice-id-cell,
+.invoice-id-text {
+    white-space: nowrap;
+}
+
+.invoice-id-text {
+    color: var(--z-accent-2, #22c55e);
+    font-weight: 850;
+}
+
+.invoice-document-cell strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #f8fafc;
+}
+
+.invoice-file-link-compact {
+    display: inline-flex;
+    align-items: center;
+    width: max-content;
+    max-width: 100%;
+    margin-top: 6px;
+    padding: 2px 8px;
+
+    border: 1px solid rgba(34, 197, 94, 0.22);
+    border-radius: 999px;
+    background: rgba(34, 197, 94, 0.08);
+
+    color: var(--z-accent-2, #22c55e) !important;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+/* ---------- Блок оплаты ---------- */
+
+.payment-mini,
+.payment-mini-list,
+.payment-mini-schedule,
+.payment-mini-registry,
+.payment-status-card {
+    width: 100%;
+    min-width: 142px;
+    max-width: 172px;
+}
+
+.payment-mini-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: 10px;
+    align-items: baseline;
+}
+
+.payment-mini-row span {
+    min-width: 0;
+}
+
+.payment-mini-row strong {
+    white-space: nowrap;
+}
+
+.invoice-payment-action-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    width: 100%;
+    max-width: 180px;
+}
+
+.invoice-payment-action-wrap .btn,
+.table-actions-vertical .btn {
+    width: 100%;
+}
+
+/* ---------- Колонки: Счета ---------- */
+
+.invoice-table-compact col.col-select { width: 48px; }
+.invoice-table-compact col.col-id { width: 68px; }
+.invoice-table-compact col.col-document { width: 25%; }
+.invoice-table-compact col.col-counterparty { width: 31%; }
+.invoice-table-compact col.col-user { width: 86px; }
+.invoice-table-compact col.col-amount { width: 150px; }
+.invoice-table-compact col.col-status { width: 130px; }
+.invoice-table-compact col.col-payment-action { width: 190px; }
+
+/* ---------- Колонки: График платежей ---------- */
+
+.payment-schedule-table col.col-id { width: 72px; }
+.payment-schedule-table col.col-counterparty { width: 25%; }
+.payment-schedule-table col.col-invoice { width: 140px; }
+.payment-schedule-table col.col-amount { width: 130px; }
+.payment-schedule-table col.col-date { width: 130px; }
+.payment-schedule-table col.col-priority { width: 94px; }
+.payment-schedule-table col.col-payment { width: 170px; }
+.payment-schedule-table col.col-status { width: 130px; }
+.payment-schedule-table col.col-user { width: 120px; }
+.payment-schedule-table col.col-actions { width: 130px; }
+
+/* ---------- Колонки: Реестр, текущий черновик ---------- */
+
+.payment-registry-draft-table col.col-invoice { width: 130px; }
+.payment-registry-draft-table col.col-counterparty { width: 30%; }
+.payment-registry-draft-table col.col-amount { width: 140px; }
+.payment-registry-draft-table col.col-date { width: 140px; }
+.payment-registry-draft-table col.col-line-status { width: 150px; }
+.payment-registry-draft-table col.col-payment { width: 180px; }
+.payment-registry-draft-table col.col-actions { width: 120px; }
+
+/* ---------- Колонки: Реестр, доступные счета ---------- */
+
+.payment-registry-source-table col.col-select { width: 48px; }
+.payment-registry-source-table col.col-id { width: 70px; }
+.payment-registry-source-table col.col-counterparty { width: 28%; }
+.payment-registry-source-table col.col-invoice { width: 130px; }
+.payment-registry-source-table col.col-invoice-date { width: 135px; }
+.payment-registry-source-table col.col-amount { width: 130px; }
+.payment-registry-source-table col.col-plan-date { width: 135px; }
+.payment-registry-source-table col.col-priority { width: 94px; }
+.payment-registry-source-table col.col-payment { width: 170px; }
+.payment-registry-source-table col.col-status { width: 130px; }
+
+/* ---------- Широкие экраны: всё должно помещаться без принудительной карточки ---------- */
+
+@media (min-width: 1600px) {
+    .invoice-table-compact,
+    .payment-schedule-table,
+    .payment-registry-draft-table,
+    .payment-registry-source-table {
+        min-width: 0;
+    }
+
+    .table th,
+    .table td,
+    .registry-table th,
+    .registry-table td {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
+
+/* ---------- Ноутбук 15": таблица остаётся таблицей, но получает внутренний скролл ---------- */
+
+@media (max-width: 1599px) {
+    .invoice-table-compact {
+        min-width: 1180px;
+    }
+
+    .payment-schedule-table {
+        min-width: 1280px;
+    }
+
+    .payment-registry-draft-table {
+        min-width: 1040px;
+    }
+
+    .payment-registry-source-table {
+        min-width: 1180px;
+    }
+
+    .table th,
+    .table td,
+    .registry-table th,
+    .registry-table td {
+        padding-left: 12px;
+        padding-right: 12px;
+        font-size: 14px;
+    }
+
+    .invoice-counterparty-cell strong,
+    .payment-schedule-table td strong,
+    .payment-registry-draft-table td strong,
+    .payment-registry-source-table td strong {
+        max-width: 30ch;
+    }
+}
+
+/* ---------- Малые экраны: пока не делаем карточки автоматически ---------- */
+
+@media (max-width: 1100px) {
+    .invoice-table-compact {
+        min-width: 1080px;
+    }
+
+    .payment-schedule-table {
+        min-width: 1160px;
+    }
+
+    .payment-registry-draft-table {
+        min-width: 980px;
+    }
+
+    .payment-registry-source-table {
+        min-width: 1080px;
+    }
+}
+
+/* =========================================================
+   Invoice list UX v2
+   Убрали колонку "Пользователь" из таблицы "Счета".
+   Освободившееся место отдаём документу и контрагенту.
+   ========================================================= */
+
+.invoice-table-compact col.col-select { width: 48px; }
+.invoice-table-compact col.col-id { width: 68px; }
+.invoice-table-compact col.col-document { width: 27%; }
+.invoice-table-compact col.col-counterparty { width: 36%; }
+.invoice-table-compact col.col-amount { width: 160px; }
+.invoice-table-compact col.col-status { width: 135px; }
+.invoice-table-compact col.col-payment-action { width: 195px; }
+
+.invoice-table-compact th,
+.invoice-table-compact td {
+    line-height: 1.35;
+}
+
+.invoice-counterparty-cell strong {
+    max-width: 36ch;
+    line-height: 1.35;
+}
+
+@media (max-width: 1599px) {
+    .invoice-table-compact {
+        min-width: 1080px;
+    }
+
+    .invoice-counterparty-cell strong {
+        max-width: 32ch;
+    }
+}
+
+@media (min-width: 1600px) {
+    .invoice-table-compact {
+        min-width: 0;
+    }
+}
+
+/* =========================================================
+   Registry source table UX v1
+   Таблица "Счета, доступные для добавления":
+   статус скрыт как лишний — в этот блок уже попадают подходящие счета.
+   ========================================================= */
+
+.payment-registry-source-table col.col-status {
+    display: none !important;
+    width: 0 !important;
+}
+
+.payment-registry-source-table thead th:nth-child(10),
+.payment-registry-source-table tbody td:nth-child(10) {
+    display: none !important;
+}
+
+.payment-registry-source-table col.col-select {
+    width: 44px;
+}
+
+.payment-registry-source-table col.col-id {
+    width: 72px;
+}
+
+.payment-registry-source-table col.col-counterparty {
+    width: 31%;
+}
+
+.payment-registry-source-table col.col-invoice {
+    width: 110px;
+}
+
+.payment-registry-source-table col.col-invoice-date {
+    width: 135px;
+}
+
+.payment-registry-source-table col.col-amount {
+    width: 130px;
+}
+
+.payment-registry-source-table col.col-plan-date {
+    width: 135px;
+}
+
+.payment-registry-source-table col.col-priority {
+    width: 85px;
+}
+
+.payment-registry-source-table col.col-payment {
+    width: 170px;
+}
+
+.payment-registry-source-table {
+    min-width: 980px;
+}
+
+/* =========================================================
+   Priority cleanup v1
+   Приоритет временно выключен из интерфейса.
+   Поле в БД и бизнес-логика не удаляются.
+   ========================================================= */
+
+.payment-schedule-table col.col-priority,
+.payment-registry-source-table col.col-priority,
+.payment-registry-source-table col.col-status {
+    display: none !important;
+    width: 0 !important;
+}
+
+/* Фильтр приоритета скрыт, если где-то остался в разметке */
+.form-group:has(select[name="priority"]),
+.filter-field:has(select[name="priority"]),
+.filters-grid > *:has(select[name="priority"]),
+.registry-filters > *:has(select[name="priority"]),
+.schedule-filters > *:has(select[name="priority"]) {
+    display: none !important;
+}
+
+/* =========================================================
+   Draft registry status cleanup v1
+   Статус строки в черновике скрыт из UI:
+   он дублирует очевидное состояние "Добавлен".
+   ========================================================= */
+
+.payment-registry-draft-table col.col-line-status {
+    display: none !important;
+    width: 0 !important;
+}
+
+/* TABLE-WRAPPER-CLEANUP-V1-START */
+/*
+ * Нормализованные wrapper-ы таблиц.
+ * Таблица скроллится только внутри одного контейнера.
+ */
+
+.invoice-table-wrap,
+.payment-schedule-table-wrap,
+.payment-registry-draft-table-wrap,
+.payment-registry-source-table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+}
+
+.invoice-table-wrap > table,
+.payment-schedule-table-wrap > table,
+.payment-registry-draft-table-wrap > table,
+.payment-registry-source-table-wrap > table {
+    margin: 0;
+}
+
+.table-scroll .table-scroll,
+.table-scroll-fit .table-scroll-fit {
+    overflow: visible;
+    padding-bottom: 0;
+}
+/* TABLE-WRAPPER-CLEANUP-V1-END */
+
+
+
+
+
+/* PAYMENT-SCHEDULE-ACTIONS-FIX-V1-START */
+/*
+ * График платежей:
+ * - Приоритет и Ответственный убраны из интерфейса.
+ * - Ячейка действий снова показывает кнопки, а не пользователя.
+ */
+
+.payment-schedule-table col.col-user,
+.payment-schedule-table col.col-priority {
+    display: none !important;
+    width: 0 !important;
+}
+
+/* Важно: НЕ скрываем nth-child(8/9), потому что после чистки колонок
+   действия должны оставаться последней видимой ячейкой. */
+.payment-schedule-table th:last-child,
+.payment-schedule-table td:last-child {
+    display: table-cell !important;
+    visibility: visible !important;
+}
+
+.payment-schedule-table td:last-child .btn,
+.payment-schedule-table td:last-child a,
+.payment-schedule-table td:last-child button {
+    display: inline-flex;
+}
+
+.payment-schedule-table col.col-id {
+    width: 72px;
+}
+
+.payment-schedule-table col.col-counterparty {
+    width: 31%;
+}
+
+.payment-schedule-table col.col-invoice {
+    width: 150px;
+}
+
+.payment-schedule-table col.col-amount {
+    width: 145px;
+}
+
+.payment-schedule-table col.col-date {
+    width: 145px;
+}
+
+.payment-schedule-table col.col-payment {
+    width: 175px;
+}
+
+.payment-schedule-table col.col-status {
+    width: 140px;
+}
+
+.payment-schedule-table col.col-actions {
+    width: 165px;
+}
+
+.payment-schedule-table {
+    min-width: 1060px;
+}
+
+@media (min-width: 1600px) {
+    .payment-schedule-table {
+        min-width: 0 !important;
+        width: 100%;
+    }
+}
+/* PAYMENT-SCHEDULE-ACTIONS-FIX-V1-END */
+
+/* TABLE-15-SAFE-SCROLL-V2-START */
+/*
+ * 15" safe scroll v2.
+ * Главное правило: на ноутбуке не сжимаем таблицы до каши.
+ * Делаем внутренний горизонтальный скролл и фиксированные рабочие ширины.
+ */
+
+/* =========================================================
+   1. Wrapper-ы: скролл только внутри таблицы
+   ========================================================= */
+
+.invoice-table-wrap,
+.payment-schedule-table-wrap,
+.payment-registry-draft-table-wrap,
+.payment-registry-source-table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto !important;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-gutter: stable;
+}
+
+.invoice-table-wrap > table,
+.payment-schedule-table-wrap > table,
+.payment-registry-draft-table-wrap > table,
+.payment-registry-source-table-wrap > table {
+    margin: 0;
+}
+
+/* Старые вложенные скроллы не должны сжимать таблицу */
+.table-scroll .table-scroll,
+.table-scroll-fit .table-scroll-fit {
+    overflow: visible;
+    max-width: none;
+}
+
+/* =========================================================
+   2. Общая защита таблиц
+   ========================================================= */
+
+.invoice-table-compact,
+.payment-schedule-table,
+.payment-registry-draft-table,
+.payment-registry-source-table {
+    table-layout: fixed !important;
+    border-collapse: collapse;
+}
+
+.invoice-table-compact th,
+.invoice-table-compact td,
+.payment-schedule-table th,
+.payment-schedule-table td,
+.payment-registry-draft-table th,
+.payment-registry-draft-table td,
+.payment-registry-source-table th,
+.payment-registry-source-table td {
+    vertical-align: middle;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+    hyphens: none !important;
+}
+
+.invoice-table-compact th,
+.payment-schedule-table th,
+.payment-registry-draft-table th,
+.payment-registry-source-table th {
+    white-space: nowrap !important;
+    font-size: 12px;
+}
+
+.invoice-table-compact td,
+.payment-schedule-table td,
+.payment-registry-draft-table td,
+.payment-registry-source-table td {
+    font-size: 14px;
+}
+
+/* Контрагенты могут переноситься только по словам, не по буквам */
+.invoice-counterparty-cell strong,
+.payment-schedule-table td:nth-child(2) strong,
+.payment-registry-draft-table td:nth-child(2) strong,
+.payment-registry-source-table td:nth-child(3) strong {
+    display: block;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+    hyphens: none !important;
+    line-height: 1.35;
+}
+
+/* =========================================================
+   3. Широкий экран 22": таблицы занимают контейнер
+   ========================================================= */
+
+@media (min-width: 1600px) {
+    .invoice-table-compact,
+    .payment-schedule-table,
+    .payment-registry-draft-table,
+    .payment-registry-source-table {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+}
+
+/* =========================================================
+   4. Ноутбук 15": НЕ ужимаем, включаем внутренний скролл
+   ========================================================= */
+
+@media (max-width: 1599px) {
+    .invoice-table-compact {
+        width: 1180px !important;
+        min-width: 1180px !important;
+    }
+
+    .payment-schedule-table {
+        width: 1320px !important;
+        min-width: 1320px !important;
+    }
+
+    .payment-registry-draft-table {
+        width: 1080px !important;
+        min-width: 1080px !important;
+    }
+
+    .payment-registry-source-table {
+        width: 1240px !important;
+        min-width: 1240px !important;
+    }
+
+    .invoice-table-compact th,
+    .invoice-table-compact td,
+    .payment-schedule-table th,
+    .payment-schedule-table td,
+    .payment-registry-draft-table th,
+    .payment-registry-draft-table td,
+    .payment-registry-source-table th,
+    .payment-registry-source-table td {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+}
+
+/* =========================================================
+   5. График платежей: новая структура 8 колонок
+   ID | Контрагент | Счет | Сумма | Дата оплаты | Остаток | Статус | Действия
+   ========================================================= */
+
+/* Отключаем влияние старой схемы на 10 колонок */
+.payment-schedule-table th:nth-child(n),
+.payment-schedule-table td:nth-child(n),
+.schedule-table th:nth-child(n),
+.schedule-table td:nth-child(n) {
+    min-width: 0;
+    max-width: none;
+}
+
+.payment-schedule-table th:nth-child(1),
+.payment-schedule-table td:nth-child(1),
+.schedule-table th:nth-child(1),
+.schedule-table td:nth-child(1) {
+    width: 76px !important;
+    min-width: 76px !important;
+    white-space: nowrap !important;
+}
+
+.payment-schedule-table th:nth-child(2),
+.payment-schedule-table td:nth-child(2),
+.schedule-table th:nth-child(2),
+.schedule-table td:nth-child(2) {
+    width: 360px !important;
+    min-width: 360px !important;
+    white-space: normal !important;
+}
+
+.payment-schedule-table th:nth-child(3),
+.payment-schedule-table td:nth-child(3),
+.schedule-table th:nth-child(3),
+.schedule-table td:nth-child(3) {
+    width: 155px !important;
+    min-width: 155px !important;
+    white-space: normal !important;
+}
+
+.payment-schedule-table th:nth-child(4),
+.payment-schedule-table td:nth-child(4),
+.schedule-table th:nth-child(4),
+.schedule-table td:nth-child(4) {
+    width: 150px !important;
+    min-width: 150px !important;
+    white-space: nowrap !important;
+}
+
+.payment-schedule-table th:nth-child(5),
+.payment-schedule-table td:nth-child(5),
+.schedule-table th:nth-child(5),
+.schedule-table td:nth-child(5) {
+    width: 150px !important;
+    min-width: 150px !important;
+    white-space: nowrap !important;
+}
+
+.payment-schedule-table th:nth-child(6),
+.payment-schedule-table td:nth-child(6),
+.schedule-table th:nth-child(6),
+.schedule-table td:nth-child(6) {
+    width: 190px !important;
+    min-width: 190px !important;
+}
+
+.payment-schedule-table th:nth-child(7),
+.payment-schedule-table td:nth-child(7),
+.schedule-table th:nth-child(7),
+.schedule-table td:nth-child(7) {
+    width: 145px !important;
+    min-width: 145px !important;
+    white-space: nowrap !important;
+}
+
+.payment-schedule-table th:nth-child(8),
+.payment-schedule-table td:nth-child(8),
+.schedule-table th:nth-child(8),
+.schedule-table td:nth-child(8) {
+    width: 185px !important;
+    min-width: 185px !important;
+}
+
+/* Действия в графике должны быть кнопками, не текстом */
+.payment-schedule-table td:nth-child(8) .btn,
+.payment-schedule-table td:nth-child(8) a,
+.payment-schedule-table td:nth-child(8) button {
+    display: inline-flex !important;
+}
+
+/* =========================================================
+   6. Реестр: доступные счета — 8 колонок
+   # | ID | Контрагент | Счет | Дата счета | Сумма | План оплаты | Оплата
+   ========================================================= */
+
+.payment-registry-source-table th:nth-child(1),
+.payment-registry-source-table td:nth-child(1) {
+    width: 56px !important;
+    min-width: 56px !important;
+}
+
+.payment-registry-source-table th:nth-child(2),
+.payment-registry-source-table td:nth-child(2) {
+    width: 72px !important;
+    min-width: 72px !important;
+    white-space: nowrap !important;
+}
+
+.payment-registry-source-table th:nth-child(3),
+.payment-registry-source-table td:nth-child(3) {
+    width: 360px !important;
+    min-width: 360px !important;
+    white-space: normal !important;
+}
+
+.payment-registry-source-table th:nth-child(4),
+.payment-registry-source-table td:nth-child(4) {
+    width: 125px !important;
+    min-width: 125px !important;
+    white-space: nowrap !important;
+}
+
+.payment-registry-source-table th:nth-child(5),
+.payment-registry-source-table td:nth-child(5) {
+    width: 145px !important;
+    min-width: 145px !important;
+    white-space: nowrap !important;
+}
+
+.payment-registry-source-table th:nth-child(6),
+.payment-registry-source-table td:nth-child(6) {
+    width: 150px !important;
+    min-width: 150px !important;
+    white-space: nowrap !important;
+}
+
+.payment-registry-source-table th:nth-child(7),
+.payment-registry-source-table td:nth-child(7) {
+    width: 150px !important;
+    min-width: 150px !important;
+    white-space: nowrap !important;
+}
+
+.payment-registry-source-table th:nth-child(8),
+.payment-registry-source-table td:nth-child(8) {
+    width: 185px !important;
+    min-width: 185px !important;
+}
+
+/* =========================================================
+   7. Реестр: текущий черновик — 6 колонок
+   ========================================================= */
+
+.payment-registry-draft-table th:nth-child(1),
+.payment-registry-draft-table td:nth-child(1) {
+    width: 150px !important;
+    min-width: 150px !important;
+}
+
+.payment-registry-draft-table th:nth-child(2),
+.payment-registry-draft-table td:nth-child(2) {
+    width: 360px !important;
+    min-width: 360px !important;
+    white-space: normal !important;
+}
+
+.payment-registry-draft-table th:nth-child(3),
+.payment-registry-draft-table td:nth-child(3) {
+    width: 150px !important;
+    min-width: 150px !important;
+    white-space: nowrap !important;
+}
+
+.payment-registry-draft-table th:nth-child(4),
+.payment-registry-draft-table td:nth-child(4) {
+    width: 150px !important;
+    min-width: 150px !important;
+    white-space: nowrap !important;
+}
+
+.payment-registry-draft-table th:nth-child(5),
+.payment-registry-draft-table td:nth-child(5) {
+    width: 185px !important;
+    min-width: 185px !important;
+}
+
+.payment-registry-draft-table th:nth-child(6),
+.payment-registry-draft-table td:nth-child(6) {
+    width: 130px !important;
+    min-width: 130px !important;
+}
+
+/* =========================================================
+   8. Оплата и действия
+   ========================================================= */
+
+.payment-mini,
+.payment-mini-list,
+.payment-mini-schedule,
+.payment-mini-registry,
+.payment-status-card {
+    min-width: 145px !important;
+    max-width: 175px !important;
+    width: 100% !important;
+}
+
+.payment-mini-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) max-content !important;
+    gap: 8px !important;
+    align-items: baseline !important;
+}
+
+.payment-mini-row strong {
+    white-space: nowrap !important;
+}
+
+.table-actions-vertical,
+.invoice-payment-action-wrap {
+    min-width: 145px;
+    max-width: 175px;
+}
+
+.table-actions-vertical .btn,
+.invoice-payment-action-wrap .btn {
+    width: 100%;
+    justify-content: center;
+}
+
+/* =========================================================
+   9. Самые узкие экраны — пока тоже скролл, без карточек
+   ========================================================= */
+
+@media (max-width: 1100px) {
+    .invoice-table-compact {
+        width: 1120px !important;
+        min-width: 1120px !important;
+    }
+
+    .payment-schedule-table {
+        width: 1260px !important;
+        min-width: 1260px !important;
+    }
+
+    .payment-registry-draft-table {
+        width: 1040px !important;
+        min-width: 1040px !important;
+    }
+
+    .payment-registry-source-table {
+        width: 1180px !important;
+        min-width: 1180px !important;
+    }
+}
+/* TABLE-15-SAFE-SCROLL-V2-END */
+
+/* LAPTOP-TABLE-COMPACT-V3-START */
+/*
+ * Laptop compact v3.
+ * Цель:
+ * - 22" оставить широким.
+ * - 15" больше не резать правую часть таблиц.
+ * - Не включать карточный режим.
+ * - Не ломать слова по буквам.
+ * - В оплате переносить большие суммы на отдельную строку.
+ */
+
+/* =========================================================
+   1. Таблицы на 15" должны помещаться лучше
+   ========================================================= */
+
+@media (max-width: 1599px) {
+    .invoice-table-compact,
+    .payment-schedule-table,
+    .payment-registry-draft-table,
+    .payment-registry-source-table {
+        table-layout: fixed !important;
+    }
+
+    .invoice-table-compact {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .payment-schedule-table {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .payment-registry-draft-table {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .payment-registry-source-table {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .invoice-table-compact th,
+    .invoice-table-compact td,
+    .payment-schedule-table th,
+    .payment-schedule-table td,
+    .payment-registry-draft-table th,
+    .payment-registry-draft-table td,
+    .payment-registry-source-table th,
+    .payment-registry-source-table td {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+        font-size: 13px !important;
+        line-height: 1.35 !important;
+        word-break: normal !important;
+        overflow-wrap: normal !important;
+        hyphens: none !important;
+    }
+
+    .invoice-table-compact th,
+    .payment-schedule-table th,
+    .payment-registry-draft-table th,
+    .payment-registry-source-table th {
+        font-size: 12px !important;
+        white-space: nowrap !important;
+    }
+}
+
+/* =========================================================
+   2. Счета — 6 колонок
+   чекбокс | ID | документ | контрагент | сумма/OCR | статус | оплата
+   ========================================================= */
+
+@media (max-width: 1599px) {
+    .invoice-table-compact th:nth-child(1),
+    .invoice-table-compact td:nth-child(1) {
+        width: 42px !important;
+        min-width: 42px !important;
+    }
+
+    .invoice-table-compact th:nth-child(2),
+    .invoice-table-compact td:nth-child(2) {
+        width: 62px !important;
+        min-width: 62px !important;
+        white-space: nowrap !important;
+    }
+
+    .invoice-table-compact th:nth-child(3),
+    .invoice-table-compact td:nth-child(3) {
+        width: 22% !important;
+    }
+
+    .invoice-table-compact th:nth-child(4),
+    .invoice-table-compact td:nth-child(4) {
+        width: 31% !important;
+        white-space: normal !important;
+    }
+
+    .invoice-table-compact th:nth-child(5),
+    .invoice-table-compact td:nth-child(5) {
+        width: 150px !important;
+        min-width: 150px !important;
+        white-space: normal !important;
+    }
+
+    .invoice-table-compact th:nth-child(6),
+    .invoice-table-compact td:nth-child(6) {
+        width: 130px !important;
+        min-width: 130px !important;
+    }
+
+    .invoice-table-compact th:nth-child(7),
+    .invoice-table-compact td:nth-child(7) {
+        width: 165px !important;
+        min-width: 165px !important;
+    }
+}
+
+/* =========================================================
+   3. График платежей — 8 колонок
+   ID | Контрагент | Счет | Сумма | Дата | Остаток | Статус | Действия
+   ========================================================= */
+
+@media (max-width: 1599px) {
+    .payment-schedule-table th:nth-child(1),
+    .payment-schedule-table td:nth-child(1) {
+        width: 58px !important;
+        min-width: 58px !important;
+        white-space: nowrap !important;
+    }
+
+    .payment-schedule-table th:nth-child(2),
+    .payment-schedule-table td:nth-child(2) {
+        width: 24% !important;
+        min-width: 220px !important;
+        white-space: normal !important;
+    }
+
+    .payment-schedule-table th:nth-child(3),
+    .payment-schedule-table td:nth-child(3) {
+        width: 120px !important;
+        min-width: 120px !important;
+    }
+
+    .payment-schedule-table th:nth-child(4),
+    .payment-schedule-table td:nth-child(4) {
+        width: 125px !important;
+        min-width: 125px !important;
+        white-space: nowrap !important;
+    }
+
+    .payment-schedule-table th:nth-child(5),
+    .payment-schedule-table td:nth-child(5) {
+        width: 125px !important;
+        min-width: 125px !important;
+        white-space: nowrap !important;
+    }
+
+    .payment-schedule-table th:nth-child(6),
+    .payment-schedule-table td:nth-child(6) {
+        width: 150px !important;
+        min-width: 150px !important;
+    }
+
+    .payment-schedule-table th:nth-child(7),
+    .payment-schedule-table td:nth-child(7) {
+        width: 120px !important;
+        min-width: 120px !important;
+    }
+
+    .payment-schedule-table th:nth-child(8),
+    .payment-schedule-table td:nth-child(8) {
+        width: 145px !important;
+        min-width: 145px !important;
+    }
+
+    .payment-schedule-table td:nth-child(8) .btn,
+    .payment-schedule-table td:nth-child(8) a,
+    .payment-schedule-table td:nth-child(8) button {
+        display: inline-flex !important;
+    }
+}
+
+/* =========================================================
+   4. Реестр: текущий черновик — 6 колонок
+   ========================================================= */
+
+@media (max-width: 1599px) {
+    .payment-registry-draft-table th:nth-child(1),
+    .payment-registry-draft-table td:nth-child(1) {
+        width: 130px !important;
+        min-width: 130px !important;
+    }
+
+    .payment-registry-draft-table th:nth-child(2),
+    .payment-registry-draft-table td:nth-child(2) {
+        width: 31% !important;
+        min-width: 240px !important;
+        white-space: normal !important;
+    }
+
+    .payment-registry-draft-table th:nth-child(3),
+    .payment-registry-draft-table td:nth-child(3) {
+        width: 125px !important;
+        min-width: 125px !important;
+        white-space: nowrap !important;
+    }
+
+    .payment-registry-draft-table th:nth-child(4),
+    .payment-registry-draft-table td:nth-child(4) {
+        width: 130px !important;
+        min-width: 130px !important;
+    }
+
+    .payment-registry-draft-table th:nth-child(5),
+    .payment-registry-draft-table td:nth-child(5) {
+        width: 155px !important;
+        min-width: 155px !important;
+    }
+
+    .payment-registry-draft-table th:nth-child(6),
+    .payment-registry-draft-table td:nth-child(6) {
+        width: 105px !important;
+        min-width: 105px !important;
+    }
+}
+
+/* =========================================================
+   5. Реестр: доступные счета — 8 колонок
+   # | ID | Контрагент | Счет | Дата | Сумма | План | Оплата
+   ========================================================= */
+
+@media (max-width: 1599px) {
+    .payment-registry-source-table th:nth-child(1),
+    .payment-registry-source-table td:nth-child(1) {
+        width: 42px !important;
+        min-width: 42px !important;
+    }
+
+    .payment-registry-source-table th:nth-child(2),
+    .payment-registry-source-table td:nth-child(2) {
+        width: 62px !important;
+        min-width: 62px !important;
+        white-space: nowrap !important;
+    }
+
+    .payment-registry-source-table th:nth-child(3),
+    .payment-registry-source-table td:nth-child(3) {
+        width: 28% !important;
+        min-width: 240px !important;
+        white-space: normal !important;
+    }
+
+    .payment-registry-source-table th:nth-child(4),
+    .payment-registry-source-table td:nth-child(4) {
+        width: 110px !important;
+        min-width: 110px !important;
+    }
+
+    .payment-registry-source-table th:nth-child(5),
+    .payment-registry-source-table td:nth-child(5) {
+        width: 125px !important;
+        min-width: 125px !important;
+        white-space: nowrap !important;
+    }
+
+    .payment-registry-source-table th:nth-child(6),
+    .payment-registry-source-table td:nth-child(6) {
+        width: 125px !important;
+        min-width: 125px !important;
+        white-space: nowrap !important;
+    }
+
+    .payment-registry-source-table th:nth-child(7),
+    .payment-registry-source-table td:nth-child(7) {
+        width: 125px !important;
+        min-width: 125px !important;
+    }
+
+    .payment-registry-source-table th:nth-child(8),
+    .payment-registry-source-table td:nth-child(8) {
+        width: 155px !important;
+        min-width: 155px !important;
+    }
+}
+
+/* =========================================================
+   6. Контрагент — перенос только словами
+   ========================================================= */
+
+@media (max-width: 1599px) {
+    .invoice-counterparty-cell strong,
+    .payment-schedule-table td:nth-child(2) strong,
+    .payment-registry-draft-table td:nth-child(2) strong,
+    .payment-registry-source-table td:nth-child(3) strong {
+        white-space: normal !important;
+        word-break: normal !important;
+        overflow-wrap: normal !important;
+        hyphens: none !important;
+        line-height: 1.35 !important;
+    }
+}
+
+/* =========================================================
+   7. Карточка оплаты — подпись и сумма в две строки
+   ========================================================= */
+
+@media (max-width: 1599px) {
+    .payment-mini,
+    .payment-mini-list,
+    .payment-mini-schedule,
+    .payment-mini-registry,
+    .payment-status-card {
+        width: 100% !important;
+        min-width: 130px !important;
+        max-width: 155px !important;
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .payment-mini-row {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 2px !important;
+        align-items: start !important;
+    }
+
+    .payment-mini-row span {
+        display: block !important;
+        min-width: 0 !important;
+    }
+
+    .payment-mini-row strong {
+        display: block !important;
+        white-space: nowrap !important;
+        font-size: 12px !important;
+    }
+
+    .payment-mini .badge,
+    .payment-mini-list .badge,
+    .payment-mini-schedule .badge,
+    .payment-mini-registry .badge,
+    .payment-status-card .badge {
+        margin-top: 4px !important;
+        white-space: normal !important;
+        line-height: 1.2 !important;
+    }
+}
+
+/* =========================================================
+   8. Действия
+   ========================================================= */
+
+@media (max-width: 1599px) {
+    .table-actions-vertical,
+    .invoice-payment-action-wrap {
+        min-width: 125px !important;
+        max-width: 150px !important;
+    }
+
+    .table-actions-vertical .btn,
+    .invoice-payment-action-wrap .btn {
+        width: 100% !important;
+        justify-content: center !important;
+        min-height: 38px !important;
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        font-size: 13px !important;
+    }
+}
+/* LAPTOP-TABLE-COMPACT-V3-END */
+
+/* INVOICE-LIST-REGISTRY-LIKE-COLUMNS-V1-START */
+/*
+   Страница "Счета": приводим таблицу к логике реестра оплаты.
+   Оплата и действия — отдельные колонки.
+   Не меняем общий payment-mini компонент.
+*/
+
+.invoice-table-compact {
+    min-width: 1280px !important;
+}
+
+.invoice-table-compact col.col-payment {
+    width: 190px !important;
+}
+
+.invoice-table-compact col.col-actions {
+    width: 140px !important;
+}
+
+.invoice-table-compact .invoice-payment-column,
+.invoice-table-compact .invoice-actions-column {
+    white-space: nowrap !important;
+}
+
+.invoice-table-compact .invoice-payment-cell {
+    min-width: 170px !important;
+}
+
+.invoice-table-compact .invoice-payment-cell .payment-mini {
+    justify-self: start !important;
+}
+
+.invoice-table-compact .invoice-actions-cell {
+    min-width: 130px !important;
+}
+
+.invoice-table-compact .invoice-actions-cell .table-actions,
+.invoice-table-compact .invoice-actions-cell .table-actions-vertical {
+    min-width: 118px !important;
+    max-width: 140px !important;
+}
+
+.invoice-table-compact .invoice-actions-cell .btn {
+    width: 100% !important;
+    min-width: 118px !important;
+}
+/* INVOICE-LIST-REGISTRY-LIKE-COLUMNS-V1-END */
+
+/* PAYMENT-MINI-FINAL-COMPACT-V1-START */
+/*
+   Финальный компактный payment-mini:
+   - подпись слева в фиксированной колонке;
+   - сумма справа;
+   - длинные суммы не выезжают из карточки;
+   - карточка не раздута чрезмерно.
+*/
+
+.payment-mini,
+.payment-mini-list,
+.payment-mini-schedule,
+.payment-mini-registry,
+.payment-mini-registry-source,
+.payment-status-card {
+    width: 188px !important;
+    min-width: 188px !important;
+    max-width: 188px !important;
+
+    box-sizing: border-box !important;
+
+    padding: 10px 12px !important;
+
+    display: grid !important;
+    gap: 6px !important;
+}
+
+.payment-mini .payment-mini-row,
+.payment-status-card .payment-status-row {
+    display: grid !important;
+    grid-template-columns: 62px minmax(0, 1fr) !important;
+    column-gap: 8px !important;
+    row-gap: 0 !important;
+
+    align-items: center !important;
+
+    min-width: 0 !important;
+    min-height: 17px !important;
+}
+
+.payment-mini .payment-mini-row span,
+.payment-status-card .payment-status-row span {
+    display: block !important;
+
+    min-width: 0 !important;
+
+    font-size: 12px !important;
+    line-height: 17px !important;
+
+    text-align: left !important;
+    white-space: nowrap !important;
+}
+
+.payment-mini .payment-mini-row strong,
+.payment-status-card .payment-status-row strong {
+    display: block !important;
+
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    justify-self: end !important;
+
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    line-height: 17px !important;
+
+    text-align: right !important;
+    white-space: nowrap !important;
+
+    font-variant-numeric: tabular-nums !important;
+    letter-spacing: -0.01em !important;
+}
+
+.payment-mini .payment-mini-status,
+.payment-status-card .payment-mini-status {
+    margin-top: 3px !important;
+}
+
+/* Ячейка должна дать карточке место */
+.invoice-table-compact td:has(.payment-mini),
+.payment-schedule-table td:has(.payment-mini),
+.payment-registry-draft-table td:has(.payment-mini),
+.payment-registry-source-table td:has(.payment-mini),
+.registry-table td:has(.payment-mini),
+.table td:has(.payment-mini) {
+    min-width: 200px !important;
+}
+
+@media (max-width: 1599px) {
+    .payment-mini,
+    .payment-mini-list,
+    .payment-mini-schedule,
+    .payment-mini-registry,
+    .payment-mini-registry-source,
+    .payment-status-card {
+        width: 188px !important;
+        min-width: 188px !important;
+        max-width: 188px !important;
+    }
+
+    .payment-mini .payment-mini-row,
+    .payment-status-card .payment-status-row {
+        grid-template-columns: 62px minmax(0, 1fr) !important;
+        column-gap: 8px !important;
+        align-items: center !important;
+    }
+}
+/* PAYMENT-MINI-FINAL-COMPACT-V1-END */
+
+/* INVOICE-LIST-REGISTRY-LIKE-COLUMNS-V2-START */
+/*
+   Страница "Счета":
+   разводим отдельные колонки "Оплата" и "Действия".
+   payment-mini не трогаем.
+*/
+
+.invoice-table-compact {
+    min-width: 1360px !important;
+}
+
+.invoice-table-compact col.col-payment {
+    width: 220px !important;
+}
+
+.invoice-table-compact col.col-actions {
+    width: 165px !important;
+}
+
+.invoice-table-compact .invoice-payment-column,
+.invoice-table-compact .invoice-actions-column {
+    white-space: nowrap !important;
+}
+
+.invoice-table-compact .invoice-payment-cell {
+    min-width: 214px !important;
+    padding-right: 24px !important;
+}
+
+.invoice-table-compact .invoice-actions-cell {
+    min-width: 150px !important;
+    padding-left: 18px !important;
+}
+
+.invoice-table-compact .invoice-actions-cell .table-actions,
+.invoice-table-compact .invoice-actions-cell .table-actions-vertical {
+    min-width: 120px !important;
+    max-width: 145px !important;
+}
+
+.invoice-table-compact .invoice-actions-cell .btn {
+    width: 100% !important;
+    min-width: 120px !important;
+}
+/* INVOICE-LIST-REGISTRY-LIKE-COLUMNS-V2-END */
+
+
+/* PAYMENT-SCHEDULE-PAYMENT-STATUS-GAP-V1-START */
+/*
+   График платежей:
+   разводим колонки "Остаток" и "Статус".
+   payment-mini не трогаем.
+*/
+
+.payment-schedule-table {
+    min-width: 1360px !important;
+}
+
+.payment-schedule-table td:has(.payment-mini) {
+    min-width: 214px !important;
+    padding-right: 28px !important;
+}
+
+.payment-schedule-table td:has(.payment-mini) + td {
+    min-width: 145px !important;
+    padding-left: 24px !important;
+}
+
+.payment-schedule-table th.payment-schedule-remaining-column {
+    min-width: 214px !important;
+    padding-right: 28px !important;
+}
+
+.payment-schedule-table th.payment-schedule-remaining-column + th {
+    min-width: 145px !important;
+    padding-left: 24px !important;
+}
+
+.payment-schedule-table .status-badge {
+    white-space: nowrap !important;
+}
+/* PAYMENT-SCHEDULE-PAYMENT-STATUS-GAP-V1-END */

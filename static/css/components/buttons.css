@@ -1,0 +1,237 @@
+/*
+ * ERP Zarya35 — buttons component.
+ *
+ * Здесь живёт только базовая система кнопок.
+ * Страничные CSS-файлы не должны переопределять внешний вид кнопок,
+ * только их расположение в конкретных блоках.
+ */
+
+.btn,
+.button,
+.action-button,
+.primary-btn,
+.secondary-btn,
+.danger-btn,
+.audit-btn {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 0 18px;
+    border: 1px solid var(--z-border, rgba(255, 255, 255, .14));
+    border-radius: 13px;
+
+    background: rgba(255, 255, 255, .045);
+    color: var(--z-text, #ffffff);
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 850;
+    line-height: 1;
+    text-align: center;
+    text-decoration: none;
+
+    white-space: nowrap;
+    cursor: pointer;
+    box-sizing: border-box;
+
+    transition:
+        background-color .16s ease,
+        border-color .16s ease,
+        color .16s ease,
+        transform .16s ease,
+        box-shadow .16s ease;
+}
+
+.btn:hover,
+.button:hover,
+.action-button:hover,
+.primary-btn:hover,
+.secondary-btn:hover,
+.danger-btn:hover,
+.audit-btn:hover {
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.btn-primary,
+.primary-btn,
+.audit-btn-apply {
+    background: var(--z-accent, #22c55e);
+    border-color: rgba(34, 197, 94, .78);
+    color: #ffffff;
+    box-shadow: 0 12px 28px rgba(34, 197, 94, .18);
+}
+
+.btn-primary:hover,
+.primary-btn:hover,
+.audit-btn-apply:hover {
+    background: var(--z-accent-2, #16a34a);
+    border-color: rgba(34, 197, 94, .9);
+    color: #ffffff;
+}
+
+.btn-secondary,
+.secondary-btn,
+.btn-dark,
+.audit-btn-reset,
+.audit-btn-export {
+    background: rgba(255, 255, 255, .045);
+    border-color: var(--z-border, rgba(255, 255, 255, .14));
+    color: var(--z-text, #ffffff);
+}
+
+.btn-secondary:hover,
+.secondary-btn:hover,
+.btn-dark:hover,
+.audit-btn-reset:hover,
+.audit-btn-export:hover {
+    background: rgba(255, 255, 255, .075);
+    border-color: rgba(255, 255, 255, .24);
+    color: #ffffff;
+}
+
+.btn-danger,
+.danger-btn,
+.btn.is-danger,
+.button.is-danger,
+.action-button.is-danger {
+    background: rgba(185, 28, 28, .72);
+    border-color: rgba(248, 113, 113, .45);
+    color: #ffffff;
+}
+
+.btn-danger:hover,
+.danger-btn:hover,
+.btn.is-danger:hover,
+.button.is-danger:hover,
+.action-button.is-danger:hover {
+    background: rgba(220, 38, 38, .84);
+    border-color: rgba(248, 113, 113, .7);
+    color: #ffffff;
+}
+
+.btn-sm {
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 11px;
+    font-size: 13px;
+}
+
+.btn-xs {
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 9px;
+    font-size: 12px;
+}
+
+.btn-lg {
+    min-height: 48px;
+    padding: 0 22px;
+    border-radius: 15px;
+    font-size: 15px;
+}
+
+.btn-block,
+.w-100 {
+    width: 100%;
+}
+
+.btn:disabled,
+.btn[disabled],
+.button:disabled,
+.button[disabled],
+.action-button:disabled,
+.action-button[disabled],
+.primary-btn:disabled,
+.secondary-btn:disabled,
+.danger-btn:disabled {
+    opacity: .52;
+    cursor: not-allowed;
+    pointer-events: none;
+    transform: none;
+    box-shadow: none;
+}
+
+/*
+ * Groups / action rows.
+ */
+
+.page-actions,
+.card-actions,
+.form-actions,
+.table-actions,
+.row-actions,
+.dashboard-hero-actions,
+.upload-result-actions,
+.counterparty-card-actions,
+.system-maintenance-actions,
+.import-actions,
+.comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.table-actions,
+.row-actions {
+    justify-content: flex-end;
+}
+
+/*
+ * Special button-like dashboard cards.
+ */
+
+.quick-action-card {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    align-items: center;
+    gap: 14px;
+
+    min-height: 86px;
+    padding: 18px;
+    border: 1px solid var(--z-border, rgba(255, 255, 255, .14));
+    border-radius: 16px;
+
+    background: rgba(255, 255, 255, .035);
+    color: var(--z-text, #ffffff);
+    text-decoration: none;
+
+    transition:
+        background-color .16s ease,
+        border-color .16s ease,
+        transform .16s ease;
+}
+
+.quick-action-card:hover {
+    background: rgba(34, 197, 94, .08);
+    border-color: rgba(34, 197, 94, .34);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+/*
+ * File/select helper buttons.
+ */
+
+.file-button,
+.upload-button {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 18px;
+    border-radius: 13px;
+    border: 1px solid rgba(34, 197, 94, .78);
+
+    background: var(--z-accent, #22c55e);
+    color: #ffffff;
+
+    font-weight: 850;
+    cursor: pointer;
+}

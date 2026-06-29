@@ -749,11 +749,24 @@
 
                     <tr>
                         <td>
-                            <input
-                                type="checkbox"
-                                name="invoice_ids"
-                                value="{{ invoice.id }}"
-                            >
+                            {% if invoice.amount_verified %}
+                                <input
+                                    type="checkbox"
+                                    name="invoice_ids"
+                                    value="{{ invoice.id }}"
+                                >
+                            {% else %}
+                                <input
+                                    type="checkbox"
+                                    class="ocr-disabled-checkbox"
+                                    disabled
+                                    title="Сначала подтвердите сумму OCR"
+                                >
+
+                                <div class="ocr-disabled-add-note">
+                                    Сначала подтвердите сумму
+                                </div>
+                            {% endif %}
                         </td>
 
                             <td>

@@ -1029,3 +1029,17 @@
         grid-template-columns: 1fr;
     }
 }
+
+.ocr-disabled-checkbox {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.ocr-disabled-add-note {
+    margin-top: 6px;
+    max-width: 120px;
+    color: #991b1b;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.25;
+}

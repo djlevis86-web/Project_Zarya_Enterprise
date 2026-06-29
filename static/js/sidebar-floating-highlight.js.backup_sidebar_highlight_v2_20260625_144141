@@ -1,0 +1,158 @@
+
+(function () {
+    "use strict";
+
+    function normalizePath(path) {
+        if (!path) return "/";
+        return path.replace(/\/+$/, "") || "/";
+    }
+
+    function isMenuLink(link) {
+        if (!link || !link.getAttribute) return false;
+
+        const href = link.getAttribute("href");
+
+        if (!href) return false;
+        if (href.startsWith("#")) return false;
+        if (href.startsWith("javascript:")) return false;
+
+        return true;
+    }
+
+    function findBestActiveLink(nav, links) {
+        const currentPath = normalizePath(window.location.pathname);
+
+        let active =
+            nav.querySelector("a.is-active") ||
+            nav.querySelector("a.active") ||
+            nav.querySelector(".nav-link.is-active") ||
+            nav.querySelector(".nav-link.active");
+
+        if (active && isMenuLink(active)) {
+            return active;
+        }
+
+        let best = null;
+        let bestLength = -1;
+
+        links.forEach(function (link) {
+            const url = new URL(link.href, window.location.origin);
+            const linkPath = normalizePath(url.pathname);
+
+            if (linkPath === "/") {
+                if (currentPath === "/" && linkPath.length > bestLength) {
+                    best = link;
+                    bestLength = linkPath.length;
+                }
+                return;
+            }
+
+            if (currentPath === linkPath || currentPath.startsWith(linkPath + "/")) {
+                if (linkPath.length > bestLength) {
+                    best = link;
+                    bestLength = linkPath.length;
+                }
+            }
+        });
+
+        return best || links[0] || null;
+    }
+
+    function setActiveClass(links, activeLink) {
+        links.forEach(function (link) {
+            link.classList.remove("is-active");
+        });
+
+        if (activeLink) {
+            activeLink.classList.add("is-active");
+        }
+    }
+
+    function moveHighlight(nav, highlight, target) {
+        if (!nav || !highlight || !target) return;
+
+        const navRect = nav.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+
+        const top = targetRect.top - navRect.top + nav.scrollTop;
+        const height = targetRect.height;
+
+        highlight.style.height = height + "px";
+        highlight.style.transform = "translate3d(0," + top + "px,0)";
+        nav.classList.add("has-floating-highlight");
+    }
+
+    function initNav(nav) {
+        if (!nav || nav.dataset.sidebarHighlightReady === "1") return;
+
+        const links = Array.from(nav.querySelectorAll("a")).filter(isMenuLink);
+
+        if (!links.length) return;
+
+        nav.dataset.sidebarHighlightReady = "1";
+
+        let highlight = nav.querySelector(":scope > .sidebar-nav-highlight");
+
+        if (!highlight) {
+            highlight = document.createElement("span");
+            highlight.className = "sidebar-nav-highlight";
+            highlight.setAttribute("aria-hidden", "true");
+            nav.prepend(highlight);
+        }
+
+        const activeLink = findBestActiveLink(nav, links);
+        setActiveClass(links, activeLink);
+
+        requestAnimationFrame(function () {
+            moveHighlight(nav, highlight, activeLink);
+        });
+
+        links.forEach(function (link) {
+            link.addEventListener("mouseenter", function () {
+                moveHighlight(nav, highlight, link);
+            });
+
+            link.addEventListener("focus", function () {
+                moveHighlight(nav, highlight, link);
+            });
+        });
+
+        nav.addEventListener("mouseleave", function () {
+            moveHighlight(nav, highlight, activeLink);
+        });
+
+        nav.addEventListener("focusout", function () {
+            window.setTimeout(function () {
+                if (!nav.contains(document.activeElement)) {
+                    moveHighlight(nav, highlight, activeLink);
+                }
+            }, 0);
+        });
+
+        window.addEventListener("resize", function () {
+            moveHighlight(nav, highlight, activeLink);
+        });
+
+        const scrollParent = nav.closest(".sidebar, .app-sidebar, .layout-sidebar, .side-nav");
+
+        if (scrollParent) {
+            scrollParent.addEventListener("scroll", function () {
+                moveHighlight(nav, highlight, activeLink);
+            }, { passive: true });
+        }
+    }
+
+    function init() {
+        const navs = document.querySelectorAll(
+            ".sidebar-nav, .sidebar-menu, .nav-list, .sidebar nav, .app-sidebar nav, .side-nav nav"
+        );
+
+        navs.forEach(initNav);
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+})();

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load money %}
 
 {% load static %}
 
@@ -290,7 +291,7 @@
                     </span>
 
                     <strong class="amount-main">
-                        {{ invoice.amount|floatformat:2 }} ₽
+                        {{ invoice.amount|money_ru }}
                     </strong>
                 </div>
 
@@ -301,7 +302,7 @@
 
                     <strong>
                         {% if invoice.ocr_amount %}
-                            {{ invoice.ocr_amount|floatformat:2 }} ₽
+                            {{ invoice.ocr_amount|money_ru }}
                         {% else %}
                             —
                         {% endif %}
@@ -361,17 +362,17 @@
     <div class="payment-left-summary">
         <div>
             <span>Сумма счёта</span>
-            <strong>{{ payment_summary.invoice_amount|floatformat:2 }} ₽</strong>
+            <strong>{{ payment_summary.invoice_amount|money_ru }}</strong>
         </div>
 
         <div>
             <span>Оплачено</span>
-            <strong>{{ payment_summary.paid_amount|floatformat:2 }} ₽</strong>
+            <strong>{{ payment_summary.paid_amount|money_ru }}</strong>
         </div>
 
         <div>
             <span>Остаток</span>
-            <strong>{{ payment_summary.remaining_amount|floatformat:2 }} ₽</strong>
+            <strong>{{ payment_summary.remaining_amount|money_ru }}</strong>
         </div>
 
         <div>
@@ -424,7 +425,7 @@
         {% for payment in payments %}
             <div class="payment-left-history-item">
                 <div>
-                    <strong>{{ payment.amount|floatformat:2 }} ₽</strong>
+                    <strong>{{ payment.amount|money_ru }}</strong>
                     <span>{{ payment.paid_at|date:"d.m.Y" }}</span>
                 </div>
 

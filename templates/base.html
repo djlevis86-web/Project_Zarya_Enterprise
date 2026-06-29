@@ -15,6 +15,7 @@
 
     <link rel="stylesheet"
           href="{% static 'css/app.css' %}">
+    <link rel="stylesheet" href="{% static 'css/features/sidebar-fixed-left.css' %}">
 </head>
 
 <body class="{% if user.is_authenticated and user.theme == 'light' %}light-theme{% endif %}">
@@ -25,8 +26,7 @@
 
     <aside class="sidebar">
 
-        <div class="sidebar-top">
-
+        <div class="sidebar-brand-area">
             <a href="{% url 'dashboard' %}" class="sidebar-brand">
                 <span class="brand-mark">
                     З
@@ -42,7 +42,9 @@
                     </small>
                 </span>
             </a>
+        </div>
 
+        <div class="sidebar-scroll">
             <nav class="sidebar-nav">
 
                 <div class="nav-section">
@@ -139,12 +141,6 @@
                         Аккаунт
                     </div>
 
-                    <a href="{% url 'profile' %}"
-                       class="nav-link {% if current == 'profile' %}is-active{% endif %}">
-                        <span class="nav-icon">◌</span>
-                        <span>Профиль</span>
-                    </a>
-
                     {% if request.user.is_staff %}
 
                         <a href="{% url 'system_dashboard' %}"
@@ -154,10 +150,12 @@
                         </a>
 
 {% if user.is_staff %}
-                <a href="{% url 'audit:audit_log_list' %}">
-                    Журнал действий
-                </a>
-                {% endif %}
+                        <a href="{% url 'audit:audit_log_list' %}"
+                           class="nav-link {% if current == 'audit_log_list' %}is-active{% endif %}">
+                            <span class="nav-icon">▤</span>
+                            <span>Журнал действий</span>
+                        </a>
+                    {% endif %}
 
                         <a href="/admin/" class="nav-link">
                             <span class="nav-icon">▣</span>
@@ -169,14 +167,41 @@
                 </div>
 
             </nav>
-
         </div>
 
-        <div class="sidebar-footer">
-            <a href="{% url 'logout' %}" class="nav-link logout-link">
-                <span class="nav-icon">↩</span>
-                <span>Выход</span>
-            </a>
+        <div class="sidebar-footer sidebar-account-card">
+
+            <div class="sidebar-user-card">
+                <div class="sidebar-user-avatar">
+                    {{ request.user.username|first|upper }}
+                </div>
+
+                <div class="sidebar-user-meta">
+                    <div class="sidebar-user-name">
+                        {{ request.user.username }}
+                    </div>
+
+                    {% if request.user.email %}
+                        <div class="sidebar-user-email">
+                            {{ request.user.email }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="sidebar-user-actions">
+                <a href="{% url 'profile' %}"
+                   class="sidebar-user-action {% if current == 'profile' %}is-active{% endif %}">
+                    <span class="nav-icon">⚙</span>
+                    <span>Профиль</span>
+                </a>
+
+                <a href="{% url 'logout' %}" class="sidebar-user-action sidebar-user-action-danger">
+                    <span class="nav-icon">↩</span>
+                    <span>Выйти</span>
+                </a>
+            </div>
+
         </div>
 
     </aside>
@@ -290,5 +315,6 @@
 
 {% endwith %}
 
+    <script src="{% static 'js/sidebar-floating-highlight.js' %}" defer></script>
 </body>
 </html>

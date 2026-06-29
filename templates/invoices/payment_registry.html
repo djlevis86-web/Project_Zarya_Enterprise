@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load money %}
 
 {% block content %}
 
@@ -54,7 +55,7 @@
         </span>
 
         <strong>
-            {{ total_amount|floatformat:2 }} ₽
+            {{ total_amount|money_ru }}
         </strong>
     </div>
 
@@ -336,7 +337,7 @@
 
                             <td>
                                 <strong>
-                                    {{ item.amount|floatformat:2 }} ₽
+                                    {{ item.amount|money_ru }}
                                 </strong>
                             </td>
 
@@ -354,17 +355,17 @@
                                 <div class="payment-mini payment-mini-registry payment-mini-{{ item.invoice.payment_status_code }}">
                                     <div class="payment-mini-row">
                                         <span>Счёт</span>
-                                        <strong>{{ item.invoice.amount|floatformat:2 }} ₽</strong>
+                                        <strong>{{ item.invoice.amount|money_ru }}</strong>
                                     </div>
 
                                     <div class="payment-mini-row">
                                         <span>Оплачено</span>
-                                        <strong>{{ item.invoice.payment_paid_amount|floatformat:2 }} ₽</strong>
+                                        <strong>{{ item.invoice.payment_paid_amount|money_ru }}</strong>
                                     </div>
 
                                     <div class="payment-mini-row">
                                         <span>Остаток</span>
-                                        <strong>{{ item.invoice.payment_remaining_amount|floatformat:2 }} ₽</strong>
+                                        <strong>{{ item.invoice.payment_remaining_amount|money_ru }}</strong>
                                     </div>
 
                                     <div class="payment-mini-status">
@@ -670,7 +671,7 @@
 
                             <td>
                             <strong class="amount-main">
-                                {{ invoice.amount|floatformat:2 }} ₽
+                                {{ invoice.amount|money_ru }}
                             </strong>
                         </td>
 
@@ -688,12 +689,12 @@
                             <div class="payment-mini payment-mini-registry-source payment-mini-{{ invoice.payment_status_code }}">
                                 <div class="payment-mini-row">
                                     <span>Оплачено</span>
-                                    <strong>{{ invoice.payment_paid_amount|floatformat:2 }} ₽</strong>
+                                    <strong>{{ invoice.payment_paid_amount|money_ru }}</strong>
                                 </div>
 
                                 <div class="payment-mini-row">
                                     <span>Остаток</span>
-                                    <strong>{{ invoice.payment_remaining_amount|floatformat:2 }} ₽</strong>
+                                    <strong>{{ invoice.payment_remaining_amount|money_ru }}</strong>
                                 </div>
 
                                 <div class="payment-mini-status">

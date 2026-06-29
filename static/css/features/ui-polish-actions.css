@@ -155,3 +155,83 @@
         justify-content: flex-start;
     }
 }
+
+/* UI-POLISH-PAGE-HEADER-ACTIONS-STABLE-V1-START */
+/*
+   Общий layout для верхних кнопок страниц.
+   Реальная структура:
+   .page-header
+       текстовый блок
+       .registry-actions / .page-actions / .topbar-actions / ...
+*/
+
+.page-header {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 24px !important;
+    margin-bottom: 24px !important;
+}
+
+.page-header > :first-child {
+    min-width: 0 !important;
+    max-width: 860px !important;
+}
+
+.page-header > .registry-actions,
+.page-header > .page-actions,
+.page-header > .topbar-actions,
+.page-header > .payment-registry-actions,
+.page-header > .upload-actions-row,
+.page-header > .import-actions,
+.page-header > .actions-row {
+    flex: 0 0 auto !important;
+
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+
+    column-gap: 16px !important;
+    row-gap: 12px !important;
+
+    margin-top: 6px !important;
+    margin-bottom: 0 !important;
+}
+
+.page-header > .registry-actions .btn,
+.page-header > .page-actions .btn,
+.page-header > .topbar-actions .btn,
+.page-header > .payment-registry-actions .btn,
+.page-header > .upload-actions-row .btn,
+.page-header > .import-actions .btn,
+.page-header > .actions-row .btn {
+    min-height: 44px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    white-space: nowrap !important;
+    line-height: 1 !important;
+}
+
+@media (max-width: 1200px) {
+    .page-header {
+        display: block !important;
+    }
+
+    .page-header > .registry-actions,
+    .page-header > .page-actions,
+    .page-header > .topbar-actions,
+    .page-header > .payment-registry-actions,
+    .page-header > .upload-actions-row,
+    .page-header > .import-actions,
+    .page-header > .actions-row {
+        justify-content: flex-start !important;
+        margin-top: 16px !important;
+    }
+}
+/* UI-POLISH-PAGE-HEADER-ACTIONS-STABLE-V1-END */

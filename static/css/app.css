@@ -48,6 +48,7 @@
 @import url("./features/table-clean-baseline.css");
 @import url("./features/ui-polish-actions.css");
 @import url("./features/ui-polish-badges.css");
+@import url("./features/ui-polish-filters.css");
 /* DISABLED 20260625_075613: @import url("./features/visual-stabilizer.css"); */
 
 /*
@@ -56,3 +57,5 @@
  */
 /* Legacy legacy stylesheet disabled during full CSS cleanup */
 /* /* Legacy legacy stylesheet retired. Import removed intentionally. */ */
+/* DISABLED sidebar floating highlight until sidebar base is stable: @import url("./features/sidebar-floating-highlight.css"); */
+@import url("./features/sidebar-fixed-left.css");

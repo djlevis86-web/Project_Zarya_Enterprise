@@ -1320,3 +1320,243 @@
     }
 }
 /* LAPTOP-TABLE-COMPACT-V3-END */
+
+/* INVOICE-LIST-REGISTRY-LIKE-COLUMNS-V1-START */
+/*
+   Страница "Счета": приводим таблицу к логике реестра оплаты.
+   Оплата и действия — отдельные колонки.
+   Не меняем общий payment-mini компонент.
+*/
+
+.invoice-table-compact {
+    min-width: 1280px !important;
+}
+
+.invoice-table-compact col.col-payment {
+    width: 190px !important;
+}
+
+.invoice-table-compact col.col-actions {
+    width: 140px !important;
+}
+
+.invoice-table-compact .invoice-payment-column,
+.invoice-table-compact .invoice-actions-column {
+    white-space: nowrap !important;
+}
+
+.invoice-table-compact .invoice-payment-cell {
+    min-width: 170px !important;
+}
+
+.invoice-table-compact .invoice-payment-cell .payment-mini {
+    justify-self: start !important;
+}
+
+.invoice-table-compact .invoice-actions-cell {
+    min-width: 130px !important;
+}
+
+.invoice-table-compact .invoice-actions-cell .table-actions,
+.invoice-table-compact .invoice-actions-cell .table-actions-vertical {
+    min-width: 118px !important;
+    max-width: 140px !important;
+}
+
+.invoice-table-compact .invoice-actions-cell .btn {
+    width: 100% !important;
+    min-width: 118px !important;
+}
+/* INVOICE-LIST-REGISTRY-LIKE-COLUMNS-V1-END */
+
+/* PAYMENT-MINI-FINAL-COMPACT-V1-START */
+/*
+   Финальный компактный payment-mini:
+   - подпись слева в фиксированной колонке;
+   - сумма справа;
+   - длинные суммы не выезжают из карточки;
+   - карточка не раздута чрезмерно.
+*/
+
+.payment-mini,
+.payment-mini-list,
+.payment-mini-schedule,
+.payment-mini-registry,
+.payment-mini-registry-source,
+.payment-status-card {
+    width: 188px !important;
+    min-width: 188px !important;
+    max-width: 188px !important;
+
+    box-sizing: border-box !important;
+
+    padding: 10px 12px !important;
+
+    display: grid !important;
+    gap: 6px !important;
+}
+
+.payment-mini .payment-mini-row,
+.payment-status-card .payment-status-row {
+    display: grid !important;
+    grid-template-columns: 62px minmax(0, 1fr) !important;
+    column-gap: 8px !important;
+    row-gap: 0 !important;
+
+    align-items: center !important;
+
+    min-width: 0 !important;
+    min-height: 17px !important;
+}
+
+.payment-mini .payment-mini-row span,
+.payment-status-card .payment-status-row span {
+    display: block !important;
+
+    min-width: 0 !important;
+
+    font-size: 12px !important;
+    line-height: 17px !important;
+
+    text-align: left !important;
+    white-space: nowrap !important;
+}
+
+.payment-mini .payment-mini-row strong,
+.payment-status-card .payment-status-row strong {
+    display: block !important;
+
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    justify-self: end !important;
+
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    line-height: 17px !important;
+
+    text-align: right !important;
+    white-space: nowrap !important;
+
+    font-variant-numeric: tabular-nums !important;
+    letter-spacing: -0.01em !important;
+}
+
+.payment-mini .payment-mini-status,
+.payment-status-card .payment-mini-status {
+    margin-top: 3px !important;
+}
+
+/* Ячейка должна дать карточке место */
+.invoice-table-compact td:has(.payment-mini),
+.payment-schedule-table td:has(.payment-mini),
+.payment-registry-draft-table td:has(.payment-mini),
+.payment-registry-source-table td:has(.payment-mini),
+.registry-table td:has(.payment-mini),
+.table td:has(.payment-mini) {
+    min-width: 200px !important;
+}
+
+@media (max-width: 1599px) {
+    .payment-mini,
+    .payment-mini-list,
+    .payment-mini-schedule,
+    .payment-mini-registry,
+    .payment-mini-registry-source,
+    .payment-status-card {
+        width: 188px !important;
+        min-width: 188px !important;
+        max-width: 188px !important;
+    }
+
+    .payment-mini .payment-mini-row,
+    .payment-status-card .payment-status-row {
+        grid-template-columns: 62px minmax(0, 1fr) !important;
+        column-gap: 8px !important;
+        align-items: center !important;
+    }
+}
+/* PAYMENT-MINI-FINAL-COMPACT-V1-END */
+
+/* INVOICE-LIST-REGISTRY-LIKE-COLUMNS-V2-START */
+/*
+   Страница "Счета":
+   разводим отдельные колонки "Оплата" и "Действия".
+   payment-mini не трогаем.
+*/
+
+.invoice-table-compact {
+    min-width: 1360px !important;
+}
+
+.invoice-table-compact col.col-payment {
+    width: 220px !important;
+}
+
+.invoice-table-compact col.col-actions {
+    width: 165px !important;
+}
+
+.invoice-table-compact .invoice-payment-column,
+.invoice-table-compact .invoice-actions-column {
+    white-space: nowrap !important;
+}
+
+.invoice-table-compact .invoice-payment-cell {
+    min-width: 214px !important;
+    padding-right: 24px !important;
+}
+
+.invoice-table-compact .invoice-actions-cell {
+    min-width: 150px !important;
+    padding-left: 18px !important;
+}
+
+.invoice-table-compact .invoice-actions-cell .table-actions,
+.invoice-table-compact .invoice-actions-cell .table-actions-vertical {
+    min-width: 120px !important;
+    max-width: 145px !important;
+}
+
+.invoice-table-compact .invoice-actions-cell .btn {
+    width: 100% !important;
+    min-width: 120px !important;
+}
+/* INVOICE-LIST-REGISTRY-LIKE-COLUMNS-V2-END */
+
+
+/* PAYMENT-SCHEDULE-PAYMENT-STATUS-GAP-V1-START */
+/*
+   График платежей:
+   разводим колонки "Остаток" и "Статус".
+   payment-mini не трогаем.
+*/
+
+.payment-schedule-table {
+    min-width: 1360px !important;
+}
+
+.payment-schedule-table td:has(.payment-mini) {
+    min-width: 214px !important;
+    padding-right: 28px !important;
+}
+
+.payment-schedule-table td:has(.payment-mini) + td {
+    min-width: 145px !important;
+    padding-left: 24px !important;
+}
+
+.payment-schedule-table th.payment-schedule-remaining-column {
+    min-width: 214px !important;
+    padding-right: 28px !important;
+}
+
+.payment-schedule-table th.payment-schedule-remaining-column + th {
+    min-width: 145px !important;
+    padding-left: 24px !important;
+}
+
+.payment-schedule-table .status-badge {
+    white-space: nowrap !important;
+}
+/* PAYMENT-SCHEDULE-PAYMENT-STATUS-GAP-V1-END */

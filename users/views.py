@@ -8,6 +8,7 @@ from .forms import (
     UserSettingsForm
 )
 from invoices.models import Invoice
+from django.utils import timezone
 
 
 def login_view(request):
@@ -54,6 +55,17 @@ def dashboard(request):
 
     total_count = invoices.count()
 
+    month_start = timezone.now().replace(
+        day=1,
+        hour=0,
+        minute=0,
+        second=0,
+        microsecond=0
+    )
+
+    month_count = invoices.filter(
+        created_at__gte=month_start
+    ).count()
     new_count = invoices.filter(
         status='new'
     ).count()
@@ -72,11 +84,34 @@ def dashboard(request):
 
     latest_invoices = invoices.order_by(
         '-created_at'
-    )[:10]
+    )[:5]
+
+    attention_items = [
+        {
+            'label': 'Новые счета',
+            'value': new_count,
+            'hint': 'Ожидают OCR и первичной проверки',
+            'url_name': 'invoice_list',
+        },
+        {
+            'label': 'На проверке',
+            'value': review_count,
+            'hint': 'Нужно принять решение по счетам',
+            'url_name': 'invoice_list',
+        },
+        {
+            'label': 'Готово к оплате',
+            'value': approved_count,
+            'hint': 'Можно включать в платежный реестр',
+            'url_name': 'payment_registry',
+        },
+    ]
 
     context = {
 
         'total_count': total_count,
+
+        'month_count': month_count,
 
         'new_count': new_count,
 
@@ -87,6 +122,8 @@ def dashboard(request):
         'latest_invoices': latest_invoices,
 
         'paid_count': paid_count,
+
+        'attention_items': attention_items,
     }
 
     return render(

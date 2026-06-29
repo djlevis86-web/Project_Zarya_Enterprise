@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load money %}
 
 {% block content %}
 
@@ -192,7 +193,7 @@
 
                         <td>
                             <strong class="amount-main">
-                                {{ invoice.amount|floatformat:2 }} ₽
+                                {{ invoice.amount|money_ru }}
                             </strong>
                         </td>
 

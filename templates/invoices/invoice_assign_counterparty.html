@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load money %}
 
 {% block content %}
 
@@ -58,7 +59,7 @@
         </span>
 
         <strong>
-            {{ invoice.amount|floatformat:2 }} ₽
+            {{ invoice.amount|money_ru }}
         </strong>
     </div>
 

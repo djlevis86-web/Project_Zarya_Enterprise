@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load money %}
 
 {% block content %}
 
@@ -14,7 +15,7 @@
         </p>
     </div>
 
-    <div class="registry-actions">
+    <div class="registry-actions invoice-top-actions-v1">
         <a href="{% url 'upload_invoice' %}" class="btn btn-primary">
             Загрузить счет
         </a>
@@ -76,14 +77,15 @@
 
 <div class="card registry-filter-card">
 
-    <form method="get" class="invoice-filter-form invoice-filter-form-compact">
+    <form method="get" class="invoice-filter-form invoice-filter-form-compact invoice-filter-clean-v5">
 
-        <div class="form-group">
-            <label>
+        <div class="filter-field filter-field-search-v5">
+            <label for="invoice_search">
                 Поиск
             </label>
 
             <input
+                id="invoice_search"
                 type="text"
                 name="search"
                 value="{{ search }}"
@@ -93,13 +95,12 @@
         </div>
 
         {% if user.is_staff %}
-            <div class="form-group">
-                <label>
+            <div class="filter-field filter-field-user-v5">
+                <label for="invoice_user">
                     Пользователь
                 </label>
 
-                <select name="user" class="form-control">
-
+                <select id="invoice_user" name="user" class="form-control">
                     <option value="">
                         Все пользователи
                     </option>
@@ -112,18 +113,16 @@
                             {{ u.username }}
                         </option>
                     {% endfor %}
-
                 </select>
             </div>
         {% endif %}
 
-        <div class="form-group">
-            <label>
+        <div class="filter-field filter-field-status-v5">
+            <label for="invoice_status">
                 Статус
             </label>
 
-            <select name="status" class="form-control">
-
+            <select id="invoice_status" name="status" class="form-control">
                 <option value="">
                     Все статусы
                 </option>
@@ -136,37 +135,36 @@
                         {{ label }}
                     </option>
                 {% endfor %}
-
             </select>
-
-            <div class="filter-field">
-                <label for="payment_status">Оплата</label>
-
-                <select
-                    id="payment_status"
-                    name="payment_status"
-                    class="form-control"
-                >
-                    {% for value, label in payment_status_choices %}
-                        <option
-                            value="{{ value }}"
-                            {% if payment_status_filter == value %}selected{% endif %}
-                        >
-                            {{ label }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-
         </div>
 
-        <div class="form-group">
-            <label>
+        <div class="filter-field filter-field-payment-v5">
+            <label for="payment_status">
+                Оплата
+            </label>
+
+            <select
+                id="payment_status"
+                name="payment_status"
+                class="form-control"
+            >
+                {% for value, label in payment_status_choices %}
+                    <option
+                        value="{{ value }}"
+                        {% if payment_status_filter == value %}selected{% endif %}
+                    >
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-field filter-field-sort-v5">
+            <label for="invoice_sort">
                 Сортировка
             </label>
 
-            <select name="sort" class="form-control">
-
+            <select id="invoice_sort" name="sort" class="form-control">
                 <option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>
                     Сначала новые
                 </option>
@@ -190,11 +188,10 @@
                 <option value="id" {% if sort == 'id' %}selected{% endif %}>
                     ID по возрастанию
                 </option>
-
             </select>
         </div>
 
-        <div class="registry-filter-actions">
+        <div class="filter-actions invoice-filter-actions-v5">
             <button type="submit" class="btn btn-primary">
                 Применить
             </button>
@@ -237,7 +234,7 @@
             </span>
         </div>
 
-        <div class="registry-actions">
+        <div class="registry-actions invoice-bulk-actions-v1">
             <a href="{% url 'unmatched_counterparties' %}" class="btn btn-secondary">
                 Не найдено в 1С
             </a>
@@ -276,7 +273,8 @@
     <col class="col-counterparty">
     <col class="col-amount">
     <col class="col-status">
-    <col class="col-payment-action">
+    <col class="col-payment">
+    <col class="col-actions">
 </colgroup>
 
 <thead>
@@ -310,7 +308,13 @@
                         Статус
                     </th>
 
-                        <th class="invoice-payment-action-head">Оплата / действие</th>
+                        <th class="invoice-payment-column">
+                        Оплата
+                    </th>
+
+                        <th class="invoice-actions-column">
+                        Действия
+                    </th>
                 </tr>
             </thead>
 
@@ -390,12 +394,12 @@
 
                             <td>
                             <div class="amount-main">
-                                {{ invoice.amount|floatformat:2 }} ₽
+                                {{ invoice.amount|money_ru }}
                             </div>
 
                             {% if invoice.ocr_amount %}
                                 <div class="amount-ocr">
-                                    OCR: {{ invoice.ocr_amount|floatformat:2 }} ₽
+                                    OCR: {{ invoice.ocr_amount|money_ru }}
                                 </div>
 
                                 {% if invoice.amount_verified %}
@@ -419,28 +423,26 @@
                                 {{ invoice.get_status_display }}
                             </span>
                         </td>
-<td class="invoice-payment-action-cell">
-    <div class="invoice-payment-action-wrap">
-        <div class="invoice-payment-side">
-            <div class="payment-mini payment-mini-list payment-mini-{{ invoice.payment_status_code }}">
+<td class="invoice-payment-cell">
+                            <div class="payment-mini payment-mini-registry payment-mini-{{ invoice.payment_status_code }}">
                                 <div class="payment-mini-row">
                                     <span>Оплачено</span>
-                                    <strong>{{ invoice.payment_paid_amount|floatformat:2 }} ₽</strong>
+                                    <strong>{{ invoice.payment_paid_amount|money_ru }}</strong>
                                 </div>
 
                                 <div class="payment-mini-row">
                                     <span>Остаток</span>
-                                    <strong>{{ invoice.payment_remaining_amount|floatformat:2 }} ₽</strong>
+                                    <strong>{{ invoice.payment_remaining_amount|money_ru }}</strong>
                                 </div>
 
                                 <div class="payment-mini-status">
                                     {{ invoice.payment_status_label }}
                                 </div>
                             </div>
-        </div>
+                        </td>
 
-        <div class="invoice-action-side">
-            <div class="table-actions table-actions-vertical">
+                            <td class="invoice-actions-cell">
+                            <div class="table-actions table-actions-vertical">
                                 <a
                                     href="{% url 'invoice_detail' invoice.id %}"
                                     class="btn btn-primary btn-sm"
@@ -457,15 +459,13 @@
                                     </a>
                                 {% endif %}
                             </div>
-        </div>
-    </div>
-</td>
+                        </td>
                     </tr>
 
                 {% empty %}
 
                     <tr>
-                        <td colspan="8" class="empty-table">
+                        <td colspan="9" class="empty-table">
                             Документы отсутствуют.
                         </td>
                     </tr>

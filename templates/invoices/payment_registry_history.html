@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load money %}
 
 {% block content %}
 
@@ -48,7 +49,7 @@
             </span>
 
             <strong>
-                {{ total_amount|floatformat:2 }} ₽
+                {{ total_amount|money_ru }}
             </strong>
         </div>
 
@@ -223,7 +224,7 @@
 
                             <td>
                                 <strong>
-                                    {{ registry.total_amount|floatformat:2 }} ₽
+                                    {{ registry.total_amount|money_ru }}
                                 </strong>
                             </td>
 

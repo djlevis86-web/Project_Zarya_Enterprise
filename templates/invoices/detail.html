@@ -340,7 +340,7 @@
 
                     <strong>
                         {% if invoice.paid_at %}
-                            {{ invoice.paid_at|date:"d.m.Y H:i" }}
+                            {{ invoice.paid_at|date:"d.m.Y" }}
                         {% else %}
                             —
                         {% endif %}
@@ -490,24 +490,98 @@
                 {% endif %}
             </div>
 
+            <div class="ocr-check-grid">
+
+                <div class="ocr-check-item">
+                    <span>
+                        Сумма в системе
+                    </span>
+
+                    <strong>
+                        {{ invoice.amount|money_ru }}
+                    </strong>
+                </div>
+
+                <div class="ocr-check-item">
+                    <span>
+                        Сумма из OCR
+                    </span>
+
+                    <strong>
+                        {% if invoice.ocr_amount %}
+                            {{ invoice.ocr_amount|money_ru }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <div class="ocr-check-item">
+                    <span>
+                        Номер и дата
+                    </span>
+
+                    <strong>
+                        № {{ invoice.invoice_number|default:"—" }}
+                    </strong>
+
+                    <small>
+                        {{ invoice.invoice_date|default:"Дата не определена" }}
+                    </small>
+                </div>
+
+                <div class="ocr-check-item">
+                    <span>
+                        Контрагент
+                    </span>
+
+                    {% if invoice.counterparty %}
+                        <strong>
+                            {{ invoice.counterparty.name }}
+                        </strong>
+
+                        {% if invoice.counterparty.inn %}
+                            <small>
+                                ИНН {{ invoice.counterparty.inn }}
+                            </small>
+                        {% endif %}
+                    {% else %}
+                        <strong>
+                            Не привязан
+                        </strong>
+                    {% endif %}
+                </div>
+
+            </div>
+
             {% if invoice.ocr_amount %}
 
                 {% if invoice.amount_verified %}
                     <div class="ocr-result-card ocr-result-success">
-                        OCR сумма совпадает с подтвержденной суммой.
+                        Сумма подтверждена: OCR-сумма совпадает с суммой в системе.
                     </div>
                 {% else %}
                     <div class="ocr-result-card ocr-result-warning">
-                        OCR сумма отличается от подтвержденной суммы.
+                        Сумма требует проверки: OCR-сумма отличается от суммы в системе.
                     </div>
                 {% endif %}
 
             {% else %}
 
                 <div class="ocr-result-card ocr-result-muted">
-                    OCR сумма не определена.
+                    OCR сумма не определена. Перед оплатой сумму нужно проверить вручную.
                 </div>
 
+            {% endif %}
+
+            {% if invoice.amount_verified %}
+                <span class="ocr-badge ocr-badge-ok">
+                    Сумма подтверждена
+                </span>
+            {% else %}
+                <span class="ocr-badge ocr-badge-error">
+                    Сумма требует проверки
+                </span>
             {% endif %}
 
             {% if invoice.ocr_comment %}

@@ -342,9 +342,27 @@
                             </td>
 
                             <td>
-                                <strong>
-                                    {{ item.amount|money_ru }}
-                                </strong>
+                                <div class="ocr-amount-cell">
+                                    <strong class="amount-main">
+                                        {{ item.amount|money_ru }}
+                                    </strong>
+
+                                    {% if item.invoice.ocr_amount %}
+                                        <div class="ocr-amount-sub">
+                                            OCR: {{ item.invoice.ocr_amount|money_ru }}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if item.invoice.amount_verified %}
+                                        <span class="ocr-badge ocr-badge-ok">
+                                            Сумма подтверждена
+                                        </span>
+                                    {% else %}
+                                        <span class="ocr-badge ocr-badge-error">
+                                            Сумма требует проверки
+                                        </span>
+                                    {% endif %}
+                                </div>
                             </td>
 
                             <td>
@@ -676,9 +694,27 @@
                         </td>
 
                             <td>
-                            <strong class="amount-main">
-                                {{ invoice.amount|money_ru }}
-                            </strong>
+                            <div class="ocr-amount-cell">
+                                <strong class="amount-main">
+                                    {{ invoice.amount|money_ru }}
+                                </strong>
+
+                                {% if invoice.ocr_amount %}
+                                    <div class="ocr-amount-sub">
+                                        OCR: {{ invoice.ocr_amount|money_ru }}
+                                    </div>
+                                {% endif %}
+
+                                {% if invoice.amount_verified %}
+                                    <span class="ocr-badge ocr-badge-ok">
+                                        Сумма подтверждена
+                                    </span>
+                                {% else %}
+                                    <span class="ocr-badge ocr-badge-error">
+                                        Сумма требует проверки
+                                    </span>
+                                {% endif %}
+                            </div>
                         </td>
 
                             <td>

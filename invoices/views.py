@@ -595,15 +595,26 @@ def upload_invoice(request):
                     'invoice_number'
                 )
 
-                if invoice.invoice_number:
+                invoice.invoice_date = parsed.get(
+                    'invoice_date'
+                )
+
+                if invoice.invoice_number and invoice.invoice_date:
 
                     exists_invoice = (
                         Invoice.objects
                         .filter(
-                            invoice_number=invoice.invoice_number
+                            invoice_number=invoice.invoice_number,
+                            invoice_date=invoice.invoice_date,
                         )
                         .exclude(
                             id=invoice.id
+                        )
+                        .exclude(
+                            status=Invoice.STATUS_REJECTED
+                        )
+                        .order_by(
+                            'id'
                         )
                         .first()
                     )
@@ -617,14 +628,14 @@ def upload_invoice(request):
                                 'filename': uploaded_file.name,
                                 'invoice_id': exists_invoice.id,
                                 'invoice_title': exists_invoice.title,
+                                'duplicate_reason': (
+                                    'Найден существующий счёт с таким же '
+                                    'номером и датой.'
+                                ),
                             }
                         )
 
                         continue
-
-                invoice.invoice_date = parsed.get(
-                    'invoice_date'
-                )
 
                 invoice.vendor = parsed.get(
                     'vendor'
@@ -1012,17 +1023,25 @@ def repeat_ocr(request, invoice_id):
             'invoice_number'
         )
 
+        parsed_invoice_date = parsed.get(
+            'invoice_date'
+        )
+
         number_warning = ''
 
-        if parsed_invoice_number:
+        if parsed_invoice_number and parsed_invoice_date:
 
             duplicate_invoice = (
                 Invoice.objects
                 .filter(
-                    invoice_number=parsed_invoice_number
+                    invoice_number=parsed_invoice_number,
+                    invoice_date=parsed_invoice_date,
                 )
                 .exclude(
                     id=invoice.id
+                )
+                .exclude(
+                    status=Invoice.STATUS_REJECTED
                 )
                 .first()
             )
@@ -1030,8 +1049,9 @@ def repeat_ocr(request, invoice_id):
             if duplicate_invoice:
 
                 number_warning = (
-                    f'OCR нашел номер {parsed_invoice_number}, '
-                    f'но такой номер уже есть у счета #{duplicate_invoice.id}. '
+                    f'OCR нашел номер {parsed_invoice_number} '
+                    f'от {parsed_invoice_date}, '
+                    f'но такой счет уже есть: #{duplicate_invoice.id}. '
                     'Номер текущего счета не изменен.'
                 )
 
@@ -1039,13 +1059,15 @@ def repeat_ocr(request, invoice_id):
 
                 invoice.invoice_number = parsed_invoice_number
 
+        elif parsed_invoice_number:
+
+            invoice.invoice_number = parsed_invoice_number
+
         else:
 
             invoice.invoice_number = None
 
-        invoice.invoice_date = parsed.get(
-            'invoice_date'
-        )
+        invoice.invoice_date = parsed_invoice_date
 
         invoice.vendor = parsed.get(
             'vendor'
@@ -1260,17 +1282,25 @@ def run_invoice_ocr_processing(invoice, user, log_action):
             'invoice_number'
         )
 
+        parsed_invoice_date = parsed.get(
+            'invoice_date'
+        )
+
         number_warning = ''
 
-        if parsed_invoice_number:
+        if parsed_invoice_number and parsed_invoice_date:
 
             duplicate_invoice = (
                 Invoice.objects
                 .filter(
-                    invoice_number=parsed_invoice_number
+                    invoice_number=parsed_invoice_number,
+                    invoice_date=parsed_invoice_date,
                 )
                 .exclude(
                     id=invoice.id
+                )
+                .exclude(
+                    status=Invoice.STATUS_REJECTED
                 )
                 .first()
             )
@@ -1278,8 +1308,9 @@ def run_invoice_ocr_processing(invoice, user, log_action):
             if duplicate_invoice:
 
                 number_warning = (
-                    f'OCR нашел номер {parsed_invoice_number}, '
-                    f'но такой номер уже есть у счета #{duplicate_invoice.id}. '
+                    f'OCR нашел номер {parsed_invoice_number} '
+                    f'от {parsed_invoice_date}, '
+                    f'но такой счет уже есть: #{duplicate_invoice.id}. '
                     'Номер текущего счета не изменен.'
                 )
 
@@ -1287,13 +1318,15 @@ def run_invoice_ocr_processing(invoice, user, log_action):
 
                 invoice.invoice_number = parsed_invoice_number
 
+        elif parsed_invoice_number:
+
+            invoice.invoice_number = parsed_invoice_number
+
         else:
 
             invoice.invoice_number = None
 
-        invoice.invoice_date = parsed.get(
-            'invoice_date'
-        )
+        invoice.invoice_date = parsed_invoice_date
 
         invoice.vendor = parsed.get(
             'vendor'
@@ -2845,9 +2878,9 @@ def export_payment_registry_draft_excel(request, registry_id):
                 getattr(counterparty, 'inn', '') if counterparty else '',
                 getattr(counterparty, 'kpp', '') if counterparty else '',
                 getattr(counterparty, 'bank_name', '') if counterparty else '',
-                getattr(counterparty, 'bank_account', '') if counterparty else '',
+                getattr(counterparty, 'account_number', '') if counterparty else '',
                 getattr(counterparty, 'bik', '') if counterparty else '',
-                getattr(counterparty, 'corr_account', '') if counterparty else '',
+                getattr(counterparty, 'correspondent_account', '') if counterparty else '',
                 float(amount),
                 payment_date.strftime('%d.%m.%Y') if payment_date else '',
                 purpose,
@@ -3053,9 +3086,9 @@ def export_payment_registry_draft_1c(request, registry_id):
                 getattr(counterparty, 'inn', '') if counterparty else '',
                 getattr(counterparty, 'kpp', '') if counterparty else '',
                 getattr(counterparty, 'bank_name', '') if counterparty else '',
-                getattr(counterparty, 'bank_account', '') if counterparty else '',
+                getattr(counterparty, 'account_number', '') if counterparty else '',
                 getattr(counterparty, 'bik', '') if counterparty else '',
-                getattr(counterparty, 'corr_account', '') if counterparty else '',
+                getattr(counterparty, 'correspondent_account', '') if counterparty else '',
                 str(item.amount).replace('.', ','),
                 payment_date.strftime('%d.%m.%Y') if payment_date else '',
                 purpose,
@@ -3452,17 +3485,11 @@ def payment_registry(request):
     from .models import PaymentRegistry, PaymentRegistryItem
     from .payment_registry_services import ACTIVE_REGISTRY_STATUSES, check_payment_registry
 
-    draft_registry = (
-        PaymentRegistry.objects
-        .filter(
-            status=PaymentRegistry.STATUS_DRAFT,
-            created_by=request.user,
-        )
-        .order_by(
-            '-created_at'
-        )
-        .first()
+    from .payment_registry_services import (
+        get_or_create_draft_payment_registry,
     )
+
+    draft_registry, draft_registry_created = get_or_create_draft_payment_registry(request.user)
 
     draft_registry_items = PaymentRegistryItem.objects.none()
     draft_registry_check_result = None
@@ -4131,7 +4158,7 @@ def export_payment_registry_1c(request):
 
         counterparty = invoice.counterparty
 
-        amount = invoice.amount or invoice.ocr_amount or 0
+        amount = invoice.amount or 0
 
         payment_date = invoice.planned_payment_date or date.today()
 

@@ -51,7 +51,12 @@ def validate_invoice_for_payment_registry(invoice):
             "Счёт уже находится в статусе оплаты."
         )
 
-    amount = invoice.amount or getattr(invoice, "ocr_amount", None) or Decimal("0")
+    amount = invoice.amount or Decimal("0")
+
+    if not getattr(invoice, "amount_verified", False):
+        errors.append(
+            "Сумма счёта не подтверждена после OCR-проверки."
+        )
 
     if amount <= 0:
         errors.append(
@@ -74,7 +79,7 @@ def validate_invoice_for_payment_registry(invoice):
         for field_name, title in (
             ("inn", "ИНН"),
             ("bank_name", "банк"),
-            ("bank_account", "расчётный счёт"),
+            ("account_number", "расчётный счёт"),
             ("bik", "БИК"),
         ):
             value = getattr(invoice.counterparty, field_name, "")
@@ -267,6 +272,11 @@ def check_payment_registry(registry):
         row_errors = []
         row_warnings = []
 
+        if not getattr(invoice, "amount_verified", False):
+            row_errors.append(
+                "сумма счёта не подтверждена после OCR-проверки"
+            )
+
         if not item.amount or item.amount <= 0:
             row_errors.append(
                 "не указана сумма"
@@ -312,7 +322,7 @@ def check_payment_registry(registry):
             for field_name, title in (
                 ("inn", "ИНН"),
                 ("bank_name", "банк"),
-                ("bank_account", "расчётный счёт"),
+                ("account_number", "расчётный счёт"),
                 ("bik", "БИК"),
             ):
                 value = getattr(

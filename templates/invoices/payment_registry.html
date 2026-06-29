@@ -69,7 +69,8 @@
                 Текущий черновик
             </span>
 
-            <form
+            {% if draft_registry and draft_registry.id %}
+                <form
                     method="post"
                     action="{% url 'check_payment_registry' draft_registry.id %}"
                     class="payment-registry-check-form"
@@ -80,6 +81,11 @@
                         Проверить реестр
                     </button>
                 </form>
+            {% else %}
+                <button type="button" class="btn btn-secondary" disabled>
+                    Черновик не создан
+                </button>
+            {% endif %}
 
                 {% if draft_registry_check_result.items_count and not draft_registry_check_result.errors_count %}
                     <form

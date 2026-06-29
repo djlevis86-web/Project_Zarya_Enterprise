@@ -205,65 +205,181 @@ def parse_deletion_mark(value):
 
 
 def read_xlsx(file_path, sheet_name=None):
+    """
+    Читает XLSX/XLSM выгрузку 1С.
+
+    Особенность выгрузок 1С:
+    первые строки часто служебные:
+    - Параметры;
+    - Тип объекта;
+    - Имя объекта;
+    - Имя таблицы.
+
+    Поэтому строку заголовков ищем автоматически среди первых 40 строк.
+    """
 
     workbook = load_workbook(
         file_path,
-        data_only=True
+        data_only=True,
+        read_only=True
     )
 
-    if sheet_name:
+    try:
+        if sheet_name:
+            if sheet_name not in workbook.sheetnames:
+                raise Exception(
+                    f'Лист "{sheet_name}" не найден. '
+                    f'Доступные листы: {", ".join(workbook.sheetnames)}'
+                )
 
-        sheet = workbook[
-            sheet_name
-        ]
+            worksheet = workbook[sheet_name]
 
-    else:
+        else:
+            worksheet = workbook.active
 
-        sheet = workbook.active
+        def cell_to_text(value):
+            if value is None:
+                return ''
 
-    rows = list(
-        sheet.iter_rows(
-            values_only=True
+            text = str(value)
+            text = text.replace('\xa0', ' ')
+            text = re.sub(r'\s+', ' ', text)
+
+            return text.strip()
+
+        def normalize_header_value(value):
+            text = cell_to_text(value).lower()
+
+            text = text.replace('ё', 'е')
+            text = text.replace('счёт', 'счет')
+            text = text.replace('расчёт', 'расчет')
+
+            text = re.sub(r'\s+', ' ', text)
+            text = text.strip()
+            text = text.strip(' .:;')
+
+            return text
+
+        alias_lookup = {}
+
+        for field_name, aliases in HEADER_ALIASES.items():
+            alias_lookup[field_name] = {
+                normalize_header_value(alias)
+                for alias in aliases
+                if normalize_header_value(alias)
+            }
+
+        header_row_number = None
+        header_values = None
+        best_score = -1
+        best_matches = set()
+
+        max_scan_row = min(
+            worksheet.max_row or 1,
+            40
         )
-    )
 
-    if not rows:
+        for row_number, row_values in enumerate(
+            worksheet.iter_rows(
+                min_row=1,
+                max_row=max_scan_row,
+                values_only=True
+            ),
+            start=1
+        ):
+            normalized_cells = {
+                normalize_header_value(value)
+                for value in row_values
+                if normalize_header_value(value)
+            }
 
-        return []
+            if not normalized_cells:
+                continue
 
-    headers = [
-        clean_value(value)
-        for value in rows[0]
-    ]
+            matches = set()
 
-    result = []
+            for field_name, aliases in alias_lookup.items():
+                if normalized_cells.intersection(aliases):
+                    matches.add(field_name)
 
-    for raw_row in rows[1:]:
+            score = len(matches)
 
-        row = {}
+            if 'name' in matches:
+                score += 10
 
-        for index, header in enumerate(headers):
+            if 'inn' in matches:
+                score += 4
+
+            if 'kpp' in matches:
+                score += 2
+
+            if 'external_id_1c' in matches:
+                score += 2
+
+            if score > best_score:
+                best_score = score
+                best_matches = matches
+                header_row_number = row_number
+                header_values = row_values
+
+        if not header_row_number or 'name' not in best_matches:
+            raise Exception(
+                'Не найдена строка заголовков XLSX. '
+                'Ожидаются колонки вроде: Код, Контрагент, Наименование, ИНН, КПП.'
+            )
+
+        headers = []
+        used_headers = {}
+
+        for column_index, value in enumerate(
+            header_values,
+            start=1
+        ):
+            header = cell_to_text(value)
 
             if not header:
+                headers.append(
+                    f'__empty_column_{column_index}'
+                )
 
                 continue
 
-            row[header] = (
-                raw_row[index]
-                if index < len(raw_row)
-                else ''
-            )
+            if header in used_headers:
+                used_headers[header] += 1
+                header = f'{header}__{used_headers[header]}'
+            else:
+                used_headers[header] = 1
 
-        if any(
-            clean_value(value)
-            for value in row.values()
+            headers.append(header)
+
+        rows = []
+
+        for row_values in worksheet.iter_rows(
+            min_row=header_row_number + 1,
+            values_only=True
         ):
+            row = {}
+            has_data = False
 
-            result.append(
-                row
-            )
+            for header, value in zip(headers, row_values):
+                if header.startswith('__empty_column_'):
+                    continue
 
-    return result
+                row[header] = value
+
+                if cell_to_text(value):
+                    has_data = True
+
+            if has_data:
+                rows.append(row)
+
+        return rows
+
+    finally:
+        try:
+            workbook.close()
+        except Exception:
+            pass
 
 
 def read_csv(file_path):
@@ -349,6 +465,124 @@ def read_rows(file_path, sheet_name=None):
     raise Exception(
         'Поддерживаются только .xlsx, .xlsm, .csv'
     )
+
+
+# ONE_C_DELETION_MARK_ACTIVE_FIX_V1-START
+def normalize_1c_header_name(value):
+    if value is None:
+        return ''
+
+    text = str(value)
+    text = text.replace('\xa0', ' ')
+    text = text.replace('ё', 'е')
+    text = text.replace('счёт', 'счет')
+    text = text.replace('расчёт', 'расчет')
+    text = re.sub(r'\s+', ' ', text)
+    text = text.strip().strip(' .:;').lower()
+
+    return text
+
+
+def normalize_1c_cell_text(value):
+    if value is None:
+        return ''
+
+    text = str(value)
+    text = text.replace('\xa0', ' ')
+    text = re.sub(r'\s+', ' ', text)
+
+    return text.strip()
+
+
+def get_1c_row_value_by_headers(row, headers):
+    normalized_headers = {
+        normalize_1c_header_name(header)
+        for header in headers
+    }
+
+    for key, value in row.items():
+        if normalize_1c_header_name(key) in normalized_headers:
+            return value
+
+    return None
+
+
+def parse_1c_bool(value, default=False):
+    text = normalize_1c_cell_text(value).lower()
+    text = text.replace('ё', 'е')
+
+    if not text:
+        return default
+
+    if text in {
+        '1',
+        'true',
+        'yes',
+        'y',
+        'да',
+        'истина',
+        'активен',
+        'активный',
+        'помечен',
+    }:
+        return True
+
+    if text in {
+        '0',
+        'false',
+        'no',
+        'n',
+        'нет',
+        'ложь',
+        'не активен',
+        'неактивен',
+        'не помечен',
+    }:
+        return False
+
+    return default
+
+
+def parse_counterparty_is_active(row):
+    """
+    В 1С колонка "Пометка удаления" означает обратное активности:
+    - "Нет" => не помечен на удаление => активен;
+    - "Да" => помечен на удаление => неактивен.
+    """
+
+    deletion_mark = get_1c_row_value_by_headers(
+        row,
+        {
+            'Пометка удаления',
+            'Deletion mark',
+            'DeletionMark',
+        }
+    )
+
+    if deletion_mark is not None and normalize_1c_cell_text(deletion_mark):
+        return not parse_1c_bool(
+            deletion_mark,
+            default=False
+        )
+
+    active_value = get_1c_row_value_by_headers(
+        row,
+        {
+            'Активен',
+            'Активность',
+            'Is active',
+            'Active',
+        }
+    )
+
+    if active_value is not None and normalize_1c_cell_text(active_value):
+        return parse_1c_bool(
+            active_value,
+            default=True
+        )
+
+    return True
+# ONE_C_DELETION_MARK_ACTIVE_FIX_V1-END
 
 
 def import_counterparties_from_file(
@@ -551,7 +785,7 @@ def import_counterparties_from_file(
 
         counterparty.source = Counterparty.SOURCE_1C
 
-        counterparty.is_active = is_active
+        counterparty.is_active = parse_counterparty_is_active(row)
 
         counterparty.synced_at = timezone.now()
 
@@ -592,3 +826,64 @@ def import_counterparties_from_file(
             source=Counterparty.SOURCE_1C
         ).count(),
     }
+
+# ONE_C_HEADER_ALIASES_1C_EXPORT_V1-START
+# Дополнительные варианты заголовков из стандартной выгрузки 1С.
+_extra_1c_header_aliases = {
+    'external_id_1c': [
+        'код',
+        'код 1с',
+    ],
+    'name': [
+        'контрагент',
+        'наименование',
+        'краткое наименование',
+    ],
+    'full_name': [
+        'полное наименование',
+    ],
+    'inn': [
+        'инн',
+    ],
+    'kpp': [
+        'кпп',
+    ],
+    'bank_name': [
+        'банк',
+        'наименование банка',
+        'банковский счет.банк.наименование',
+        'банковский счёт.банк.наименование',
+    ],
+    'bik': [
+        'бик',
+        'банковский счет.банк.бик',
+        'банковский счёт.банк.бик',
+    ],
+    'account_number': [
+        'номер счета',
+        'номер счёта',
+        'расчетный счет',
+        'расчётный счёт',
+        'банковский счет.номер счета',
+        'банковский счёт.номер счёта',
+    ],
+    'correspondent_account': [
+        'корр. счет',
+        'корр. счёт',
+        'корреспондентский счет',
+        'корреспондентский счёт',
+        'банковский счет.банк.корр. счет',
+        'банковский счёт.банк.корр. счёт',
+    ],
+    'is_active': [
+        'пометка удаления',
+    ],
+}
+
+for _field_name, _aliases in _extra_1c_header_aliases.items():
+    _target_aliases = HEADER_ALIASES.setdefault(_field_name, [])
+
+    for _alias in _aliases:
+        if _alias not in _target_aliases:
+            _target_aliases.append(_alias)
+# ONE_C_HEADER_ALIASES_1C_EXPORT_V1-END

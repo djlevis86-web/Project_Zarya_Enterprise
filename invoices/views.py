@@ -45,6 +45,7 @@ from .models import (
 )
 from .one_c_import_service import import_counterparties_from_file
 from .ocr_verification_service import sync_invoice_amount_verification
+from .payment_registry_services import get_active_registry_items_for_invoice
 
 from ocr.services import (
     extract_text_from_image,
@@ -2193,6 +2194,37 @@ def edit_invoice(request, invoice_id):
                     messages.warning(
                         request,
                         'Сумма требует проверки: отличается от OCR-суммы.'
+                    )
+
+            if amount_changed:
+                active_registry_items = list(
+                    get_active_registry_items_for_invoice(
+                        invoice
+                    )[:5]
+                )
+
+                if active_registry_items:
+                    registry_numbers = ", ".join(
+                        f"№{item.registry_id}"
+                        for item in active_registry_items
+                    )
+
+                    create_invoice_log(
+                        invoice,
+                        request.user,
+                        (
+                            "Сумма счёта изменена при наличии активного "
+                            f"реестра оплаты: {registry_numbers}."
+                        )
+                    )
+
+                    messages.warning(
+                        request,
+                        (
+                            "Счёт уже есть в активном реестре оплаты "
+                            f"{registry_numbers}. Проверь реестр повторно: "
+                            "сумма строки может быть устаревшей."
+                        )
                     )
 
             messages.success(

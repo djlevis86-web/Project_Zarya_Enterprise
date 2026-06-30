@@ -117,9 +117,11 @@ from .view_modules.payment_registry_page_views import (
     payment_schedule,
 )
 
-from .view_modules.payment_registry_export_views import (
+from .view_modules.payment_registry_1c_export_views import (
     export_payment_registry_1c,
     export_payment_registry_draft_1c,
+)
+from .view_modules.payment_registry_excel_export_views import (
     export_payment_registry_draft_excel,
     export_payment_registry_excel,
 )

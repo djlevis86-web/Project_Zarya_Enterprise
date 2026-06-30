@@ -8,7 +8,7 @@ import django
 from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
+from users.permissions import system_admin_required
 from django.http import (
     FileResponse,
     Http404,
@@ -96,7 +96,7 @@ def get_ocr_stats():
     }
 
 
-@staff_member_required
+@system_admin_required
 def system_dashboard(request):
 
     version = "unknown"
@@ -320,7 +320,7 @@ def system_dashboard(request):
     )
 
 
-@staff_member_required
+@system_admin_required
 def backups_list(request):
 
     backups_dir = (
@@ -361,7 +361,7 @@ def backups_list(request):
     )
 
 
-@staff_member_required
+@system_admin_required
 def create_backup(request):
 
     try:
@@ -410,7 +410,7 @@ def create_backup(request):
     )
 
 
-@staff_member_required
+@system_admin_required
 def download_backup(request, filename):
 
     backup_file = (
@@ -449,7 +449,7 @@ def download_backup(request, filename):
     )
 
 
-@staff_member_required
+@system_admin_required
 def delete_backup(request, filename):
 
     backup_file = (
@@ -511,7 +511,7 @@ def delete_backup(request, filename):
     )
 
 
-@staff_member_required
+@system_admin_required
 def versions_page(request):
 
     version = "-"
@@ -598,7 +598,7 @@ def versions_page(request):
     )
 
 
-@staff_member_required
+@system_admin_required
 def updates_page(request):
 
     local_version = "-"
@@ -651,7 +651,7 @@ def updates_page(request):
     )
 
 
-@staff_member_required
+@system_admin_required
 def maintenance_page(request):
 
     return render(

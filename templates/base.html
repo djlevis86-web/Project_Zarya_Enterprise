@@ -79,6 +79,9 @@
 
                 </div>
 
+                {# ROLE_MENU_FINANCE_START #}
+                {% if request.user.is_staff %}
+
                 <div class="nav-section">
 
                     <div class="nav-section-title">
@@ -98,6 +101,9 @@
                     </a>
 
                 </div>
+
+                {% endif %}
+                {# ROLE_MENU_FINANCE_END #}
 
                 {% if request.user.is_staff %}
 
@@ -141,7 +147,7 @@
                         Аккаунт
                     </div>
 
-                    {% if request.user.is_staff %}
+                    {% if request.user.is_superuser or request.user.role == 'ADMIN' %}
 
                         <a href="{% url 'system_dashboard' %}"
                            class="nav-link {% if current == 'system_dashboard' or current == 'backups_list' or current == 'versions_page' or current == 'updates_page' or current == 'maintenance_page' %}is-active{% endif %}">
@@ -149,13 +155,23 @@
                             <span>Система</span>
                         </a>
 
-{% if user.is_staff %}
+{% if request.user.is_superuser or request.user.role == 'ADMIN' %}
                         <a href="{% url 'audit:audit_log_list' %}"
                            class="nav-link {% if current == 'audit_log_list' %}is-active{% endif %}">
                             <span class="nav-icon">▤</span>
                             <span>Журнал действий</span>
                         </a>
                     {% endif %}
+
+                        {% if request.user.is_superuser or request.user.role == 'ADMIN' %}
+
+                            <a href="{% url 'user_admin_list' %}"
+                               class="nav-link {% if current == 'user_admin_list' or current == 'user_admin_create' or current == 'user_admin_edit' %}is-active{% endif %}">
+                                <span class="nav-icon">◉</span>
+                                <span>Пользователи</span>
+                            </a>
+
+                        {% endif %}
 
                         <a href="/admin/" class="nav-link">
                             <span class="nav-icon">▣</span>

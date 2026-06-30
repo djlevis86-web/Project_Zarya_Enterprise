@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>
+            Пользователи
+        </h1>
+
+        <p>
+            Управление доступом к Project Zarya.
+        </p>
+    </div>
+
+    <div>
+        <a href="{% url 'user_admin_create' %}" class="btn btn-primary">
+            Создать пользователя
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <form method="get" class="form-grid">
+        <div class="form-group">
+            <label>
+                Роль
+            </label>
+
+            <select name="role" class="form-control">
+                <option value="">
+                    Все роли
+                </option>
+
+                {% for value, label in role_choices %}
+                    <option value="{{ value }}" {% if role_filter == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-secondary">
+                Фильтр
+            </button>
+
+            <a href="{% url 'user_admin_list' %}" class="btn btn-light">
+                Сбросить
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>
+                        ID
+                    </th>
+                    <th>
+                        Пользователь
+                    </th>
+                    <th>
+                        E-mail
+                    </th>
+                    <th>
+                        Роль
+                    </th>
+                    <th>
+                        Активен
+                    </th>
+                    <th>
+                        Staff
+                    </th>
+                    <th>
+                        Superuser
+                    </th>
+                    <th>
+                        Действия
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in users %}
+                    <tr>
+                        <td>
+                            {{ item.id }}
+                        </td>
+
+                        <td>
+                            <strong>
+                                {{ item.first_name }} {{ item.last_name }}
+                            </strong>
+
+                            <div class="muted">
+                                {{ item.username }}
+                            </div>
+                        </td>
+
+                        <td>
+                            {{ item.email }}
+                        </td>
+
+                        <td>
+                            {{ item.get_role_display }}
+                        </td>
+
+                        <td>
+                            {% if item.is_active %}
+                                Да
+                            {% else %}
+                                Нет
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if item.is_staff %}
+                                Да
+                            {% else %}
+                                Нет
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if item.is_superuser %}
+                                Да
+                            {% else %}
+                                Нет
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a href="{% url 'user_admin_edit' item.id %}" class="btn btn-sm btn-secondary">
+                                Изменить
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8">
+                            Пользователи не найдены.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

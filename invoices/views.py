@@ -102,6 +102,14 @@ from .view_modules.payment_views import (
     cancel_invoice_payment,
 )
 
+from .view_modules.payment_registry_action_views import (
+    add_to_payment_registry,
+    cancel_payment_registry_view,
+    check_payment_registry_view,
+    mark_payment_registry_paid,
+    remove_from_payment_registry_item,
+)
+
 from .view_modules.payment_registry_export_views import (
     export_payment_registry_1c,
     export_payment_registry_draft_1c,
@@ -110,15 +118,10 @@ from .view_modules.payment_registry_export_views import (
 )
 
 from .view_modules.payment_registry_views import (
-    add_to_payment_registry,
-    cancel_payment_registry_view,
-    check_payment_registry_view,
-    mark_payment_registry_paid,
     payment_registry,
     payment_registry_detail,
     payment_registry_history,
     payment_schedule,
-    remove_from_payment_registry_item,
 )
 
 from .view_modules.ocr_views import (

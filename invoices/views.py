@@ -68,6 +68,10 @@ from audit.services import log_action
 
 
 
+from .view_modules.counterparty_assignment_views import (
+    invoice_assign_counterparty,
+)
+
 from .view_modules.counterparty_import_views import (
     counterparties_missing_requisites,
     import_counterparties_1c,
@@ -84,7 +88,6 @@ from .view_modules.counterparty_views import (
     counterparty_detail,
     counterparty_directory,
     counterparty_edit,
-    invoice_assign_counterparty,
 )
 
 from .view_modules.invoice_views import (

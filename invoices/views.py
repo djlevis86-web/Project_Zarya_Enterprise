@@ -68,20 +68,23 @@ from audit.services import log_action
 
 
 
+from .view_modules.counterparty_import_views import (
+    counterparties_missing_requisites,
+    import_counterparties_1c,
+    rematch_counterparties_1c,
+)
+
 from .view_modules.counterparty_unmatched_views import (
     export_unmatched_counterparties_excel,
     unmatched_counterparties,
 )
 
 from .view_modules.counterparty_views import (
-    counterparties_missing_requisites,
     counterparty_create,
     counterparty_detail,
     counterparty_directory,
     counterparty_edit,
-    import_counterparties_1c,
     invoice_assign_counterparty,
-    rematch_counterparties_1c,
 )
 
 from .view_modules.invoice_views import (

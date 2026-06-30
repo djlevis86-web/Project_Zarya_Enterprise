@@ -15,7 +15,17 @@ ACTIVE_REGISTRY_STATUSES = (
 )
 
 
-def get_active_registry_item_for_invoice(invoice):
+MONEY_QUANT = Decimal("0.01")
+
+
+def normalize_registry_money(value):
+    if value is None:
+        return Decimal("0.00")
+
+    return Decimal(str(value)).quantize(MONEY_QUANT)
+
+
+def get_active_registry_items_for_invoice(invoice):
     return (
         PaymentRegistryItem.objects
         .select_related("registry")
@@ -26,8 +36,11 @@ def get_active_registry_item_for_invoice(invoice):
         .exclude(
             status=PaymentRegistryItem.STATUS_CANCELLED
         )
-        .first()
     )
+
+
+def get_active_registry_item_for_invoice(invoice):
+    return get_active_registry_items_for_invoice(invoice).first()
 
 
 def validate_invoice_for_payment_registry(invoice):
@@ -282,6 +295,25 @@ def check_payment_registry(registry):
                 "не указана сумма"
             )
 
+        payment_summary = get_invoice_payment_summary(
+            invoice
+        )
+
+        expected_amount = payment_summary["remaining_amount"]
+
+        if expected_amount <= 0:
+            row_errors.append(
+                "счёт уже полностью оплачен или имеет переплату"
+            )
+        elif normalize_registry_money(item.amount) != normalize_registry_money(expected_amount):
+            row_errors.append(
+                (
+                    "сумма строки реестра устарела: "
+                    f"в реестре {normalize_registry_money(item.amount)}, "
+                    f"актуальный остаток {normalize_registry_money(expected_amount)}"
+                )
+            )
+
         payment_date = item.planned_payment_date or invoice.planned_payment_date
 
         if not payment_date:
@@ -380,6 +412,23 @@ def _model_has_field(instance, field_name):
 
 
 def mark_payment_registry_as_paid(registry, user=None):
+    check_result = check_payment_registry(
+        registry
+    )
+
+    if check_result["items_count"] == 0:
+        raise ValueError(
+            "Реестр пуст. Сначала добавь счета."
+        )
+
+    if check_result["errors_count"]:
+        raise ValueError(
+            (
+                "Реестр нельзя отметить оплаченным: "
+                f"ошибок {check_result['errors_count']}."
+            )
+        )
+
     paid_at_date = timezone.localdate()
     paid_at_datetime = timezone.now()
 

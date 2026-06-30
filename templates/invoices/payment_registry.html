@@ -61,6 +61,80 @@
 
 </div>
 
+<div class="ocr-registry-summary">
+    <div class="ocr-registry-summary-header">
+        <div>
+            <span class="registry-summary-label">
+                OCR-контроль реестра
+            </span>
+
+            <strong>
+                Проверка сумм перед оплатой
+            </strong>
+        </div>
+
+        {% if ocr_registry_errors_count %}
+            <span class="ocr-badge ocr-badge-error">
+                Требует внимания
+            </span>
+        {% elif ocr_registry_items_count %}
+            <span class="ocr-badge ocr-badge-ok">
+                Ошибок нет
+            </span>
+        {% else %}
+            <span class="ocr-badge ocr-badge-warning">
+                Не проверено
+            </span>
+        {% endif %}
+    </div>
+
+    <div class="ocr-registry-summary-grid">
+        <div class="ocr-registry-summary-card">
+            <span>
+                Всего строк
+            </span>
+
+            <strong>
+{{ ocr_registry_items_count }}
+            </strong>
+        </div>
+
+        <div class="ocr-registry-summary-card is-ready">
+            <span>
+                Готово к оплате
+            </span>
+
+            <strong>
+{{ ocr_registry_ready_count }}
+            </strong>
+        </div>
+
+        <div class="ocr-registry-summary-card is-error">
+            <span>
+                Требуют проверки
+            </span>
+
+            <strong>
+{{ ocr_registry_errors_count }}
+            </strong>
+        </div>
+    </div>
+
+    {% if ocr_registry_errors_count %}
+        <div class="ocr-registry-summary-alert">
+            Есть счета с ошибками проверки. Оплата и выгрузка заблокированы до исправления.
+        </div>
+    {% elif ocr_registry_items_count %}
+        <div class="ocr-registry-summary-ok">
+            Критических ошибок не найдено. Реестр можно выгружать.
+        </div>
+    {% else %}
+        <div class="ocr-registry-summary-muted">
+            Нажмите “Проверить реестр”, чтобы увидеть результат OCR-контроля перед оплатой.
+        </div>
+    {% endif %}
+</div>
+
 <div class="card payment-registry-draft-card">
 
     <div class="payment-registry-draft-header">
@@ -275,7 +349,7 @@
 
         <div class="table-scroll table-scroll-fit payment-registry-draft-table-wrap">
 <table class="table payment-registry-draft-table">
-                
+
 
 <colgroup>
     <col class="col-invoice">
@@ -342,9 +416,35 @@
                             </td>
 
                             <td>
-                                <strong>
-                                    {{ item.amount|money_ru }}
-                                </strong>
+                                <div class="ocr-amount-cell {% if not item.invoice.amount_verified %}ocr-amount-cell-danger{% endif %}">
+                                    <strong class="amount-main">
+                                        {{ item.amount|money_ru }}
+                                    </strong>
+
+                                    {% if item.invoice.ocr_amount %}
+                                        <div class="ocr-amount-sub">
+                                            OCR: {{ item.invoice.ocr_amount|money_ru }}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if item.invoice.amount_verified %}
+                                        <span class="ocr-badge ocr-badge-ok">
+                                            Сумма подтверждена
+                                        </span>
+                                    {% else %}
+                                        <span class="ocr-badge ocr-badge-error">
+                                            Сумма требует проверки
+                                        </span>
+
+                                        <div class="ocr-amount-warning-text">
+                                            Оплата заблокирована
+                                        </div>
+
+                                        <div class="ocr-amount-warning-text">
+                                            Оплата заблокирована
+                                        </span>
+                                    {% endif %}
+                                </div>
                             </td>
 
                             <td>
@@ -412,9 +512,9 @@
 
 </div>
 
-<div class="card registry-filter-card">
+<div class="card registry-filter-card" id="registry-filter-card">
 
-    <form method="get" class="registry-filter-form">
+    <form method="get" action="{% url 'payment_registry' %}#registry-filter-card" class="registry-filter-form">
 
         <div class="form-group">
             <label>
@@ -494,6 +594,27 @@
         </div>
 
         <div class="form-group">
+            <label for="ocr_status">
+                OCR-проверка
+            </label>
+
+            <select
+                id="ocr_status"
+                name="ocr_status"
+                class="form-control"
+            >
+                {% for value, label in ocr_status_choices %}
+                    <option
+                        value="{{ value }}"
+                        {% if ocr_status_filter == value %}selected{% endif %}
+                    >
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
             <label>
                 Оплата с
             </label>
@@ -524,7 +645,7 @@
                 Применить
             </button>
 
-            <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
+            <a href="{% url 'payment_registry' %}#registry-filter-card" class="btn btn-secondary">
                 Сбросить
             </a>
         </div>
@@ -547,7 +668,7 @@
             </span>
         </div>
 
-        
+
 
 
     </div>
@@ -573,7 +694,7 @@
 <div class="table-scroll table-scroll-fit payment-registry-source-table-wrap">
 <table class="table registry-table payment-registry-source-table">
 
-            
+
 
 <colgroup>
     <col class="col-select">
@@ -628,11 +749,24 @@
 
                     <tr>
                         <td>
-                            <input
-                                type="checkbox"
-                                name="invoice_ids"
-                                value="{{ invoice.id }}"
-                            >
+                            {% if invoice.amount_verified %}
+                                <input
+                                    type="checkbox"
+                                    name="invoice_ids"
+                                    value="{{ invoice.id }}"
+                                >
+                            {% else %}
+                                <input
+                                    type="checkbox"
+                                    class="ocr-disabled-checkbox"
+                                    disabled
+                                    title="Сначала подтвердите сумму OCR"
+                                >
+
+                                <div class="ocr-disabled-add-note">
+                                    Сначала подтвердите сумму
+                                </div>
+                            {% endif %}
                         </td>
 
                             <td>
@@ -676,9 +810,31 @@
                         </td>
 
                             <td>
-                            <strong class="amount-main">
-                                {{ invoice.amount|money_ru }}
-                            </strong>
+                            <div class="ocr-amount-cell {% if not invoice.amount_verified %}ocr-amount-cell-danger{% endif %}">
+                                <strong class="amount-main">
+                                    {{ invoice.amount|money_ru }}
+                                </strong>
+
+                                {% if invoice.ocr_amount %}
+                                    <div class="ocr-amount-sub">
+                                        OCR: {{ invoice.ocr_amount|money_ru }}
+                                    </div>
+                                {% endif %}
+
+                                {% if invoice.amount_verified %}
+                                    <span class="ocr-badge ocr-badge-ok">
+                                        Сумма подтверждена
+                                    </span>
+                                {% else %}
+                                    <span class="ocr-badge ocr-badge-error">
+                                        Сумма требует проверки
+                                    </span>
+
+                                        <div class="ocr-amount-warning-text">
+                                            Оплата заблокирована
+                                        </div>
+                                {% endif %}
+                            </div>
                         </td>
 
                             <td>

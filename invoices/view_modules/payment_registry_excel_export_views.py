@@ -36,18 +36,12 @@ from .payment_registry_helpers import (
 )
 
 
-
-from .payment_registry_excel_export_views import (
-    export_payment_registry_draft_excel,
-    export_payment_registry_excel,
-)
-
 @login_required
 @require_payment_registry_permission(
     user_can_export_payment_registry,
     'Нет прав на выгрузку реестра оплаты.',
 )
-def export_payment_registry_draft_1c(request, registry_id):
+def export_payment_registry_draft_excel(request, registry_id):
 
     if request.method != 'POST':
 
@@ -59,6 +53,7 @@ def export_payment_registry_draft_1c(request, registry_id):
         return redirect(
             'payment_registry'
         )
+
 
 
 
@@ -127,35 +122,51 @@ def export_payment_registry_draft_1c(request, registry_id):
         )
     )
 
-    buffer = StringIO()
-    writer = csv.writer(
-        buffer,
-        delimiter=';',
-        lineterminator='\n',
+    wb = Workbook()
+    ws = wb.active
+    ws.title = f'Registry {registry.id}'
+
+    headers = [
+        '№ реестра',
+        'ID счета',
+        'Номер счета',
+        'Контрагент',
+        'ИНН',
+        'КПП',
+        'Банк',
+        'Расчетный счет',
+        'БИК',
+        'Корр. счет',
+        'Сумма',
+        'Дата оплаты',
+        'Назначение платежа',
+        'Ответственный',
+    ]
+
+    ws.append(headers)
+
+    header_fill = PatternFill(
+        fill_type='solid',
+        fgColor='1F2937',
     )
 
-    writer.writerow(
-        [
-            'RegistryID',
-            'InvoiceID',
-            'InvoiceNumber',
-            'Counterparty',
-            'INN',
-            'KPP',
-            'Bank',
-            'BankAccount',
-            'BIK',
-            'CorrAccount',
-            'Amount',
-            'PaymentDate',
-            'Purpose',
-        ]
-    )
+    for cell in ws[1]:
+        cell.font = Font(
+            bold=True,
+            color='FFFFFF',
+        )
+        cell.fill = header_fill
+        cell.alignment = Alignment(
+            horizontal='center',
+            vertical='center',
+        )
 
     for item in items:
 
         invoice = item.invoice
         counterparty = invoice.counterparty
+
+        amount = item.amount or Decimal('0')
         payment_date = item.planned_payment_date or invoice.planned_payment_date
 
         purpose = (
@@ -165,7 +176,7 @@ def export_payment_registry_draft_1c(request, registry_id):
             or ''
         )
 
-        writer.writerow(
+        ws.append(
             [
                 registry.id,
                 invoice.id,
@@ -177,11 +188,36 @@ def export_payment_registry_draft_1c(request, registry_id):
                 getattr(counterparty, 'account_number', '') if counterparty else '',
                 getattr(counterparty, 'bik', '') if counterparty else '',
                 getattr(counterparty, 'correspondent_account', '') if counterparty else '',
-                str(item.amount).replace('.', ','),
+                float(amount),
                 payment_date.strftime('%d.%m.%Y') if payment_date else '',
                 purpose,
+                invoice.user.get_username() if invoice.user else '',
             ]
         )
+
+    for column_cells in ws.columns:
+        max_length = 0
+        column_letter = get_column_letter(
+            column_cells[0].column
+        )
+
+        for cell in column_cells:
+            value = str(cell.value or '')
+            max_length = max(
+                max_length,
+                len(value),
+            )
+
+        ws.column_dimensions[column_letter].width = min(
+            max_length + 2,
+            42,
+        )
+
+    ws.freeze_panes = 'A2'
+
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
 
     now = timezone.now()
 
@@ -205,39 +241,23 @@ def export_payment_registry_draft_1c(request, registry_id):
         registry
     )
 
-    content = '\ufeff' + buffer.getvalue()
-
     response = HttpResponse(
-        content,
-        content_type='text/plain; charset=utf-8',
+        output.getvalue(),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     )
 
     response['Content-Disposition'] = (
-        f'attachment; filename="payment_registry_{registry.id}_1c.txt"'
+        f'attachment; filename="payment_registry_{registry.id}.xlsx"'
     )
 
     return response
-
 
 @login_required
 @require_payment_registry_permission(
     user_can_export_payment_registry,
     'Нет прав на выгрузку реестра оплаты.',
 )
-def export_payment_registry_1c(request):
-
-    company = CompanyRequisites.objects.first()
-
-    if not company:
-
-        messages.error(
-            request,
-            'Сначала заполните реквизиты организации в админке.'
-        )
-
-        return redirect(
-            'payment_registry'
-        )
+def export_payment_registry_excel(request):
 
     selected_status = request.GET.get(
         'status',
@@ -320,139 +340,71 @@ def export_payment_registry_1c(request):
         'id'
     )
 
-    missing_requisites = []
+    workbook = Workbook()
 
-    for invoice in invoices:
+    sheet = workbook.active
 
-        counterparty = invoice.counterparty
+    sheet.title = 'Реестр оплаты'
 
-        if not counterparty:
+    headers = [
+        'ID',
+        'Контрагент',
+        'ИНН',
+        'КПП',
+        'Номер счета',
+        'Дата счета',
+        'Сумма',
+        'Плановая дата оплаты',
+        'Приоритет',
+        'Статус',
+        'Назначение платежа',
+    ]
 
-            missing_requisites.append(
-                f'Счет #{invoice.id}: контрагент не найден'
-            )
+    sheet.append(
+        headers
+    )
 
-            continue
+    header_fill = PatternFill(
+        fill_type='solid',
+        fgColor='E5E7EB'
+    )
 
-        required_values = [
-            counterparty.inn,
-            counterparty.bank_name,
-            counterparty.bik,
-            counterparty.account_number,
-        ]
+    for cell in sheet[1]:
 
-        if any(
-            not value
-            for value in required_values
-        ):
-
-            missing_requisites.append(
-                f'Счет #{invoice.id}: {counterparty.name}'
-            )
-
-    if missing_requisites:
-
-        messages.error(
-            request,
-            (
-                'Выгрузка 1С TXT остановлена. '
-                'Есть контрагенты без обязательных платежных реквизитов.'
-            )
+        cell.font = Font(
+            bold=True
         )
 
-        return redirect(
-            'counterparties_missing_requisites'
+        cell.fill = header_fill
+
+        cell.alignment = Alignment(
+            horizontal='center',
+            vertical='center'
         )
 
-    def clean_value(value):
-
-        if value is None:
-
-            return ''
-
-        value = str(value)
-
-        value = value.replace(
-            '\r',
-            ' '
-        )
-
-        value = value.replace(
-            '\n',
-            ' '
-        )
-
-        value = value.strip()
-
-        return value
-
-    def format_date(value):
-
-        if value:
-
-            return value.strftime(
-                '%d.%m.%Y'
-            )
-
-        return date.today().strftime(
-            '%d.%m.%Y'
-        )
-
-    def format_amount(value):
-
-        if not value:
-
-            return '0.00'
-
-        return f'{value:.2f}'
-
-    created_at = datetime.now()
-
-    lines = []
-
-    lines.append(
-        '1CClientBankExchange'
-    )
-
-    lines.append(
-        'ВерсияФормата=1.03'
-    )
-
-    lines.append(
-        'Кодировка=Windows'
-    )
-
-    lines.append(
-        'Отправитель=Project Zarya'
-    )
-
-    lines.append(
-        'Получатель=1С'
-    )
-
-    lines.append(
-        f'ДатаСоздания={created_at.strftime("%d.%m.%Y")}'
-    )
-
-    lines.append(
-        f'ВремяСоздания={created_at.strftime("%H:%M:%S")}'
-    )
-
-    lines.append(
-        f'РасчСчет={clean_value(company.account_number)}'
+    total_amount = Decimal(
+        '0.00'
     )
 
     for invoice in invoices:
 
-        if not invoice.counterparty:
+        if invoice.counterparty:
 
-            continue
+            counterparty_name = invoice.counterparty.name or ''
+            inn = invoice.counterparty.inn or ''
+            kpp = invoice.counterparty.kpp or ''
 
-        counterparty = invoice.counterparty
+        else:
 
-        amount = invoice.amount or 0
+            counterparty_name = invoice.vendor or ''
+            inn = ''
+            kpp = ''
 
-        payment_date = invoice.planned_payment_date or date.today()
+        amount = invoice.amount or Decimal(
+            '0.00'
+        )
+
+        total_amount += amount
 
         if invoice.invoice_number:
 
@@ -472,118 +424,112 @@ def export_payment_registry_1c(request):
                 f'Оплата по счету ID {invoice.id}'
             )
 
-        lines.append(
-            'СекцияДокумент=Платежное поручение'
+        sheet.append(
+            [
+                invoice.id,
+                counterparty_name,
+                inn,
+                kpp,
+                invoice.invoice_number or '',
+                invoice.invoice_date or '',
+                amount,
+                (
+                    invoice.planned_payment_date.strftime(
+                        '%d.%m.%Y'
+                    )
+                    if invoice.planned_payment_date
+                    else ''
+                ),
+                invoice.payment_priority,
+                invoice.get_status_display(),
+                payment_purpose,
+            ]
         )
 
-        lines.append(
-            f'Номер={invoice.id}'
-        )
+    total_row = sheet.max_row + 2
 
-        lines.append(
-            f'Дата={format_date(payment_date)}'
-        )
-
-        lines.append(
-            f'Сумма={format_amount(amount)}'
-        )
-
-        lines.append(
-            f'Плательщик={clean_value(company.name)}'
-        )
-
-        lines.append(
-            f'ПлательщикИНН={clean_value(company.inn)}'
-        )
-
-        lines.append(
-            f'ПлательщикКПП={clean_value(company.kpp)}'
-        )
-
-        lines.append(
-            f'ПлательщикСчет={clean_value(company.account_number)}'
-        )
-
-        lines.append(
-            f'ПлательщикБанк1={clean_value(company.bank_name)}'
-        )
-
-        lines.append(
-            f'ПлательщикБИК={clean_value(company.bik)}'
-        )
-
-        lines.append(
-            f'ПлательщикКорсчет={clean_value(company.correspondent_account)}'
-        )
-
-        lines.append(
-            f'Получатель={clean_value(counterparty.name)}'
-        )
-
-        lines.append(
-            f'ПолучательИНН={clean_value(counterparty.inn)}'
-        )
-
-        lines.append(
-            f'ПолучательКПП={clean_value(counterparty.kpp)}'
-        )
-
-        lines.append(
-            f'ПолучательСчет={clean_value(counterparty.account_number)}'
-        )
-
-        lines.append(
-            f'ПолучательБанк1={clean_value(counterparty.bank_name)}'
-        )
-
-        lines.append(
-            f'ПолучательБИК={clean_value(counterparty.bik)}'
-        )
-
-        lines.append(
-            f'ПолучательКорсчет={clean_value(counterparty.correspondent_account)}'
-        )
-
-        lines.append(
-            'ВидПлатежа=Электронно'
-        )
-
-        lines.append(
-            'ВидОплаты=01'
-        )
-
-        lines.append(
-            'Очередность=5'
-        )
-
-        lines.append(
-            f'НазначениеПлатежа={clean_value(payment_purpose)}'
-        )
-
-        lines.append(
-            'КонецДокумента'
-        )
-
-    lines.append(
-        'КонецФайла'
+    sheet.cell(
+        row=total_row,
+        column=6,
+        value='Итого:'
     )
 
-    content = '\r\n'.join(
-        lines
+    sheet.cell(
+        row=total_row,
+        column=7,
+        value=total_amount
     )
+
+    sheet.cell(
+        row=total_row,
+        column=6
+    ).font = Font(
+        bold=True
+    )
+
+    sheet.cell(
+        row=total_row,
+        column=7
+    ).font = Font(
+        bold=True
+    )
+
+    for row in sheet.iter_rows():
+
+        for cell in row:
+
+            cell.alignment = Alignment(
+                vertical='top',
+                wrap_text=True
+            )
+
+    column_widths = {
+        'A': 8,
+        'B': 36,
+        'C': 16,
+        'D': 14,
+        'E': 18,
+        'F': 16,
+        'G': 16,
+        'H': 20,
+        'I': 12,
+        'J': 18,
+        'K': 48,
+    }
+
+    for column_letter, width in column_widths.items():
+
+        sheet.column_dimensions[
+            column_letter
+        ].width = width
+
+    for row_number in range(
+        2,
+        sheet.max_row + 1
+    ):
+
+        sheet.cell(
+            row=row_number,
+            column=7
+        ).number_format = '#,##0.00'
+
+    sheet.freeze_panes = 'A2'
 
     response = HttpResponse(
-        content.encode(
-            'cp1251',
-            errors='replace'
-        ),
-        content_type='text/plain; charset=windows-1251'
+        content_type=(
+            'application/vnd.openxmlformats-officedocument.'
+            'spreadsheetml.sheet'
+        )
     )
 
     response[
         'Content-Disposition'
     ] = (
-        'attachment; filename="payment_registry_1c.txt"'
+        'attachment; filename="payment_registry.xlsx"'
+    )
+
+    workbook.save(
+        response
     )
 
     return response

@@ -90,6 +90,11 @@ from .view_modules.counterparty_views import (
     counterparty_edit,
 )
 
+from .view_modules.invoice_status_comment_views import (
+    add_comment,
+    change_invoice_status,
+)
+
 from .view_modules.invoice_upload_result_views import (
     upload_result,
 )
@@ -100,9 +105,7 @@ from .view_modules.invoice_upload_batch_views import (
 )
 
 from .view_modules.invoice_views import (
-    add_comment,
     calculate_uploaded_file_hash,
-    change_invoice_status,
     create_upload_token,
     edit_invoice,
     get_latest_upload_batches_for_user,

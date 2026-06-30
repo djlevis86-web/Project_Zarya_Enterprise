@@ -105,6 +105,11 @@ from .invoice_upload_result_views import (
     upload_result,
 )
 
+from .invoice_status_comment_views import (
+    add_comment,
+    change_invoice_status,
+)
+
 @login_required
 def invoice_list(request):
 
@@ -659,107 +664,7 @@ def invoice_detail(request, invoice_id):
         }
     )
 
-@staff_member_required
-def change_invoice_status(request, invoice_id, status):
 
-    invoice = get_object_or_404(
-        Invoice,
-        id=invoice_id
-    )
-
-    allowed_statuses = [
-        Invoice.STATUS_NEW,
-        Invoice.STATUS_REVIEW,
-        Invoice.STATUS_APPROVED,
-        Invoice.STATUS_PAID,
-        Invoice.STATUS_REJECTED,
-    ]
-
-    if status not in allowed_statuses:
-
-        messages.error(
-            request,
-            'Недопустимый статус.'
-        )
-
-        return redirect(
-            'invoice_detail',
-            invoice_id=invoice.id
-        )
-
-    old_status = invoice.status
-    old_status_label = dict(Invoice.STATUS_CHOICES).get(old_status, old_status)
-    new_status_label = dict(Invoice.STATUS_CHOICES).get(status, status)
-
-    invoice.status = status
-
-    invoice.save()
-
-    create_invoice_log(
-        invoice,
-        request.user,
-        f'Статус изменен на "{invoice.get_status_display()}"'
-    )
-
-    log_action(
-        request=request,
-        action=AuditLog.ACTION_UPDATE,
-        obj=invoice,
-        message=f'Статус счета изменен: {old_status_label} -> {new_status_label}.',
-        metadata={
-            'field': 'status',
-            'old_status': old_status,
-            'new_status': status,
-            'old_status_label': old_status_label,
-            'new_status_label': new_status_label,
-        },
-    )
-
-    messages.success(
-        request,
-        'Статус успешно изменен.'
-    )
-
-    return redirect(
-        'invoice_detail',
-        invoice_id=invoice.id
-    )
-
-@login_required
-def add_comment(request, invoice_id):
-
-    invoice = get_object_or_404(
-        Invoice,
-        id=invoice_id
-    )
-
-    if request.method == 'POST':
-
-        form = InvoiceCommentForm(
-            request.POST
-        )
-
-        if form.is_valid():
-
-            comment = form.save(
-                commit=False
-            )
-
-            comment.invoice = invoice
-            comment.user = request.user
-
-            comment.save()
-
-            create_invoice_log(
-                invoice,
-                request.user,
-                'Добавлен комментарий'
-            )
-
-    return redirect(
-        'invoice_detail',
-        invoice_id=invoice.id
-    )
 
 @staff_member_required
 def edit_invoice(request, invoice_id):

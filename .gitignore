@@ -76,3 +76,34 @@ Thumbs.db
 htmlcov/
 
 releases/
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Local databases and DB backups
+db.sqlite3
+*.sqlite3
+backups_db/
+
+# Local diagnostics / temporary dumps
+ocr_dump.txt
+redis_inspect.json
+*.broken_backup
+*.backup*
+*.backup_*
+
+# Local cleanup reports
+static/css/_cleanup_reports/

@@ -11,84 +11,14 @@ from ..models import Invoice, OCRJob
 from ..ocr_processing_service import run_invoice_ocr_processing
 
 
+from .ocr_repeat_views import (
+    repeat_ocr,
+)
+
 from .ocr_queue_views import (
     ocr_queue,
 )
 
-@login_required
-def repeat_ocr(request, invoice_id):
-
-    invoice = get_object_or_404(
-        Invoice,
-        id=invoice_id
-    )
-
-    if (
-        not request.user.is_staff
-        and invoice.user_id != request.user.id
-    ):
-
-        raise PermissionDenied
-
-    if request.method != 'POST':
-
-        return redirect(
-            'invoice_detail',
-            invoice_id=invoice.id
-        )
-
-    ok, message = run_invoice_ocr_processing(
-        invoice,
-        request.user,
-        'OCR повторно выполнен вручную'
-    )
-
-    if ok:
-
-        log_action(
-            request=request,
-            action=AuditLog.ACTION_OCR,
-            obj=invoice,
-            message='OCR повторно выполнен вручную.',
-            metadata={
-                'mode': 'single',
-            },
-        )
-
-        messages.success(
-            request,
-            'OCR успешно обновлен.'
-        )
-
-        if message and message != 'OCR успешно обновлен':
-
-            messages.warning(
-                request,
-                message
-            )
-
-    else:
-
-        log_action(
-            request=request,
-            action=AuditLog.ACTION_OCR,
-            obj=invoice,
-            message=f'OCR повторно не выполнен: {message}',
-            metadata={
-                'mode': 'single',
-                'error': message,
-            },
-        )
-
-        messages.error(
-            request,
-            f'OCR не выполнен: {message}'
-        )
-
-    return redirect(
-        'invoice_detail',
-        invoice_id=invoice.id
-    )
 
 @login_required
 def bulk_repeat_ocr(request):

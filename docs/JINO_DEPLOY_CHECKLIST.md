@@ -214,19 +214,29 @@ Static отдаёт WhiteNoise. Media обычно должен отдавать
 
 ---
 
-## 11. WSGI
+## 11. WSGI / Passenger
 
-Точка входа проекта:
+На Jino Django-проект запускается через файл:
 
-    config/wsgi.py
+    passenger_wsgi.py
 
-WSGI application:
+Файл должен лежать в папке домена рядом с кодом проекта.
+
+В нашем проекте `passenger_wsgi.py` уже подготовлен и подключает:
 
     config.wsgi:application
+
+Основная Django WSGI-точка:
+
+    config/wsgi.py
 
 По умолчанию используется:
 
     DJANGO_SETTINGS_MODULE=config.settings.production
+
+Если виртуальное окружение на сервере называется не `~/venv`, можно задать переменную окружения:
+
+    PROJECT_ZARYA_VENV_PYTHON=/полный/путь/к/venv/bin/python
 
 ---
 

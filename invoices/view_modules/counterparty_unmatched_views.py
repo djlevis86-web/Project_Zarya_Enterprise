@@ -2,6 +2,7 @@ from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render
+from users.permissions import require_user_permission, user_can_manage_counterparties
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from ..counterparty_service import extract_requisites_near_vendor, normalize_counterparty_name
@@ -9,6 +10,7 @@ from ..models import Invoice
 
 
 @login_required
+@require_user_permission(user_can_manage_counterparties, 'Нет прав на просмотр неподобранных контрагентов.')
 def unmatched_counterparties(request):
 
     invoices = (
@@ -88,6 +90,7 @@ def unmatched_counterparties(request):
     )
 
 @login_required
+@require_user_permission(user_can_manage_counterparties, 'Нет прав на экспорт неподобранных контрагентов.')
 def export_unmatched_counterparties_excel(request):
 
     invoices = (

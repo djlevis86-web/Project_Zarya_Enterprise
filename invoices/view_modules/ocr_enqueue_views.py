@@ -1,11 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
+from users.permissions import require_user_permission, user_can_process_invoices
 from ..models import Invoice, OCRJob
 from ..log_service import create_invoice_log
 
 
 @login_required
+@require_user_permission(user_can_process_invoices, 'Нет прав на постановку OCR-задач.')
 def enqueue_ocr_jobs(request):
 
     if request.method != 'POST':

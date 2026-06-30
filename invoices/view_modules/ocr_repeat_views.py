@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect
+from users.permissions import require_user_permission, user_can_process_invoices
 from audit.models import AuditLog
 from audit.services import log_action
 from ..models import Invoice
@@ -9,6 +10,7 @@ from ..ocr_processing_service import run_invoice_ocr_processing
 
 
 @login_required
+@require_user_permission(user_can_process_invoices, 'Нет прав на повторное OCR-распознавание.')
 def repeat_ocr(request, invoice_id):
 
     invoice = get_object_or_404(

@@ -19,11 +19,14 @@ from .view_modules.counterparty_unmatched_views import (
     unmatched_counterparties,
 )
 
-from .view_modules.counterparty_views import (
+from .view_modules.counterparty_form_views import (
     counterparty_create,
+    counterparty_edit,
+)
+
+from .view_modules.counterparty_views import (
     counterparty_detail,
     counterparty_directory,
-    counterparty_edit,
 )
 
 from .view_modules.invoice_upload_views import (

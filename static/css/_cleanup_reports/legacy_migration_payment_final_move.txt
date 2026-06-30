@@ -1,6 +1,0 @@
-ERP Zarya35 — final payment legacy migration move
-====================================================================================================
-
-legacy blocks before: 21
-payment blocks moved: 21
-blocks remaining: 0

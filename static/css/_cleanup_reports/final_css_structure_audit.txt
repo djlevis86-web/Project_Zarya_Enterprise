@@ -1,7 +1,0 @@
-ERP Zarya35 — final CSS structure audit
-====================================================================================================
-
-app_css_exists: True
-style_import_active: False
-style_css_blocks: 0
-legacy_migration_blocks: 0

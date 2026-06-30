@@ -90,6 +90,10 @@ from .view_modules.counterparty_views import (
     counterparty_edit,
 )
 
+from .view_modules.invoice_list_views import (
+    invoice_list,
+)
+
 from .view_modules.invoice_detail_views import (
     invoice_detail,
 )
@@ -113,7 +117,6 @@ from .view_modules.invoice_views import (
     create_upload_token,
     edit_invoice,
     get_latest_upload_batches_for_user,
-    invoice_list,
     render_upload_invoice_form,
     upload_invoice,
 )

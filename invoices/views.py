@@ -90,20 +90,38 @@ from .view_modules.counterparty_views import (
     counterparty_edit,
 )
 
-from .view_modules.invoice_views import (
-    add_comment,
+from .view_modules.invoice_upload_views import (
     calculate_uploaded_file_hash,
-    change_invoice_status,
     create_upload_token,
-    edit_invoice,
     get_latest_upload_batches_for_user,
-    invoice_detail,
-    invoice_list,
     render_upload_invoice_form,
+    upload_invoice,
+)
+
+from .view_modules.invoice_edit_views import (
+    edit_invoice,
+)
+
+from .view_modules.invoice_list_views import (
+    invoice_list,
+)
+
+from .view_modules.invoice_detail_views import (
+    invoice_detail,
+)
+
+from .view_modules.invoice_status_comment_views import (
+    add_comment,
+    change_invoice_status,
+)
+
+from .view_modules.invoice_upload_result_views import (
+    upload_result,
+)
+
+from .view_modules.invoice_upload_batch_views import (
     upload_batch_detail,
     upload_batches,
-    upload_invoice,
-    upload_result,
 )
 
 from .view_modules.payment_views import (

@@ -110,6 +110,10 @@ from .invoice_status_comment_views import (
     change_invoice_status,
 )
 
+from .invoice_detail_views import (
+    invoice_detail,
+)
+
 @login_required
 def invoice_list(request):
 
@@ -596,73 +600,6 @@ def upload_invoice(request):
 
 
 
-@login_required
-def invoice_detail(request, invoice_id):
-
-    invoice = get_object_or_404(
-        Invoice,
-        id=invoice_id
-    )
-
-    if (
-        not request.user.is_staff
-        and invoice.user != request.user
-    ):
-
-        raise PermissionDenied
-
-
-
-
-
-    payment_summary = get_invoice_payment_summary(
-        invoice
-    )
-
-    payments = (
-        invoice.payments
-        .filter(
-            status=InvoicePayment.STATUS_POSTED
-        )
-        .select_related(
-            "created_by"
-        )
-        .order_by(
-            "-paid_at",
-            "-created_at"
-        )
-    )
-
-    payment_form = InvoicePaymentForm()
-
-    comments = (
-        InvoiceComment.objects
-        .filter(
-            invoice=invoice
-        )
-        .select_related(
-            'user'
-        )
-        .order_by(
-            '-created_at'
-        )
-    )
-
-    comment_form = InvoiceCommentForm()
-
-    return render(
-        request,
-        'invoices/detail.html',
-        {
-            'invoice': invoice,
-            'logs': invoice.logs.all(),
-            'comments': comments,
-            'comment_form': comment_form,
-            'payment_summary': payment_summary,
-            'payments': payments,
-            'payment_form': payment_form,
-        }
-    )
 
 
 

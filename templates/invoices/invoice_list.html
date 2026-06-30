@@ -465,8 +465,28 @@
                 {% empty %}
 
                     <tr>
-                        <td colspan="9" class="empty-table">
-                            Документы отсутствуют.
+                        <td colspan="9" class="empty-table empty-table-modern">
+                            <div class="empty-state empty-state-compact">
+                                <div class="empty-state-inner">
+                                    <div class="empty-state-icon">
+                                        📄
+                                    </div>
+
+                                    <h3 class="empty-state-title">
+                                        Счетов пока нет
+                                    </h3>
+
+                                    <p class="empty-state-text">
+                                        Загрузите первый счет, чтобы запустить OCR-проверку, назначить контрагента и подготовить оплату.
+                                    </p>
+
+                                    <div class="empty-state-actions">
+                                        <a href="{% url 'upload_invoice' %}" class="btn btn-primary">
+                                            Загрузить счет
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </td>
                     </tr>
 

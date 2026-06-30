@@ -124,8 +124,28 @@
                 {% empty %}
 
                     <tr>
-                        <td colspan="9" class="empty-table">
-                            Пакетов загрузки пока нет.
+                        <td colspan="9" class="empty-table empty-table-modern">
+                            <div class="empty-state empty-state-compact">
+                                <div class="empty-state-inner">
+                                    <div class="empty-state-icon">
+                                        ⬆
+                                    </div>
+
+                                    <h3 class="empty-state-title">
+                                        Загрузок пока нет
+                                    </h3>
+
+                                    <p class="empty-state-text">
+                                        Здесь появится история пакетных загрузок: новые счета, дубликаты и пропущенные файлы.
+                                    </p>
+
+                                    <div class="empty-state-actions">
+                                        <a href="{% url 'upload_invoice' %}" class="btn btn-primary">
+                                            Загрузить счет
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </td>
                     </tr>
 

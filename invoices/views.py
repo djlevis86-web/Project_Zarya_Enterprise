@@ -110,6 +110,13 @@ from .view_modules.payment_registry_action_views import (
     remove_from_payment_registry_item,
 )
 
+from .view_modules.payment_registry_page_views import (
+    payment_registry,
+    payment_registry_detail,
+    payment_registry_history,
+    payment_schedule,
+)
+
 from .view_modules.payment_registry_export_views import (
     export_payment_registry_1c,
     export_payment_registry_draft_1c,
@@ -117,12 +124,6 @@ from .view_modules.payment_registry_export_views import (
     export_payment_registry_excel,
 )
 
-from .view_modules.payment_registry_views import (
-    payment_registry,
-    payment_registry_detail,
-    payment_registry_history,
-    payment_schedule,
-)
 
 from .view_modules.ocr_views import (
     bulk_repeat_ocr,

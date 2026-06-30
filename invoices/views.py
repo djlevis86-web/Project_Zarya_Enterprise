@@ -86,6 +86,10 @@ from .view_modules.payment_registry_excel_export_views import (
     export_payment_registry_excel,
 )
 
+from .view_modules.ocr_enqueue_views import (
+    enqueue_ocr_jobs,
+)
+
 from .view_modules.ocr_repeat_views import (
     repeat_ocr,
 )
@@ -96,7 +100,6 @@ from .view_modules.ocr_queue_views import (
 
 from .view_modules.ocr_views import (
     bulk_repeat_ocr,
-    enqueue_ocr_jobs,
 )
 
 __all__ = (

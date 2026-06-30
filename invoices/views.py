@@ -102,14 +102,17 @@ from .view_modules.payment_views import (
     cancel_invoice_payment,
 )
 
-from .view_modules.payment_registry_views import (
-    add_to_payment_registry,
-    cancel_payment_registry_view,
-    check_payment_registry_view,
+from .view_modules.payment_registry_export_views import (
     export_payment_registry_1c,
     export_payment_registry_draft_1c,
     export_payment_registry_draft_excel,
     export_payment_registry_excel,
+)
+
+from .view_modules.payment_registry_views import (
+    add_to_payment_registry,
+    cancel_payment_registry_view,
+    check_payment_registry_view,
     mark_payment_registry_paid,
     payment_registry,
     payment_registry_detail,

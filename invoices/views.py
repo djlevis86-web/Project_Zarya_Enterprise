@@ -1,72 +1,8 @@
-from django.utils.dateparse import parse_date
-from datetime import date, datetime, timedelta
-from decimal import Decimal
-from pathlib import Path
+"""Facade for invoice app views.
 
-import hashlib
-import traceback
-import uuid
-
-from django.conf import settings
-from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
-from django.core.files.storage import FileSystemStorage
-from django.core.paginator import Paginator
-from django.db.models import Count, Q, Sum
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
-
-from openpyxl import Workbook
-from openpyxl.styles import Alignment, Font, PatternFill
-
-from .comment_forms import InvoiceCommentForm
-from .comment_models import InvoiceComment
-from .counterparty_service import (
-    extract_requisites_near_vendor,
-    normalize_counterparty_name,
-)
-from .forms import (
-    CounterpartyImportForm,
-    CounterpartyManualForm,
-    InvoiceCounterpartyAssignForm,
-    InvoiceEditForm,
-    InvoiceForm,
-)
-from .log_service import create_invoice_log
-from .models import (
-    CompanyRequisites,
-    Counterparty,
-    Invoice,
-    InvoiceUploadBatch,
-    OCRJob,
-)
-from .one_c_import_service import import_counterparties_from_file
-from .ocr_processing_service import (
-    apply_ocr_identity_to_invoice,
-    get_duplicate_invoice_by_ocr_identity,
-    read_and_parse_invoice_file,
-    run_invoice_ocr_processing,
-)
-from .ocr_verification_service import (
-    apply_ocr_amount_to_invoice,
-    sync_invoice_amount_verification,
-)
-from .payment_registry_services import get_active_registry_items_for_invoice
-
-from audit.models import AuditLog
-from audit.services import log_action
-
-
-
-
-
-
-
-
-
+View implementations live in invoices.view_modules.*.
+This module re-exports only URL-facing view callables.
+"""
 
 from .view_modules.counterparty_assignment_views import (
     invoice_assign_counterparty,
@@ -91,10 +27,6 @@ from .view_modules.counterparty_views import (
 )
 
 from .view_modules.invoice_upload_views import (
-    calculate_uploaded_file_hash,
-    create_upload_token,
-    get_latest_upload_batches_for_user,
-    render_upload_invoice_form,
     upload_invoice,
 )
 
@@ -148,11 +80,11 @@ from .view_modules.payment_registry_1c_export_views import (
     export_payment_registry_1c,
     export_payment_registry_draft_1c,
 )
+
 from .view_modules.payment_registry_excel_export_views import (
     export_payment_registry_draft_excel,
     export_payment_registry_excel,
 )
-
 
 from .view_modules.ocr_views import (
     bulk_repeat_ocr,
@@ -161,30 +93,43 @@ from .view_modules.ocr_views import (
     repeat_ocr,
 )
 
-from .payment_registry_permissions import (
-    require_payment_registry_permission,
-    user_can_cancel_payment_registry,
-    user_can_check_payment_registry,
-    user_can_export_payment_registry,
-    user_can_manage_payment_registry,
-    user_can_mark_payment_registry_paid,
-)
-
-
-
-
-
-PAYMENT_STATUS_FILTER_CHOICES = (
-    ("", "Все оплаты"),
-    ("unpaid", "Не оплачен"),
-    ("partial", "Частично оплачен"),
-    ("paid", "Оплачен"),
-    ("overpaid", "Переплата"),
-)
-
-
-OCR_STATUS_FILTER_CHOICES = (
-    ("", "Все OCR-статусы"),
-    ("verified", "Сумма подтверждена"),
-    ("unverified", "Сумма требует проверки"),
+__all__ = (
+    'invoice_list',
+    'upload_invoice',
+    'upload_result',
+    'upload_batches',
+    'upload_batch_detail',
+    'invoice_detail',
+    'add_invoice_payment',
+    'cancel_invoice_payment',
+    'repeat_ocr',
+    'bulk_repeat_ocr',
+    'enqueue_ocr_jobs',
+    'ocr_queue',
+    'change_invoice_status',
+    'add_comment',
+    'edit_invoice',
+    'payment_schedule',
+    'payment_registry',
+    'add_to_payment_registry',
+    'export_payment_registry_excel',
+    'export_payment_registry_1c',
+    'unmatched_counterparties',
+    'export_unmatched_counterparties_excel',
+    'import_counterparties_1c',
+    'rematch_counterparties_1c',
+    'counterparties_missing_requisites',
+    'counterparty_directory',
+    'counterparty_detail',
+    'counterparty_create',
+    'counterparty_edit',
+    'invoice_assign_counterparty',
+    'remove_from_payment_registry_item',
+    'check_payment_registry_view',
+    'export_payment_registry_draft_excel',
+    'export_payment_registry_draft_1c',
+    'payment_registry_history',
+    'payment_registry_detail',
+    'mark_payment_registry_paid',
+    'cancel_payment_registry_view',
 )

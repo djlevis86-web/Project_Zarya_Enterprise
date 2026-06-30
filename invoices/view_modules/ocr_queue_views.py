@@ -1,10 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import render
+from users.permissions import require_user_permission, user_can_process_invoices
 from ..models import OCRJob
 
 
 @login_required
+@require_user_permission(user_can_process_invoices, 'Нет прав на просмотр OCR-очереди.')
 def ocr_queue(request):
 
     selected_status = request.GET.get(

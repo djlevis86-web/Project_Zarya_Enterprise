@@ -1,10 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login, logout
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from invoices.models import Invoice
+
+from .permissions import admin_required
 
 from .forms import (
     LoginForm,
@@ -14,27 +16,6 @@ from .forms import (
 )
 
 User = get_user_model()
-
-
-def user_is_admin(user):
-    return (
-        user.is_authenticated
-        and (
-            user.is_superuser
-            or getattr(user, "role", None) == User.Role.ADMIN
-        )
-    )
-
-
-def admin_required(view_func):
-    return login_required(
-        user_passes_test(
-            user_is_admin,
-            login_url="dashboard"
-        )(
-            view_func
-        )
-    )
 
 
 def login_view(request):

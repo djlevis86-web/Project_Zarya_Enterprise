@@ -1,17 +1,13 @@
 import csv
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required, user_passes_test
+from users.permissions import audit_admin_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render
 
 from .models import AuditLog
-
-
-def staff_required(user):
-    return user.is_authenticated and user.is_staff
 
 
 def apply_audit_filters(request, logs):
@@ -42,8 +38,7 @@ def apply_audit_filters(request, logs):
     return logs
 
 
-@login_required
-@user_passes_test(staff_required)
+@audit_admin_required
 def audit_log_list(request):
     logs = AuditLog.objects.select_related("user").all()
     logs = apply_audit_filters(request, logs)
@@ -87,8 +82,7 @@ def audit_log_list(request):
     return render(request, "audit/audit_log_list.html", context)
 
 
-@login_required
-@user_passes_test(staff_required)
+@audit_admin_required
 def audit_log_export_csv(request):
     logs = AuditLog.objects.select_related("user").all()
     logs = apply_audit_filters(request, logs)

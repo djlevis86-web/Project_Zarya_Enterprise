@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect
+from users.permissions import require_user_permission, user_can_process_invoices
 
 from ..forms import InvoicePaymentForm
 from ..log_service import create_invoice_log
@@ -10,6 +11,7 @@ from ..payment_services import create_invoice_payment, get_invoice_payment_summa
 
 
 @login_required
+@require_user_permission(user_can_process_invoices, 'Нет прав на отмену оплаты счета.')
 def cancel_invoice_payment(request, payment_id):
     from ..models import InvoicePayment
     from ..payment_services import get_invoice_payment_summary
@@ -83,6 +85,7 @@ def cancel_invoice_payment(request, payment_id):
     )
 
 @login_required
+@require_user_permission(user_can_process_invoices, 'Нет прав на добавление оплаты счета.')
 def add_invoice_payment(request, invoice_id):
     invoice = get_object_or_404(
         Invoice,

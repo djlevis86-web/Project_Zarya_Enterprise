@@ -11,6 +11,7 @@ from django.db.models.functions import Coalesce
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from users.permissions import require_user_permission, user_can_process_invoices
 from django.utils.dateparse import parse_date
 
 from openpyxl import Workbook
@@ -46,6 +47,7 @@ from ..payment_registry_permissions import (
 
 
 @login_required
+@require_user_permission(user_can_process_invoices, 'Нет прав на просмотр графика платежей.')
 def payment_schedule(request):
 
     filter_type = request.GET.get(
@@ -317,6 +319,7 @@ def payment_schedule(request):
     )
 
 @login_required
+@require_user_permission(user_can_process_invoices, 'Нет прав на просмотр реестра оплаты.')
 def payment_registry_detail(request, registry_id):
 
     from ..models import PaymentRegistry, PaymentRegistryItem
@@ -393,6 +396,7 @@ def payment_registry_detail(request, registry_id):
     )
 
 @login_required
+@require_user_permission(user_can_process_invoices, 'Нет прав на просмотр истории реестров оплаты.')
 def payment_registry_history(request):
 
     from django.core.paginator import Paginator
@@ -493,6 +497,7 @@ def payment_registry_history(request):
     )
 
 @login_required
+@require_user_permission(user_can_process_invoices, 'Нет прав на работу с реестром оплаты.')
 def payment_registry(request):
 
     selected_status = request.GET.get(

@@ -1,26 +1,64 @@
 from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
-
 import os
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 load_dotenv(BASE_DIR / ".env")
 
+
+def env_bool(name, default=False):
+    value = os.getenv(name)
+
+    if value is None:
+        return default
+
+    return value.strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
+def env_list(name, default=""):
+    value = os.getenv(name, default)
+
+    return [
+        item.strip()
+        for item in value.split(",")
+        if item.strip()
+    ]
+
+
+def env_path(name, default):
+    value = os.getenv(name, "").strip()
+
+    if not value:
+        return default
+
+    return Path(value)
+
+
 SECRET_KEY = os.getenv(
-    "SECRET_KEY"
+    "SECRET_KEY",
+    "django-insecure-local-dev-key-change-me"
 )
 
-DEBUG = os.getenv(
+DEBUG = env_bool(
     "DEBUG",
-    "False"
-).lower() == "true"
+    False
+)
 
-ALLOWED_HOSTS = os.getenv(
-    "ALLOWED_HOSTS",
-    ""
-).split(",")
+ALLOWED_HOSTS = env_list(
+    "ALLOWED_HOSTS"
+)
+
+CSRF_TRUSTED_ORIGINS = env_list(
+    "CSRF_TRUSTED_ORIGINS"
+)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -66,7 +104,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                
+
                 'config.context_processors.project_version',
             ],
         },
@@ -76,6 +114,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 AUTH_USER_MODEL = 'users.User'
+
+AUTHENTICATION_BACKENDS = [
+    "users.backends.EmailOrUsernameBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 LANGUAGE_CODE = 'ru-ru'
 
@@ -91,9 +134,17 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]
 
+STATIC_ROOT = env_path(
+    "STATIC_ROOT",
+    BASE_DIR / "staticfiles"
+)
+
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = env_path(
+    "MEDIA_ROOT",
+    BASE_DIR / 'media'
+)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -113,9 +164,15 @@ DATABASE_URL = os.getenv(
     ""
 )
 
-CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+CELERY_BROKER_URL = os.getenv(
+    "CELERY_BROKER_URL",
+    "redis://127.0.0.1:6379/0"
+)
 
-CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+CELERY_RESULT_BACKEND = os.getenv(
+    "CELERY_RESULT_BACKEND",
+    "redis://127.0.0.1:6379/0"
+)
 
 CELERY_ACCEPT_CONTENT = [
     "json",

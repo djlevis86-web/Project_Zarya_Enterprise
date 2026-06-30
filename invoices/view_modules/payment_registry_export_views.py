@@ -30,7 +30,7 @@ from ..payment_registry_services import (
     check_payment_registry,
     recalculate_payment_registry,
 )
-from .payment_registry_views import (
+from .payment_registry_helpers import (
     apply_payment_status_filter,
     apply_positive_payment_balance_filter,
 )

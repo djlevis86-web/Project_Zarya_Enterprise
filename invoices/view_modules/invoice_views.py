@@ -34,7 +34,7 @@ from ..ocr_verification_service import (
 )
 from ..payment_registry_services import get_active_registry_items_for_invoice
 from ..payment_services import get_invoice_payment_summary
-from .payment_registry_views import (
+from .payment_registry_helpers import (
     PAYMENT_STATUS_FILTER_CHOICES,
     apply_payment_status_filter,
 )

@@ -157,6 +157,16 @@
                         </a>
                     {% endif %}
 
+                        {% if request.user.is_superuser or request.user.role == 'ADMIN' %}
+
+                            <a href="{% url 'user_admin_list' %}"
+                               class="nav-link {% if current == 'user_admin_list' or current == 'user_admin_create' or current == 'user_admin_edit' %}is-active{% endif %}">
+                                <span class="nav-icon">◉</span>
+                                <span>Пользователи</span>
+                            </a>
+
+                        {% endif %}
+
                         <a href="/admin/" class="nav-link">
                             <span class="nav-icon">▣</span>
                             <span>Администрирование</span>

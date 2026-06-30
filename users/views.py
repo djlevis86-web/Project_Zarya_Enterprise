@@ -1,26 +1,52 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
-from .forms import LoginForm, ProfileForm
+from django.contrib import messages
+from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+
+from invoices.models import Invoice
 
 from .forms import (
     LoginForm,
-    UserSettingsForm
+    ProfileForm,
+    UserAdminCreateForm,
+    UserAdminEditForm,
 )
-from invoices.models import Invoice
-from django.utils import timezone
+
+User = get_user_model()
+
+
+def user_is_admin(user):
+    return (
+        user.is_authenticated
+        and (
+            user.is_superuser
+            or getattr(user, "role", None) == User.Role.ADMIN
+        )
+    )
+
+
+def admin_required(view_func):
+    return login_required(
+        user_passes_test(
+            user_is_admin,
+            login_url="dashboard"
+        )(
+            view_func
+        )
+    )
 
 
 def login_view(request):
 
     if request.user.is_authenticated:
-        return redirect('dashboard')
+        return redirect("dashboard")
 
     form = LoginForm(
         data=request.POST or None
     )
 
-    if request.method == 'POST':
+    if request.method == "POST":
 
         if form.is_valid():
 
@@ -30,14 +56,14 @@ def login_view(request):
             )
 
             return redirect(
-                'dashboard'
+                "dashboard"
             )
 
     return render(
         request,
-        'login.html',
+        "login.html",
         {
-            'form': form
+            "form": form
         }
     )
 
@@ -66,69 +92,62 @@ def dashboard(request):
     month_count = invoices.filter(
         created_at__gte=month_start
     ).count()
+
     new_count = invoices.filter(
-        status='new'
+        status="new"
     ).count()
 
     review_count = invoices.filter(
-        status='review'
+        status="review"
     ).count()
 
     paid_count = invoices.filter(
-        status='paid'
+        status="paid"
     ).count()
 
     approved_count = invoices.filter(
-        status='approved'
+        status="approved"
     ).count()
 
     latest_invoices = invoices.order_by(
-        '-created_at'
+        "-created_at"
     )[:5]
 
     attention_items = [
         {
-            'label': 'Новые счета',
-            'value': new_count,
-            'hint': 'Ожидают OCR и первичной проверки',
-            'url_name': 'invoice_list',
+            "label": "Новые счета",
+            "value": new_count,
+            "hint": "Ожидают OCR и первичной проверки",
+            "url_name": "invoice_list",
         },
         {
-            'label': 'На проверке',
-            'value': review_count,
-            'hint': 'Нужно принять решение по счетам',
-            'url_name': 'invoice_list',
+            "label": "На проверке",
+            "value": review_count,
+            "hint": "Нужно принять решение по счетам",
+            "url_name": "invoice_list",
         },
         {
-            'label': 'Готово к оплате',
-            'value': approved_count,
-            'hint': 'Можно включать в платежный реестр',
-            'url_name': 'payment_registry',
+            "label": "Готово к оплате",
+            "value": approved_count,
+            "hint": "Можно включать в платежный реестр",
+            "url_name": "payment_registry",
         },
     ]
 
     context = {
-
-        'total_count': total_count,
-
-        'month_count': month_count,
-
-        'new_count': new_count,
-
-        'review_count': review_count,
-
-        'approved_count': approved_count,
-
-        'latest_invoices': latest_invoices,
-
-        'paid_count': paid_count,
-
-        'attention_items': attention_items,
+        "total_count": total_count,
+        "month_count": month_count,
+        "new_count": new_count,
+        "review_count": review_count,
+        "approved_count": approved_count,
+        "latest_invoices": latest_invoices,
+        "paid_count": paid_count,
+        "attention_items": attention_items,
     }
 
     return render(
         request,
-        'dashboard.html',
+        "dashboard.html",
         context
     )
 
@@ -136,7 +155,7 @@ def dashboard(request):
 @login_required
 def profile(request):
 
-    if request.method == 'POST':
+    if request.method == "POST":
 
         form = ProfileForm(
             request.POST,
@@ -147,7 +166,12 @@ def profile(request):
 
             form.save()
 
-            return redirect('profile')
+            messages.success(
+                request,
+                "Профиль обновлен."
+            )
+
+            return redirect("profile")
 
     else:
 
@@ -157,9 +181,128 @@ def profile(request):
 
     return render(
         request,
-        'profile.html',
+        "profile.html",
         {
-            'form': form
+            "form": form
+        }
+    )
+
+
+@admin_required
+def user_admin_list(request):
+
+    users = User.objects.order_by(
+        "role",
+        "last_name",
+        "first_name",
+        "email",
+    )
+
+    role_filter = request.GET.get(
+        "role",
+        ""
+    )
+
+    if role_filter:
+        users = users.filter(
+            role=role_filter
+        )
+
+    return render(
+        request,
+        "users/user_admin_list.html",
+        {
+            "users": users,
+            "role_filter": role_filter,
+            "role_choices": User.Role.choices,
+        }
+    )
+
+
+@admin_required
+def user_admin_create(request):
+
+    if request.method == "POST":
+
+        form = UserAdminCreateForm(
+            request.POST
+        )
+
+        if form.is_valid():
+
+            user = form.save()
+
+            messages.success(
+                request,
+                f"Пользователь {user.email} создан."
+            )
+
+            return redirect(
+                "user_admin_list"
+            )
+
+    else:
+
+        form = UserAdminCreateForm(
+            initial={
+                "is_active": True,
+                "role": User.Role.USER,
+            }
+        )
+
+    return render(
+        request,
+        "users/user_admin_form.html",
+        {
+            "form": form,
+            "page_title": "Новый пользователь",
+            "submit_label": "Создать пользователя",
+        }
+    )
+
+
+@admin_required
+def user_admin_edit(request, user_id):
+
+    edited_user = get_object_or_404(
+        User,
+        pk=user_id
+    )
+
+    if request.method == "POST":
+
+        form = UserAdminEditForm(
+            request.POST,
+            instance=edited_user
+        )
+
+        if form.is_valid():
+
+            user = form.save()
+
+            messages.success(
+                request,
+                f"Пользователь {user.email} обновлен."
+            )
+
+            return redirect(
+                "user_admin_list"
+            )
+
+    else:
+
+        form = UserAdminEditForm(
+            instance=edited_user
+        )
+
+    return render(
+        request,
+        "users/user_admin_form.html",
+        {
+            "form": form,
+            "page_title": "Редактирование пользователя",
+            "submit_label": "Сохранить пользователя",
+            "edited_user": edited_user,
         }
     )
 
@@ -169,5 +312,5 @@ def logout_view(request):
     logout(request)
 
     return redirect(
-        'login'
+        "login"
     )

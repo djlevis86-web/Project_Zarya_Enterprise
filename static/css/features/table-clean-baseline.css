@@ -1580,3 +1580,802 @@
     color: #ffffff;
 }
 /* PAYMENT-SCHEDULE-ROW-ACTIONS-POLISH-V1-END */
+
+/* PAYMENT-SCHEDULE-TABLE-POLISH-V1-START */
+/*
+ * График платежей:
+ * - таблица использует 8 реальных колонок из colgroup;
+ * - убираем лишнее распирание строк;
+ * - делаем блок оплаты и кнопки действий компактнее;
+ * - не трогаем реестр оплаты и список счетов.
+ */
+
+.payment-schedule-table {
+    min-width: 1080px;
+}
+
+.payment-schedule-table col.col-id {
+    width: 64px;
+}
+
+.payment-schedule-table col.col-counterparty {
+    width: 28%;
+}
+
+.payment-schedule-table col.col-invoice {
+    width: 128px;
+}
+
+.payment-schedule-table col.col-amount {
+    width: 128px;
+}
+
+.payment-schedule-table col.col-date {
+    width: 126px;
+}
+
+.payment-schedule-table col.col-payment {
+    width: 174px;
+}
+
+.payment-schedule-table col.col-status {
+    width: 124px;
+}
+
+.payment-schedule-table col.col-actions {
+    width: 112px;
+}
+
+.payment-schedule-table th,
+.payment-schedule-table td {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.payment-schedule-table td:nth-child(1),
+.payment-schedule-table td:nth-child(4),
+.payment-schedule-table td:nth-child(5) {
+    white-space: nowrap;
+}
+
+.payment-schedule-table td:nth-child(2) strong {
+    max-width: 42ch;
+    overflow-wrap: break-word;
+}
+
+.payment-schedule-table td:nth-child(3) {
+    white-space: normal;
+}
+
+.payment-schedule-table .payment-mini-schedule {
+    width: 100%;
+    min-width: 0;
+    max-width: 158px;
+    padding: 8px 10px;
+}
+
+.payment-schedule-table .payment-mini-row {
+    gap: 8px;
+}
+
+.payment-schedule-table .payment-mini-row span {
+    font-size: 11px;
+}
+
+.payment-schedule-table .payment-mini-row strong {
+    font-size: 12px;
+}
+
+.payment-schedule-table .payment-mini-status {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+.payment-schedule-table .table-actions-vertical {
+    width: 100%;
+    max-width: 100px;
+    gap: 6px;
+}
+
+.payment-schedule-table .table-actions-vertical .btn {
+    min-height: 30px;
+    padding: 6px 8px;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+@media (max-width: 1280px) {
+    .payment-schedule-table {
+        min-width: 1020px;
+    }
+
+    .payment-schedule-table th,
+    .payment-schedule-table td {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .payment-schedule-table col.col-counterparty {
+        width: 26%;
+    }
+
+    .payment-schedule-table col.col-payment {
+        width: 166px;
+    }
+
+    .payment-schedule-table col.col-actions {
+        width: 106px;
+    }
+}
+/* PAYMENT-SCHEDULE-TABLE-POLISH-V1-END */
+
+
+/* PAYMENT-SCHEDULE-TABLE-POLISH-V2-START */
+/* фиксим уехавшие кнопки в графике платежей */
+
+.payment-schedule-table col.col-counterparty {
+    width: 24%;
+}
+
+.payment-schedule-table col.col-invoice {
+    width: 120px;
+}
+
+.payment-schedule-table col.col-amount {
+    width: 120px;
+}
+
+.payment-schedule-table col.col-date {
+    width: 118px;
+}
+
+.payment-schedule-table col.col-payment {
+    width: 190px;
+}
+
+.payment-schedule-table col.col-status {
+    width: 118px;
+}
+
+.payment-schedule-table col.col-actions {
+    width: 156px;
+}
+
+.payment-schedule-table td:last-child,
+.payment-schedule-table th:last-child {
+    width: 156px;
+    min-width: 156px;
+}
+
+.payment-schedule-table .table-actions-vertical {
+    width: 100%;
+    min-width: 136px;
+    max-width: none;
+    align-items: stretch;
+}
+
+.payment-schedule-table .table-actions-vertical .btn {
+    width: 100%;
+    min-width: 0;
+    padding: 6px 10px;
+    font-size: 12px;
+    line-height: 1.2;
+}
+/* PAYMENT-SCHEDULE-TABLE-POLISH-V2-END */
+/* PAYMENT-REGISTRY-TABLE-POLISH-V1-START */
+/*
+ * Реестр оплаты:
+ * - черновик реестра: 6 реальных колонок;
+ * - доступные счета: 8 реальных колонок;
+ * - убираем старое распирание под бывшие 7/10 колонок;
+ * - делаем OCR-сумму, оплату и действия компактнее.
+ */
+
+/* Черновик реестра */
+
+.payment-registry-draft-table {
+    min-width: 1040px;
+}
+
+.payment-registry-draft-table col.col-invoice {
+    width: 120px;
+}
+
+.payment-registry-draft-table col.col-counterparty {
+    width: 27%;
+}
+
+.payment-registry-draft-table col.col-amount {
+    width: 210px;
+}
+
+.payment-registry-draft-table col.col-date {
+    width: 124px;
+}
+
+.payment-registry-draft-table col.col-payment {
+    width: 190px;
+}
+
+.payment-registry-draft-table col.col-actions {
+    width: 112px;
+}
+
+.payment-registry-draft-table th,
+.payment-registry-draft-table td {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.payment-registry-draft-table td:nth-child(1),
+.payment-registry-draft-table td:nth-child(4),
+.payment-registry-draft-table td:nth-child(6) {
+    white-space: nowrap;
+}
+
+.payment-registry-draft-table td:nth-child(2) strong {
+    max-width: 38ch;
+    overflow-wrap: break-word;
+}
+
+.payment-registry-draft-table .ocr-amount-cell {
+    max-width: 190px;
+}
+
+.payment-registry-draft-table .ocr-badge {
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.25;
+}
+
+.payment-registry-draft-table .ocr-amount-warning-text {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+.payment-registry-draft-table .payment-mini-registry {
+    width: 100%;
+    min-width: 0;
+    max-width: 176px;
+    padding: 8px 10px;
+}
+
+.payment-registry-draft-table .payment-mini-row {
+    gap: 8px;
+}
+
+.payment-registry-draft-table .payment-mini-row span {
+    font-size: 11px;
+}
+
+.payment-registry-draft-table .payment-mini-row strong {
+    font-size: 12px;
+}
+
+.payment-registry-draft-table .payment-mini-status {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+.payment-registry-draft-table .payment-registry-remove-form {
+    width: 100%;
+    max-width: 96px;
+}
+
+.payment-registry-draft-table .payment-registry-remove-form .btn {
+    width: 100%;
+    min-height: 30px;
+    padding: 6px 8px;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+/* Доступные счета */
+
+.payment-registry-source-table {
+    min-width: 1140px;
+}
+
+.payment-registry-source-table col.col-select {
+    width: 46px;
+}
+
+.payment-registry-source-table col.col-id {
+    width: 64px;
+}
+
+.payment-registry-source-table col.col-counterparty {
+    width: 26%;
+}
+
+.payment-registry-source-table col.col-invoice {
+    width: 112px;
+}
+
+.payment-registry-source-table col.col-invoice-date {
+    width: 112px;
+}
+
+.payment-registry-source-table col.col-amount {
+    width: 210px;
+}
+
+.payment-registry-source-table col.col-plan-date {
+    width: 118px;
+}
+
+.payment-registry-source-table col.col-payment {
+    width: 190px;
+}
+
+.payment-registry-source-table th,
+.payment-registry-source-table td {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.payment-registry-source-table th:nth-child(1),
+.payment-registry-source-table td:nth-child(1) {
+    width: 46px;
+    min-width: 46px;
+    text-align: center;
+}
+
+.payment-registry-source-table th:nth-child(2),
+.payment-registry-source-table td:nth-child(2) {
+    width: 64px;
+    min-width: 64px;
+    white-space: nowrap;
+}
+
+.payment-registry-source-table th:nth-child(3),
+.payment-registry-source-table td:nth-child(3) {
+    width: auto;
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+
+.payment-registry-source-table td:nth-child(3) strong {
+    max-width: 40ch;
+    overflow-wrap: break-word;
+}
+
+.payment-registry-source-table th:nth-child(4),
+.payment-registry-source-table td:nth-child(4),
+.payment-registry-source-table th:nth-child(5),
+.payment-registry-source-table td:nth-child(5),
+.payment-registry-source-table th:nth-child(7),
+.payment-registry-source-table td:nth-child(7) {
+    white-space: nowrap;
+}
+
+.payment-registry-source-table .ocr-amount-cell {
+    max-width: 190px;
+}
+
+.payment-registry-source-table .ocr-badge {
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.25;
+}
+
+.payment-registry-source-table .ocr-amount-warning-text {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+.payment-registry-source-table .payment-mini-registry-source {
+    width: 100%;
+    min-width: 0;
+    max-width: 176px;
+    padding: 8px 10px;
+}
+
+.payment-registry-source-table .payment-mini-row {
+    gap: 8px;
+}
+
+.payment-registry-source-table .payment-mini-row span {
+    font-size: 11px;
+}
+
+.payment-registry-source-table .payment-mini-row strong {
+    font-size: 12px;
+}
+
+.payment-registry-source-table .payment-mini-status {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+@media (max-width: 1280px) {
+    .payment-registry-draft-table {
+        min-width: 1000px;
+    }
+
+    .payment-registry-source-table {
+        min-width: 1100px;
+    }
+
+    .payment-registry-draft-table th,
+    .payment-registry-draft-table td,
+    .payment-registry-source-table th,
+    .payment-registry-source-table td {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .payment-registry-draft-table col.col-counterparty,
+    .payment-registry-source-table col.col-counterparty {
+        width: 24%;
+    }
+}
+/* PAYMENT-REGISTRY-TABLE-POLISH-V1-END */
+
+/* OCR-QUEUE-TABLE-POLISH-V1-START */
+/*
+ * OCR-очередь:
+ * - таблица имеет 9 реальных колонок;
+ * - старый CSS задавал ширины только первым 6;
+ * - выравниваем даты, источник, попытки и сообщение;
+ * - не трогаем шаблон.
+ */
+
+.ocr-queue-table {
+    min-width: 1240px;
+    table-layout: fixed;
+}
+
+.ocr-queue-table th,
+.ocr-queue-table td {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.ocr-queue-table th:nth-child(1),
+.ocr-queue-table td:nth-child(1) {
+    width: 64px;
+    white-space: nowrap;
+}
+
+.ocr-queue-table th:nth-child(2),
+.ocr-queue-table td:nth-child(2) {
+    width: 120px;
+}
+
+.ocr-queue-table th:nth-child(3),
+.ocr-queue-table td:nth-child(3) {
+    width: 260px;
+}
+
+.ocr-queue-table th:nth-child(4),
+.ocr-queue-table td:nth-child(4) {
+    width: 110px;
+}
+
+.ocr-queue-table th:nth-child(5),
+.ocr-queue-table td:nth-child(5) {
+    width: 118px;
+}
+
+.ocr-queue-table th:nth-child(6),
+.ocr-queue-table td:nth-child(6) {
+    width: 78px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.ocr-queue-table th:nth-child(7),
+.ocr-queue-table td:nth-child(7),
+.ocr-queue-table th:nth-child(8),
+.ocr-queue-table td:nth-child(8) {
+    width: 132px;
+    white-space: nowrap;
+}
+
+.ocr-queue-table th:nth-child(9),
+.ocr-queue-table td:nth-child(9) {
+    width: 280px;
+}
+
+.ocr-queue-table td:nth-child(3) a {
+    display: inline-flex;
+    max-width: 100%;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.ocr-queue-table td:nth-child(3) .muted {
+    display: block;
+    max-width: 32ch;
+    margin-top: 4px;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: normal;
+}
+
+.ocr-queue-table .status-badge {
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.25;
+}
+
+.ocr-queue-table .queue-message,
+.ocr-queue-table .queue-message-error {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: normal;
+    line-height: 1.35;
+}
+
+@media (max-width: 1280px) {
+    .ocr-queue-table {
+        min-width: 1180px;
+    }
+
+    .ocr-queue-table th,
+    .ocr-queue-table td {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .ocr-queue-table th:nth-child(3),
+    .ocr-queue-table td:nth-child(3) {
+        width: 235px;
+    }
+
+    .ocr-queue-table th:nth-child(7),
+    .ocr-queue-table td:nth-child(7),
+    .ocr-queue-table th:nth-child(8),
+    .ocr-queue-table td:nth-child(8) {
+        width: 124px;
+    }
+
+    .ocr-queue-table th:nth-child(9),
+    .ocr-queue-table td:nth-child(9) {
+        width: 260px;
+    }
+}
+/* OCR-QUEUE-TABLE-POLISH-V1-END */
+
+/* INVOICE-LIST-TABLE-POLISH-V1-START */
+/*
+ * Счета:
+ * - таблица имеет 8 реальных колонок;
+ * - используем colgroup вместо старых nth-child-настроек;
+ * - компактнее делаем сумму/OCR, оплату и действия;
+ * - не трогаем логику bulk OCR.
+ */
+
+.invoice-table-compact {
+    min-width: 1220px;
+    table-layout: fixed;
+}
+
+.invoice-table-compact col.col-select {
+    width: 46px;
+}
+
+.invoice-table-compact col.col-id {
+    width: 64px;
+}
+
+.invoice-table-compact col.col-document {
+    width: 24%;
+}
+
+.invoice-table-compact col.col-counterparty {
+    width: 27%;
+}
+
+.invoice-table-compact col.col-amount {
+    width: 170px;
+}
+
+.invoice-table-compact col.col-status {
+    width: 132px;
+}
+
+.invoice-table-compact col.col-payment {
+    width: 178px;
+}
+
+.invoice-table-compact col.col-actions {
+    width: 136px;
+}
+
+.invoice-table-compact th,
+.invoice-table-compact td {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.invoice-table-compact th:nth-child(1),
+.invoice-table-compact td:nth-child(1) {
+    width: 46px;
+    min-width: 46px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.invoice-table-compact th:nth-child(2),
+.invoice-table-compact td:nth-child(2) {
+    width: 64px;
+    min-width: 64px;
+    white-space: nowrap;
+}
+
+.invoice-table-compact td:nth-child(3),
+.invoice-table-compact td:nth-child(4) {
+    overflow-wrap: break-word;
+    word-break: normal;
+}
+
+.invoice-table-compact .invoice-document-cell strong {
+    max-width: 34ch;
+    line-height: 1.35;
+    overflow-wrap: break-word;
+}
+
+.invoice-table-compact .invoice-counterparty-cell strong {
+    max-width: 38ch;
+    line-height: 1.35;
+    overflow-wrap: break-word;
+}
+
+.invoice-table-compact .amount-main {
+    white-space: nowrap;
+}
+
+.invoice-table-compact .amount-ocr {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 1.25;
+    white-space: nowrap;
+}
+
+.invoice-table-compact .ocr-inline {
+    margin-top: 6px;
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.25;
+}
+
+.invoice-table-compact .status-badge {
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.25;
+}
+
+.invoice-table-compact .invoice-payment-cell .payment-mini {
+    width: 100%;
+    min-width: 0;
+    max-width: 164px;
+    padding: 8px 10px;
+}
+
+.invoice-table-compact .invoice-payment-cell .payment-mini-row {
+    gap: 8px;
+}
+
+.invoice-table-compact .invoice-payment-cell .payment-mini-row span {
+    font-size: 11px;
+}
+
+.invoice-table-compact .invoice-payment-cell .payment-mini-row strong {
+    font-size: 12px;
+}
+
+.invoice-table-compact .invoice-payment-cell .payment-mini-status {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+.invoice-table-compact .invoice-actions-cell .table-actions-vertical {
+    width: 100%;
+    min-width: 112px;
+    max-width: 120px;
+    gap: 6px;
+    align-items: stretch;
+}
+
+.invoice-table-compact .invoice-actions-cell .table-actions-vertical .btn {
+    width: 100%;
+    min-height: 30px;
+    padding: 6px 8px;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+@media (max-width: 1280px) {
+    .invoice-table-compact {
+        min-width: 1160px;
+    }
+
+    .invoice-table-compact th,
+    .invoice-table-compact td {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .invoice-table-compact col.col-document {
+        width: 23%;
+    }
+
+    .invoice-table-compact col.col-counterparty {
+        width: 25%;
+    }
+
+    .invoice-table-compact col.col-amount {
+        width: 160px;
+    }
+
+    .invoice-table-compact col.col-payment {
+        width: 170px;
+    }
+
+    .invoice-table-compact col.col-actions {
+        width: 126px;
+    }
+}
+/* INVOICE-LIST-TABLE-POLISH-V1-END */
+
+/* INVOICE-LIST-ROW-ACTIONS-POLISH-V1-START */
+/*
+ * Счета: строковая кнопка "Открыть" не должна выглядеть
+ * как главное действие всей страницы.
+ * Верхние primary-кнопки не затрагиваем.
+ */
+
+.invoice-table-compact .invoice-actions-cell .table-actions-vertical .btn-primary {
+    background: rgba(34, 197, 94, 0.16);
+    border-color: rgba(34, 197, 94, 0.28);
+    color: #bbf7d0;
+    box-shadow: none;
+}
+
+.invoice-table-compact .invoice-actions-cell .table-actions-vertical .btn-primary:hover {
+    background: rgba(34, 197, 94, 0.22);
+    border-color: rgba(34, 197, 94, 0.38);
+    color: #ffffff;
+}
+
+.invoice-table-compact .invoice-actions-cell .table-actions-vertical .btn-primary:focus {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.14);
+}
+/* INVOICE-LIST-ROW-ACTIONS-POLISH-V1-END */
+
+/* TABLE-ROW-PRIMARY-ACTIONS-POLISH-V1-START */
+/*
+ * Общие строковые действия в таблицах:
+ * - кнопка "Открыть" внутри строки не должна выглядеть как главный CTA страницы;
+ * - верхние primary-кнопки не затрагиваются, потому что правило работает только внутри td.
+ */
+
+.registry-table td .btn-primary.btn-sm,
+.table td .btn-primary.btn-sm {
+    background: rgba(34, 197, 94, 0.16);
+    border-color: rgba(34, 197, 94, 0.28);
+    color: #bbf7d0;
+    box-shadow: none;
+}
+
+.registry-table td .btn-primary.btn-sm:hover,
+.table td .btn-primary.btn-sm:hover {
+    background: rgba(34, 197, 94, 0.22);
+    border-color: rgba(34, 197, 94, 0.38);
+    color: #ffffff;
+}
+
+.registry-table td .btn-primary.btn-sm:focus,
+.table td .btn-primary.btn-sm:focus {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.14);
+}
+/* TABLE-ROW-PRIMARY-ACTIONS-POLISH-V1-END */

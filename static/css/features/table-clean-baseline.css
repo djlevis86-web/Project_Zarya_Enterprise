@@ -1763,3 +1763,256 @@
     line-height: 1.2;
 }
 /* PAYMENT-SCHEDULE-TABLE-POLISH-V2-END */
+/* PAYMENT-REGISTRY-TABLE-POLISH-V1-START */
+/*
+ * Реестр оплаты:
+ * - черновик реестра: 6 реальных колонок;
+ * - доступные счета: 8 реальных колонок;
+ * - убираем старое распирание под бывшие 7/10 колонок;
+ * - делаем OCR-сумму, оплату и действия компактнее.
+ */
+
+/* Черновик реестра */
+
+.payment-registry-draft-table {
+    min-width: 1040px;
+}
+
+.payment-registry-draft-table col.col-invoice {
+    width: 120px;
+}
+
+.payment-registry-draft-table col.col-counterparty {
+    width: 27%;
+}
+
+.payment-registry-draft-table col.col-amount {
+    width: 210px;
+}
+
+.payment-registry-draft-table col.col-date {
+    width: 124px;
+}
+
+.payment-registry-draft-table col.col-payment {
+    width: 190px;
+}
+
+.payment-registry-draft-table col.col-actions {
+    width: 112px;
+}
+
+.payment-registry-draft-table th,
+.payment-registry-draft-table td {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.payment-registry-draft-table td:nth-child(1),
+.payment-registry-draft-table td:nth-child(4),
+.payment-registry-draft-table td:nth-child(6) {
+    white-space: nowrap;
+}
+
+.payment-registry-draft-table td:nth-child(2) strong {
+    max-width: 38ch;
+    overflow-wrap: break-word;
+}
+
+.payment-registry-draft-table .ocr-amount-cell {
+    max-width: 190px;
+}
+
+.payment-registry-draft-table .ocr-badge {
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.25;
+}
+
+.payment-registry-draft-table .ocr-amount-warning-text {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+.payment-registry-draft-table .payment-mini-registry {
+    width: 100%;
+    min-width: 0;
+    max-width: 176px;
+    padding: 8px 10px;
+}
+
+.payment-registry-draft-table .payment-mini-row {
+    gap: 8px;
+}
+
+.payment-registry-draft-table .payment-mini-row span {
+    font-size: 11px;
+}
+
+.payment-registry-draft-table .payment-mini-row strong {
+    font-size: 12px;
+}
+
+.payment-registry-draft-table .payment-mini-status {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+.payment-registry-draft-table .payment-registry-remove-form {
+    width: 100%;
+    max-width: 96px;
+}
+
+.payment-registry-draft-table .payment-registry-remove-form .btn {
+    width: 100%;
+    min-height: 30px;
+    padding: 6px 8px;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+/* Доступные счета */
+
+.payment-registry-source-table {
+    min-width: 1140px;
+}
+
+.payment-registry-source-table col.col-select {
+    width: 46px;
+}
+
+.payment-registry-source-table col.col-id {
+    width: 64px;
+}
+
+.payment-registry-source-table col.col-counterparty {
+    width: 26%;
+}
+
+.payment-registry-source-table col.col-invoice {
+    width: 112px;
+}
+
+.payment-registry-source-table col.col-invoice-date {
+    width: 112px;
+}
+
+.payment-registry-source-table col.col-amount {
+    width: 210px;
+}
+
+.payment-registry-source-table col.col-plan-date {
+    width: 118px;
+}
+
+.payment-registry-source-table col.col-payment {
+    width: 190px;
+}
+
+.payment-registry-source-table th,
+.payment-registry-source-table td {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.payment-registry-source-table th:nth-child(1),
+.payment-registry-source-table td:nth-child(1) {
+    width: 46px;
+    min-width: 46px;
+    text-align: center;
+}
+
+.payment-registry-source-table th:nth-child(2),
+.payment-registry-source-table td:nth-child(2) {
+    width: 64px;
+    min-width: 64px;
+    white-space: nowrap;
+}
+
+.payment-registry-source-table th:nth-child(3),
+.payment-registry-source-table td:nth-child(3) {
+    width: auto;
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+
+.payment-registry-source-table td:nth-child(3) strong {
+    max-width: 40ch;
+    overflow-wrap: break-word;
+}
+
+.payment-registry-source-table th:nth-child(4),
+.payment-registry-source-table td:nth-child(4),
+.payment-registry-source-table th:nth-child(5),
+.payment-registry-source-table td:nth-child(5),
+.payment-registry-source-table th:nth-child(7),
+.payment-registry-source-table td:nth-child(7) {
+    white-space: nowrap;
+}
+
+.payment-registry-source-table .ocr-amount-cell {
+    max-width: 190px;
+}
+
+.payment-registry-source-table .ocr-badge {
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.25;
+}
+
+.payment-registry-source-table .ocr-amount-warning-text {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+.payment-registry-source-table .payment-mini-registry-source {
+    width: 100%;
+    min-width: 0;
+    max-width: 176px;
+    padding: 8px 10px;
+}
+
+.payment-registry-source-table .payment-mini-row {
+    gap: 8px;
+}
+
+.payment-registry-source-table .payment-mini-row span {
+    font-size: 11px;
+}
+
+.payment-registry-source-table .payment-mini-row strong {
+    font-size: 12px;
+}
+
+.payment-registry-source-table .payment-mini-status {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+@media (max-width: 1280px) {
+    .payment-registry-draft-table {
+        min-width: 1000px;
+    }
+
+    .payment-registry-source-table {
+        min-width: 1100px;
+    }
+
+    .payment-registry-draft-table th,
+    .payment-registry-draft-table td,
+    .payment-registry-source-table th,
+    .payment-registry-source-table td {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .payment-registry-draft-table col.col-counterparty,
+    .payment-registry-source-table col.col-counterparty {
+        width: 24%;
+    }
+}
+/* PAYMENT-REGISTRY-TABLE-POLISH-V1-END */

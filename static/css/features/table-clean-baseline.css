@@ -1580,3 +1580,186 @@
     color: #ffffff;
 }
 /* PAYMENT-SCHEDULE-ROW-ACTIONS-POLISH-V1-END */
+
+/* PAYMENT-SCHEDULE-TABLE-POLISH-V1-START */
+/*
+ * График платежей:
+ * - таблица использует 8 реальных колонок из colgroup;
+ * - убираем лишнее распирание строк;
+ * - делаем блок оплаты и кнопки действий компактнее;
+ * - не трогаем реестр оплаты и список счетов.
+ */
+
+.payment-schedule-table {
+    min-width: 1080px;
+}
+
+.payment-schedule-table col.col-id {
+    width: 64px;
+}
+
+.payment-schedule-table col.col-counterparty {
+    width: 28%;
+}
+
+.payment-schedule-table col.col-invoice {
+    width: 128px;
+}
+
+.payment-schedule-table col.col-amount {
+    width: 128px;
+}
+
+.payment-schedule-table col.col-date {
+    width: 126px;
+}
+
+.payment-schedule-table col.col-payment {
+    width: 174px;
+}
+
+.payment-schedule-table col.col-status {
+    width: 124px;
+}
+
+.payment-schedule-table col.col-actions {
+    width: 112px;
+}
+
+.payment-schedule-table th,
+.payment-schedule-table td {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.payment-schedule-table td:nth-child(1),
+.payment-schedule-table td:nth-child(4),
+.payment-schedule-table td:nth-child(5) {
+    white-space: nowrap;
+}
+
+.payment-schedule-table td:nth-child(2) strong {
+    max-width: 42ch;
+    overflow-wrap: break-word;
+}
+
+.payment-schedule-table td:nth-child(3) {
+    white-space: normal;
+}
+
+.payment-schedule-table .payment-mini-schedule {
+    width: 100%;
+    min-width: 0;
+    max-width: 158px;
+    padding: 8px 10px;
+}
+
+.payment-schedule-table .payment-mini-row {
+    gap: 8px;
+}
+
+.payment-schedule-table .payment-mini-row span {
+    font-size: 11px;
+}
+
+.payment-schedule-table .payment-mini-row strong {
+    font-size: 12px;
+}
+
+.payment-schedule-table .payment-mini-status {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+.payment-schedule-table .table-actions-vertical {
+    width: 100%;
+    max-width: 100px;
+    gap: 6px;
+}
+
+.payment-schedule-table .table-actions-vertical .btn {
+    min-height: 30px;
+    padding: 6px 8px;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+@media (max-width: 1280px) {
+    .payment-schedule-table {
+        min-width: 1020px;
+    }
+
+    .payment-schedule-table th,
+    .payment-schedule-table td {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .payment-schedule-table col.col-counterparty {
+        width: 26%;
+    }
+
+    .payment-schedule-table col.col-payment {
+        width: 166px;
+    }
+
+    .payment-schedule-table col.col-actions {
+        width: 106px;
+    }
+}
+/* PAYMENT-SCHEDULE-TABLE-POLISH-V1-END */
+
+
+/* PAYMENT-SCHEDULE-TABLE-POLISH-V2-START */
+/* фиксим уехавшие кнопки в графике платежей */
+
+.payment-schedule-table col.col-counterparty {
+    width: 24%;
+}
+
+.payment-schedule-table col.col-invoice {
+    width: 120px;
+}
+
+.payment-schedule-table col.col-amount {
+    width: 120px;
+}
+
+.payment-schedule-table col.col-date {
+    width: 118px;
+}
+
+.payment-schedule-table col.col-payment {
+    width: 190px;
+}
+
+.payment-schedule-table col.col-status {
+    width: 118px;
+}
+
+.payment-schedule-table col.col-actions {
+    width: 156px;
+}
+
+.payment-schedule-table td:last-child,
+.payment-schedule-table th:last-child {
+    width: 156px;
+    min-width: 156px;
+}
+
+.payment-schedule-table .table-actions-vertical {
+    width: 100%;
+    min-width: 136px;
+    max-width: none;
+    align-items: stretch;
+}
+
+.payment-schedule-table .table-actions-vertical .btn {
+    width: 100%;
+    min-width: 0;
+    padding: 6px 10px;
+    font-size: 12px;
+    line-height: 1.2;
+}
+/* PAYMENT-SCHEDULE-TABLE-POLISH-V2-END */

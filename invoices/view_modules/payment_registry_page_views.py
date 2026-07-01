@@ -323,7 +323,10 @@ def payment_schedule(request):
 def payment_registry_detail(request, registry_id):
 
     from ..models import PaymentRegistry, PaymentRegistryItem
-    from ..payment_registry_services import check_payment_registry
+    from ..payment_registry_services import (
+        check_payment_registry,
+        payment_registry_can_be_edited,
+    )
 
     registry = (
         PaymentRegistry.objects
@@ -384,6 +387,10 @@ def payment_registry_detail(request, registry_id):
             registry
         )
 
+    can_edit_registry = payment_registry_can_be_edited(
+        registry
+    )
+
     return render(
         request,
         'invoices/payment_registry_detail.html',
@@ -392,6 +399,7 @@ def payment_registry_detail(request, registry_id):
             'registry': registry,
             'registry_items': registry_items,
             'check_result': check_result,
+            'can_edit_registry': can_edit_registry,
         }
     )
 

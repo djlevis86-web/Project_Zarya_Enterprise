@@ -2143,3 +2143,211 @@
     }
 }
 /* OCR-QUEUE-TABLE-POLISH-V1-END */
+
+/* INVOICE-LIST-TABLE-POLISH-V1-START */
+/*
+ * Счета:
+ * - таблица имеет 8 реальных колонок;
+ * - используем colgroup вместо старых nth-child-настроек;
+ * - компактнее делаем сумму/OCR, оплату и действия;
+ * - не трогаем логику bulk OCR.
+ */
+
+.invoice-table-compact {
+    min-width: 1220px;
+    table-layout: fixed;
+}
+
+.invoice-table-compact col.col-select {
+    width: 46px;
+}
+
+.invoice-table-compact col.col-id {
+    width: 64px;
+}
+
+.invoice-table-compact col.col-document {
+    width: 24%;
+}
+
+.invoice-table-compact col.col-counterparty {
+    width: 27%;
+}
+
+.invoice-table-compact col.col-amount {
+    width: 170px;
+}
+
+.invoice-table-compact col.col-status {
+    width: 132px;
+}
+
+.invoice-table-compact col.col-payment {
+    width: 178px;
+}
+
+.invoice-table-compact col.col-actions {
+    width: 136px;
+}
+
+.invoice-table-compact th,
+.invoice-table-compact td {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.invoice-table-compact th:nth-child(1),
+.invoice-table-compact td:nth-child(1) {
+    width: 46px;
+    min-width: 46px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.invoice-table-compact th:nth-child(2),
+.invoice-table-compact td:nth-child(2) {
+    width: 64px;
+    min-width: 64px;
+    white-space: nowrap;
+}
+
+.invoice-table-compact td:nth-child(3),
+.invoice-table-compact td:nth-child(4) {
+    overflow-wrap: break-word;
+    word-break: normal;
+}
+
+.invoice-table-compact .invoice-document-cell strong {
+    max-width: 34ch;
+    line-height: 1.35;
+    overflow-wrap: break-word;
+}
+
+.invoice-table-compact .invoice-counterparty-cell strong {
+    max-width: 38ch;
+    line-height: 1.35;
+    overflow-wrap: break-word;
+}
+
+.invoice-table-compact .amount-main {
+    white-space: nowrap;
+}
+
+.invoice-table-compact .amount-ocr {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 1.25;
+    white-space: nowrap;
+}
+
+.invoice-table-compact .ocr-inline {
+    margin-top: 6px;
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.25;
+}
+
+.invoice-table-compact .status-badge {
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.25;
+}
+
+.invoice-table-compact .invoice-payment-cell .payment-mini {
+    width: 100%;
+    min-width: 0;
+    max-width: 164px;
+    padding: 8px 10px;
+}
+
+.invoice-table-compact .invoice-payment-cell .payment-mini-row {
+    gap: 8px;
+}
+
+.invoice-table-compact .invoice-payment-cell .payment-mini-row span {
+    font-size: 11px;
+}
+
+.invoice-table-compact .invoice-payment-cell .payment-mini-row strong {
+    font-size: 12px;
+}
+
+.invoice-table-compact .invoice-payment-cell .payment-mini-status {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+.invoice-table-compact .invoice-actions-cell .table-actions-vertical {
+    width: 100%;
+    min-width: 112px;
+    max-width: 120px;
+    gap: 6px;
+    align-items: stretch;
+}
+
+.invoice-table-compact .invoice-actions-cell .table-actions-vertical .btn {
+    width: 100%;
+    min-height: 30px;
+    padding: 6px 8px;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+@media (max-width: 1280px) {
+    .invoice-table-compact {
+        min-width: 1160px;
+    }
+
+    .invoice-table-compact th,
+    .invoice-table-compact td {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .invoice-table-compact col.col-document {
+        width: 23%;
+    }
+
+    .invoice-table-compact col.col-counterparty {
+        width: 25%;
+    }
+
+    .invoice-table-compact col.col-amount {
+        width: 160px;
+    }
+
+    .invoice-table-compact col.col-payment {
+        width: 170px;
+    }
+
+    .invoice-table-compact col.col-actions {
+        width: 126px;
+    }
+}
+/* INVOICE-LIST-TABLE-POLISH-V1-END */
+
+/* INVOICE-LIST-ROW-ACTIONS-POLISH-V1-START */
+/*
+ * Счета: строковая кнопка "Открыть" не должна выглядеть
+ * как главное действие всей страницы.
+ * Верхние primary-кнопки не затрагиваем.
+ */
+
+.invoice-table-compact .invoice-actions-cell .table-actions-vertical .btn-primary {
+    background: rgba(34, 197, 94, 0.16);
+    border-color: rgba(34, 197, 94, 0.28);
+    color: #bbf7d0;
+    box-shadow: none;
+}
+
+.invoice-table-compact .invoice-actions-cell .table-actions-vertical .btn-primary:hover {
+    background: rgba(34, 197, 94, 0.22);
+    border-color: rgba(34, 197, 94, 0.38);
+    color: #ffffff;
+}
+
+.invoice-table-compact .invoice-actions-cell .table-actions-vertical .btn-primary:focus {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.14);
+}
+/* INVOICE-LIST-ROW-ACTIONS-POLISH-V1-END */

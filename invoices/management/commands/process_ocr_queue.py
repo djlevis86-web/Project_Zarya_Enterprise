@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from invoices.models import OCRJob
-from invoices.views import run_invoice_ocr_processing
+from invoices.ocr_processing_service import run_invoice_ocr_processing
 
 
 class Command(BaseCommand):

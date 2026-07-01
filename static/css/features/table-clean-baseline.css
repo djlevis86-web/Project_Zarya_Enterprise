@@ -1560,3 +1560,23 @@
     white-space: nowrap !important;
 }
 /* PAYMENT-SCHEDULE-PAYMENT-STATUS-GAP-V1-END */
+
+/* PAYMENT-SCHEDULE-ROW-ACTIONS-POLISH-V1-START */
+/*
+ * График платежей: строковая кнопка "Открыть" не должна выглядеть
+ * как главное действие всей страницы.
+ * Верхние кнопки страницы не затрагиваются.
+ */
+.payment-schedule-table .table-actions-vertical .btn-primary {
+    background: rgba(34, 197, 94, 0.16);
+    border-color: rgba(34, 197, 94, 0.28);
+    color: #bbf7d0;
+    box-shadow: none;
+}
+
+.payment-schedule-table .table-actions-vertical .btn-primary:hover {
+    background: rgba(34, 197, 94, 0.22);
+    border-color: rgba(34, 197, 94, 0.38);
+    color: #ffffff;
+}
+/* PAYMENT-SCHEDULE-ROW-ACTIONS-POLISH-V1-END */

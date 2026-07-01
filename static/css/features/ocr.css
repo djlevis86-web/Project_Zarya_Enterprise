@@ -918,10 +918,20 @@
 }
 
 .ocr-amount-warning-text {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    margin-top: 2px;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: rgba(220, 38, 38, 0.10);
     color: #991b1b;
     font-size: 11px;
     font-weight: 700;
-    line-height: 1.25;
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .ocr-amount-cell-danger {
@@ -1037,9 +1047,13 @@
 
 .ocr-disabled-add-note {
     margin-top: 6px;
-    max-width: 120px;
+    max-width: 160px;
     color: #991b1b;
     font-size: 11px;
     font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
     line-height: 1.25;
 }

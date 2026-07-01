@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from ..models import Invoice
 from .payment_registry_helpers import PAYMENT_STATUS_FILTER_CHOICES, apply_payment_status_filter
+from django.utils.dateparse import parse_date
 
 
 @login_required
@@ -46,6 +47,31 @@ def invoice_list(request):
         ''
     )
 
+    document_type_filter = request.GET.get(
+        'document_type',
+        ''
+    )
+
+    document_date_from = request.GET.get(
+        'document_date_from',
+        ''
+    )
+
+    document_date_to = request.GET.get(
+        'document_date_to',
+        ''
+    )
+
+    planned_payment_date_from = request.GET.get(
+        'planned_payment_date_from',
+        ''
+    )
+
+    planned_payment_date_to = request.GET.get(
+        'planned_payment_date_to',
+        ''
+    )
+
     sort = request.GET.get(
         'sort',
         '-created_at'
@@ -81,6 +107,52 @@ def invoice_list(request):
             user_id=user_filter
         )
 
+    if document_type_filter:
+
+        invoices = invoices.filter(
+            document_type=document_type_filter
+        )
+
+    parsed_document_date_from = parse_date(
+        document_date_from
+    )
+
+    parsed_document_date_to = parse_date(
+        document_date_to
+    )
+
+    if parsed_document_date_from:
+
+        invoices = invoices.filter(
+            document_date__gte=parsed_document_date_from
+        )
+
+    if parsed_document_date_to:
+
+        invoices = invoices.filter(
+            document_date__lte=parsed_document_date_to
+        )
+
+    parsed_planned_payment_date_from = parse_date(
+        planned_payment_date_from
+    )
+
+    parsed_planned_payment_date_to = parse_date(
+        planned_payment_date_to
+    )
+
+    if parsed_planned_payment_date_from:
+
+        invoices = invoices.filter(
+            planned_payment_date__gte=parsed_planned_payment_date_from
+        )
+
+    if parsed_planned_payment_date_to:
+
+        invoices = invoices.filter(
+            planned_payment_date__lte=parsed_planned_payment_date_to
+        )
+
     invoices = apply_payment_status_filter(
         invoices,
         payment_status_filter
@@ -95,6 +167,10 @@ def invoice_list(request):
         '-amount',
         'created_at',
         '-created_at',
+        'document_date',
+        '-document_date',
+        'planned_payment_date',
+        '-planned_payment_date',
     ]
 
     if sort not in allowed_sorts:
@@ -163,6 +239,12 @@ def invoice_list(request):
             'user_filter': user_filter,
             'payment_status_filter': payment_status_filter,
             'payment_status_choices': PAYMENT_STATUS_FILTER_CHOICES,
+            'document_type_filter': document_type_filter,
+            'document_type_choices': Invoice.DOCUMENT_TYPE_CHOICES,
+            'document_date_from': document_date_from,
+            'document_date_to': document_date_to,
+            'planned_payment_date_from': planned_payment_date_from,
+            'planned_payment_date_to': planned_payment_date_to,
             'statuses': Invoice.STATUS_CHOICES,
             'users': users,
             'total_count': total_count,

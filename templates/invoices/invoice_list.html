@@ -159,6 +159,84 @@
             </select>
         </div>
 
+        {# DOCUMENT_TYPE_AND_DATE_FILTERS_V1 #}
+        <div class="filter-field filter-field-document-type-v1">
+            <label for="document_type">
+                Тип документа
+            </label>
+
+            <select id="document_type" name="document_type" class="form-control">
+                <option value="">
+                    Все документы
+                </option>
+
+                {% for value, label in document_type_choices %}
+                    <option
+                        value="{{ value }}"
+                        {% if document_type_filter == value %}selected{% endif %}
+                    >
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-field filter-field-document-date-from-v1">
+            <label for="document_date_from">
+                Дата документа с
+            </label>
+
+            <input
+                id="document_date_from"
+                type="date"
+                name="document_date_from"
+                value="{{ document_date_from }}"
+                class="form-control"
+            >
+        </div>
+
+        <div class="filter-field filter-field-document-date-to-v1">
+            <label for="document_date_to">
+                Дата документа по
+            </label>
+
+            <input
+                id="document_date_to"
+                type="date"
+                name="document_date_to"
+                value="{{ document_date_to }}"
+                class="form-control"
+            >
+        </div>
+
+        <div class="filter-field filter-field-planned-payment-date-from-v1">
+            <label for="planned_payment_date_from">
+                Плановая оплата с
+            </label>
+
+            <input
+                id="planned_payment_date_from"
+                type="date"
+                name="planned_payment_date_from"
+                value="{{ planned_payment_date_from }}"
+                class="form-control"
+            >
+        </div>
+
+        <div class="filter-field filter-field-planned-payment-date-to-v1">
+            <label for="planned_payment_date_to">
+                Плановая оплата по
+            </label>
+
+            <input
+                id="planned_payment_date_to"
+                type="date"
+                name="planned_payment_date_to"
+                value="{{ planned_payment_date_to }}"
+                class="form-control"
+            >
+        </div>
+
         <div class="filter-field filter-field-sort-v5">
             <label for="invoice_sort">
                 Сортировка
@@ -342,13 +420,18 @@
                             </td>
 
                             <td class="invoice-document-cell">
+                            {# DOCUMENT_TYPE_BADGE_V1 #}
+                            <div class="muted">
+                                {{ invoice.get_document_type_display }}
+                            </div>
+
                             <strong>
                                 {{ invoice.title }}
                             </strong>
 
                             {% if invoice.invoice_number %}
                                 <div class="muted">
-                                    Счет № {{ invoice.invoice_number }}
+                                    {{ invoice.get_document_type_display }} № {{ invoice.invoice_number }}
                                 </div>
                             {% endif %}
 
@@ -363,8 +446,34 @@
                                 </a>
                             {% endif %}
 
+                            {# DOCUMENT_META_DATES_USER_V1 #}
+                            {% if invoice.document_date %}
+                                <div class="muted">
+                                    Дата документа: {{ invoice.document_date|date:"d.m.Y" }}
+                                </div>
+                            {% elif invoice.invoice_date %}
+                                <div class="muted">
+                                    Дата документа: {{ invoice.invoice_date }}
+                                </div>
+                            {% endif %}
+
+                            {% if invoice.planned_payment_date %}
+                                <div class="muted">
+                                    Плановая оплата: {{ invoice.planned_payment_date|date:"d.m.Y" }}
+                                </div>
+                            {% endif %}
+
                             <div class="muted">
-                                {{ invoice.created_at|date:"d.m.Y H:i" }}
+                                Загружен: {{ invoice.created_at|date:"d.m.Y H:i" }}
+                            </div>
+
+                            <div class="muted">
+                                Загрузил:
+                                {% if invoice.user.get_full_name %}
+                                    {{ invoice.user.get_full_name }}
+                                {% else %}
+                                    {{ invoice.user.username }}
+                                {% endif %}
                             </div>
                         </td>
 

@@ -20,6 +20,7 @@
 
 /* Components */
 @import url("./components/buttons.css");
+@import url("./components/page-headers.css");
 @import url("./components/forms.css");
 @import url("./components/tables.css");
 @import url("./components/cards.css");

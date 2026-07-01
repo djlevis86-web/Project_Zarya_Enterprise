@@ -1,0 +1,196 @@
+D:\Project_Zarya\templates\invoices\counterparties_missing_requisites.html:18: <a href="{% url 'import_counterparties_1c' %}" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\counterparties_missing_requisites.html:22: <a href="{% url 'counterparty_directory' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\counterparties_missing_requisites.html:26: <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\counterparties_missing_requisites.html:120: <a href="{% url 'counterparty_directory' %}?requisites=missing" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\counterparties_missing_requisites.html:187: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\counterparties_missing_requisites.html:206: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\counterparties_missing_requisites.html:216: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\counterparties_missing_requisites.html:226: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:23: class="btn btn-primary"
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:31: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:38: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:69: <div class="counterparty-profile-badges">
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:71: <span class="status-badge status-new">
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:76: <span class="status-badge status-approved">
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:80: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:86: <span class="status-badge status-approved">
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:90: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:195: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:241: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:257: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:273: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:412: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:488: <span class="status-badge status-{{ invoice.status }}">
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:507: class="btn btn-primary btn-sm"
+D:\Project_Zarya\templates\invoices\counterparty_detail.html:515: class="btn btn-secondary btn-sm"
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:18: <a href="{% url 'counterparty_create' %}" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:22: <a href="{% url 'import_counterparties_1c' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:26: <a href="{% url 'counterparties_missing_requisites' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:160: <button type="submit" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:164: <a href="{% url 'counterparty_directory' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:188: <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:220: <div class="counterparty-badges">
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:222: <span class="status-badge status-new">
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:227: <span class="status-badge status-approved">
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:231: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:237: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:322: class="btn btn-primary btn-sm"
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:329: class="btn btn-secondary btn-sm"
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:337: class="btn btn-secondary btn-sm"
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:363: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\counterparty_directory.html:376: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\counterparty_form.html:20: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\counterparty_form.html:28: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\counterparty_form.html:199: <button type="submit" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\counterparty_form.html:205: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\detail.html:25: class="btn btn-primary"
+D:\Project_Zarya\templates\invoices\detail.html:33: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\detail.html:48: class="btn btn-primary"
+D:\Project_Zarya\templates\invoices\detail.html:80: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\detail.html:89: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\detail.html:115: <span class="status-badge status-{{ invoice.status }}">
+D:\Project_Zarya\templates\invoices\detail.html:234: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\detail.html:241: class="btn btn-secondary btn-sm"
+D:\Project_Zarya\templates\invoices\detail.html:412: <button type="submit" class="btn btn-primary payment-left-submit">
+D:\Project_Zarya\templates\invoices\detail.html:451: class="btn btn-secondary btn-xs"
+D:\Project_Zarya\templates\invoices\detail.html:483: <span class="status-badge status-approved">
+D:\Project_Zarya\templates\invoices\detail.html:487: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\detail.html:584: <span class="ocr-badge ocr-badge-ok">
+D:\Project_Zarya\templates\invoices\detail.html:588: <span class="ocr-badge ocr-badge-error">
+D:\Project_Zarya\templates\invoices\detail.html:673: class="btn btn-primary"
+D:\Project_Zarya\templates\invoices\detail.html:742: class="btn btn-secondary btn-sm"
+D:\Project_Zarya\templates\invoices\detail.html:754: class="btn btn-secondary btn-sm"
+D:\Project_Zarya\templates\invoices\import_counterparties_1c.html:18: <a href="{% url 'counterparty_directory' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\import_counterparties_1c.html:22: <a href="{% url 'unmatched_counterparties' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\import_counterparties_1c.html:26: <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\import_counterparties_1c.html:118: <button type="submit" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\import_counterparties_1c.html:122: <a href="{% url 'counterparty_directory' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\import_counterparties_1c.html:343: <button type="submit" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\invoice_assign_counterparty.html:20: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\invoice_assign_counterparty.html:27: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\invoice_assign_counterparty.html:99: <button type="submit" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\invoice_assign_counterparty.html:105: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\invoice_list.html:19: <a href="{% url 'upload_invoice' %}" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\invoice_list.html:23: <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\invoice_list.html:27: <a href="{% url 'ocr_queue' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\invoice_list.html:195: <button type="submit" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\invoice_list.html:199: <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\invoice_list.html:238: <a href="{% url 'unmatched_counterparties' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\invoice_list.html:242: <a href="{% url 'counterparties_missing_requisites' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\invoice_list.html:248: class="btn btn-primary"
+D:\Project_Zarya\templates\invoices\invoice_list.html:256: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\invoice_list.html:389: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\invoice_list.html:422: <span class="status-badge status-{{ invoice.status }}">
+D:\Project_Zarya\templates\invoices\invoice_list.html:448: class="btn btn-primary btn-sm"
+D:\Project_Zarya\templates\invoices\invoice_list.html:456: class="btn btn-secondary btn-sm"
+D:\Project_Zarya\templates\invoices\invoice_list.html:489: <a href="?page=1" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\invoice_list.html:493: <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\invoice_list.html:503: <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\invoice_list.html:507: <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\list.html:10: class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\list.html:66: <span class="badge bg-success">
+D:\Project_Zarya\templates\invoices\list.html:72: <span class="badge bg-danger">
+D:\Project_Zarya\templates\invoices\list.html:78: <span class="badge bg-warning text-dark">
+D:\Project_Zarya\templates\invoices\list.html:84: <span class="badge bg-secondary">
+D:\Project_Zarya\templates\invoices\list.html:103: class="btn btn-sm btn-dark">
+D:\Project_Zarya\templates\invoices\ocr_queue.html:18: <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\ocr_queue.html:22: <a href="{% url 'upload_batches' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\ocr_queue.html:101: <button type="submit" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\ocr_queue.html:105: <a href="{% url 'ocr_queue' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\ocr_queue.html:230: <span class="status-badge status-{{ job.status }}">
+D:\Project_Zarya\templates\invoices\ocr_queue.html:313: <a href="?page=1{% if selected_status %}&status={{ selected_status }}{% endif %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\ocr_queue.html:317: <a href="?page={{ page_obj.previous_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\ocr_queue.html:327: <a href="?page={{ page_obj.next_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\ocr_queue.html:331: <a href="?page={{ page_obj.paginator.num_pages }}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\payment_registry_detail.html:24: <a href="{% url 'payment_registry' %}" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\payment_registry_detail.html:28: <a href="{% url 'payment_registry_history' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\payment_registry_detail.html:122: class="btn btn-danger"
+D:\Project_Zarya\templates\invoices\payment_registry_detail.html:140: class="btn btn-primary"
+D:\Project_Zarya\templates\invoices\payment_registry_detail.html:147: <button type="button" class="btn btn-secondary" disabled>
+D:\Project_Zarya\templates\invoices\payment_registry_detail.html:153: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\payment_registry_detail.html:161: <span class="status-badge status-{{ registry.status }}">
+D:\Project_Zarya\templates\invoices\payment_registry_detail.html:172: <button type="submit" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\payment_registry_detail.html:184: <button type="submit" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\payment_registry_detail.html:412: <span class="status-badge status-{{ item.status }}">
+D:\Project_Zarya\templates\invoices\payment_registry_history.html:24: <a href="{% url 'payment_registry' %}" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\payment_registry_history.html:28: <a href="{% url 'payment_schedule' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\payment_registry_history.html:125: <button type="submit" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\payment_registry_history.html:129: <a href="{% url 'payment_registry_history' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\payment_registry_history.html:216: <span class="status-badge status-{{ registry.status }}">
+D:\Project_Zarya\templates\invoices\payment_registry.html:19: <a href="{% url 'payment_registry_history' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\payment_registry.html:25: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\payment_registry.html:32: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\payment_registry.html:77: <span class="ocr-badge ocr-badge-error">
+D:\Project_Zarya\templates\invoices\payment_registry.html:81: <span class="ocr-badge ocr-badge-ok">
+D:\Project_Zarya\templates\invoices\payment_registry.html:85: <span class="ocr-badge ocr-badge-warning">
+D:\Project_Zarya\templates\invoices\payment_registry.html:154: <button type="submit" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\payment_registry.html:159: <button type="button" class="btn btn-secondary" disabled>
+D:\Project_Zarya\templates\invoices\payment_registry.html:172: <button type="submit" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\payment_registry.html:184: <button type="submit" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\payment_registry.html:192: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\payment_registry.html:201: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\payment_registry.html:210: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\payment_registry.html:219: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\payment_registry.html:228: <span class="status-badge status-draft">
+D:\Project_Zarya\templates\invoices\payment_registry.html:232: <a href="{% url 'payment_schedule' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\payment_registry.html:431: <span class="ocr-badge ocr-badge-ok">
+D:\Project_Zarya\templates\invoices\payment_registry.html:435: <span class="ocr-badge ocr-badge-error">
+D:\Project_Zarya\templates\invoices\payment_registry.html:493: class="btn btn-danger btn-sm"
+D:\Project_Zarya\templates\invoices\payment_registry.html:644: <button type="submit" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\payment_registry.html:648: <a href="{% url 'payment_registry' %}#registry-filter-card" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\payment_registry.html:684: <button type="submit" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\payment_registry.html:790: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\payment_registry.html:825: <span class="ocr-badge ocr-badge-ok">
+D:\Project_Zarya\templates\invoices\payment_registry.html:829: <span class="ocr-badge ocr-badge-error">
+D:\Project_Zarya\templates\invoices\payment_schedule.html:19: <a href="{% url 'payment_registry' %}" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\payment_schedule.html:23: <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\payment_schedule.html:171: <button type="submit" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\payment_schedule.html:175: <a href="{% url 'payment_schedule' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\payment_schedule.html:199: <a href="{% url 'payment_registry' %}?date_from={{ date_from }}&date_to={{ date_to }}&q={{ search_query }}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\payment_schedule.html:297: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\payment_schedule.html:303: <span class="status-badge status-review">
+D:\Project_Zarya\templates\invoices\payment_schedule.html:309: <span class="status-badge status-review">
+D:\Project_Zarya\templates\invoices\payment_schedule.html:334: <span class="status-badge status-{{ invoice.status }}">
+D:\Project_Zarya\templates\invoices\payment_schedule.html:343: <a href="{% url 'invoice_detail' invoice.id %}" class="btn btn-primary btn-sm">
+D:\Project_Zarya\templates\invoices\payment_schedule.html:360: <button type="submit" class="btn btn-secondary btn-sm">
+D:\Project_Zarya\templates\invoices\payment_schedule.html:366: <a href="{% url 'edit_invoice' invoice.id %}" class="btn btn-secondary btn-sm">
+D:\Project_Zarya\templates\invoices\unmatched_counterparties.html:22: class="btn btn-primary"
+D:\Project_Zarya\templates\invoices\unmatched_counterparties.html:29: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\unmatched_counterparties.html:41: <button type="submit" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\unmatched_counterparties.html:48: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\unmatched_counterparties.html:118: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\unmatched_counterparties.html:170: <span class="status-badge status-review">
+D:\Project_Zarya\templates\invoices\unmatched_counterparties.html:209: class="btn btn-secondary btn-sm"
+D:\Project_Zarya\templates\invoices\upload_batch_detail.html:19: <a href="{% url 'upload_batches' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\upload_batch_detail.html:23: <a href="{% url 'upload_invoice' %}" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\upload_batch_detail.html:106: class="btn btn-primary"
+D:\Project_Zarya\templates\invoices\upload_batch_detail.html:114: class="btn btn-secondary"
+D:\Project_Zarya\templates\invoices\upload_batch_detail.html:184: <span class="status-badge status-rejected">
+D:\Project_Zarya\templates\invoices\upload_batch_detail.html:201: <span class="status-badge status-{{ invoice.status }}">
+D:\Project_Zarya\templates\invoices\upload_batch_detail.html:209: class="btn btn-primary btn-sm"
+D:\Project_Zarya\templates\invoices\upload_batch_detail.html:304: class="btn btn-primary btn-sm"
+D:\Project_Zarya\templates\invoices\upload_batches.html:18: <a href="{% url 'upload_invoice' %}" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\upload_batches.html:22: <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\upload_batches.html:87: <span class="status-badge status-{{ batch.status }}">
+D:\Project_Zarya\templates\invoices\upload_batches.html:117: class="btn btn-primary btn-sm"
+D:\Project_Zarya\templates\invoices\upload_batches.html:147: <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\upload_batches.html:157: <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\upload_invoice.html:18: <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\upload_invoice.html:22: <a href="{% url 'unmatched_counterparties' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\upload_invoice.html:152: class="btn btn-primary"
+D:\Project_Zarya\templates\invoices\upload_invoice.html:158: <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\upload_invoice.html:285: <a href="{% url 'upload_batches' %}" class="btn btn-secondary btn-sm">
+D:\Project_Zarya\templates\invoices\upload_invoice.html:313: <span class="status-badge status-{{ batch.status }}">
+D:\Project_Zarya\templates\invoices\upload_result.html:18: <a href="{% url 'invoice_list' %}" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\upload_result.html:22: <a href="{% url 'upload_invoice' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\upload_result.html:191: class="btn btn-primary btn-sm"
+D:\Project_Zarya\templates\invoices\upload_result.html:294: class="btn btn-primary btn-sm"
+D:\Project_Zarya\templates\invoices\upload_result.html:322: <a href="{% url 'invoice_list' %}" class="btn btn-primary">
+D:\Project_Zarya\templates\invoices\upload_result.html:326: <a href="{% url 'upload_invoice' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\upload_result.html:330: <a href="{% url 'unmatched_counterparties' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\invoices\upload.html:76: <button class="btn btn-primary">
+D:\Project_Zarya\templates\users\user_admin_form.html:17: <a href="{% url 'user_admin_list' %}" class="btn btn-secondary">
+D:\Project_Zarya\templates\users\user_admin_form.html:56: <button type="submit" class="btn btn-primary">
+D:\Project_Zarya\templates\users\user_admin_list.html:17: <a href="{% url 'user_admin_create' %}" class="btn btn-primary">
+D:\Project_Zarya\templates\users\user_admin_list.html:44: <button type="submit" class="btn btn-secondary">
+D:\Project_Zarya\templates\users\user_admin_list.html:137: <a href="{% url 'user_admin_edit' item.id %}" class="btn btn-sm btn-secondary">

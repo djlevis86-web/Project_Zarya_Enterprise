@@ -1,0 +1,255 @@
+D:\Project_Zarya\static\css\components\badges.css:19: .status-badge {
+D:\Project_Zarya\static\css\components\badges.css:111: .counterparty-card-actions .btn {
+D:\Project_Zarya\static\css\components\badges.css:188: .upload-result-actions .btn {
+D:\Project_Zarya\static\css\components\badges.css:225: .status-badge {
+D:\Project_Zarya\static\css\components\badges.css:235: .btn,
+D:\Project_Zarya\static\css\components\badges.css:236: .status-badge,
+D:\Project_Zarya\static\css\components\badges.css:284: .payment-schedule-table .schedule-row-overdue .status-badge.status-rejected {
+D:\Project_Zarya\static\css\components\badges.css:290: .payment-registry-history-table .status-badge {
+D:\Project_Zarya\static\css\components\badges.css:294: .status-badge.status-draft {
+D:\Project_Zarya\static\css\components\badges.css:300: .status-badge.status-checked {
+D:\Project_Zarya\static\css\components\badges.css:306: .status-badge.status-exported {
+D:\Project_Zarya\static\css\components\badges.css:312: .status-badge.status-partially_paid {
+D:\Project_Zarya\static\css\components\badges.css:318: .status-badge.status-paid {
+D:\Project_Zarya\static\css\components\badges.css:324: .status-badge.status-cancelled {
+D:\Project_Zarya\static\css\components\badges.css:330: .payment-registry-history-table .status-badge {
+D:\Project_Zarya\static\css\components\badges.css:337: .payment-registry-draft-table .status-badge,
+D:\Project_Zarya\static\css\components\badges.css:338: .payment-registry-detail-table .status-badge {
+D:\Project_Zarya\static\css\components\buttons.css:9: .btn,
+D:\Project_Zarya\static\css\components\buttons.css:48: .btn:hover,
+D:\Project_Zarya\static\css\components\buttons.css:59: .btn-primary,
+D:\Project_Zarya\static\css\components\buttons.css:68: .btn-primary:hover,
+D:\Project_Zarya\static\css\components\buttons.css:76: .btn-secondary,
+D:\Project_Zarya\static\css\components\buttons.css:78: .btn-dark,
+D:\Project_Zarya\static\css\components\buttons.css:86: .btn-secondary:hover,
+D:\Project_Zarya\static\css\components\buttons.css:88: .btn-dark:hover,
+D:\Project_Zarya\static\css\components\buttons.css:96: .btn-danger,
+D:\Project_Zarya\static\css\components\buttons.css:98: .btn.is-danger,
+D:\Project_Zarya\static\css\components\buttons.css:106: .btn-danger:hover,
+D:\Project_Zarya\static\css\components\buttons.css:108: .btn.is-danger:hover,
+D:\Project_Zarya\static\css\components\buttons.css:116: .btn-sm {
+D:\Project_Zarya\static\css\components\buttons.css:123: .btn-xs {
+D:\Project_Zarya\static\css\components\buttons.css:130: .btn-lg {
+D:\Project_Zarya\static\css\components\buttons.css:137: .btn-block,
+D:\Project_Zarya\static\css\components\buttons.css:142: .btn:disabled,
+D:\Project_Zarya\static\css\components\buttons.css:143: .btn[disabled],
+D:\Project_Zarya\static\css\components\filters.css:153: .registry-actions .btn,
+D:\Project_Zarya\static\css\components\filters.css:154: .topbar-actions .btn,
+D:\Project_Zarya\static\css\components\filters.css:155: .upload-actions-row .btn,
+D:\Project_Zarya\static\css\components\filters.css:156: .import-actions .btn,
+D:\Project_Zarya\static\css\components\filters.css:157: .registry-filter-actions .btn {
+D:\Project_Zarya\static\css\components\filters.css:231: .audit-filter-actions .btn,
+D:\Project_Zarya\static\css\components\filters.css:337: .payment-schedule-filter-actions .btn {
+D:\Project_Zarya\static\css\components\filters.css:389: .payment-schedule-filter-actions .btn {
+D:\Project_Zarya\static\css\components\filters.css:398: .payment-schedule-filter-actions .btn {
+D:\Project_Zarya\static\css\components\filters.css:477: .registry-filter-card .registry-filter-actions .btn {
+D:\Project_Zarya\static\css\components\filters.css:509: .registry-filter-card .registry-filter-actions .btn {
+D:\Project_Zarya\static\css\components\filters.css:560: .payment-registry-history-filter .registry-filter-actions .btn {
+D:\Project_Zarya\static\css\components\forms.css:322: .form-actions .btn,
+D:\Project_Zarya\static\css\components\forms.css:323: .filter-actions .btn,
+D:\Project_Zarya\static\css\components\forms.css:324: .upload-actions .btn,
+D:\Project_Zarya\static\css\components\forms.css:325: .registry-actions .btn,
+D:\Project_Zarya\static\css\components\forms.css:326: .payment-actions .btn,
+D:\Project_Zarya\static\css\components\tables.css:242: .table .badge,
+D:\Project_Zarya\static\css\components\tables.css:243: .registry-table .badge,
+D:\Project_Zarya\static\css\components\tables.css:244: .zarya-table .badge,
+D:\Project_Zarya\static\css\components\tables.css:245: .data-table .badge,
+D:\Project_Zarya\static\css\components\tables.css:246: .list-table .badge,
+D:\Project_Zarya\static\css\components\tables.css:247: .table .status-badge,
+D:\Project_Zarya\static\css\components\tables.css:248: .registry-table .status-badge {
+D:\Project_Zarya\static\css\components\tables.css:293: .payment-mini .badge,
+D:\Project_Zarya\static\css\components\tables.css:294: .payment-mini-list .badge,
+D:\Project_Zarya\static\css\components\tables.css:295: .payment-mini-schedule .badge,
+D:\Project_Zarya\static\css\components\tables.css:296: .payment-mini-registry .badge,
+D:\Project_Zarya\static\css\components\tables.css:297: .payment-status-card .badge {
+D:\Project_Zarya\static\css\components\tables.css:320: .table-actions .btn,
+D:\Project_Zarya\static\css\components\tables.css:321: .table-action-stack .btn,
+D:\Project_Zarya\static\css\components\tables.css:322: .invoice-payment-action .btn,
+D:\Project_Zarya\static\css\components\tables.css:323: .invoice-table-action .btn,
+D:\Project_Zarya\static\css\components\tables.css:324: .payment-action-stack .btn,
+D:\Project_Zarya\static\css\components\tables.css:325: .registry-action-stack .btn {
+D:\Project_Zarya\static\css\components\tables.css:407: .invoice-table-compact td:nth-child(7) .btn {
+D:\Project_Zarya\static\css\components\tables.css:813: .invoice-payment-action-wrap .btn {
+D:\Project_Zarya\static\css\components\tables.css:855: .table td .btn.btn-sm,
+D:\Project_Zarya\static\css\components\tables.css:856: .registry-table td .btn.btn-sm {
+D:\Project_Zarya\static\css\features\ocr.css:313: .registry-actions .btn,
+D:\Project_Zarya\static\css\features\ocr.css:314: .topbar-actions .btn,
+D:\Project_Zarya\static\css\features\ocr.css:315: .upload-actions-row .btn,
+D:\Project_Zarya\static\css\features\ocr.css:316: .import-actions .btn,
+D:\Project_Zarya\static\css\features\ocr.css:317: .registry-filter-actions .btn {
+D:\Project_Zarya\static\css\features\ocr.css:420: .upload-result-actions .btn {
+D:\Project_Zarya\static\css\features\ocr.css:471: .btn:disabled,
+D:\Project_Zarya\static\css\features\ocr.css:472: .btn.is-loading {
+D:\Project_Zarya\static\css\features\ocr.css:877: .ocr-badge {
+D:\Project_Zarya\static\css\features\ocr.css:889: .ocr-badge-ok {
+D:\Project_Zarya\static\css\features\ocr.css:894: .ocr-badge-error {
+D:\Project_Zarya\static\css\features\ocr.css:899: .ocr-badge-warning {
+D:\Project_Zarya\static\css\features\partial-payments.css:14: .status-badge.status-partially_paid {
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:189: .invoice-payment-action-wrap .btn,
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:190: .table-actions-vertical .btn {
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:501: .payment-schedule-table td:last-child .btn,
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:779: .payment-schedule-table td:nth-child(8) .btn,
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:918: .table-actions-vertical .btn,
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:919: .invoice-payment-action-wrap .btn {
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:1128: .payment-schedule-table td:nth-child(8) .btn,
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:1290: .payment-mini .badge,
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:1291: .payment-mini-list .badge,
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:1292: .payment-mini-schedule .badge,
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:1293: .payment-mini-registry .badge,
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:1294: .payment-status-card .badge {
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:1312: .table-actions-vertical .btn,
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:1313: .invoice-payment-action-wrap .btn {
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:1366: .invoice-table-compact .invoice-actions-cell .btn {
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:1521: .invoice-table-compact .invoice-actions-cell .btn {
+D:\Project_Zarya\static\css\features\table-clean-baseline.css:1559: .payment-schedule-table .status-badge {
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:51: .page-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:52: .invoice-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:53: .bulk-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:54: .registry-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:55: .payment-registry-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:56: .payment-toolbar .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:57: .registry-toolbar .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:58: .actions-row .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:59: .panel-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:60: .card-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:61: .section-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:62: .toolbar-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:63: .header-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:64: .page-header-actions .btn {
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:82: .card-header > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:83: .section-header > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:84: .panel-header > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:85: .page-titlebar > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:86: .content-header > .btn {
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:97: .table-actions-vertical .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:98: .invoice-payment-action-wrap .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:99: .payment-registry-draft-table .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:100: .payment-registry-source-table .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:101: .payment-schedule-table .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:102: .invoice-table-compact .btn {
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:115: .page-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:116: .invoice-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:117: .bulk-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:118: .registry-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:119: .payment-registry-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:120: .payment-toolbar .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:121: .registry-toolbar .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:122: .actions-row .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:123: .panel-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:124: .card-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:125: .section-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:126: .toolbar-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:127: .header-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:128: .page-header-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:129: .card-header > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:130: .section-header > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:131: .panel-header > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:132: .page-titlebar > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:133: .content-header > .btn {
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:202: .page-header > .registry-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:203: .page-header > .page-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:204: .page-header > .topbar-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:205: .page-header > .payment-registry-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:206: .page-header > .upload-actions-row .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:207: .page-header > .import-actions .btn,
+D:\Project_Zarya\static\css\features\ui-polish-actions.css:208: .page-header > .actions-row .btn {
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:25: .badge,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:26: .status-badge,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:28: .ocr-badge,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:56: .badge-new,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:57: .status-badge.status-new {
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:65: .status-badge.status-approved,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:66: .status-badge.status-confirmed {
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:74: .status-badge.status-rejected,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:75: .status-badge.status-error {
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:85: .badge-unpaid,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:86: .badge-danger,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:95: .badge-partial,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:96: .badge-warning,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:105: .badge-paid,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:106: .badge-success,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:117: .badge-match,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:118: .badge-ok,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:127: .badge-mismatch,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:128: .badge-error,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:177: .payment-mini .badge,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:178: .payment-mini-list .badge,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:179: .payment-mini-schedule .badge,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:180: .payment-mini-registry .badge,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:181: .payment-status-card .badge,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:192: .invoice-table-compact .status-badge,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:193: .payment-schedule-table .status-badge,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:194: .payment-registry-draft-table .status-badge,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:195: .payment-registry-source-table .status-badge,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:196: .invoice-table-compact .badge,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:197: .payment-schedule-table .badge,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:198: .payment-registry-draft-table .badge,
+D:\Project_Zarya\static\css\features\ui-polish-badges.css:199: .payment-registry-source-table .badge {
+D:\Project_Zarya\static\css\features\ui-polish-filters.css:192: .tabs .btn,
+D:\Project_Zarya\static\css\features\ui-polish-filters.css:193: .tab-list .btn,
+D:\Project_Zarya\static\css\features\ui-polish-filters.css:194: .registry-tabs .btn,
+D:\Project_Zarya\static\css\features\ui-polish-filters.css:195: .payment-tabs .btn {
+D:\Project_Zarya\static\css\features\ui-polish-filters.css:366: .filters form > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-filters.css:368: .filters-panel form > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-filters.css:370: .filters-card form > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-filters.css:372: .filter-form > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-filters.css:374: .invoice-filters form > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-filters.css:376: .registry-filters form > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-filters.css:378: .schedule-filters form > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-filters.css:380: .payment-filters form > .btn,
+D:\Project_Zarya\static\css\features\ui-polish-filters.css:382: .search-filters form > .btn {
+D:\Project_Zarya\static\css\features\ui-polish-filters.css:536: .invoice-filter-clean-v5 .invoice-filter-actions-v5 .btn,
+D:\Project_Zarya\static\css\layout\sidebar.css:257: .counterparty-card-actions .btn {
+D:\Project_Zarya\static\css\layout\sidebar.css:282: .btn,
+D:\Project_Zarya\static\css\layout\sidebar.css:283: .status-badge,
+D:\Project_Zarya\static\css\layout\topbar.css:160: .registry-actions .btn,
+D:\Project_Zarya\static\css\layout\topbar.css:161: .topbar-actions .btn,
+D:\Project_Zarya\static\css\layout\topbar.css:162: .upload-actions-row .btn,
+D:\Project_Zarya\static\css\layout\topbar.css:163: .import-actions .btn,
+D:\Project_Zarya\static\css\layout\topbar.css:164: .registry-filter-actions .btn {
+D:\Project_Zarya\static\css\pages\audit.css:132: .audit-filter-actions .btn,
+D:\Project_Zarya\static\css\pages\audit.css:240: .audit-filter-actions .btn,
+D:\Project_Zarya\static\css\pages\counterparties.css:121: .counterparty-card-actions .btn {
+D:\Project_Zarya\static\css\pages\counterparties.css:238: .counterparty-card-actions .btn {
+D:\Project_Zarya\static\css\pages\invoice-list.css:91: .invoice-table-compact .btn-sm {
+D:\Project_Zarya\static\css\pages\invoice-list.css:233: .invoice-list-page td:nth-child(9) .btn,
+D:\Project_Zarya\static\css\pages\invoice-list.css:238: .invoices-page td:nth-child(9) .btn,
+D:\Project_Zarya\static\css\pages\invoice-list.css:299: .invoice-payment-action-cell .btn,
+D:\Project_Zarya\static\css\pages\invoice-list.css:378: .invoice-payment-action-cell .btn,
+D:\Project_Zarya\static\css\pages\invoice-list.css:464: .invoice-payment-action-cell .table-actions .btn,
+D:\Project_Zarya\static\css\pages\invoice-list.css:465: .invoice-payment-action-cell .table-actions-vertical .btn {
+D:\Project_Zarya\static\css\pages\payment-registry.css:147: .registry-actions .btn,
+D:\Project_Zarya\static\css\pages\payment-registry.css:148: .topbar-actions .btn,
+D:\Project_Zarya\static\css\pages\payment-registry.css:149: .upload-actions-row .btn,
+D:\Project_Zarya\static\css\pages\payment-registry.css:150: .import-actions .btn,
+D:\Project_Zarya\static\css\pages\payment-registry.css:151: .registry-filter-actions .btn {
+D:\Project_Zarya\static\css\pages\payment-registry.css:252: .registry-page-header .registry-actions .btn {
+D:\Project_Zarya\static\css\pages\payment-registry.css:282: .registry-table-header .registry-actions .btn {
+D:\Project_Zarya\static\css\pages\payment-registry.css:294: .payment-registry-add-form .btn {
+D:\Project_Zarya\static\css\pages\payment-registry.css:358: .payment-registry-bulk-actions .btn {
+D:\Project_Zarya\static\css\pages\payment-registry.css:374: .payment-registry-bulk-actions .btn {
+D:\Project_Zarya\static\css\pages\payment-registry.css:385: .payment-registry-remove-form .btn {
+D:\Project_Zarya\static\css\pages\payment-registry.css:404: .payment-registry-check-form .btn {
+D:\Project_Zarya\static\css\pages\payment-registry.css:544: .payment-registry-export-form .btn,
+D:\Project_Zarya\static\css\pages\payment-registry.css:545: .payment-registry-draft-actions .btn[disabled] {
+D:\Project_Zarya\static\css\pages\payment-registry.css:552: .payment-registry-draft-actions .btn[disabled] {
+D:\Project_Zarya\static\css\pages\payment-registry.css:600: .payment-registry-history-table .status-badge {
+D:\Project_Zarya\static\css\pages\payment-registry.css:624: .payment-registry-history-filter .registry-filter-actions .btn {
+D:\Project_Zarya\static\css\pages\payment-registry.css:731: .payment-registry-paid-form .btn {
+D:\Project_Zarya\static\css\pages\payment-registry.css:831: .payment-registry-history-table .status-badge {
+D:\Project_Zarya\static\css\pages\payment-registry.css:850: .payment-registry-cancel-form .btn {
+D:\Project_Zarya\static\css\pages\payment-registry.css:1053: .payment-registry-draft-table .status-badge,
+D:\Project_Zarya\static\css\pages\payment-registry.css:1054: .payment-registry-detail-table .status-badge {
+D:\Project_Zarya\static\css\pages\payment-registry.css:1060: .payment-registry-remove-form .btn {
+D:\Project_Zarya\static\css\pages\payment-registry.css:1066: .payment-registry-remove-form .btn:hover {
+D:\Project_Zarya\static\css\pages\payment-registry.css:1094: .payment-registry-detail-actions .btn[disabled] {
+D:\Project_Zarya\static\css\pages\payment-registry.css:1129: .payment-registry-export-form .btn,
+D:\Project_Zarya\static\css\pages\payment-registry.css:1130: .payment-registry-check-form .btn,
+D:\Project_Zarya\static\css\pages\payment-registry.css:1131: .payment-registry-draft-actions > .btn[disabled] {
+D:\Project_Zarya\static\css\pages\payment-registry.css:1139: .payment-registry-draft-actions > .btn[disabled] {
+D:\Project_Zarya\static\css\pages\payment-registry.css:1195: .payment-registry-page td:last-child .btn,
+D:\Project_Zarya\static\css\pages\payment-schedule.css:209: .payment-schedule-filter-actions .btn {
+D:\Project_Zarya\static\css\pages\payment-schedule.css:268: .payment-schedule-filter-actions .btn {
+D:\Project_Zarya\static\css\pages\payment-schedule.css:277: .payment-schedule-filter-actions .btn {
+D:\Project_Zarya\static\css\pages\payment-schedule.css:317: .payment-schedule-table .schedule-row-overdue .status-badge.status-rejected {
+D:\Project_Zarya\static\css\pages\payment-schedule.css:432: .payment-schedule-page td:last-child .btn,

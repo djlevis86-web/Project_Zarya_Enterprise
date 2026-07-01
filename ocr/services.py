@@ -1,19 +1,72 @@
+import os
 import re
+
 import pytesseract
 
 from PIL import Image
 from PIL import ImageFilter
 from PIL import ImageOps
 from pdf2image import convert_from_path
+from pdf2image.exceptions import PDFInfoNotInstalledError
+from pytesseract import TesseractNotFoundError
 
 
-pytesseract.pytesseract.tesseract_cmd = (
-    r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-)
+TESSERACT_CMD = os.getenv(
+    "TESSERACT_CMD",
+    "",
+).strip()
 
-POPPLER_PATH = (
-    r"D:\Release-26.02.0-0\poppler-26.02.0\Library\bin"
-)
+if TESSERACT_CMD:
+    pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
+
+
+POPPLER_PATH = os.getenv(
+    "POPPLER_PATH",
+    "",
+).strip() or None
+
+
+def get_poppler_kwargs():
+    if not POPPLER_PATH:
+        return {}
+
+    return {
+        "poppler_path": POPPLER_PATH,
+    }
+
+
+def convert_pdf_pages(pdf_path, dpi):
+    try:
+        return convert_from_path(
+            pdf_path,
+            dpi=dpi,
+            **get_poppler_kwargs(),
+        )
+
+    except PDFInfoNotInstalledError as error:
+        raise RuntimeError(
+            "Poppler не установлен или не найден в PATH. "
+            "Для OCR PDF нужны утилиты pdfinfo/pdftoppm. "
+            "На Windows укажи POPPLER_PATH в .env. "
+            "На Linux установи poppler-utils или запускай OCR-worker там, где Poppler доступен."
+        ) from error
+
+
+def image_to_text(image, config):
+    try:
+        return pytesseract.image_to_string(
+            image,
+            lang="rus+eng",
+            config=config,
+        )
+
+    except TesseractNotFoundError as error:
+        raise RuntimeError(
+            "Tesseract OCR не установлен или не найден в PATH. "
+            "На Windows укажи TESSERACT_CMD в .env. "
+            "На Linux установи tesseract и языковые пакеты rus/eng "
+            "или запускай OCR-worker там, где Tesseract доступен."
+        ) from error
 
 
 MONTH_FIXES = {
@@ -259,10 +312,9 @@ def extract_text_from_pdf(pdf_path):
 
     variants = []
 
-    pages = convert_from_path(
+    pages = convert_pdf_pages(
         pdf_path,
-        poppler_path=POPPLER_PATH,
-        dpi=300
+        dpi=300,
     )
 
     text_soft = ''
@@ -273,10 +325,9 @@ def extract_text_from_pdf(pdf_path):
             page
         )
 
-        page_text = pytesseract.image_to_string(
+        page_text = image_to_text(
             page,
-            lang='rus+eng',
-            config='--oem 3 --psm 4'
+            config="--oem 3 --psm 4",
         )
 
         text_soft += page_text + '\n'
@@ -309,10 +360,9 @@ def extract_text_from_pdf_hard(pdf_path):
 
     text = ''
 
-    pages = convert_from_path(
+    pages = convert_pdf_pages(
         pdf_path,
-        poppler_path=POPPLER_PATH,
-        dpi=600
+        dpi=600,
     )
 
     for page in pages:
@@ -321,10 +371,9 @@ def extract_text_from_pdf_hard(pdf_path):
             page
         )
 
-        page_text = pytesseract.image_to_string(
+        page_text = image_to_text(
             page,
-            lang='rus+eng',
-            config='--oem 3 --psm 6'
+            config="--oem 3 --psm 6",
         )
 
         text += page_text + '\n'
@@ -344,10 +393,9 @@ def extract_text_from_image(image_path):
         image
     )
 
-    text = pytesseract.image_to_string(
+    text = image_to_text(
         image,
-        lang='rus+eng',
-        config='--oem 3 --psm 6'
+        config="--oem 3 --psm 6",
     )
 
     return normalize_ocr_text(

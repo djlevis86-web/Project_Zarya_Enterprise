@@ -6,8 +6,8 @@ def get_github_version(repo_name):
     try:
 
         url = (
-            f"https://raw.githubusercontent.com/"
-            f"{repo_name}/main/VERSION"
+            f"https://api.github.com/repos/"
+            f"{repo_name}/tags"
         )
 
         response = requests.get(
@@ -17,12 +17,17 @@ def get_github_version(repo_name):
 
         if response.status_code == 200:
 
-            return (
-                response.text
-                .strip()
-            )
+            tags = response.json()
 
-    except Exception:
-        pass
+            if tags:
+
+                return tags[0]["name"]
+
+    except Exception as e:
+
+        print(
+            "GitHub version error:",
+            e
+        )
 
     return None

@@ -83,15 +83,15 @@ def sync_invoice_amount_verification(
 def apply_ocr_amount_to_invoice(
     invoice,
     raw_amount,
-    use_ocr_as_confirmed_amount=False,
+    prefill_amount_from_ocr=False,
 ):
     """
     Применяет OCR-сумму к счету и обновляет признаки проверки суммы.
 
     Правило:
     - OCR-суммы нет -> сумма требует проверки;
-    - use_ocr_as_confirmed_amount=True -> берем OCR-сумму как подтвержденную;
-    - сумма в системе пустая/нулевая -> берем OCR-сумму как подтвержденную;
+    - prefill_amount_from_ocr=True -> подставляем OCR-сумму, но не подтверждаем автоматически;
+    - сумма в системе пустая/нулевая -> подставляем OCR-сумму, но не подтверждаем автоматически;
     - сумма в системе есть -> сравниваем ее с OCR-суммой.
     """
 
@@ -117,17 +117,22 @@ def apply_ocr_amount_to_invoice(
             ) or Decimal("0.00")
 
             if (
-                use_ocr_as_confirmed_amount
+                prefill_amount_from_ocr
                 or current_amount == Decimal("0.00")
             ):
                 invoice.amount = ocr_amount
-                invoice.amount_verified = True
-                invoice.ocr_verified = True
-            else:
-                invoice.amount_verified = (
-                    current_amount == ocr_amount
+                invoice.amount_verified = False
+                invoice.ocr_verified = False
+
+                return (
+                    "OCR сумма автоматически подставлена. "
+                    "Требуется ручное подтверждение."
                 )
-                invoice.ocr_verified = invoice.amount_verified
+
+            invoice.amount_verified = (
+                current_amount == ocr_amount
+            )
+            invoice.ocr_verified = invoice.amount_verified
 
             return ""
 

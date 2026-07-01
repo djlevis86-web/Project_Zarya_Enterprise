@@ -323,13 +323,19 @@ def upload_invoice(request):
                     parsed
                 )
 
-                apply_ocr_amount_to_invoice(
+                amount_warning = apply_ocr_amount_to_invoice(
                     invoice,
                     parsed.get(
                         'amount'
                     ),
-                    use_ocr_as_confirmed_amount=True,
+                    prefill_amount_from_ocr=True,
                 )
+
+                if amount_warning:
+                    invoice.ocr_comment = (
+                        f"{invoice.ocr_comment or ''} "
+                        f"{amount_warning}"
+                    ).strip()
 
                 match_counterparty_after_upload_ocr(
                     invoice,

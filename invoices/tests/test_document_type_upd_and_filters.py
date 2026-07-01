@@ -27,6 +27,36 @@ class DocumentTypeOCRTests(TestCase):
         self.assertEqual(parsed["document_date"], date(2026, 7, 1))
 
 
+    def test_parse_real_upd_invoice_text_from_white_clover(self):
+        parsed = parse_invoice_data(
+            """
+            Универсальный Счет-фактура № 198 от 25 июня 2026 г.
+            передаточный документ
+            Продавец: ООО "БЕЛЫЙ КЛЕВЕР"
+            Покупатель: ОАО "Заря"
+            ИНН/КПП продавца: 5321188917/532101001
+            Документ об отгрузке Универсальный передаточный документ, № 198 от 25.06.2026
+            Всего к оплате (9) 136 363,64 X 13 636,36 150 000,00
+            """
+        )
+
+        self.assertEqual(
+            parsed["document_type"],
+            "upd",
+        )
+
+        self.assertEqual(
+            parsed["invoice_number"],
+            "198",
+        )
+
+        self.assertEqual(
+            parsed["document_date"],
+            date(2026, 6, 25),
+        )
+
+
+
 class InvoiceListDocumentFilterTests(TestCase):
     def setUp(self):
         User = get_user_model()

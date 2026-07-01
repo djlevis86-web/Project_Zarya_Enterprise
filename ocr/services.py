@@ -283,6 +283,13 @@ def ocr_score(text):
     score = 0
 
     keywords = [
+        'СЧЕТ-ФАКТУРА',
+        'СЧЁТ-ФАКТУРА',
+        'ПРОДАВЕЦ',
+        'ПОКУПАТЕЛЬ',
+        'ДОКУМЕНТ ОБ ОТГРУЗКЕ',
+        'ГРУЗООТПРАВИТЕЛЬ',
+        'ГРУЗОПОЛУЧАТЕЛЬ',
         'СЧЕТ',
         'СЧЁТ',
         'УПД',
@@ -313,42 +320,90 @@ def ocr_score(text):
 
 
 def extract_text_from_pdf(pdf_path):
-
+    # OCR_PDF_MULTI_PSM_V1
     variants = []
 
-    pages = convert_pdf_pages(
+    def collect_variants(pages, configs, use_hard_preprocess=False):
+        collected = []
+
+        for config in configs:
+            text = ''
+
+            for page in pages:
+                if use_hard_preprocess:
+                    prepared_page = preprocess_image_hard(
+                        page
+                    )
+                else:
+                    prepared_page = preprocess_image(
+                        page
+                    )
+
+                page_text = image_to_text(
+                    prepared_page,
+                    config=config,
+                )
+
+                text += page_text + '\n'
+
+            normalized = normalize_ocr_text(
+                text
+            )
+
+            if normalized:
+                collected.append(
+                    normalized
+                )
+
+        return collected
+
+    pages_300 = convert_pdf_pages(
         pdf_path,
         dpi=300,
     )
 
-    text_soft = ''
-
-    for page in pages:
-
-        page = preprocess_image(
-            page
+    variants.extend(
+        collect_variants(
+            pages_300,
+            configs=[
+                "--oem 3 --psm 3",
+                "--oem 3 --psm 4",
+                "--oem 3 --psm 11",
+            ],
+            use_hard_preprocess=False,
         )
-
-        page_text = image_to_text(
-            page,
-            config="--oem 3 --psm 4",
-        )
-
-        text_soft += page_text + '\n'
-
-    variants.append(
-        text_soft
     )
 
-    if ocr_score(text_soft) < 55:
-
-        text_hard = extract_text_from_pdf_hard(
-            pdf_path
+    if variants:
+        best_300 = max(
+            variants,
+            key=ocr_score
         )
 
-        variants.append(
-            text_hard
+        if ocr_score(best_300) >= 85:
+            return normalize_ocr_text(
+                best_300
+            )
+
+    pages_600 = convert_pdf_pages(
+        pdf_path,
+        dpi=600,
+    )
+
+    variants.extend(
+        collect_variants(
+            pages_600,
+            configs=[
+                "--oem 3 --psm 3",
+                "--oem 3 --psm 6",
+                "--oem 3 --psm 11",
+            ],
+            use_hard_preprocess=True,
         )
+    )
+
+    if not variants:
+        return ''
 
     best_text = max(
         variants,
@@ -358,7 +413,6 @@ def extract_text_from_pdf(pdf_path):
     return normalize_ocr_text(
         best_text
     )
-
 
 def extract_text_from_pdf_hard(pdf_path):
 
@@ -478,6 +532,12 @@ def parse_invoice_number(text):
     text = str(text)
 
     patterns = [
+
+        r"Счет-фактура\s*№\s*(.+?)\s+от\s+\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4}",
+        r"Сч[её]т-фактура\s*№\s*(.+?)\s+от\s+\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4}",
+        r"Универсальн\w*\s+Счет-фактура\s*№\s*(.+?)\s+от\s+\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4}",
+        r"Универсальн\w*\s+Сч[её]т-фактура\s*№\s*(.+?)\s+от\s+\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4}",
+        r"Документ\s+об\s+отгрузке.*?№\s*(.+?)\s+от\s+\d{1,2}[./-]\d{1,2}[./-]\d{4}",
 
         r"УПД\s*№\s*(.+?)\s+от\s+\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4}",
         r"УПД\s*№\s*(.+?)\s+от\s+\d{1,2}[./-]\d{1,2}[./-]\d{4}",

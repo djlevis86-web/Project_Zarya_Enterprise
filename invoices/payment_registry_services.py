@@ -14,8 +14,40 @@ ACTIVE_REGISTRY_STATUSES = (
     PaymentRegistry.STATUS_PARTIALLY_PAID,
 )
 
+EDITABLE_REGISTRY_STATUSES = (
+    PaymentRegistry.STATUS_DRAFT,
+    PaymentRegistry.STATUS_CHECKED,
+    PaymentRegistry.STATUS_EXPORTED,
+)
+
+LOCKED_REGISTRY_STATUSES = (
+    PaymentRegistry.STATUS_PARTIALLY_PAID,
+    PaymentRegistry.STATUS_PAID,
+    PaymentRegistry.STATUS_CANCELLED,
+)
+
 
 MONEY_QUANT = Decimal("0.01")
+
+
+def payment_registry_can_be_edited(registry):
+    return registry.status in EDITABLE_REGISTRY_STATUSES
+
+
+def mark_payment_registry_dirty_after_edit(registry):
+    """
+    Если уже выгруженный/проверенный реестр изменили,
+    возвращаем его в черновик: файл нужно выгрузить заново.
+    """
+
+    if registry.status in (
+        PaymentRegistry.STATUS_CHECKED,
+        PaymentRegistry.STATUS_EXPORTED,
+    ):
+        registry.status = PaymentRegistry.STATUS_DRAFT
+        registry.save(update_fields=("status",))
+
+    return registry
 
 
 def normalize_registry_money(value):
@@ -112,7 +144,7 @@ def get_or_create_draft_payment_registry(user):
     registry = (
         PaymentRegistry.objects
         .filter(
-            status=PaymentRegistry.STATUS_DRAFT,
+            status__in=EDITABLE_REGISTRY_STATUSES,
             created_by=user,
         )
         .order_by("-created_at")

@@ -114,6 +114,23 @@ def apply_ocr_identity_to_invoice(invoice, parsed):
         'vendor'
     )
 
+    parsed_document_type = parsed.get(
+        'document_type'
+    )
+
+    if parsed_document_type in (
+        Invoice.DOCUMENT_TYPE_INVOICE,
+        Invoice.DOCUMENT_TYPE_UPD,
+    ):
+        invoice.document_type = parsed_document_type
+
+    parsed_document_date = parsed.get(
+        'document_date'
+    )
+
+    if parsed_document_date:
+        invoice.document_date = parsed_document_date
+
     return number_warning
 
 

@@ -31,18 +31,25 @@ class InvoiceForm(forms.ModelForm):
         model = Invoice
 
         fields = [
+            'document_type',
             'title',
             'description',
             'amount',
         ]
 
         labels = {
-            'title': 'Название счета',
+            'document_type': 'Тип документа',
+            'title': 'Название документа',
             'description': 'Описание',
             'amount': 'Сумма',
         }
 
         widgets = {
+            'document_type': forms.Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
             'title': forms.TextInput(
                 attrs={
                     'class': 'form-control',
@@ -87,11 +94,13 @@ class InvoiceEditForm(forms.ModelForm):
         model = Invoice
 
         fields = [
+            'document_type',
             'title',
             'description',
             'vendor',
             'invoice_number',
             'invoice_date',
+            'document_date',
             'amount',
 
             'planned_payment_date',
@@ -102,6 +111,10 @@ class InvoiceEditForm(forms.ModelForm):
         ]
 
         widgets = {
+
+            'document_type': forms.Select(
+                attrs={'class': 'form-control'}
+            ),
 
             'title': forms.TextInput(
                 attrs={'class': 'form-control'}
@@ -124,6 +137,13 @@ class InvoiceEditForm(forms.ModelForm):
 
             'invoice_date': forms.TextInput(
                 attrs={'class': 'form-control'}
+            ),
+
+            'document_date': forms.DateInput(
+                attrs={
+                    'class': 'form-control',
+                    'type': 'date',
+                }
             ),
 
             'amount': forms.NumberInput(

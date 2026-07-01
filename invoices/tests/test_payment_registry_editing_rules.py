@@ -86,6 +86,42 @@ class PaymentRegistryEditingRulesTests(TestCase):
         self.assertEqual(item.status, PaymentRegistryItem.STATUS_CANCELLED)
         self.assertEqual(registry.status, PaymentRegistry.STATUS_DRAFT)
 
+
+    def test_exported_registry_detail_shows_edit_actions(self):
+        registry, item = self._registry_with_item(PaymentRegistry.STATUS_EXPORTED)
+
+        self.client.force_login(self.user)
+
+        response = self.client.get(
+            reverse("payment_registry_detail", args=[registry.id])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Редактировать состав")
+        self.assertContains(response, "Добавить счета")
+        self.assertContains(
+            response,
+            reverse("remove_from_payment_registry_item", args=[item.id]),
+        )
+
+    def test_paid_registry_detail_hides_edit_actions(self):
+        registry, item = self._registry_with_item(PaymentRegistry.STATUS_PAID)
+
+        self.client.force_login(self.user)
+
+        response = self.client.get(
+            reverse("payment_registry_detail", args=[registry.id])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Редактировать состав")
+        self.assertNotContains(response, "Добавить счета")
+        self.assertNotContains(
+            response,
+            reverse("remove_from_payment_registry_item", args=[item.id]),
+        )
+
+
     def test_cannot_remove_item_from_paid_registry(self):
         registry, item = self._registry_with_item(PaymentRegistry.STATUS_PAID)
 

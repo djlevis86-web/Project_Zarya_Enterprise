@@ -80,12 +80,17 @@ def sync_invoice_amount_verification(
     return changed, message
 
 
-def apply_ocr_amount_to_invoice(invoice, raw_amount):
+def apply_ocr_amount_to_invoice(
+    invoice,
+    raw_amount,
+    use_ocr_as_confirmed_amount=False,
+):
     """
     Применяет OCR-сумму к счету и обновляет признаки проверки суммы.
 
     Правило:
     - OCR-суммы нет -> сумма требует проверки;
+    - use_ocr_as_confirmed_amount=True -> берем OCR-сумму как подтвержденную;
     - сумма в системе пустая/нулевая -> берем OCR-сумму как подтвержденную;
     - сумма в системе есть -> сравниваем ее с OCR-суммой.
     """
@@ -111,7 +116,10 @@ def apply_ocr_amount_to_invoice(invoice, raw_amount):
                 invoice.amount
             ) or Decimal("0.00")
 
-            if current_amount == Decimal("0.00"):
+            if (
+                use_ocr_as_confirmed_amount
+                or current_amount == Decimal("0.00")
+            ):
                 invoice.amount = ocr_amount
                 invoice.amount_verified = True
                 invoice.ocr_verified = True

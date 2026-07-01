@@ -327,7 +327,8 @@ def upload_invoice(request):
                     invoice,
                     parsed.get(
                         'amount'
-                    )
+                    ),
+                    use_ocr_as_confirmed_amount=True,
                 )
 
                 match_counterparty_after_upload_ocr(

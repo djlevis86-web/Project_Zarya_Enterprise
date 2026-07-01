@@ -100,9 +100,26 @@
                 <p>
                     {{ registry.title|default:"Реестр оплаты" }}
                 </p>
+
+                {# PAYMENT_REGISTRY_DETAIL_EXPORTED_NOTICE_V1 #}
+                {% if can_edit_registry and registry.status == "exported" %}
+                    <p class="muted">
+                        Реестр уже выгружался. Если изменить состав, выгрузи его заново.
+                    </p>
+                {% endif %}
             </div>
 
             <div class="payment-registry-detail-actions">
+                {# PAYMENT_REGISTRY_DETAIL_EDIT_ACTIONS_V1 #}
+                {% if can_edit_registry %}
+                    <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
+                        Редактировать состав
+                    </a>
+
+                    <a href="{% url 'payment_schedule' %}" class="btn btn-secondary">
+                        Добавить счета
+                    </a>
+                {% endif %}
                 {% if request.user.is_staff or request.user.is_superuser or can_cancel_payment_registry %}
                     <form
                         method="post"
@@ -362,7 +379,14 @@
                         <th>
                             Ответственный
                         </th>
-                    </tr>
+                    
+                        {# PAYMENT_REGISTRY_DETAIL_ACTIONS_HEADER_V1 #}
+                        {% if can_edit_registry %}
+                            <th>
+                                Действия
+                            </th>
+                        {% endif %}
+</tr>
                 </thead>
 
                 <tbody>
@@ -423,7 +447,28 @@
                                     </span>
                                 {% endif %}
                             </td>
-                        </tr>
+                        
+                            {# PAYMENT_REGISTRY_DETAIL_REMOVE_ITEM_V1 #}
+                            {% if can_edit_registry %}
+                                <td>
+                                    <form
+                                        method="post"
+                                        action="{% url 'remove_from_payment_registry_item' item.id %}"
+                                        class="payment-registry-remove-form"
+                                    >
+                                        {% csrf_token %}
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Убрать этот документ из реестра? Если реестр уже выгружался, его нужно будет выгрузить заново.');"
+                                        >
+                                            Удалить
+                                        </button>
+                                    </form>
+                                </td>
+                            {% endif %}
+</tr>
                     {% empty %}
                         <tr>
                             <td colspan="6" class="empty-table">

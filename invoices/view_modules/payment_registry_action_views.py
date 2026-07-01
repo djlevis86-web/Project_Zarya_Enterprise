@@ -1,3 +1,4 @@
+from ..payment_registry_services import EDITABLE_REGISTRY_STATUSES, mark_payment_registry_dirty_after_edit
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
@@ -136,7 +137,7 @@ def add_to_payment_registry(request):
 @login_required
 @require_payment_registry_permission(
     user_can_manage_payment_registry,
-    'Нет прав на удаление счетов из черновика реестра.',
+    'Нет прав на удаление счетов из редактируемого реестра.',
 )
 def remove_from_payment_registry_item(request, item_id):
 
@@ -144,7 +145,7 @@ def remove_from_payment_registry_item(request, item_id):
 
         messages.warning(
             request,
-            'Удалять счета из черновика можно только из формы.'
+            'Удалять счета из реестра можно только из формы.'
         )
 
         return redirect(
@@ -162,7 +163,7 @@ def remove_from_payment_registry_item(request, item_id):
         )
         .filter(
             id=item_id,
-            registry__status=PaymentRegistry.STATUS_DRAFT,
+            registry__status__in=EDITABLE_REGISTRY_STATUSES,
             registry__created_by=request.user,
         )
         .exclude(
@@ -192,13 +193,17 @@ def remove_from_payment_registry_item(request, item_id):
         )
     )
 
+    mark_payment_registry_dirty_after_edit(
+        registry
+    )
+
     recalculate_payment_registry(
         registry
     )
 
     messages.success(
         request,
-        f'Счёт #{invoice_id} удалён из черновика реестра №{registry.id}.'
+        f'Счёт #{invoice_id} удалён из реестра №{registry.id}. Если реестр уже выгружался, выгрузи его заново.'
     )
 
     return redirect(
@@ -231,7 +236,7 @@ def check_payment_registry_view(request, registry_id):
         .filter(
             id=registry_id,
             created_by=request.user,
-            status=PaymentRegistry.STATUS_DRAFT,
+            status__in=EDITABLE_REGISTRY_STATUSES,
         )
         .first()
     )
@@ -240,7 +245,7 @@ def check_payment_registry_view(request, registry_id):
 
         messages.warning(
             request,
-            'Черновик реестра не найден.'
+            'Редактируемый реестр не найден.'
         )
 
         return redirect(
@@ -432,3 +437,4 @@ def cancel_payment_registry_view(request, registry_id):
         'payment_registry_detail',
         registry_id=registry.id,
     )
+

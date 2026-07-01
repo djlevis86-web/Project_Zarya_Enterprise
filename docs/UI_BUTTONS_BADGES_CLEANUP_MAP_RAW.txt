@@ -1,0 +1,197 @@
+===== .\static\css\components\buttons.css =====
+9: .btn,
+48: .btn:hover,
+59: .btn-primary,
+68: .btn-primary:hover,
+76: .btn-secondary,
+78: .btn-dark,
+86: .btn-secondary:hover,
+88: .btn-dark:hover,
+96: .btn-danger,
+98: .btn.is-danger,
+106: .btn-danger:hover,
+108: .btn.is-danger:hover,
+116: .btn-sm {
+123: .btn-xs {
+130: .btn-lg {
+137: .btn-block,
+142: .btn:disabled,
+143: .btn[disabled],
+144: .button:disabled,
+145: .button[disabled],
+146: .action-button:disabled,
+147: .action-button[disabled],
+148: .primary-btn:disabled,
+149: .secondary-btn:disabled,
+150: .danger-btn:disabled {
+
+===== .\static\css\components\badges.css =====
+19: .status-badge {
+111: .counterparty-card-actions .btn {
+188: .upload-result-actions .btn {
+225: .status-badge {
+235: .btn,
+236: .status-badge,
+284: .payment-schedule-table .schedule-row-overdue .status-badge.status-rejected {
+290: .payment-registry-history-table .status-badge {
+294: .status-badge.status-draft {
+300: .status-badge.status-checked {
+306: .status-badge.status-exported {
+312: .status-badge.status-partially_paid {
+318: .status-badge.status-paid {
+324: .status-badge.status-cancelled {
+330: .payment-registry-history-table .status-badge {
+337: .payment-registry-draft-table .status-badge,
+338: .payment-registry-detail-table .status-badge {
+
+===== .\static\css\components\filters.css =====
+153: .registry-actions .btn,
+154: .topbar-actions .btn,
+155: .upload-actions-row .btn,
+156: .import-actions .btn,
+157: .registry-filter-actions .btn {
+231: .audit-filter-actions .btn,
+337: .payment-schedule-filter-actions .btn {
+389: .payment-schedule-filter-actions .btn {
+398: .payment-schedule-filter-actions .btn {
+477: .registry-filter-card .registry-filter-actions .btn {
+509: .registry-filter-card .registry-filter-actions .btn {
+560: .payment-registry-history-filter .registry-filter-actions .btn {
+
+===== .\static\css\components\forms.css =====
+299: /* Disabled */
+301: .form-control:disabled,
+302: input:disabled,
+303: select:disabled,
+304: textarea:disabled {
+322: .form-actions .btn,
+323: .filter-actions .btn,
+324: .upload-actions .btn,
+325: .registry-actions .btn,
+326: .payment-actions .btn,
+424: .main select:disabled,
+425: .page select:disabled,
+426: .registry-page select:disabled,
+427: .form-card select:disabled,
+428: .card select:disabled,
+429: .filters-card select:disabled,
+430: .filter-card select:disabled,
+431: .filter-panel select:disabled,
+432: .form-group select:disabled,
+433: .field-group select:disabled {
+
+===== .\static\css\components\tables.css =====
+242: .table .badge,
+243: .registry-table .badge,
+244: .zarya-table .badge,
+245: .data-table .badge,
+246: .list-table .badge,
+247: .table .status-badge,
+248: .registry-table .status-badge {
+293: .payment-mini .badge,
+294: .payment-mini-list .badge,
+295: .payment-mini-schedule .badge,
+296: .payment-mini-registry .badge,
+297: .payment-status-card .badge {
+320: .table-actions .btn,
+321: .table-action-stack .btn,
+322: .invoice-payment-action .btn,
+323: .invoice-table-action .btn,
+324: .payment-action-stack .btn,
+325: .registry-action-stack .btn {
+407: .invoice-table-compact td:nth-child(7) .btn {
+813: .invoice-payment-action-wrap .btn {
+855: .table td .btn.btn-sm,
+856: .registry-table td .btn.btn-sm {
+
+===== .\static\css\features\ocr.css =====
+313: .registry-actions .btn,
+314: .topbar-actions .btn,
+315: .upload-actions-row .btn,
+316: .import-actions .btn,
+317: .registry-filter-actions .btn {
+420: .upload-result-actions .btn {
+471: .btn:disabled,
+472: .btn.is-loading {
+877: .ocr-badge {
+889: .ocr-badge-ok {
+894: .ocr-badge-error {
+899: .ocr-badge-warning {
+1033: .ocr-disabled-checkbox {
+1038: .ocr-disabled-add-note {
+
+===== .\static\css\features\table-clean-baseline.css =====
+189: .invoice-payment-action-wrap .btn,
+190: .table-actions-vertical .btn {
+501: .payment-schedule-table td:last-child .btn,
+779: .payment-schedule-table td:nth-child(8) .btn,
+918: .table-actions-vertical .btn,
+919: .invoice-payment-action-wrap .btn {
+1128: .payment-schedule-table td:nth-child(8) .btn,
+1290: .payment-mini .badge,
+1291: .payment-mini-list .badge,
+1292: .payment-mini-schedule .badge,
+1293: .payment-mini-registry .badge,
+1294: .payment-status-card .badge {
+1312: .table-actions-vertical .btn,
+1313: .invoice-payment-action-wrap .btn {
+1366: .invoice-table-compact .invoice-actions-cell .btn {
+1521: .invoice-table-compact .invoice-actions-cell .btn {
+1559: .payment-schedule-table .status-badge {
+
+===== .\static\css\features\ui-polish-actions.css =====
+51: .page-actions .btn,
+52: .invoice-actions .btn,
+53: .bulk-actions .btn,
+54: .registry-actions .btn,
+55: .payment-registry-actions .btn,
+56: .payment-toolbar .btn,
+57: .registry-toolbar .btn,
+58: .actions-row .btn,
+59: .panel-actions .btn,
+60: .card-actions .btn,
+61: .section-actions .btn,
+62: .toolbar-actions .btn,
+63: .header-actions .btn,
+64: .page-header-actions .btn {
+82: .card-header > .btn,
+83: .section-header > .btn,
+84: .panel-header > .btn,
+85: .page-titlebar > .btn,
+86: .content-header > .btn {
+97: .table-actions-vertical .btn,
+98: .invoice-payment-action-wrap .btn,
+99: .payment-registry-draft-table .btn,
+100: .payment-registry-source-table .btn,
+101: .payment-schedule-table .btn,
+102: .invoice-table-compact .btn {
+115: .page-actions .btn,
+116: .invoice-actions .btn,
+117: .bulk-actions .btn,
+118: .registry-actions .btn,
+119: .payment-registry-actions .btn,
+120: .payment-toolbar .btn,
+121: .registry-toolbar .btn,
+122: .actions-row .btn,
+123: .panel-actions .btn,
+124: .card-actions .btn,
+125: .section-actions .btn,
+126: .toolbar-actions .btn,
+127: .header-actions .btn,
+128: .page-header-actions .btn,
+129: .card-header > .btn,
+130: .section-header > .btn,
+131: .panel-header > .btn,
+132: .page-titlebar > .btn,
+133: .content-header > .btn {
+202: .page-header > .registry-actions .btn,
+203: .page-header > .page-actions .btn,
+204: .page-header > .topbar-actions .btn,
+205: .page-header > .payment-registry-actions .btn,
+206: .page-header > .upload-actions-row .btn,
+207: .page-header > .import-actions .btn,
+208: .page-header > .actions-row .btn {
+
+===== .\static\css\features\partial-payments.css =====
+14: .status-badge.status-partially_paid {
+

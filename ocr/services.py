@@ -9,6 +9,7 @@ from PIL import ImageOps
 from pdf2image import convert_from_path
 from pdf2image.exceptions import PDFInfoNotInstalledError
 from pytesseract import TesseractNotFoundError
+from datetime import date
 
 
 TESSERACT_CMD = os.getenv(
@@ -284,6 +285,9 @@ def ocr_score(text):
     keywords = [
         'СЧЕТ',
         'СЧЁТ',
+        'УПД',
+        'УНИВЕРСАЛЬНЫЙ',
+        'ПЕРЕДАТОЧНЫЙ',
         'ОПЛАТ',
         'ПОСТАВЩИК',
         'ИСПОЛНИТЕЛЬ',
@@ -474,6 +478,11 @@ def parse_invoice_number(text):
     text = str(text)
 
     patterns = [
+
+        r"УПД\s*№\s*(.+?)\s+от\s+\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4}",
+        r"УПД\s*№\s*(.+?)\s+от\s+\d{1,2}[./-]\d{1,2}[./-]\d{4}",
+        r"Универсальн\w*\s+передаточн\w*\s+документ\w*\s*№\s*(.+?)\s+от\s+\d{1,2}[./-]\d{1,2}[./-]\d{4}",
+        r"Документ\s+об\s+отгрузке\s*№\s*(.+?)\s+от\s+\d{1,2}[./-]\d{1,2}[./-]\d{4}",
 
         r"Сч[её]т\s+на\s+оплату\s*№\s*(.+?)\s+от\s+\d{1,2}\s+[А-Яа-яA-Za-z]+\s+\d{4}",
 
@@ -1232,6 +1241,97 @@ def extract_kpp(text):
     return None
 
 
+
+def detect_document_type(text):
+    normalized = normalize_ocr_text(text or '').lower()
+
+    upd_markers = (
+        'упд',
+        'универсальный передаточный документ',
+        'универсальный передаточный',
+        'документ об отгрузке',
+        'передаточный документ',
+    )
+
+    for marker in upd_markers:
+        if marker in normalized:
+            return 'upd'
+
+    return 'invoice'
+
+
+def parse_document_date_value(value):
+    if not value:
+        return None
+
+    value = str(value).strip().lower()
+
+    month_map = {
+        'января': 1,
+        'январь': 1,
+        'февраля': 2,
+        'февраль': 2,
+        'марта': 3,
+        'март': 3,
+        'апреля': 4,
+        'апрель': 4,
+        'мая': 5,
+        'май': 5,
+        'июня': 6,
+        'июнь': 6,
+        'июля': 7,
+        'июль': 7,
+        'августа': 8,
+        'август': 8,
+        'сентября': 9,
+        'сентябрь': 9,
+        'октября': 10,
+        'октябрь': 10,
+        'ноября': 11,
+        'ноябрь': 11,
+        'декабря': 12,
+        'декабрь': 12,
+    }
+
+    match = re.search(
+        r'(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})',
+        value,
+        re.IGNORECASE
+    )
+
+    if match:
+        day = int(match.group(1))
+        month = int(match.group(2))
+        year = int(match.group(3))
+
+        try:
+            return date(year, month, day)
+        except ValueError:
+            return None
+
+    match = re.search(
+        r'(\d{1,2})\s+([а-яё]+)\s+(\d{4})',
+        value,
+        re.IGNORECASE
+    )
+
+    if match:
+        day = int(match.group(1))
+        month_name = match.group(2).lower()
+        year = int(match.group(3))
+        month = month_map.get(month_name)
+
+        if not month:
+            return None
+
+        try:
+            return date(year, month, day)
+        except ValueError:
+            return None
+
+    return None
+
+
 def parse_invoice_data(text):
 
     text = normalize_ocr_text(
@@ -1244,6 +1344,8 @@ def parse_invoice_data(text):
             'amount': None,
             'invoice_number': None,
             'invoice_date': None,
+            'document_date': None,
+            'document_type': 'invoice',
             'vendor': None,
             'inn': None,
             'kpp': None,
@@ -1533,6 +1635,14 @@ def parse_invoice_data(text):
         text
     )
 
+    document_type = detect_document_type(
+        text
+    )
+
+    document_date = parse_document_date_value(
+        invoice_date
+    )
+
     amount = parse_amount(
         text
     )
@@ -1549,6 +1659,8 @@ def parse_invoice_data(text):
         'amount': amount,
         'invoice_number': invoice_number,
         'invoice_date': invoice_date,
+        'document_date': document_date,
+        'document_type': document_type,
         'vendor': None,
         'inn': inn,
         'kpp': kpp,

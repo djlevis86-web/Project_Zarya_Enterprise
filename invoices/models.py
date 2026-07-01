@@ -282,6 +282,14 @@ class Invoice(models.Model):
     STATUS_PAID = 'paid'
     STATUS_REJECTED = 'rejected'
 
+    DOCUMENT_TYPE_INVOICE = 'invoice'
+    DOCUMENT_TYPE_UPD = 'upd'
+
+    DOCUMENT_TYPE_CHOICES = [
+        (DOCUMENT_TYPE_INVOICE, 'Счёт'),
+        (DOCUMENT_TYPE_UPD, 'УПД'),
+    ]
+
     STATUS_CHOICES = [
         (STATUS_NEW, 'Новый'),
         (STATUS_REVIEW, 'На проверке'),
@@ -306,6 +314,14 @@ class Invoice(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='invoices'
+    )
+
+    document_type = models.CharField(
+        max_length=20,
+        choices=DOCUMENT_TYPE_CHOICES,
+        default=DOCUMENT_TYPE_INVOICE,
+        db_index=True,
+        verbose_name='Тип документа'
     )
 
     upload_batch = models.ForeignKey(
@@ -388,6 +404,13 @@ class Invoice(models.Model):
         max_length=255,
         blank=True,
         null=True
+    )
+
+    document_date = models.DateField(
+        null=True,
+        blank=True,
+        db_index=True,
+        verbose_name='Дата документа'
     )
 
     vendor = models.CharField(

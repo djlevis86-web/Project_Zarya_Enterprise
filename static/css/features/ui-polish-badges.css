@@ -31,7 +31,7 @@
 .registry-badge,
 .priority-badge {
     min-height: var(--z-badge-height);
-    width: max-content;
+    width: auto;
     max-width: 100%;
 
     display: inline-flex;
@@ -46,8 +46,10 @@
     font-weight: var(--z-badge-font-weight);
     line-height: 1.15;
     letter-spacing: -0.01em;
+    text-align: center;
 
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 /* ---------- Состояния счетов ---------- */

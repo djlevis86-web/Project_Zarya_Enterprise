@@ -2016,3 +2016,130 @@
     }
 }
 /* PAYMENT-REGISTRY-TABLE-POLISH-V1-END */
+
+/* OCR-QUEUE-TABLE-POLISH-V1-START */
+/*
+ * OCR-очередь:
+ * - таблица имеет 9 реальных колонок;
+ * - старый CSS задавал ширины только первым 6;
+ * - выравниваем даты, источник, попытки и сообщение;
+ * - не трогаем шаблон.
+ */
+
+.ocr-queue-table {
+    min-width: 1240px;
+    table-layout: fixed;
+}
+
+.ocr-queue-table th,
+.ocr-queue-table td {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.ocr-queue-table th:nth-child(1),
+.ocr-queue-table td:nth-child(1) {
+    width: 64px;
+    white-space: nowrap;
+}
+
+.ocr-queue-table th:nth-child(2),
+.ocr-queue-table td:nth-child(2) {
+    width: 120px;
+}
+
+.ocr-queue-table th:nth-child(3),
+.ocr-queue-table td:nth-child(3) {
+    width: 260px;
+}
+
+.ocr-queue-table th:nth-child(4),
+.ocr-queue-table td:nth-child(4) {
+    width: 110px;
+}
+
+.ocr-queue-table th:nth-child(5),
+.ocr-queue-table td:nth-child(5) {
+    width: 118px;
+}
+
+.ocr-queue-table th:nth-child(6),
+.ocr-queue-table td:nth-child(6) {
+    width: 78px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.ocr-queue-table th:nth-child(7),
+.ocr-queue-table td:nth-child(7),
+.ocr-queue-table th:nth-child(8),
+.ocr-queue-table td:nth-child(8) {
+    width: 132px;
+    white-space: nowrap;
+}
+
+.ocr-queue-table th:nth-child(9),
+.ocr-queue-table td:nth-child(9) {
+    width: 280px;
+}
+
+.ocr-queue-table td:nth-child(3) a {
+    display: inline-flex;
+    max-width: 100%;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.ocr-queue-table td:nth-child(3) .muted {
+    display: block;
+    max-width: 32ch;
+    margin-top: 4px;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: normal;
+}
+
+.ocr-queue-table .status-badge {
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.25;
+}
+
+.ocr-queue-table .queue-message,
+.ocr-queue-table .queue-message-error {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: normal;
+    line-height: 1.35;
+}
+
+@media (max-width: 1280px) {
+    .ocr-queue-table {
+        min-width: 1180px;
+    }
+
+    .ocr-queue-table th,
+    .ocr-queue-table td {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .ocr-queue-table th:nth-child(3),
+    .ocr-queue-table td:nth-child(3) {
+        width: 235px;
+    }
+
+    .ocr-queue-table th:nth-child(7),
+    .ocr-queue-table td:nth-child(7),
+    .ocr-queue-table th:nth-child(8),
+    .ocr-queue-table td:nth-child(8) {
+        width: 124px;
+    }
+
+    .ocr-queue-table th:nth-child(9),
+    .ocr-queue-table td:nth-child(9) {
+        width: 260px;
+    }
+}
+/* OCR-QUEUE-TABLE-POLISH-V1-END */

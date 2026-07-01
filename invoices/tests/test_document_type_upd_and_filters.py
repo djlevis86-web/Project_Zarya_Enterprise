@@ -57,6 +57,49 @@ class DocumentTypeOCRTests(TestCase):
 
 
 
+    def test_parse_real_upd_invoice_text_extracts_vendor_and_requisites(self):
+        parsed = parse_invoice_data(
+            """
+            Универсальный Счет-фактура № 198 от 25 июня 2026 г.
+            передаточный документ
+            Продавец: ООО "БЕЛЫЙ КЛЕВЕР" (2) Покупатель: ОАО "Заря" (6)
+            ИННЖПП продавца: 5321188917/532101001
+            Документ об отгрузке Универсальный передаточный документ, № 198 от 25.06.2026
+            Всего к оплате (9) 136 363,64 X 13 636,36 150 000,00
+            """
+        )
+
+        self.assertEqual(
+            parsed["document_type"],
+            "upd",
+        )
+
+        self.assertEqual(
+            parsed["invoice_number"],
+            "198",
+        )
+
+        self.assertEqual(
+            parsed["document_date"],
+            date(2026, 6, 25),
+        )
+
+        self.assertEqual(
+            parsed["vendor"],
+            "ООО БЕЛЫЙ КЛЕВЕР",
+        )
+
+        self.assertEqual(
+            parsed["inn"],
+            "5321188917",
+        )
+
+        self.assertEqual(
+            parsed["kpp"],
+            "532101001",
+        )
+
+
 class InvoiceListDocumentFilterTests(TestCase):
     def setUp(self):
         User = get_user_model()
@@ -133,6 +176,23 @@ class InvoiceListDocumentFilterTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Счёт для фильтра")
         self.assertNotContains(response, "УПД для фильтра")
+
+    def test_invoice_list_shows_amount_requires_manual_verification(self):
+        self.invoice.ocr_amount = Decimal("1000.00")
+        self.invoice.amount_verified = False
+        self.invoice.save(
+            update_fields=[
+                "ocr_amount",
+                "amount_verified",
+            ]
+        )
+
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("invoice_list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Требует проверки")
 
     def test_invoice_list_shows_uploader_name(self):
         self.client.force_login(self.user)

@@ -513,7 +513,11 @@
 
                                 {% if invoice.amount_verified %}
                                     <span class="ocr-inline ocr-inline-ok">
-                                        ✓ совпадает
+                                        ✓ проверена
+                                    </span>
+                                {% elif invoice.amount == invoice.ocr_amount %}
+                                    <span class="ocr-inline ocr-inline-warning">
+                                        Требует проверки
                                     </span>
                                 {% else %}
                                     <span class="ocr-inline ocr-inline-error">

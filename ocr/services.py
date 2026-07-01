@@ -1392,6 +1392,119 @@ def parse_document_date_value(value):
     return None
 
 
+
+def parse_upd_seller_vendor(text):
+    if not text:
+        return None
+
+    normalized_text = normalize_ocr_text(
+        text
+    )
+
+    lines = [
+        line.strip()
+        for line in normalized_text.splitlines()
+        if line.strip()
+    ]
+
+    for line in lines:
+        if not re.search(r'\bПродавец\b', line, re.IGNORECASE):
+            continue
+
+        match = re.search(
+            r'\bПродавец\b\s*[:\-]?\s*(.+)$',
+            line,
+            re.IGNORECASE
+        )
+
+        if not match:
+            continue
+
+        candidate = match.group(1).strip()
+
+        candidate = re.split(
+            r'\s+(?:\(\d+\)|Покупатель\s*:|Адрес\s*:|ИНН|КПП)\b',
+            candidate,
+            maxsplit=1,
+            flags=re.IGNORECASE
+        )[0].strip()
+
+        vendor = extract_vendor_name_from_candidate(
+            candidate
+        )
+
+        if vendor:
+            return vendor
+
+        vendor = clean_vendor(
+            candidate
+        )
+
+        if vendor:
+            return vendor
+
+    patterns = [
+        r'Продавец\s*:\s*(.+?)(?:\s+\(\d+\)|\s+Покупатель\s*:|\s+Адрес\s*:|\s+ИНН|\s+КПП|$)',
+        r'Наименование\s+экономического\s+субъекта.*?((?:ООО|ОАО|АО|ПАО)\s+"?[^"\n;,]+\"?)',
+    ]
+
+    for pattern in patterns:
+        match = re.search(
+            pattern,
+            normalized_text,
+            re.IGNORECASE | re.DOTALL
+        )
+
+        if not match:
+            continue
+
+        candidate = match.group(1).strip()
+
+        vendor = extract_vendor_name_from_candidate(
+            candidate
+        )
+
+        if vendor:
+            return vendor
+
+        vendor = clean_vendor(
+            candidate
+        )
+
+        if vendor:
+            return vendor
+
+    return None
+
+
+def parse_upd_seller_requisites(text):
+    if not text:
+        return None, None
+
+    normalized_text = normalize_ocr_text(
+        text
+    )
+
+    patterns = [
+        r'ИНН\s*/\s*КПП\s+продавца\s*:\s*(\d{10,12})\s*/\s*(\d{9})',
+        r'ИННКПП\s+продавца\s*:\s*(\d{10,12})\s*/\s*(\d{9})',
+        r'ИННЖПП\s+продавца\s*:\s*(\d{10,12})\s*/\s*(\d{9})',
+        r'ИННЖКПП\s+продавца\s*:\s*(\d{10,12})\s*/\s*(\d{9})',
+        r'ИНН[^\n]{0,20}продавца\s*:\s*(\d{10,12})\s*/\s*(\d{9})',
+    ]
+
+    for pattern in patterns:
+        match = re.search(
+            pattern,
+            normalized_text,
+            re.IGNORECASE
+        )
+
+        if match:
+            return match.group(1), match.group(2)
+
+    return None, None
+
 def parse_invoice_data(text):
 
     text = normalize_ocr_text(
@@ -1715,13 +1828,30 @@ def parse_invoice_data(text):
         text
     )
 
+    upd_vendor = parse_upd_seller_vendor(
+        text
+    )
+
+    if upd_vendor:
+        vendor = upd_vendor
+
+    upd_inn, upd_kpp = parse_upd_seller_requisites(
+        text
+    )
+
+    if upd_inn:
+        inn = upd_inn
+
+    if upd_kpp:
+        kpp = upd_kpp
+
     return {
         'amount': amount,
         'invoice_number': invoice_number,
         'invoice_date': invoice_date,
         'document_date': document_date,
         'document_type': document_type,
-        'vendor': None,
+        'vendor': vendor,
         'inn': inn,
         'kpp': kpp,
     }

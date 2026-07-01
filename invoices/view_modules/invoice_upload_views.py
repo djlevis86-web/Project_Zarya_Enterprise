@@ -8,6 +8,7 @@ from audit.models import AuditLog
 from audit.services import log_action
 from ..forms import InvoiceForm
 from ..log_service import create_invoice_log
+from ..counterparty_service import get_or_create_counterparty_from_invoice
 from ..models import Invoice, InvoiceUploadBatch
 from ..ocr_processing_service import apply_ocr_identity_to_invoice, get_duplicate_invoice_by_ocr_identity, read_and_parse_invoice_file
 from ..ocr_verification_service import apply_ocr_amount_to_invoice
@@ -68,6 +69,39 @@ def render_upload_invoice_form(request, form):
             ),
         }
     )
+
+
+def match_counterparty_after_upload_ocr(invoice, user):
+    try:
+        invoice.counterparty = None
+
+        counterparty = get_or_create_counterparty_from_invoice(
+            invoice
+        )
+
+        invoice.counterparty = counterparty
+
+        invoice.save(
+            update_fields=[
+                "counterparty",
+                "counterparty_match_status",
+                "counterparty_match_comment",
+            ]
+        )
+
+        if counterparty:
+            create_invoice_log(
+                invoice,
+                user,
+                f"Контрагент сопоставлен после OCR при загрузке: {counterparty.name}"
+            )
+
+    except Exception as match_error:
+        create_invoice_log(
+            invoice,
+            user,
+            f"Ошибка сопоставления контрагента после OCR при загрузке: {match_error}"
+        )
 
 @login_required
 def upload_invoice(request):
@@ -294,6 +328,11 @@ def upload_invoice(request):
                     parsed.get(
                         'amount'
                     )
+                )
+
+                match_counterparty_after_upload_ocr(
+                    invoice,
+                    request.user,
                 )
 
                 invoice.save()

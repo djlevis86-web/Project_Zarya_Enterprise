@@ -2351,3 +2351,31 @@
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.14);
 }
 /* INVOICE-LIST-ROW-ACTIONS-POLISH-V1-END */
+
+/* TABLE-ROW-PRIMARY-ACTIONS-POLISH-V1-START */
+/*
+ * Общие строковые действия в таблицах:
+ * - кнопка "Открыть" внутри строки не должна выглядеть как главный CTA страницы;
+ * - верхние primary-кнопки не затрагиваются, потому что правило работает только внутри td.
+ */
+
+.registry-table td .btn-primary.btn-sm,
+.table td .btn-primary.btn-sm {
+    background: rgba(34, 197, 94, 0.16);
+    border-color: rgba(34, 197, 94, 0.28);
+    color: #bbf7d0;
+    box-shadow: none;
+}
+
+.registry-table td .btn-primary.btn-sm:hover,
+.table td .btn-primary.btn-sm:hover {
+    background: rgba(34, 197, 94, 0.22);
+    border-color: rgba(34, 197, 94, 0.38);
+    color: #ffffff;
+}
+
+.registry-table td .btn-primary.btn-sm:focus,
+.table td .btn-primary.btn-sm:focus {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.14);
+}
+/* TABLE-ROW-PRIMARY-ACTIONS-POLISH-V1-END */

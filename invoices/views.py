@@ -48,6 +48,10 @@ from .view_modules.invoice_detail_views import (
     invoice_detail,
 )
 
+from .view_modules.invoice_delete_views import (
+    delete_invoice,
+)
+
 from .view_modules.invoice_status_comment_views import (
     add_comment,
     change_invoice_status,
@@ -115,6 +119,7 @@ __all__ = (
     'upload_batches',
     'upload_batch_detail',
     'invoice_detail',
+    'delete_invoice',
     'add_invoice_payment',
     'cancel_invoice_payment',
     'repeat_ocr',

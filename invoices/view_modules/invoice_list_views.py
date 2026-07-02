@@ -18,7 +18,9 @@ def invoice_list(request):
         .select_related(
             'user'
         )
-        .all()
+        .filter(
+            is_deleted=False
+        )
     )
 
     if not request.user.is_staff:
@@ -194,7 +196,9 @@ def invoice_list(request):
         page_number
     )
 
-    stats_queryset = Invoice.objects.all()
+    stats_queryset = Invoice.objects.filter(
+        is_deleted=False
+    )
 
     if not request.user.is_staff:
 

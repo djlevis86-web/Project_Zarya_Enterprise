@@ -607,12 +607,28 @@ def get_or_create_counterparty_from_invoice(invoice):
 
     if not inn:
 
+        counterparty = find_counterparty_by_name(
+            invoice.vendor
+        )
+
+        if counterparty:
+
+            invoice.counterparty_match_status = (
+                Invoice.COUNTERPARTY_MATCH_FOUND
+            )
+
+            invoice.counterparty_match_comment = (
+                'Контрагент найден в справочнике 1С/ручном справочнике по названию поставщика'
+            )
+
+            return counterparty
+
         invoice.counterparty_match_status = (
             Invoice.COUNTERPARTY_MATCH_NOT_FOUND
         )
 
         invoice.counterparty_match_comment = (
-            'OCR не определил ИНН поставщика'
+            'OCR не определил ИНН поставщика, контрагент по названию не найден'
         )
 
         return None
@@ -630,6 +646,22 @@ def get_or_create_counterparty_from_invoice(invoice):
 
         invoice.counterparty_match_comment = (
             f'Контрагент найден в справочнике 1С/ручном справочнике по ИНН {inn}'
+        )
+
+        return counterparty
+
+    counterparty = find_counterparty_by_name(
+        invoice.vendor
+    )
+
+    if counterparty:
+
+        invoice.counterparty_match_status = (
+            Invoice.COUNTERPARTY_MATCH_FOUND
+        )
+
+        invoice.counterparty_match_comment = (
+            'Контрагент найден в справочнике 1С/ручном справочнике по названию поставщика после неудачного поиска по ИНН/КПП'
         )
 
         return counterparty

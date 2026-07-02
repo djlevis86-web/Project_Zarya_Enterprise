@@ -92,7 +92,7 @@ def apply_ocr_amount_to_invoice(
     - OCR-суммы нет -> сумма требует проверки;
     - prefill_amount_from_ocr=True -> подставляем OCR-сумму, но не подтверждаем автоматически;
     - сумма в системе пустая/нулевая -> подставляем OCR-сумму, но не подтверждаем автоматически;
-    - сумма в системе есть -> сравниваем ее с OCR-суммой.
+    - сумма в системе есть -> сравниваем ее с OCR-суммой, но не подтверждаем автоматически.
     """
 
     if raw_amount:
@@ -129,10 +129,14 @@ def apply_ocr_amount_to_invoice(
                     "Требуется ручное подтверждение."
                 )
 
-            invoice.amount_verified = (
-                current_amount == ocr_amount
-            )
-            invoice.ocr_verified = invoice.amount_verified
+            invoice.amount_verified = False
+            invoice.ocr_verified = False
+
+            if current_amount == ocr_amount:
+                return (
+                    "OCR-сумма совпадает с суммой в системе. "
+                    "Требуется ручное подтверждение."
+                )
 
             return ""
 

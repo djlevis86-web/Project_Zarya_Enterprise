@@ -431,13 +431,29 @@
                                         <span class="ocr-badge ocr-badge-ok">
                                             Сумма подтверждена
                                         </span>
-                                    {% else %}
+                                    {% elif item.invoice.ocr_amount %}
                                         <span class="ocr-badge ocr-badge-error">
                                             Сумма требует проверки
                                         </span>
 
                                         <div class="ocr-amount-warning-text">
                                             Оплата заблокирована
+                                        </div>
+                                    {% elif item.invoice.ocr_text %}
+                                        <span class="ocr-badge ocr-badge-error">
+                                            OCR выполнен, сумма не найдена
+                                        </span>
+
+                                        <div class="ocr-amount-warning-text">
+                                            Оплата заблокирована: сумма не найдена
+                                        </div>
+                                    {% else %}
+                                        <span class="ocr-badge ocr-badge-error">
+                                            OCR не выполнен
+                                        </span>
+
+                                        <div class="ocr-amount-warning-text">
+                                            Оплата заблокирована: OCR не выполнен
                                         </div>
                                     {% endif %}
                                 </div>
@@ -817,14 +833,30 @@
                                     <span class="ocr-badge ocr-badge-ok">
                                         Сумма подтверждена
                                     </span>
-                                {% else %}
+                                {% elif invoice.ocr_amount %}
                                     <span class="ocr-badge ocr-badge-error">
                                         Сумма требует проверки
                                     </span>
 
-                                        <div class="ocr-amount-warning-text">
-                                            Оплата заблокирована
-                                        </div>
+                                    <div class="ocr-amount-warning-text">
+                                        Оплата заблокирована
+                                    </div>
+                                {% elif invoice.ocr_text %}
+                                    <span class="ocr-badge ocr-badge-error">
+                                        OCR выполнен, сумма не найдена
+                                    </span>
+
+                                    <div class="ocr-amount-warning-text">
+                                        Оплата заблокирована: сумма не найдена
+                                    </div>
+                                {% else %}
+                                    <span class="ocr-badge ocr-badge-error">
+                                        OCR не выполнен
+                                    </span>
+
+                                    <div class="ocr-amount-warning-text">
+                                        Оплата заблокирована: OCR не выполнен
+                                    </div>
                                 {% endif %}
                             </div>
                         </td>

@@ -451,6 +451,61 @@ def find_counterparty_by_requisites(inn, kpp=None):
     return None
 
 
+
+def normalize_counterparty_word_set(value):
+    normalized = normalize_for_search(
+        value
+    )
+
+    legal_words = {
+        'ООО',
+        'ОАО',
+        'АО',
+        'ПАО',
+        'ЗАО',
+        'ИП',
+        'ОБЩЕСТВО',
+        'ОГРАНИЧЕННОЙ',
+        'ОТВЕТСТВЕННОСТЬЮ',
+        'ИНДИВИДУАЛЬНЫЙ',
+        'ПРЕДПРИНИМАТЕЛЬ',
+    }
+
+    words = [
+        word
+        for word in normalized.split()
+        if len(word) >= 2 and word not in legal_words
+    ]
+
+    return set(words)
+
+
+def counterparty_names_match_by_words(vendor_name, candidate_name):
+    if not vendor_name or not candidate_name:
+        return False
+
+    vendor_words = normalize_counterparty_word_set(
+        vendor_name
+    )
+
+    candidate_words = normalize_counterparty_word_set(
+        candidate_name
+    )
+
+    if not vendor_words or not candidate_words:
+        return False
+
+    if vendor_words == candidate_words:
+        return True
+
+    if len(vendor_words) >= 2 and vendor_words.issubset(candidate_words):
+        return True
+
+    if len(candidate_words) >= 2 and candidate_words.issubset(vendor_words):
+        return True
+
+    return False
+
 def find_counterparty_by_name(vendor_name):
 
     if not vendor_name:
@@ -511,6 +566,26 @@ def find_counterparty_by_name(vendor_name):
             if (
                 len(normalized_candidate) >= 8
                 and normalized_candidate in normalized_vendor
+            ):
+
+                return counterparty
+
+    for counterparty in candidates:
+
+        candidate_names = [
+            counterparty.name,
+            counterparty.full_name,
+        ]
+
+        for candidate_name in candidate_names:
+
+            if not candidate_name:
+
+                continue
+
+            if counterparty_names_match_by_words(
+                vendor_name,
+                candidate_name,
             ):
 
                 return counterparty

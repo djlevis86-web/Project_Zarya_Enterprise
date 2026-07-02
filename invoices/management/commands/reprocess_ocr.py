@@ -170,20 +170,13 @@ class Command(BaseCommand):
 
                             invoice.amount = invoice.ocr_amount
 
-                            invoice.amount_verified = True
-                            invoice.ocr_verified = True
+                            invoice.amount_verified = False
+                            invoice.ocr_verified = False
 
                         else:
 
-                            invoice.amount_verified = (
-                                float(invoice.amount)
-                                ==
-                                float(invoice.ocr_amount)
-                            )
-
-                            invoice.ocr_verified = (
-                                invoice.amount_verified
-                            )
+                            invoice.amount_verified = False
+                            invoice.ocr_verified = False
 
                     except Exception:
 

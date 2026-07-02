@@ -7,6 +7,7 @@ from .views import (
     upload_batches,
     upload_batch_detail,
     invoice_detail,
+    delete_invoice,
     add_invoice_payment,
     cancel_invoice_payment,
     repeat_ocr,
@@ -222,6 +223,12 @@ urlpatterns = [
         'counterparties/<int:counterparty_id>/edit/',
         counterparty_edit,
         name='counterparty_edit'
+    ),
+
+    path(
+        '<int:invoice_id>/delete/',
+        delete_invoice,
+        name='delete_invoice'
     ),
 
     path(

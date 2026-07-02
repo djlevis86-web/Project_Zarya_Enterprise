@@ -26,6 +26,22 @@
             >
                 Редактировать
             </a>
+
+            <form
+                method="post"
+                action="{% url 'delete_invoice' invoice.id %}"
+                class="registry-action-form"
+                onsubmit="return confirm('Удалить счёт #{{ invoice.id }} из рабочих списков? Запись останется в базе для истории.');"
+            >
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="btn btn-secondary"
+                >
+                    Удалить
+                </button>
+            </form>
         {% endif %}
 
         <a

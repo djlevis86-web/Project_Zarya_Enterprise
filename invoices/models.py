@@ -473,6 +473,27 @@ class Invoice(models.Model):
         auto_now=True
     )
 
+    is_deleted = models.BooleanField(
+        default=False,
+        db_index=True,
+        verbose_name='Удалён'
+    )
+
+    deleted_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name='Дата удаления'
+    )
+
+    deleted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='deleted_invoices',
+        verbose_name='Кто удалил'
+    )
+
     def __str__(self):
         return f"{self.title} ({self.user.username})"
 

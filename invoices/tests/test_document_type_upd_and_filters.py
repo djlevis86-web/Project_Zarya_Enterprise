@@ -192,7 +192,7 @@ class InvoiceListDocumentFilterTests(TestCase):
         response = self.client.get(reverse("invoice_list"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Требует проверки")
+        self.assertContains(response, "Сумма требует проверки")
 
     def test_invoice_list_shows_uploader_name(self):
         self.client.force_login(self.user)
@@ -202,3 +202,4 @@ class InvoiceListDocumentFilterTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Загрузил")
         self.assertContains(response, "Иван Петров")
+

@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from audit.models import AuditLog
 from audit.services import log_action
-from ..forms import InvoiceForm
+from ..forms import UploadInvoiceForm
 from ..log_service import create_invoice_log
 from ..counterparty_service import get_or_create_counterparty_from_invoice
 from ..models import Invoice, InvoiceUploadBatch
@@ -144,7 +144,7 @@ def upload_invoice(request):
             request
         )
 
-        form = InvoiceForm(
+        form = UploadInvoiceForm(
             request.POST,
             request.FILES
         )
@@ -153,15 +153,30 @@ def upload_invoice(request):
 
             messages.error(
                 request,
-                'Проверьте поля формы.'
+                'Загрузка не выполнена. Проверьте ошибки ниже.'
             )
+
+            for field_name, errors in form.errors.items():
+                field = form.fields.get(
+                    field_name
+                )
+
+                label = field.label if field else field_name
+
+                for error in errors:
+                    messages.error(
+                        request,
+                        f'{label}: {error}'
+                    )
 
             return render_upload_invoice_form(
                 request,
                 form
             )
 
-        files = request.FILES.getlist(
+        files = form.cleaned_data.get(
+            'files'
+        ) or request.FILES.getlist(
             'files'
         )
 
@@ -251,8 +266,17 @@ def upload_invoice(request):
             invoice = Invoice.objects.create(
                 user=request.user,
                 upload_batch=batch,
-                title=form.cleaned_data.get(
-                    'title'
+                document_type=(
+                    form.cleaned_data.get(
+                        'document_type'
+                    )
+                    or Invoice.DOCUMENT_TYPE_INVOICE
+                ),
+                title=(
+                    form.cleaned_data.get(
+                        'title'
+                    )
+                    or uploaded_file.name
                 ),
                 description=form.cleaned_data.get(
                     'description'
@@ -472,9 +496,10 @@ def upload_invoice(request):
             'upload_result'
         )
 
-    form = InvoiceForm()
+    form = UploadInvoiceForm()
 
     return render_upload_invoice_form(
         request,
         form
     )
+

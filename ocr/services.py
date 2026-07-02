@@ -33,21 +33,21 @@ POPPLER_PATH = os.getenv(
 MAX_OCR_IMAGE_PIXELS = int(
     os.getenv(
         "MAX_OCR_IMAGE_PIXELS",
-        "18000000"
+        "12000000"
     )
 )
 
 MAX_OCR_IMAGE_SIDE = int(
     os.getenv(
         "MAX_OCR_IMAGE_SIDE",
-        "4200"
+        "3200"
     )
 )
 
 OCR_TESSERACT_TIMEOUT = int(
     os.getenv(
         "OCR_TESSERACT_TIMEOUT",
-        "45"
+        "25"
     )
 )
 
@@ -60,7 +60,15 @@ OCR_PDF_DPI_VARIANTS = [
 OCR_PDF_MAX_PAGES = int(
     os.getenv(
         "OCR_PDF_MAX_PAGES",
-        "5"
+        "3"
+    )
+)
+
+
+OCR_MAX_TESSERACT_CALLS = int(
+    os.getenv(
+        "OCR_MAX_TESSERACT_CALLS",
+        "8"
     )
 )
 
@@ -221,6 +229,18 @@ def convert_pdf_pages(pdf_path, dpi):
     return pages
 
 
+def is_ocr_timeout_error(error):
+    message = str(
+        error
+    ).lower()
+
+    return (
+        "timeout" in message
+        or "timed out" in message
+        or "превысил лимит времени" in message
+    )
+
+
 def image_to_text(image, config):
     try:
         image = safe_prepare_image_for_ocr(
@@ -243,7 +263,7 @@ def image_to_text(image, config):
         ) from error
 
     except RuntimeError as error:
-        if "timeout" in str(error).lower():
+        if is_ocr_timeout_error(error):
             raise RuntimeError(
                 "OCR превысил лимит времени на распознавание. "
                 "Файл сохранен, но OCR нужно повторить отдельно или уменьшить качество изображения."
@@ -504,6 +524,7 @@ def ocr_score(text):
 
 def extract_text_from_pdf(pdf_path):
     variants = []
+    tesseract_calls = 0
 
     page_count = min(
         get_pdf_page_count(
@@ -545,6 +566,9 @@ def extract_text_from_pdf(pdf_path):
             1,
             page_count + 1
         ):
+            if tesseract_calls >= OCR_MAX_TESSERACT_CALLS:
+                break
+
             page = convert_pdf_page(
                 pdf_path,
                 dpi=dpi,
@@ -555,7 +579,12 @@ def extract_text_from_pdf(pdf_path):
                 continue
 
             for config in configs:
+                if tesseract_calls >= OCR_MAX_TESSERACT_CALLS:
+                    break
+
                 try:
+                    tesseract_calls += 1
+
                     prepared_page = preprocess_image(
                         page.copy()
                     )
@@ -567,7 +596,14 @@ def extract_text_from_pdf(pdf_path):
 
                     texts_by_config[config] += page_text + '\n'
 
-                except Exception:
+                except Exception as error:
+                    if is_ocr_timeout_error(error):
+                        raise RuntimeError(
+                            "OCR остановлен по таймауту Tesseract. "
+                            "Файл сохранен, но автоматическое распознавание прервано, "
+                            "чтобы не зависал OCR-worker."
+                        ) from error
+
                     continue
 
         for config_text in texts_by_config.values():
@@ -592,6 +628,9 @@ def extract_text_from_pdf(pdf_path):
                 return normalize_ocr_text(
                     best_text
                 )
+
+        if tesseract_calls >= OCR_MAX_TESSERACT_CALLS:
+            break
 
     if not variants:
         return ''

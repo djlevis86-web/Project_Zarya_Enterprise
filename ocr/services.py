@@ -1,4 +1,5 @@
 import os
+import math
 import re
 from decimal import Decimal, InvalidOperation
 
@@ -7,7 +8,7 @@ import pytesseract
 from PIL import Image
 from PIL import ImageFilter
 from PIL import ImageOps
-from pdf2image import convert_from_path
+from pdf2image import convert_from_path, pdfinfo_from_path
 from pdf2image.exceptions import PDFInfoNotInstalledError
 from pytesseract import TesseractNotFoundError
 from datetime import date
@@ -28,21 +29,120 @@ POPPLER_PATH = os.getenv(
 ).strip() or None
 
 
-def get_poppler_kwargs():
-    if not POPPLER_PATH:
-        return {}
 
-    return {
-        "poppler_path": POPPLER_PATH,
-    }
+MAX_OCR_IMAGE_PIXELS = int(
+    os.getenv(
+        "MAX_OCR_IMAGE_PIXELS",
+        "18000000"
+    )
+)
+
+MAX_OCR_IMAGE_SIDE = int(
+    os.getenv(
+        "MAX_OCR_IMAGE_SIDE",
+        "4200"
+    )
+)
+
+OCR_TESSERACT_TIMEOUT = int(
+    os.getenv(
+        "OCR_TESSERACT_TIMEOUT",
+        "45"
+    )
+)
+
+OCR_PDF_DPI_VARIANTS = [
+    180,
+    150,
+    120,
+]
+
+OCR_PDF_MAX_PAGES = int(
+    os.getenv(
+        "OCR_PDF_MAX_PAGES",
+        "5"
+    )
+)
+
+Image.MAX_IMAGE_PIXELS = max(
+    Image.MAX_IMAGE_PIXELS or 0,
+    MAX_OCR_IMAGE_PIXELS * 4
+)
 
 
-def convert_pdf_pages(pdf_path, dpi):
+def get_image_resample_filter():
+    if hasattr(Image, "Resampling"):
+        return Image.Resampling.LANCZOS
+
+    return Image.LANCZOS
+
+
+def safe_prepare_image_for_ocr(image):
+    if not image:
+        return image
+
+    width, height = image.size
+    pixels = width * height
+
+    if (
+        pixels > MAX_OCR_IMAGE_PIXELS
+        or width > MAX_OCR_IMAGE_SIDE
+        or height > MAX_OCR_IMAGE_SIDE
+    ):
+        scale = min(
+            MAX_OCR_IMAGE_SIDE / max(width, 1),
+            MAX_OCR_IMAGE_SIDE / max(height, 1),
+            math.sqrt(MAX_OCR_IMAGE_PIXELS / max(pixels, 1)),
+        )
+
+        scale = min(
+            scale,
+            1
+        )
+
+        new_width = max(
+            1,
+            int(width * scale)
+        )
+
+        new_height = max(
+            1,
+            int(height * scale)
+        )
+
+        image.thumbnail(
+            (
+                new_width,
+                new_height,
+            ),
+            resample=get_image_resample_filter()
+        )
+    else:
+        image.load()
+
+    if image.mode not in [
+        "RGB",
+        "L",
+    ]:
+        image = image.convert(
+            "RGB"
+        )
+
+    return image
+
+
+def get_pdf_page_count(pdf_path):
     try:
-        return convert_from_path(
+        info = pdfinfo_from_path(
             pdf_path,
-            dpi=dpi,
             **get_poppler_kwargs(),
+        )
+
+        return int(
+            info.get(
+                "Pages",
+                1
+            )
         )
 
     except PDFInfoNotInstalledError as error:
@@ -53,13 +153,85 @@ def convert_pdf_pages(pdf_path, dpi):
             "На Linux установи poppler-utils или запускай OCR-worker там, где Poppler доступен."
         ) from error
 
+    except Exception:
+        return 1
+
+
+def convert_pdf_page(pdf_path, dpi, page_number):
+    try:
+        pages = convert_from_path(
+            pdf_path,
+            dpi=dpi,
+            first_page=page_number,
+            last_page=page_number,
+            thread_count=1,
+            grayscale=True,
+            **get_poppler_kwargs(),
+        )
+
+        if not pages:
+            return None
+
+        return safe_prepare_image_for_ocr(
+            pages[0]
+        )
+
+    except PDFInfoNotInstalledError as error:
+        raise RuntimeError(
+            "Poppler не установлен или не найден в PATH. "
+            "Для OCR PDF нужны утилиты pdfinfo/pdftoppm. "
+            "На Windows укажи POPPLER_PATH в .env. "
+            "На Linux установи poppler-utils или запускай OCR-worker там, где Poppler доступен."
+        ) from error
+
+def get_poppler_kwargs():
+    if not POPPLER_PATH:
+        return {}
+
+    return {
+        "poppler_path": POPPLER_PATH,
+    }
+
+
+def convert_pdf_pages(pdf_path, dpi):
+    page_count = min(
+        get_pdf_page_count(
+            pdf_path
+        ),
+        OCR_PDF_MAX_PAGES
+    )
+
+    pages = []
+
+    for page_number in range(
+        1,
+        page_count + 1
+    ):
+        page = convert_pdf_page(
+            pdf_path,
+            dpi=dpi,
+            page_number=page_number
+        )
+
+        if page:
+            pages.append(
+                page
+            )
+
+    return pages
+
 
 def image_to_text(image, config):
     try:
+        image = safe_prepare_image_for_ocr(
+            image
+        )
+
         return pytesseract.image_to_string(
             image,
             lang="rus+eng",
             config=config,
+            timeout=OCR_TESSERACT_TIMEOUT,
         )
 
     except TesseractNotFoundError as error:
@@ -69,6 +241,15 @@ def image_to_text(image, config):
             "На Linux установи tesseract и языковые пакеты rus/eng "
             "или запускай OCR-worker там, где Tesseract доступен."
         ) from error
+
+    except RuntimeError as error:
+        if "timeout" in str(error).lower():
+            raise RuntimeError(
+                "OCR превысил лимит времени на распознавание. "
+                "Файл сохранен, но OCR нужно повторить отдельно или уменьшить качество изображения."
+            ) from error
+
+        raise
 
 
 MONTH_FIXES = {
@@ -322,87 +503,95 @@ def ocr_score(text):
 
 
 def extract_text_from_pdf(pdf_path):
-    # OCR_PDF_MULTI_PSM_V1
     variants = []
 
-    def collect_variants(pages, configs, use_hard_preprocess=False):
-        collected = []
+    page_count = min(
+        get_pdf_page_count(
+            pdf_path
+        ),
+        OCR_PDF_MAX_PAGES
+    )
 
-        for config in configs:
-            text = ''
+    configs_by_dpi = {
+        180: [
+            "--oem 3 --psm 3",
+            "--oem 3 --psm 4",
+            "--oem 3 --psm 11",
+        ],
+        150: [
+            "--oem 3 --psm 3",
+            "--oem 3 --psm 6",
+        ],
+        120: [
+            "--oem 3 --psm 3",
+            "--oem 3 --psm 6",
+        ],
+    }
 
-            for page in pages:
-                if use_hard_preprocess:
-                    prepared_page = preprocess_image_hard(
-                        page
-                    )
-                else:
+    for dpi in OCR_PDF_DPI_VARIANTS:
+        configs = configs_by_dpi.get(
+            dpi,
+            [
+                "--oem 3 --psm 3",
+            ]
+        )
+
+        texts_by_config = {
+            config: ''
+            for config in configs
+        }
+
+        for page_number in range(
+            1,
+            page_count + 1
+        ):
+            page = convert_pdf_page(
+                pdf_path,
+                dpi=dpi,
+                page_number=page_number
+            )
+
+            if not page:
+                continue
+
+            for config in configs:
+                try:
                     prepared_page = preprocess_image(
-                        page
+                        page.copy()
                     )
 
-                page_text = image_to_text(
-                    prepared_page,
-                    config=config,
-                )
+                    page_text = image_to_text(
+                        prepared_page,
+                        config=config,
+                    )
 
-                text += page_text + '\n'
+                    texts_by_config[config] += page_text + '\n'
 
+                except Exception:
+                    continue
+
+        for config_text in texts_by_config.values():
             normalized = normalize_ocr_text(
-                text
+                config_text
             )
 
             if normalized:
-                collected.append(
+                variants.append(
                     normalized
                 )
 
-        return collected
-
-    pages_300 = convert_pdf_pages(
-        pdf_path,
-        dpi=300,
-    )
-
-    variants.extend(
-        collect_variants(
-            pages_300,
-            configs=[
-                "--oem 3 --psm 3",
-                "--oem 3 --psm 4",
-                "--oem 3 --psm 11",
-            ],
-            use_hard_preprocess=False,
-        )
-    )
-
-    if variants:
-        best_300 = max(
-            variants,
-            key=ocr_score
-        )
-
-        if ocr_score(best_300) >= 85:
-            return normalize_ocr_text(
-                best_300
+        if variants:
+            best_text = max(
+                variants,
+                key=ocr_score
             )
 
-    pages_600 = convert_pdf_pages(
-        pdf_path,
-        dpi=600,
-    )
-
-    variants.extend(
-        collect_variants(
-            pages_600,
-            configs=[
-                "--oem 3 --psm 3",
-                "--oem 3 --psm 6",
-                "--oem 3 --psm 11",
-            ],
-            use_hard_preprocess=True,
-        )
-    )
+            if ocr_score(
+                best_text
+            ) >= 85:
+                return normalize_ocr_text(
+                    best_text
+                )
 
     if not variants:
         return ''
@@ -417,36 +606,29 @@ def extract_text_from_pdf(pdf_path):
     )
 
 def extract_text_from_pdf_hard(pdf_path):
-
-    text = ''
-
-    pages = convert_pdf_pages(
-        pdf_path,
-        dpi=600,
+    return extract_text_from_pdf(
+        pdf_path
     )
-
-    for page in pages:
-
-        page = preprocess_image_hard(
-            page
-        )
-
-        page_text = image_to_text(
-            page,
-            config="--oem 3 --psm 6",
-        )
-
-        text += page_text + '\n'
-
-    return normalize_ocr_text(
-        text
-    )
-
 
 def extract_text_from_image(image_path):
 
     image = Image.open(
         image_path
+    )
+
+    try:
+        image.draft(
+            "RGB",
+            (
+                MAX_OCR_IMAGE_SIDE,
+                MAX_OCR_IMAGE_SIDE,
+            )
+        )
+    except Exception:
+        pass
+
+    image = safe_prepare_image_for_ocr(
+        image
     )
 
     image = preprocess_image(

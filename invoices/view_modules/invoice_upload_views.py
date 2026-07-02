@@ -14,6 +14,9 @@ from ..ocr_processing_service import apply_ocr_identity_to_invoice, get_duplicat
 from ..ocr_verification_service import apply_ocr_amount_to_invoice
 
 
+INLINE_OCR_MAX_FILE_SIZE_BYTES = 8 * 1024 * 1024
+
+
 def calculate_uploaded_file_hash(uploaded_file):
 
     uploaded_file.seek(0)
@@ -280,6 +283,26 @@ def upload_invoice(request):
                 },
             )
 
+            if (
+                len(files) > 1
+                or getattr(uploaded_file, 'size', 0) > INLINE_OCR_MAX_FILE_SIZE_BYTES
+            ):
+                invoice.ocr_comment = (
+                    "OCR отложен: пакетная загрузка или большой файл. "
+                    "Счет сохранен и доступен в разделе Счета. "
+                    "OCR можно выполнить отдельно после загрузки."
+                )
+                invoice.save()
+
+                create_invoice_log(
+                    invoice,
+                    request.user,
+                    "Счет загружен без автоматического OCR: OCR отложен для безопасной обработки"
+                )
+
+                created_count += 1
+                continue
+
             try:
 
                 file_path = invoice.file.path
@@ -410,6 +433,31 @@ def upload_invoice(request):
                 'status',
             ]
         )
+
+        if created_count > 0:
+            messages.success(
+                request,
+                f"Загружено счетов: {created_count}. "
+                "Если OCR был отложен, счета уже доступны в разделе Счета."
+            )
+
+        if duplicate_files:
+            messages.warning(
+                request,
+                f"Дубликаты не загружены: {len(duplicate_files)}."
+            )
+
+        if skipped_files:
+            messages.warning(
+                request,
+                f"Файлы с неподдерживаемым форматом пропущены: {len(skipped_files)}."
+            )
+
+        if created_count == 0:
+            messages.warning(
+                request,
+                "Новые счета не созданы. Проверьте список дубликатов и пропущенных файлов."
+            )
 
         request.session['last_upload_result'] = {
             'batch_id': batch.id,

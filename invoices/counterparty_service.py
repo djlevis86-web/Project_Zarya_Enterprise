@@ -8,6 +8,9 @@ from .models import (
 )
 
 
+OWN_COMPANY_INN = '3507012256'
+
+
 BAD_COUNTERPARTY_WORDS = [
     'ОПЛАТА ПО',
     'НАЗНАЧЕНИЕ ПЛАТЕЖА',
@@ -291,25 +294,105 @@ def extract_requisite_candidates(text):
     return candidates
 
 
-def select_supplier_requisite_candidate(text):
 
-    own_inn = '3507012256'
+def only_digits(value):
+    return re.sub(
+        r'\D',
+        '',
+        str(value or '')
+    )
+
+
+def is_own_company_inn(inn):
+    return only_digits(
+        inn
+    ) == OWN_COMPANY_INN
+
+
+def is_valid_supplier_requisite_candidate(candidate):
+    if not candidate:
+        return False
+
+    inn = only_digits(
+        candidate.get(
+            'inn'
+        )
+    )
+
+    if len(inn) not in [
+        10,
+        12,
+    ]:
+        return False
+
+    if is_own_company_inn(
+        inn
+    ):
+        return False
+
+    context = ' '.join(
+        str(candidate.get(key) or '')
+        for key in [
+            'context',
+            'line',
+            'raw',
+            'source',
+        ]
+    ).upper()
+
+    if (
+        any(marker in context for marker in ['ТЕЛ', 'ТЕЛЕФОН', 'ФАКС'])
+        and 'ИНН' not in context
+    ):
+        return False
+
+    return True
+
+
+def counterparty_is_own_company(counterparty):
+    if not counterparty:
+        return False
+
+    return is_own_company_inn(
+        getattr(
+            counterparty,
+            'inn',
+            None
+        )
+    )
+
+def select_supplier_requisite_candidate(text):
 
     candidates = extract_requisite_candidates(
         text
     )
 
-    for candidate in candidates:
+    safe_candidates = [
+        candidate
+        for candidate in candidates
+        if is_valid_supplier_requisite_candidate(
+            candidate
+        )
+    ]
 
-        if candidate.get(
-            'inn'
-        ) != own_inn:
+    for candidate in safe_candidates:
+
+        counterparty = find_counterparty_by_requisites(
+            candidate.get(
+                'inn'
+            ),
+            candidate.get(
+                'kpp'
+            )
+        )
+
+        if counterparty:
 
             return candidate
 
-    if candidates:
+    if safe_candidates:
 
-        return candidates[0]
+        return safe_candidates[0]
 
     return None
 
@@ -428,7 +511,15 @@ def find_counterparty_by_requisites(inn, kpp=None):
 
         return None
 
-    queryset = get_official_counterparties_queryset().filter(
+    if is_own_company_inn(
+        inn
+    ):
+
+        return None
+
+    queryset = get_official_counterparties_queryset().exclude(
+        inn=OWN_COMPANY_INN
+    ).filter(
         inn=inn
     )
 
@@ -516,7 +607,9 @@ def find_counterparty_by_name(vendor_name):
         vendor_name
     )
 
-    candidates = get_official_counterparties_queryset()
+    candidates = get_official_counterparties_queryset().exclude(
+        inn=OWN_COMPANY_INN
+    )
 
     for counterparty in candidates:
 

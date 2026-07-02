@@ -1,5 +1,6 @@
 import os
 import re
+from decimal import Decimal, InvalidOperation
 
 import pytesseract
 
@@ -159,6 +160,7 @@ def normalize_ocr_text(text):
         return ''
 
     text = str(text)
+
 
     replacements = {
         'AHH': 'ИНН',
@@ -1108,6 +1110,168 @@ def normalize_amount(value):
     return None
 
 
+
+def normalize_ocr_money_token_for_total_selection(value):
+    if value is None:
+        return None
+
+    value = str(value)
+    value = value.replace('\u00a0', ' ')
+    value = value.replace(' ', '')
+    value = value.replace('$', '')
+    value = value.replace('[', '')
+    value = value.replace(']', '')
+    value = value.replace(',', '.')
+    value = value.strip(' .,:;')
+
+    if not value:
+        return None
+
+    try:
+        amount = Decimal(value).quantize(Decimal('0.01'))
+    except (InvalidOperation, TypeError, ValueError):
+        return None
+
+    if amount <= 0:
+        return None
+
+    return format(amount, 'f')
+
+
+def get_money_tokens_from_text(value):
+    if not value:
+        return []
+
+    value = str(value).replace('\u00a0', ' ')
+
+    money_pattern = re.compile(
+        r'(?<!\d)(?:\d{1,3}(?:[ \u00a0]\d{3})+|\d+)(?:[,.]\d{2})(?!\d)'
+    )
+
+    result = []
+
+    for match in money_pattern.finditer(value):
+        normalized = normalize_ocr_money_token_for_total_selection(
+            match.group(0)
+        )
+
+        if normalized:
+            result.append(normalized)
+
+    return result
+
+
+def get_line_with_keyword(text, keyword):
+    keyword_lower = keyword.lower()
+
+    for line in str(text).splitlines():
+        if keyword_lower in line.lower():
+            pos = line.lower().find(keyword_lower)
+            return line[pos:]
+
+    pos = str(text).lower().find(keyword_lower)
+
+    if pos < 0:
+        return ''
+
+    return str(text)[pos:pos + 260]
+
+
+def get_first_money_after_phrase(text, phrase):
+    pattern = re.compile(
+        phrase + r'.{0,120}',
+        re.IGNORECASE | re.DOTALL
+    )
+
+    match = pattern.search(text)
+
+    if not match:
+        return None
+
+    amounts = get_money_tokens_from_text(
+        match.group(0)
+    )
+
+    if not amounts:
+        return None
+
+    return amounts[0]
+
+
+def get_last_money_on_keyword_line(text, keyword):
+    line = get_line_with_keyword(
+        text,
+        keyword
+    )
+
+    if not line:
+        return None
+
+    amounts = get_money_tokens_from_text(
+        line
+    )
+
+    if not amounts:
+        return None
+
+    return amounts[-1]
+
+
+def parse_preferred_total_amount(text):
+    if not text:
+        return None
+
+    normalized_text = str(text)
+    normalized_text = normalized_text.replace('\u00a0', ' ')
+
+    # 1. Самые надежные итоговые формулировки.
+    for phrase in [
+        r'Итого\s+с\s+НДС\s*[:\-]?\s*',
+        r'Итого\s+к\s+оплате\s*[:\-]?\s*',
+    ]:
+        amount = get_first_money_after_phrase(
+            normalized_text,
+            phrase
+        )
+
+        if amount:
+            return amount
+
+    # 2. УПД / счет-фактура: в строке "Всего к оплате" последняя сумма — с НДС.
+    amount = get_last_money_on_keyword_line(
+        normalized_text,
+        'Всего к оплате'
+    )
+
+    if amount:
+        return amount
+
+    # 3. Стандартный счет: итоговая строка может содержать несколько колонок.
+    # Берем последнюю сумму в строке "Итого Руб" / "Итого:".
+    for keyword in [
+        'Итого Руб',
+        'Итого:',
+        'Итого'
+    ]:
+        amount = get_last_money_on_keyword_line(
+            normalized_text,
+            keyword
+        )
+
+        if amount:
+            return amount
+
+    # 4. Фраза "Всего наименований ..., на сумму ..." — сумма счета.
+    amount = get_first_money_after_phrase(
+        normalized_text,
+        r'Всего\s+наименований.*?на\s+сумму\s*'
+    )
+
+    if amount:
+        return amount
+
+    return None
+
 def parse_amount(text):
 
     if not text:
@@ -1115,6 +1279,13 @@ def parse_amount(text):
         return None
 
     text = str(text)
+
+    preferred_total_amount = parse_preferred_total_amount(
+        text
+    )
+
+    if preferred_total_amount:
+        return preferred_total_amount
 
     text = text.replace(
         '\\u00a0',

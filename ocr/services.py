@@ -650,37 +650,92 @@ def extract_text_from_pdf_hard(pdf_path):
     )
 
 def extract_text_from_image(image_path):
+    variants = []
 
-    image = Image.open(
+    configs = [
+        "--oem 3 --psm 12",
+        "--oem 3 --psm 3",
+        "--oem 3 --psm 6",
+        "--oem 3 --psm 11",
+    ]
+
+    preprocessors = [
+        preprocess_image,
+        preprocess_image_hard,
+    ]
+
+    with Image.open(
         image_path
-    )
-
-    try:
-        image.draft(
-            "RGB",
-            (
-                MAX_OCR_IMAGE_SIDE,
-                MAX_OCR_IMAGE_SIDE,
+    ) as image:
+        try:
+            image.draft(
+                "RGB",
+                (
+                    MAX_OCR_IMAGE_SIDE,
+                    MAX_OCR_IMAGE_SIDE,
+                )
             )
+        except Exception:
+            pass
+
+        image = safe_prepare_image_for_ocr(
+            image
         )
-    except Exception:
-        pass
 
-    image = safe_prepare_image_for_ocr(
-        image
-    )
+        base_image = image.copy()
 
-    image = preprocess_image(
-        image
-    )
+    for config in configs:
+        for preprocessor in preprocessors:
+            try:
+                prepared_image = preprocessor(
+                    base_image.copy()
+                )
 
-    text = image_to_text(
-        image,
-        config="--oem 3 --psm 6",
+                text = image_to_text(
+                    prepared_image,
+                    config=config,
+                )
+
+                normalized = normalize_ocr_text(
+                    text
+                )
+
+                if normalized:
+                    variants.append(
+                        normalized
+                    )
+
+                if variants:
+                    best_text = max(
+                        variants,
+                        key=ocr_score
+                    )
+
+                    if ocr_score(
+                        best_text
+                    ) >= 85:
+                        return normalize_ocr_text(
+                            best_text
+                        )
+
+            except Exception as error:
+                if is_ocr_timeout_error(
+                    error
+                ):
+                    continue
+
+                continue
+
+    if not variants:
+        return ''
+
+    best_text = max(
+        variants,
+        key=ocr_score
     )
 
     return normalize_ocr_text(
-        text
+        best_text
     )
 
 

@@ -42,7 +42,7 @@ class UploadOCRAmountConfirmationTests(TestCase):
         self.assertFalse(invoice.amount_verified)
         self.assertFalse(invoice.ocr_verified)
 
-    def test_existing_amount_matching_ocr_is_verified_by_default(self):
+    def test_existing_amount_matching_ocr_requires_manual_confirmation(self):
         invoice = Invoice(
             title="OCR matching amount test",
             amount=Decimal("987.65"),
@@ -53,11 +53,11 @@ class UploadOCRAmountConfirmationTests(TestCase):
             "987.65",
         )
 
-        self.assertEqual(warning, "")
+        self.assertIn("Требуется ручное подтверждение", warning)
         self.assertEqual(invoice.ocr_amount, Decimal("987.65"))
         self.assertEqual(invoice.amount, Decimal("987.65"))
-        self.assertTrue(invoice.amount_verified)
-        self.assertTrue(invoice.ocr_verified)
+        self.assertFalse(invoice.amount_verified)
+        self.assertFalse(invoice.ocr_verified)
 
     def test_zero_amount_is_prefilled_but_requires_manual_confirmation(self):
         invoice = Invoice(

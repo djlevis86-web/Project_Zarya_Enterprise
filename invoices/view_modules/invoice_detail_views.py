@@ -13,7 +13,8 @@ def invoice_detail(request, invoice_id):
 
     invoice = get_object_or_404(
         Invoice,
-        id=invoice_id
+        id=invoice_id,
+        is_deleted=False
     )
 
     if (

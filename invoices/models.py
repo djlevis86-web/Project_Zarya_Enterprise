@@ -758,6 +758,13 @@ class PaymentRegistry(models.Model):
         verbose_name="Дата выгрузки",
     )
 
+    paid_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True,
+        verbose_name="Дата фактической оплаты",
+    )
+
     items_count = models.PositiveIntegerField(
         default=0,
         verbose_name="Количество счетов",

@@ -190,6 +190,10 @@
                         </th>
 
                         <th>
+                            Факт. оплата
+                        </th>
+
+                        <th>
                             Действия
                         </th>
                     </tr>
@@ -267,6 +271,16 @@
                             </td>
 
                             <td>
+                                {% if registry.paid_at %}
+                                    {{ registry.paid_at|date:"d.m.Y H:i" }}
+                                {% else %}
+                                    <span class="muted">
+                                        —
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
                                 {% if registry.items_count %}
                                     {% if registry.status == 'draft' or registry.status == 'checked' or registry.status == 'exported' %}
                                         <form
@@ -294,7 +308,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="10" class="empty-table">
+                            <td colspan="11" class="empty-table">
                                 Реестры оплаты пока не найдены.
                             </td>
                         </tr>

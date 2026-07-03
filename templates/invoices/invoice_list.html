@@ -623,11 +623,11 @@
     <div class="pagination">
 
         {% if page_obj.has_previous %}
-            <a href="?page=1" class="btn btn-secondary">
+            <a href="?page=1{% if querystring_without_page %}&amp;{{ querystring_without_page }}{% endif %}" class="btn btn-secondary">
                 Первая
             </a>
 
-            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">
+            <a href="?page={{ page_obj.previous_page_number }}{% if querystring_without_page %}&amp;{{ querystring_without_page }}{% endif %}" class="btn btn-secondary">
                 Назад
             </a>
         {% endif %}
@@ -637,11 +637,11 @@
         </span>
 
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">
+            <a href="?page={{ page_obj.next_page_number }}{% if querystring_without_page %}&amp;{{ querystring_without_page }}{% endif %}" class="btn btn-secondary">
                 Далее
             </a>
 
-            <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if querystring_without_page %}&amp;{{ querystring_without_page }}{% endif %}" class="btn btn-secondary">
                 Последняя
             </a>
         {% endif %}

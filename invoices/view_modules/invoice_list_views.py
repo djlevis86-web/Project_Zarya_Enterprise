@@ -201,6 +201,13 @@ def invoice_list(request):
         page_number
     )
 
+    query_params = request.GET.copy()
+    query_params.pop(
+        'page',
+        None
+    )
+    querystring_without_page = query_params.urlencode()
+
     stats_queryset = Invoice.objects.filter(
         is_deleted=False
     )
@@ -242,6 +249,7 @@ def invoice_list(request):
         'invoices/invoice_list.html',
         {
             'page_obj': page_obj,
+            'querystring_without_page': querystring_without_page,
             'search': search,
             'status': status,
             'sort': sort,

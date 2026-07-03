@@ -563,31 +563,9 @@
         </div>
 
         <div class="form-group">
-            <label>
-                Контрагент
-            </label>
+            <label for="payment_status">Оплата</label>
 
-            <select name="counterparty" class="form-control">
-
-                <option value="">
-                    Все контрагенты
-                </option>
-
-                {% for counterparty in counterparties %}
-                    <option
-                        value="{{ counterparty.id }}"
-                        {% if selected_counterparty|stringformat:"s" == counterparty.id|stringformat:"s" %}selected{% endif %}
-                    >
-                        {{ counterparty.name }}
-                    </option>
-                {% endfor %}
-
-            </select>
-
-            <div class="filter-field">
-                <label for="payment_status">Оплата</label>
-
-                <select
+            <select
                     id="payment_status"
                     name="payment_status"
                     class="form-control"

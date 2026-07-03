@@ -140,6 +140,21 @@ class UploadInvoiceForm(forms.Form):
         )
     )
 
+    planned_payment_date = forms.DateField(
+        label='Плановая дата оплаты',
+        required=True,
+        widget=forms.DateInput(
+            attrs={
+                'class': 'form-control',
+                'type': 'date',
+            }
+        ),
+        error_messages={
+            'required': 'Укажите плановую дату оплаты.',
+            'invalid': 'Введите корректную плановую дату оплаты.',
+        },
+    )
+
     files = MultipleFileField(
         label='Файлы счетов',
         required=True,
@@ -229,6 +244,17 @@ class UploadInvoiceForm(forms.Form):
 
 
 class InvoiceEditForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['planned_payment_date'].required = True
+        self.fields['planned_payment_date'].error_messages.update(
+            {
+                'required': 'Укажите плановую дату оплаты.',
+                'invalid': 'Введите корректную плановую дату оплаты.',
+            }
+        )
 
     class Meta:
         model = Invoice

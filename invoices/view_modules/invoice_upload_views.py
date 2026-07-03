@@ -316,6 +316,9 @@ def upload_invoice(request):
                 amount=form.cleaned_data.get(
                     'amount'
                 ) or 0,
+                planned_payment_date=form.cleaned_data.get(
+                    'planned_payment_date'
+                ),
                 file=uploaded_file,
                 original_filename=uploaded_file.name,
                 file_hash=file_hash,

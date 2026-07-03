@@ -5,8 +5,9 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
+from django.utils import timezone
 
-from invoices.models import Invoice, PaymentRegistry, PaymentRegistryItem
+from invoices.models import Counterparty, Invoice, PaymentRegistry, PaymentRegistryItem
 from invoices.payment_registry_services import (
     add_invoice_to_payment_registry,
     get_or_create_draft_payment_registry,
@@ -32,12 +33,34 @@ class PaymentRegistryServiceTests(TestCase):
             password="pass12345",
         )
 
+        self.counterparty = Counterparty.objects.create(
+            name="ТЕСТОВЫЙ ПОСТАВЩИК",
+            full_name="ООО ТЕСТОВЫЙ ПОСТАВЩИК",
+            inn="7705551111",
+            kpp="770501001",
+            source=Counterparty.SOURCE_1C,
+            is_active=True,
+            bank_name="АО ТЕСТ БАНК",
+            account_number="40702810900000000001",
+            bik="044525225",
+        )
+
     def _create_invoice(
         self,
         title="REGISTRY-INVOICE-TEST",
         amount=Decimal("1000.00"),
         amount_verified=True,
+        planned_payment_date=None,
+        counterparty_marker="default",
     ):
+        if planned_payment_date is None:
+            planned_payment_date = timezone.localdate()
+
+        counterparty = self.counterparty
+
+        if counterparty_marker == "none":
+            counterparty = None
+
         return Invoice.objects.create(
             user=self.user,
             title=title,
@@ -50,6 +73,10 @@ class PaymentRegistryServiceTests(TestCase):
             amount=amount,
             status=Invoice.STATUS_APPROVED,
             amount_verified=amount_verified,
+            planned_payment_date=planned_payment_date,
+            counterparty=counterparty,
+            vendor=getattr(counterparty, "name", "") if counterparty else "",
+            counterparty_match_status=Invoice.COUNTERPARTY_MATCH_FOUND if counterparty else Invoice.COUNTERPARTY_MATCH_NOT_FOUND,
         )
 
     def test_get_or_create_draft_payment_registry_creates_registry(self):
@@ -128,6 +155,79 @@ class PaymentRegistryServiceTests(TestCase):
 
         self.assertEqual(registry.items_count, 0)
         self.assertEqual(registry.total_amount, Decimal("0.00"))
+
+    def test_invoice_without_planned_payment_date_is_not_added(self):
+        invoice = self._create_invoice(
+            title="REGISTRY-NO-PLAN-DATE",
+        )
+
+        invoice.planned_payment_date = None
+        invoice.save(update_fields=["planned_payment_date"])
+
+        registry, _ = get_or_create_draft_payment_registry(self.user)
+
+        item, errors, warnings = add_invoice_to_payment_registry(
+            invoice,
+            registry,
+        )
+
+        self.assertIsNone(item)
+        self.assertIn(
+            "Не указана плановая дата оплаты.",
+            errors,
+        )
+        self.assertFalse(
+            PaymentRegistryItem.objects.filter(
+                registry=registry,
+                invoice=invoice,
+            ).exists()
+        )
+
+    def test_invoice_without_counterparty_is_not_added(self):
+        invoice = self._create_invoice(
+            title="REGISTRY-NO-COUNTERPARTY",
+            counterparty_marker="none",
+        )
+
+        registry, _ = get_or_create_draft_payment_registry(self.user)
+
+        item, errors, warnings = add_invoice_to_payment_registry(
+            invoice,
+            registry,
+        )
+
+        self.assertIsNone(item)
+        self.assertIn(
+            "Контрагент не сопоставлен со справочником.",
+            errors,
+        )
+
+    def test_invoice_with_counterparty_missing_requisites_is_not_added(self):
+        self.counterparty.account_number = ""
+        self.counterparty.bik = ""
+        self.counterparty.save(
+            update_fields=[
+                "account_number",
+                "bik",
+            ]
+        )
+
+        invoice = self._create_invoice(
+            title="REGISTRY-MISSING-REQUISITES",
+        )
+
+        registry, _ = get_or_create_draft_payment_registry(self.user)
+
+        item, errors, warnings = add_invoice_to_payment_registry(
+            invoice,
+            registry,
+        )
+
+        self.assertIsNone(item)
+        self.assertIn(
+            "У контрагента не заполнено: расчётный счёт, БИК.",
+            errors,
+        )
 
     def test_duplicate_active_invoice_is_not_added_twice(self):
         invoice = self._create_invoice(

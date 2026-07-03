@@ -109,12 +109,12 @@ def validate_invoice_for_payment_registry(invoice):
         )
 
     if not invoice.planned_payment_date:
-        warnings.append(
+        errors.append(
             "Не указана плановая дата оплаты."
         )
 
     if not invoice.counterparty:
-        warnings.append(
+        errors.append(
             "Контрагент не сопоставлен со справочником."
         )
 
@@ -133,7 +133,7 @@ def validate_invoice_for_payment_registry(invoice):
                 missing.append(title)
 
         if missing:
-            warnings.append(
+            errors.append(
                 "У контрагента не заполнено: " + ", ".join(missing) + "."
             )
 

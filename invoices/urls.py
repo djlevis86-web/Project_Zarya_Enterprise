@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import (
     invoice_list,
+    clear_recent_invoice_filters,
     upload_invoice,
     upload_result,
     upload_batches,
@@ -50,6 +51,12 @@ urlpatterns = [
         '',
         invoice_list,
         name='invoice_list'
+    ),
+
+    path(
+        'clear-recent-filters/',
+        clear_recent_invoice_filters,
+        name='clear_recent_invoice_filters'
     ),
 
     path(

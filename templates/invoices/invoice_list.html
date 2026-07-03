@@ -295,6 +295,18 @@
                     {{ recent_filter.label }}
                 </a>
             {% endfor %}
+
+            <form
+                method="post"
+                action="{% url 'clear_recent_invoice_filters' %}"
+                class="inline-form"
+            >
+                {% csrf_token %}
+
+                <button type="submit" class="btn btn-secondary btn-sm">
+                    Очистить
+                </button>
+            </form>
         </div>
     {% endif %}
 

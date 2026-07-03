@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -29,6 +30,7 @@ class UploadInvoiceFormSeparateValidationTests(SimpleTestCase):
                 "document_type": "",
                 "title": "Аксютина Г.А.",
                 "amount": "",
+                "planned_payment_date": "2026-07-10",
                 "description": "",
             },
             files=self._files(),
@@ -50,6 +52,10 @@ class UploadInvoiceFormSeparateValidationTests(SimpleTestCase):
             form.cleaned_data["amount"],
         )
         self.assertEqual(
+            form.cleaned_data["planned_payment_date"],
+            date(2026, 7, 10),
+        )
+        self.assertEqual(
             len(form.cleaned_data["files"]),
             1,
         )
@@ -60,6 +66,7 @@ class UploadInvoiceFormSeparateValidationTests(SimpleTestCase):
                 "document_type": "invoice",
                 "title": "",
                 "amount": "",
+                "planned_payment_date": "2026-07-10",
                 "description": "",
             },
             files=self._files(),
@@ -73,12 +80,32 @@ class UploadInvoiceFormSeparateValidationTests(SimpleTestCase):
             form.errors,
         )
 
+    def test_upload_form_requires_planned_payment_date(self):
+        form = UploadInvoiceForm(
+            data={
+                "document_type": "invoice",
+                "title": "Аксютина Г.А.",
+                "amount": "",
+                "description": "",
+            },
+            files=self._files(),
+        )
+
+        self.assertFalse(
+            form.is_valid(),
+        )
+        self.assertIn(
+            "planned_payment_date",
+            form.errors,
+        )
+
     def test_upload_form_requires_files(self):
         form = UploadInvoiceForm(
             data={
                 "document_type": "invoice",
                 "title": "Аксютина Г.А.",
                 "amount": "",
+                "planned_payment_date": "2026-07-10",
                 "description": "",
             },
             files=MultiValueDict(),
@@ -98,6 +125,7 @@ class UploadInvoiceFormSeparateValidationTests(SimpleTestCase):
                 "document_type": "invoice",
                 "title": "Аксютина Г.А.",
                 "amount": "12 345,67",
+                "planned_payment_date": "2026-07-10",
                 "description": "",
             },
             files=self._files(),
@@ -118,6 +146,7 @@ class UploadInvoiceFormSeparateValidationTests(SimpleTestCase):
                 "document_type": "invoice",
                 "title": "Аксютина Г.А.",
                 "amount": "",
+                "planned_payment_date": "2026-07-10",
                 "description": "",
             },
             files=self._files(

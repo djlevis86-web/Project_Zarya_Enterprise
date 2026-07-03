@@ -1,9 +1,45 @@
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+
 from ..forms import InvoiceCounterpartyAssignForm
 from ..log_service import create_invoice_log
-from ..models import Invoice
+from ..models import Counterparty, Invoice
+
+
+COUNTERPARTY_SEARCH_LIMIT = 30
+
+
+def get_counterparty_search_queryset(search_query):
+
+    search_query = (
+        search_query or ''
+    ).strip()
+
+    if not search_query:
+        return Counterparty.objects.none()
+
+    return (
+        Counterparty.objects
+        .filter(
+            is_active=True,
+            source__in=[
+                Counterparty.SOURCE_1C,
+                Counterparty.SOURCE_MANUAL,
+            ],
+        )
+        .filter(
+            Q(name__icontains=search_query)
+            | Q(full_name__icontains=search_query)
+            | Q(inn__icontains=search_query)
+            | Q(kpp__icontains=search_query)
+        )
+        .order_by(
+            'name',
+            'inn',
+        )[:COUNTERPARTY_SEARCH_LIMIT]
+    )
 
 
 @staff_member_required
@@ -11,7 +47,23 @@ def invoice_assign_counterparty(request, invoice_id):
 
     invoice = get_object_or_404(
         Invoice,
-        id=invoice_id
+        id=invoice_id,
+        is_deleted=False,
+    )
+
+    search_query = (
+        request.POST.get(
+            'q',
+            request.GET.get(
+                'q',
+                '',
+            ),
+        )
+        or ''
+    ).strip()
+
+    counterparties = get_counterparty_search_queryset(
+        search_query
     )
 
     if request.method == 'POST':
@@ -80,5 +132,8 @@ def invoice_assign_counterparty(request, invoice_id):
         {
             'invoice': invoice,
             'form': form,
+            'search_query': search_query,
+            'counterparties': counterparties,
+            'counterparty_search_limit': COUNTERPARTY_SEARCH_LIMIT,
         }
     )

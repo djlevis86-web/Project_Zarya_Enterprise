@@ -522,36 +522,43 @@ class CounterpartyManualForm(forms.ModelForm):
     
 class InvoiceCounterpartyAssignForm(forms.Form):
 
-    counterparty = forms.ModelChoiceField(
+    counterparty = forms.IntegerField(
         label='Контрагент',
-        queryset=Counterparty.objects.none(),
-        empty_label='Выберите контрагента',
-        widget=forms.Select(
-            attrs={
-                'class': 'form-control',
-            }
-        )
+        required=True,
+        widget=forms.HiddenInput(),
+        error_messages={
+            'required': 'Выберите контрагента из результатов поиска.',
+            'invalid': 'Некорректный идентификатор контрагента.',
+        },
     )
 
-    def __init__(self, *args, **kwargs):
+    def clean_counterparty(self):
 
-        super().__init__(*args, **kwargs)
+        counterparty_id = self.cleaned_data[
+            'counterparty'
+        ]
 
-        self.fields['counterparty'].queryset = (
-            Counterparty.objects
-            .filter(
-                is_active=True
+        try:
+            return (
+                Counterparty.objects
+                .filter(
+                    is_active=True,
+                    source__in=[
+                        Counterparty.SOURCE_1C,
+                        Counterparty.SOURCE_MANUAL,
+                    ],
+                )
+                .get(
+                    id=counterparty_id,
+                )
             )
-            .filter(
-                source__in=[
-                    Counterparty.SOURCE_1C,
-                    Counterparty.SOURCE_MANUAL,
-                ]
+
+        except Counterparty.DoesNotExist:
+
+            raise forms.ValidationError(
+                'Выберите активного контрагента из 1С или ручного справочника.'
             )
-            .order_by(
-                'name'
-            )
-        )
+
 
 from .models import InvoicePayment
 

@@ -27,6 +27,7 @@ from ..payment_registry_permissions import (
     user_can_export_payment_registry,
 )
 from ..payment_registry_services import (
+    EDITABLE_REGISTRY_STATUSES,
     check_payment_registry,
     recalculate_payment_registry,
 )
@@ -63,8 +64,7 @@ def export_payment_registry_draft_excel(request, registry_id):
         PaymentRegistry.objects
         .filter(
             id=registry_id,
-            created_by=request.user,
-            status=PaymentRegistry.STATUS_DRAFT,
+            status__in=EDITABLE_REGISTRY_STATUSES,
         )
         .first()
     )
@@ -73,7 +73,7 @@ def export_payment_registry_draft_excel(request, registry_id):
 
         messages.warning(
             request,
-            'Черновик реестра не найден или уже выгружен.'
+            'Редактируемый реестр не найден или уже закрыт.'
         )
 
         return redirect(

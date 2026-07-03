@@ -206,7 +206,8 @@ def remove_from_payment_registry_item(request, item_id):
     )
 
     return redirect(
-        'payment_registry'
+        'payment_registry_detail',
+        registry.id,
     )
 
 @login_required

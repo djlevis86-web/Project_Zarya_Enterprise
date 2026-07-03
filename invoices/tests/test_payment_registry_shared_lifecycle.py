@@ -161,6 +161,101 @@ class PaymentRegistrySharedLifecycleTests(TestCase):
             [item],
         )
 
+    def test_remove_item_redirects_back_to_registry_detail(self):
+        invoice = self._create_invoice(
+            self.first_user,
+            "REGISTRY-SHARED-REMOVE-DETAIL",
+        )
+
+        registry, created = get_or_create_draft_payment_registry(
+            self.first_user
+        )
+
+        self.assertTrue(created)
+
+        item, errors, warnings = add_invoice_to_payment_registry(
+            invoice,
+            registry,
+        )
+
+        self.assertIsNotNone(item)
+        self.assertEqual(errors, [])
+
+        self.client.force_login(
+            self.second_user
+        )
+
+        response = self.client.post(
+            reverse(
+                "remove_from_payment_registry_item",
+                args=[item.id],
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            302,
+        )
+
+        self.assertEqual(
+            response["Location"],
+            reverse(
+                "payment_registry_detail",
+                args=[registry.id],
+            ),
+        )
+
+        item.refresh_from_db()
+
+        self.assertEqual(
+            item.status,
+            PaymentRegistryItem.STATUS_CANCELLED,
+        )
+
+    def test_registry_detail_shows_excel_export_for_draft(self):
+        invoice = self._create_invoice(
+            self.first_user,
+            "REGISTRY-SHARED-DETAIL-EXCEL",
+        )
+
+        registry, created = get_or_create_draft_payment_registry(
+            self.first_user
+        )
+
+        self.assertTrue(created)
+
+        item, errors, warnings = add_invoice_to_payment_registry(
+            invoice,
+            registry,
+        )
+
+        self.assertIsNotNone(item)
+        self.assertEqual(errors, [])
+
+        self.client.force_login(
+            self.second_user
+        )
+
+        response = self.client.get(
+            reverse(
+                "payment_registry_detail",
+                args=[registry.id],
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        self.assertContains(
+            response,
+            reverse(
+                "export_payment_registry_draft_excel",
+                args=[registry.id],
+            ),
+        )
+
     def test_second_staff_user_can_export_shared_registry_excel(self):
         invoice = self._create_invoice(
             self.first_user,

@@ -546,13 +546,10 @@ def payment_registry(request):
     ).strip()
 
     from ..models import PaymentRegistry, PaymentRegistryItem
-    from ..payment_registry_services import ACTIVE_REGISTRY_STATUSES, check_payment_registry
+    from ..payment_registry_services import ACTIVE_REGISTRY_STATUSES, check_payment_registry, get_active_editable_payment_registry
 
-    from ..payment_registry_services import (
-        get_or_create_draft_payment_registry,
-    )
-
-    draft_registry, draft_registry_created = get_or_create_draft_payment_registry(request.user)
+    draft_registry = get_active_editable_payment_registry()
+    draft_registry_created = False
 
     draft_registry_items = PaymentRegistryItem.objects.none()
     draft_registry_check_result = None

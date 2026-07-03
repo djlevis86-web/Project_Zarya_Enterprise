@@ -140,16 +140,19 @@ def validate_invoice_for_payment_registry(invoice):
     return errors, warnings
 
 
-def get_or_create_draft_payment_registry(user):
-    registry = (
+def get_active_editable_payment_registry():
+    return (
         PaymentRegistry.objects
         .filter(
             status__in=EDITABLE_REGISTRY_STATUSES,
-            created_by=user,
         )
         .order_by("-created_at")
         .first()
     )
+
+
+def get_or_create_draft_payment_registry(user):
+    registry = get_active_editable_payment_registry()
 
     if registry:
         return registry, False

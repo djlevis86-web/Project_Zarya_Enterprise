@@ -234,7 +234,6 @@ def check_payment_registry_view(request, registry_id):
         PaymentRegistry.objects
         .filter(
             id=registry_id,
-            created_by=request.user,
             status__in=EDITABLE_REGISTRY_STATUSES,
         )
         .first()

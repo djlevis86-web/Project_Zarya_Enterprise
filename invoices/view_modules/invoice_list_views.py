@@ -4,7 +4,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.views.decorators.http import require_POST
 from ..models import Invoice
 from ..search_helpers import build_multi_variant_search_q
 from .payment_registry_helpers import PAYMENT_STATUS_FILTER_CHOICES, apply_payment_status_filter
@@ -257,6 +258,21 @@ def _update_recent_invoice_filters(
     request.session.modified = True
 
     return recent_filters
+
+
+@login_required
+@require_POST
+def clear_recent_invoice_filters(request):
+
+    request.session.pop(
+        RECENT_INVOICE_FILTERS_SESSION_KEY,
+        None
+    )
+    request.session.modified = True
+
+    return redirect(
+        'invoice_list'
+    )
 
 
 @login_required

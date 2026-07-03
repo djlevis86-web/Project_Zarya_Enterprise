@@ -42,6 +42,7 @@ from .view_modules.invoice_edit_views import (
 )
 
 from .view_modules.invoice_list_views import (
+    clear_recent_invoice_filters,
     invoice_list,
 )
 
@@ -115,6 +116,7 @@ from .view_modules.ocr_queue_views import (
 
 __all__ = (
     'invoice_list',
+    'clear_recent_invoice_filters',
     'upload_invoice',
     'upload_result',
     'upload_batches',

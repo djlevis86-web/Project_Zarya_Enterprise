@@ -180,3 +180,44 @@ class InvoiceRecentFiltersTests(TestCase):
             ),
             1,
         )
+
+    def test_clear_recent_invoice_filters_removes_session_key(self):
+        self.client.force_login(
+            self.user
+        )
+
+        self.client.get(
+            reverse('invoice_list'),
+            {
+                'search': 'RECENT CLEAR',
+            },
+        )
+
+        self.assertIsNotNone(
+            self.client.session.get(
+                RECENT_INVOICE_FILTERS_SESSION_KEY
+            )
+        )
+
+        response = self.client.post(
+            reverse('clear_recent_invoice_filters')
+        )
+
+        self.assertRedirects(
+            response,
+            reverse('invoice_list'),
+        )
+        self.assertIsNone(
+            self.client.session.get(
+                RECENT_INVOICE_FILTERS_SESSION_KEY
+            )
+        )
+
+        response = self.client.get(
+            reverse('invoice_list')
+        )
+
+        self.assertNotContains(
+            response,
+            'Последние поиски',
+        )

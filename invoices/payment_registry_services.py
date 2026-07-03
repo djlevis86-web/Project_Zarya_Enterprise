@@ -528,9 +528,11 @@ def mark_payment_registry_as_paid(registry, user=None):
         paid_count += 1
 
     registry.status = PaymentRegistry.STATUS_PAID
+    registry.paid_at = paid_at_datetime
     registry.save(
         update_fields=[
             "status",
+            "paid_at",
         ]
     )
 

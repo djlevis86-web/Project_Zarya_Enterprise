@@ -546,7 +546,7 @@ def payment_registry(request):
     ).strip()
 
     from ..models import PaymentRegistry, PaymentRegistryItem
-    from ..payment_registry_services import ACTIVE_REGISTRY_STATUSES, check_payment_registry, get_active_editable_payment_registry
+    from ..payment_registry_services import ACTIVE_REGISTRY_STATUSES, check_payment_registry, get_active_editable_payment_registry, validate_invoice_for_payment_registry
 
     draft_registry = get_active_editable_payment_registry()
     draft_registry_created = False
@@ -678,6 +678,22 @@ def payment_registry(request):
         'id'
     )
 
+    invoices = list(invoices)
+
+    readiness_blocked_count = 0
+
+    for invoice in invoices:
+        readiness_errors, readiness_warnings = validate_invoice_for_payment_registry(
+            invoice
+        )
+
+        invoice.payment_registry_block_errors = readiness_errors
+        invoice.payment_registry_warning_messages = readiness_warnings
+        invoice.payment_registry_is_ready = not readiness_errors
+
+        if readiness_errors:
+            readiness_blocked_count += 1
+
     # OCR_REGISTRY_SUMMARY_CONTEXT_V3
     ocr_registry_draft_items = list(draft_registry_items or [])
     draft_registry_items = ocr_registry_draft_items
@@ -726,6 +742,7 @@ def payment_registry(request):
             "ocr_registry_items_count": ocr_registry_items_count,
             "ocr_registry_ready_count": ocr_registry_ready_count,
             "ocr_registry_errors_count": ocr_registry_errors_count,
+            "readiness_blocked_count": readiness_blocked_count,
             'draft_registry_items_count': draft_registry.items_count if draft_registry else 0,
             'draft_registry_total_amount': draft_registry.total_amount if draft_registry else 0,
             'draft_registry_check_result': draft_registry_check_result,

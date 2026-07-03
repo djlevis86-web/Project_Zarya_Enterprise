@@ -6,8 +6,9 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
-from invoices.models import Invoice, PaymentRegistry, PaymentRegistryItem
+from invoices.models import Counterparty, Invoice, PaymentRegistry, PaymentRegistryItem
 from invoices.payment_registry_services import (
     add_invoice_to_payment_registry,
     get_or_create_draft_payment_registry,
@@ -38,6 +39,7 @@ class PaymentRegistryViewTests(TestCase):
             email="staff-registry-user@example.com",
             password="pass12345",
             is_staff=True,
+            is_superuser=True,
         )
 
         self.other_staff_user = User.objects.create_user(
@@ -47,13 +49,35 @@ class PaymentRegistryViewTests(TestCase):
             is_staff=True,
         )
 
+        self.counterparty = Counterparty.objects.create(
+            name="ТЕСТОВЫЙ ПОСТАВЩИК",
+            full_name="ООО ТЕСТОВЫЙ ПОСТАВЩИК",
+            inn="7705551111",
+            kpp="770501001",
+            source=Counterparty.SOURCE_1C,
+            is_active=True,
+            bank_name="АО ТЕСТ БАНК",
+            account_number="40702810900000000001",
+            bik="044525225",
+        )
+
     def _create_invoice(
         self,
         user,
         title="REGISTRY-VIEW-INVOICE-TEST",
         amount=Decimal("1000.00"),
         amount_verified=True,
+        planned_payment_date=None,
+        counterparty_marker="default",
     ):
+        if planned_payment_date is None:
+            planned_payment_date = timezone.localdate()
+
+        counterparty = self.counterparty
+
+        if counterparty_marker == "none":
+            counterparty = None
+
         return Invoice.objects.create(
             user=user,
             title=title,
@@ -66,6 +90,10 @@ class PaymentRegistryViewTests(TestCase):
             amount=amount,
             status=Invoice.STATUS_APPROVED,
             amount_verified=amount_verified,
+            planned_payment_date=planned_payment_date,
+            counterparty=counterparty,
+            vendor=getattr(counterparty, "name", "") if counterparty else "",
+            counterparty_match_status=Invoice.COUNTERPARTY_MATCH_FOUND if counterparty else Invoice.COUNTERPARTY_MATCH_NOT_FOUND,
         )
 
     def test_add_to_payment_registry_requires_login(self):
@@ -122,6 +150,36 @@ class PaymentRegistryViewTests(TestCase):
         self.assertIn(reverse("payment_schedule"), response["Location"])
         self.assertFalse(
             PaymentRegistryItem.objects.filter(invoice=invoice).exists()
+        )
+
+    def test_unready_invoice_checkbox_is_disabled_on_payment_registry_page(self):
+        invoice = self._create_invoice(
+            user=self.staff_user,
+            title="REGISTRY-VIEW-UNREADY-CHECKBOX",
+            counterparty_marker="none",
+        )
+
+        self.client.force_login(self.staff_user)
+
+        response = self.client.get(
+            reverse("payment_registry")
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(
+            response,
+            "Контрагент не сопоставлен со справочником.",
+        )
+
+        self.assertContains(
+            response,
+            "disabled",
+        )
+
+        self.assertNotContains(
+            response,
+            f'name="invoice_ids" value="{invoice.id}"',
         )
 
     def test_staff_can_add_verified_invoice_to_registry(self):
@@ -205,7 +263,13 @@ class PaymentRegistryViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 302)
-        self.assertIn(reverse("payment_registry"), response["Location"])
+        self.assertEqual(
+            response["Location"],
+            reverse(
+                "payment_registry_detail",
+                args=[registry.id],
+            ),
+        )
 
         item.refresh_from_db()
         registry.refresh_from_db()
@@ -243,7 +307,13 @@ class PaymentRegistryViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 302)
-        self.assertIn(reverse("payment_registry"), response["Location"])
+        self.assertEqual(
+            response["Location"],
+            reverse(
+                "payment_registry_detail",
+                args=[registry.id],
+            ),
+        )
 
         item.refresh_from_db()
         registry.refresh_from_db()

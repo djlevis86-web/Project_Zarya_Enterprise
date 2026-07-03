@@ -164,7 +164,6 @@ def remove_from_payment_registry_item(request, item_id):
         .filter(
             id=item_id,
             registry__status__in=EDITABLE_REGISTRY_STATUSES,
-            registry__created_by=request.user,
         )
         .exclude(
             status=PaymentRegistryItem.STATUS_CANCELLED

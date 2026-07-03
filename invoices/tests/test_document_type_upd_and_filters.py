@@ -177,6 +177,65 @@ class InvoiceListDocumentFilterTests(TestCase):
         self.assertContains(response, "Счёт для фильтра")
         self.assertNotContains(response, "УПД для фильтра")
 
+    def test_invoice_list_pagination_preserves_filters(self):
+        for index in range(16):
+            Invoice.objects.create(
+                user=self.user,
+                title=f"PAGINATIONFILTER {index:02d}",
+                document_type=Invoice.DOCUMENT_TYPE_INVOICE,
+                document_date=date(2026, 7, 1),
+                planned_payment_date=date(2026, 7, 10),
+                amount=Decimal("1000.00"),
+                amount_verified=True,
+                status=Invoice.STATUS_APPROVED,
+            )
+
+        self.client.force_login(self.user)
+
+        response = self.client.get(
+            reverse("invoice_list"),
+            {
+                "search": "PAGINATIONFILTER",
+                "status": Invoice.STATUS_APPROVED,
+                "document_type": Invoice.DOCUMENT_TYPE_INVOICE,
+                "planned_payment_date_from": "2026-07-01",
+                "planned_payment_date_to": "2026-07-31",
+                "sort": "id",
+            },
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        html = response.content.decode("utf-8")
+
+        self.assertIn(
+            "?page=2&amp;search=PAGINATIONFILTER",
+            html,
+        )
+        self.assertIn(
+            "status=approved",
+            html,
+        )
+        self.assertIn(
+            "document_type=invoice",
+            html,
+        )
+        self.assertIn(
+            "planned_payment_date_from=2026-07-01",
+            html,
+        )
+        self.assertIn(
+            "planned_payment_date_to=2026-07-31",
+            html,
+        )
+        self.assertIn(
+            "sort=id",
+            html,
+        )
+
     def test_invoice_list_shows_amount_requires_manual_verification(self):
         self.invoice.ocr_amount = Decimal("1000.00")
         self.invoice.amount_verified = False

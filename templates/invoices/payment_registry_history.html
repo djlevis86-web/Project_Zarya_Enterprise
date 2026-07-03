@@ -188,6 +188,10 @@
                         <th>
                             Дата выгрузки
                         </th>
+
+                        <th>
+                            Действия
+                        </th>
                     </tr>
                 </thead>
 
@@ -261,10 +265,36 @@
                                     </span>
                                 {% endif %}
                             </td>
+
+                            <td>
+                                {% if registry.items_count %}
+                                    {% if registry.status == 'draft' or registry.status == 'checked' or registry.status == 'exported' %}
+                                        <form
+                                            method="post"
+                                            action="{% url 'export_payment_registry_draft_excel' registry.id %}"
+                                            class="inline-form registry-history-export-form"
+                                        >
+                                            {% csrf_token %}
+
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                Excel
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="muted">
+                                            —
+                                        </span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="muted">
+                                        —
+                                    </span>
+                                {% endif %}
+                            </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="9" class="empty-table">
+                            <td colspan="10" class="empty-table">
                                 Реестры оплаты пока не найдены.
                             </td>
                         </tr>

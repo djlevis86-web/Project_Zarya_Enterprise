@@ -212,10 +212,10 @@ class PaymentRegistrySharedLifecycleTests(TestCase):
             PaymentRegistryItem.STATUS_CANCELLED,
         )
 
-    def test_registry_detail_shows_excel_export_for_draft(self):
+    def test_registry_history_shows_excel_export_for_draft(self):
         invoice = self._create_invoice(
             self.first_user,
-            "REGISTRY-SHARED-DETAIL-EXCEL",
+            "REGISTRY-SHARED-HISTORY-EXCEL",
         )
 
         registry, created = get_or_create_draft_payment_registry(
@@ -237,10 +237,7 @@ class PaymentRegistrySharedLifecycleTests(TestCase):
         )
 
         response = self.client.get(
-            reverse(
-                "payment_registry_detail",
-                args=[registry.id],
-            )
+            reverse("payment_registry_history")
         )
 
         self.assertEqual(
@@ -255,6 +252,12 @@ class PaymentRegistrySharedLifecycleTests(TestCase):
                 args=[registry.id],
             ),
         )
+
+        self.assertContains(
+            response,
+            "Excel",
+        )
+
 
     def test_second_staff_user_can_export_shared_registry_excel(self):
         invoice = self._create_invoice(

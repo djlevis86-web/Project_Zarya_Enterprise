@@ -107,3 +107,6 @@ redis_inspect.json
 
 # Local cleanup reports
 static/css/_cleanup_reports/
+
+# Runtime bot/report files
+var/

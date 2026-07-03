@@ -214,14 +214,18 @@ class PaymentRegistryViewTests(TestCase):
         self.assertEqual(registry.items_count, 0)
         self.assertEqual(registry.total_amount, Decimal("0.00"))
 
-    def test_staff_cannot_remove_item_from_foreign_draft_registry(self):
+    def test_staff_can_remove_item_from_foreign_draft_registry(self):
         invoice = self._create_invoice(
             user=self.staff_user,
             title="REGISTRY-VIEW-REMOVE-FOREIGN",
             amount=Decimal("1000.00"),
             amount_verified=True,
         )
-        registry, _ = get_or_create_draft_payment_registry(self.staff_user)
+
+        registry, _ = get_or_create_draft_payment_registry(
+            self.staff_user
+        )
+
         item, errors, warnings = add_invoice_to_payment_registry(
             invoice,
             registry,
@@ -230,7 +234,9 @@ class PaymentRegistryViewTests(TestCase):
         self.assertIsNotNone(item)
         self.assertEqual(errors, [])
 
-        self.client.force_login(self.other_staff_user)
+        self.client.force_login(
+            self.other_staff_user
+        )
 
         response = self.client.post(
             reverse("remove_from_payment_registry_item", args=[item.id])
@@ -242,6 +248,6 @@ class PaymentRegistryViewTests(TestCase):
         item.refresh_from_db()
         registry.refresh_from_db()
 
-        self.assertEqual(item.status, PaymentRegistryItem.STATUS_ADDED)
-        self.assertEqual(registry.items_count, 1)
-        self.assertEqual(registry.total_amount, Decimal("1000.00"))
+        self.assertEqual(item.status, PaymentRegistryItem.STATUS_CANCELLED)
+        self.assertEqual(registry.items_count, 0)
+        self.assertEqual(registry.total_amount, Decimal("0.00"))

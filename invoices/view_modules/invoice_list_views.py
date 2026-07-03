@@ -4,6 +4,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render
 from ..models import Invoice
+from ..search_helpers import build_multi_variant_search_q
 from .payment_registry_helpers import PAYMENT_STATUS_FILTER_CHOICES, apply_payment_status_filter
 from django.utils.dateparse import parse_date
 
@@ -16,7 +17,8 @@ def invoice_list(request):
     invoices = (
         Invoice.objects
         .select_related(
-            'user'
+            'user',
+            'counterparty',
         )
         .filter(
             is_deleted=False
@@ -82,19 +84,22 @@ def invoice_list(request):
     if search:
 
         invoices = invoices.filter(
-            Q(title__icontains=search)
-            |
-            Q(original_filename__icontains=search)
-            |
-            Q(description__icontains=search)
-            |
-            Q(vendor__icontains=search)
-            |
-            Q(invoice_number__icontains=search)
-            |
-            Q(ocr_text__icontains=search)
-            |
-            Q(user__username__icontains=search)
+            build_multi_variant_search_q(
+                search,
+                [
+                    'title',
+                    'original_filename',
+                    'description',
+                    'vendor',
+                    'invoice_number',
+                    'ocr_text',
+                    'user__username',
+                    'counterparty__name',
+                    'counterparty__full_name',
+                    'counterparty__inn',
+                    'counterparty__kpp',
+                ],
+            )
         )
 
     if status:

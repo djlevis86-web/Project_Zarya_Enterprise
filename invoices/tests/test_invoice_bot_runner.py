@@ -1,6 +1,9 @@
+import json
 from datetime import date
 from decimal import Decimal
 from io import StringIO
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
@@ -128,3 +131,80 @@ class InvoiceBotRunnerTests(TestCase):
             "Режим: только аудит, без изменения данных",
             output,
         )
+
+    def test_run_invoice_bot_writes_json_report(self):
+        self.create_invoice(
+            title="READY JSON BOT INVOICE",
+        )
+
+        self.create_invoice(
+            title="NO DATE JSON BOT INVOICE",
+            planned_payment_date=None,
+        )
+
+        with TemporaryDirectory() as temp_dir:
+            report_path = (
+                Path(temp_dir)
+                / "invoice_bot"
+                / "latest_report.json"
+            )
+
+            out = StringIO()
+
+            call_command(
+                "run_invoice_bot",
+                "--json",
+                f"--json-path={report_path}",
+                stdout=out,
+            )
+
+            self.assertTrue(
+                report_path.exists()
+            )
+
+            report = json.loads(
+                report_path.read_text(
+                    encoding="utf-8"
+                )
+            )
+
+            self.assertIn(
+                "generated_at",
+                report,
+            )
+            self.assertEqual(
+                report["total_count"],
+                2,
+            )
+            self.assertEqual(
+                report["without_planned_payment_date_count"],
+                1,
+            )
+            self.assertEqual(
+                report["without_counterparty_count"],
+                0,
+            )
+            self.assertEqual(
+                report["unverified_amount_count"],
+                0,
+            )
+            self.assertEqual(
+                report["without_ocr_text_count"],
+                0,
+            )
+            self.assertEqual(
+                report["ready_for_registry_count"],
+                1,
+            )
+            self.assertEqual(
+                report["not_ready_for_registry_count"],
+                1,
+            )
+            self.assertEqual(
+                report["mode"],
+                "audit_only",
+            )
+            self.assertIn(
+                "JSON-отчёт сохранён",
+                out.getvalue(),
+            )

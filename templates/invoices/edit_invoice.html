@@ -26,6 +26,21 @@
 
             {% csrf_token %}
 
+            {% if form.errors %}
+                <div class="form-error-summary">
+                    <strong>Форма не сохранена.</strong>
+                    Проверь обязательные поля и исправь ошибки.
+                    {{ form.errors }}
+                </div>
+            {% endif %}
+            <div class="form-group">
+
+                <label>Тип документа</label>
+
+                {{ form.document_type }}
+
+            </div>
+
             <div class="form-group">
 
                 <label>Название</label>

@@ -457,7 +457,19 @@
                                 </div>
                             {% endif %}
 
-                            {% if invoice.planned_payment_date %}
+                            {% if user.is_staff %}
+                                <div class="muted">
+                                    Плановая оплата
+                                </div>
+
+                                <input
+                                    type="date"
+                                    name="planned_payment_date"
+                                    value="{{ invoice.planned_payment_date|date:'Y-m-d' }}"
+                                    class="form-control"
+                                    form="invoice-quick-update-{{ invoice.id }}"
+                                >
+                            {% elif invoice.planned_payment_date %}
                                 <div class="muted">
                                     Плановая оплата: {{ invoice.planned_payment_date|date:"d.m.Y" }}
                                 </div>
@@ -538,9 +550,26 @@
                         </td>
 
                             <td>
-                            <span class="status-badge status-{{ invoice.status }}">
-                                {{ invoice.get_status_display }}
-                            </span>
+                            {% if user.is_staff %}
+                                <select
+                                    name="status"
+                                    class="form-control"
+                                    form="invoice-quick-update-{{ invoice.id }}"
+                                >
+                                    {% for value, label in statuses %}
+                                        <option
+                                            value="{{ value }}"
+                                            {% if invoice.status == value %}selected{% endif %}
+                                        >
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <span class="status-badge status-{{ invoice.status }}">
+                                    {{ invoice.get_status_display }}
+                                </span>
+                            {% endif %}
                         </td>
 <td class="invoice-payment-cell">
                             <div class="payment-mini payment-mini-registry payment-mini-{{ invoice.payment_status_code }}">
@@ -568,6 +597,16 @@
                                 >
                                     Открыть
                                 </a>
+
+                                {% if user.is_staff %}
+                                    <button
+                                        type="submit"
+                                        class="btn btn-secondary btn-sm"
+                                        form="invoice-quick-update-{{ invoice.id }}"
+                                    >
+                                        Сохранить
+                                    </button>
+                                {% endif %}
 
                                 {% if user.is_staff and not invoice.counterparty %}
                                     <a
@@ -615,6 +654,24 @@
 </div>
 
     </form>
+
+    {% if user.is_staff %}
+        {% for invoice in page_obj %}
+            <form
+                id="invoice-quick-update-{{ invoice.id }}"
+                method="post"
+                action="{% url 'quick_update_invoice' invoice.id %}"
+            >
+                {% csrf_token %}
+
+                <input
+                    type="hidden"
+                    name="next"
+                    value="{{ request.get_full_path }}"
+                >
+            </form>
+        {% endfor %}
+    {% endif %}
 
 </div>
 

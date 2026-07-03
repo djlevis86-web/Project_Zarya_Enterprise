@@ -38,6 +38,7 @@ from .view_modules.invoice_upload_views import (
 
 from .view_modules.invoice_edit_views import (
     edit_invoice,
+    quick_update_invoice,
 )
 
 from .view_modules.invoice_list_views import (
@@ -129,6 +130,7 @@ __all__ = (
     'change_invoice_status',
     'add_comment',
     'edit_invoice',
+    'quick_update_invoice',
     'payment_schedule',
     'payment_registry',
     'add_to_payment_registry',

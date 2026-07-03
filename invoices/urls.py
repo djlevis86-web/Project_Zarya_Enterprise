@@ -17,6 +17,7 @@ from .views import (
     change_invoice_status,
     add_comment,
     edit_invoice,
+    quick_update_invoice,
     payment_schedule,
     payment_registry,
     add_to_payment_registry,
@@ -273,6 +274,12 @@ urlpatterns = [
         '<int:invoice_id>/comment/',
         add_comment,
         name='add_comment'
+    ),
+
+    path(
+        '<int:invoice_id>/quick-update/',
+        quick_update_invoice,
+        name='quick_update_invoice'
     ),
 
     path(

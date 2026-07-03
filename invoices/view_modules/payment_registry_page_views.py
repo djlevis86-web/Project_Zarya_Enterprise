@@ -36,6 +36,8 @@ from ..models import (
     PaymentRegistryItem,
 )
 
+from ..search_helpers import build_multi_variant_search_q
+
 from ..payment_registry_permissions import (
     require_payment_registry_permission,
     user_can_cancel_payment_registry,
@@ -630,15 +632,19 @@ def payment_registry(request):
     if search_query:
 
         invoices = invoices.filter(
-            Q(title__icontains=search_query)
-            |
-            Q(original_filename__icontains=search_query)
-            |
-            Q(invoice_number__icontains=search_query)
-            |
-            Q(vendor__icontains=search_query)
-            |
-            Q(counterparty__name__icontains=search_query)
+            build_multi_variant_search_q(
+                search_query,
+                [
+                    'title',
+                    'original_filename',
+                    'invoice_number',
+                    'vendor',
+                    'counterparty__name',
+                    'counterparty__full_name',
+                    'counterparty__inn',
+                    'counterparty__kpp',
+                ],
+            )
         )
 
     if date_from:
@@ -666,17 +672,6 @@ def payment_registry(request):
             'total'
         )
         or 0
-    )
-
-    counterparties = (
-        Counterparty.objects
-        .filter(
-            invoices__isnull=False
-        )
-        .distinct()
-        .order_by(
-            'name'
-        )
     )
 
     invoices = invoices.order_by(
@@ -718,7 +713,6 @@ def payment_registry(request):
         'invoices/payment_registry.html',
         {
             'invoices': invoices,
-            'counterparties': counterparties,
             'total_amount': total_amount,
             'selected_status': selected_status,
             'selected_counterparty': selected_counterparty,

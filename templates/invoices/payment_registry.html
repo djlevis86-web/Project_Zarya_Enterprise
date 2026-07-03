@@ -750,10 +750,6 @@
                                     disabled
                                     title="{{ invoice.payment_registry_block_errors|join:'; ' }}"
                                 >
-
-                                <div class="muted">
-                                    {{ invoice.payment_registry_block_errors|join:"; " }}
-                                </div>
                             {% endif %}
                         </td>
 
@@ -778,6 +774,13 @@
                                 <span class="status-badge status-rejected">
                                     Не определен
                                 </span>
+                            {% endif %}
+
+                            {% if invoice.payment_registry_block_errors %}
+                                <div class="muted">
+                                    Не готов к реестру:
+                                    {{ invoice.payment_registry_block_errors|join:"; " }}
+                                </div>
                             {% endif %}
                         </td>
 

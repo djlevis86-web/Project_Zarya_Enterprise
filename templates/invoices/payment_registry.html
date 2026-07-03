@@ -737,7 +737,7 @@
 
                     <tr>
                         <td>
-                            {% if invoice.amount_verified %}
+                            {% if invoice.payment_registry_is_ready %}
                                 <input
                                     type="checkbox"
                                     name="invoice_ids"
@@ -748,7 +748,7 @@
                                     type="checkbox"
                                     class="ocr-disabled-checkbox"
                                     disabled
-                                    title="Сначала подтвердите сумму OCR"
+                                    title="{{ invoice.payment_registry_block_errors|join:'; ' }}"
                                 >
                             {% endif %}
                         </td>
@@ -774,6 +774,13 @@
                                 <span class="status-badge status-rejected">
                                     Не определен
                                 </span>
+                            {% endif %}
+
+                            {% if invoice.payment_registry_block_errors %}
+                                <div class="muted">
+                                    Не готов к реестру:
+                                    {{ invoice.payment_registry_block_errors|join:"; " }}
+                                </div>
                             {% endif %}
                         </td>
 

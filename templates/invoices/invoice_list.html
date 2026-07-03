@@ -281,6 +281,23 @@
 
     </form>
 
+    {% if recent_invoice_filters %}
+        <div class="registry-actions invoice-recent-filters-v1">
+            <span class="muted">
+                Последние поиски:
+            </span>
+
+            {% for recent_filter in recent_invoice_filters %}
+                <a
+                    href="{% url 'invoice_list' %}?{{ recent_filter.querystring }}"
+                    class="btn btn-secondary btn-sm"
+                >
+                    {{ recent_filter.label }}
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
 </div>
 
 <div class="card">

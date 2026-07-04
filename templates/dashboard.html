@@ -230,6 +230,16 @@
             </strong>
         </a>
 
+        <a href="{% url 'invoice_bot_report_detail' 'unknown-document-type' %}" class="registry-summary-card stat-link">
+            <span class="registry-summary-label">
+                Неизвестный тип
+            </span>
+
+            <strong>
+                {{ invoice_bot_report.unknown_document_type_count }}
+            </strong>
+        </a>
+
     </div>
 
 </div>

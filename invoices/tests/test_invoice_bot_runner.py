@@ -120,6 +120,10 @@ class InvoiceBotRunnerTests(TestCase):
             output,
         )
         self.assertIn(
+            "Неизвестный тип документа: 0",
+            output,
+        )
+        self.assertIn(
             "Готовы к реестру оплаты: 1",
             output,
         )
@@ -193,6 +197,10 @@ class InvoiceBotRunnerTests(TestCase):
                 0,
             )
             self.assertEqual(
+                report["unknown_document_type_count"],
+                0,
+            )
+            self.assertEqual(
                 report["ready_for_registry_count"],
                 1,
             )
@@ -208,3 +216,39 @@ class InvoiceBotRunnerTests(TestCase):
                 "JSON-отчёт сохранён",
                 out.getvalue(),
             )
+
+
+    def test_run_invoice_bot_counts_unknown_document_type(self):
+        self.create_invoice(
+            title="UNKNOWN TYPE BOT INVOICE",
+            document_type=Invoice.DOCUMENT_TYPE_UNKNOWN,
+            ocr_text="Акт сверки взаимных расчетов за июль 2026",
+        )
+
+        self.create_invoice(
+            title="WITHOUT OCR UNKNOWN TYPE BOT INVOICE",
+            document_type=Invoice.DOCUMENT_TYPE_UNKNOWN,
+            ocr_text="",
+        )
+
+        out = StringIO()
+
+        call_command(
+            "run_invoice_bot",
+            stdout=out,
+        )
+
+        output = out.getvalue()
+
+        self.assertIn(
+            "Всего активных счетов: 2",
+            output,
+        )
+        self.assertIn(
+            "Без OCR-текста: 1",
+            output,
+        )
+        self.assertIn(
+            "Неизвестный тип документа: 1",
+            output,
+        )

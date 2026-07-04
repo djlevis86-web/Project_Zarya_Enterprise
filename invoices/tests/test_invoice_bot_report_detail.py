@@ -266,6 +266,57 @@ class InvoiceBotReportDetailTests(TestCase):
             other_invoice.title,
         )
 
+    def test_unknown_document_type_category_filters_invoices(self):
+        matching_invoice = self.create_invoice(
+            title="MYSTERY DOC TYPE DETAIL INVOICE",
+            document_type=Invoice.DOCUMENT_TYPE_UNKNOWN,
+            ocr_text="Акт сверки взаимных расчетов за июль 2026",
+        )
+        without_ocr_invoice = self.create_invoice(
+            title="NO OCR MYSTERY TYPE DETAIL INVOICE",
+            document_type=Invoice.DOCUMENT_TYPE_UNKNOWN,
+            ocr_text="",
+        )
+        known_invoice = self.create_invoice(
+            title="REGULAR INVOICE DETAIL OK",
+            document_type=Invoice.DOCUMENT_TYPE_INVOICE,
+            ocr_text="OCR TEXT",
+        )
+
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.get(
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "unknown-document-type",
+                },
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+        self.assertContains(
+            response,
+            "Неизвестный тип документа",
+        )
+        self.assertContains(
+            response,
+            matching_invoice.title,
+        )
+        self.assertNotContains(
+            response,
+            without_ocr_invoice.title,
+        )
+        self.assertNotContains(
+            response,
+            known_invoice.title,
+        )
+
     def test_unknown_category_returns_404(self):
         self.client.force_login(
             self.user

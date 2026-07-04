@@ -138,9 +138,29 @@
                                 {% if item.invoice.planned_payment_date %}
                                     {{ item.invoice.planned_payment_date|date:"d.m.Y" }}
                                 {% else %}
-                                    <span class="status-badge status-rejected">
-                                        Не указана
-                                    </span>
+                                    {% if category == "without-planned-payment-date" and user.is_staff %}
+                                        <form
+                                            method="post"
+                                            action="{% url 'update_invoice_bot_report_planned_payment_date' category item.invoice.id %}"
+                                            class="invoice-bot-report-date-form-v1"
+                                        >
+                                            {% csrf_token %}
+
+                                            <input
+                                                type="date"
+                                                name="planned_payment_date"
+                                                required
+                                            >
+
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                Сохранить дату
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="status-badge status-rejected">
+                                            Не указана
+                                        </span>
+                                    {% endif %}
                                 {% endif %}
                             </td>
 

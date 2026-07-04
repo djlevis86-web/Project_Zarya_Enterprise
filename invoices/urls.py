@@ -5,6 +5,7 @@ from .views import (
     clear_recent_invoice_filters,
     export_invoice_bot_report_excel,
     invoice_bot_report_detail,
+    update_invoice_bot_report_planned_payment_date,
     upload_invoice,
     upload_result,
     upload_batches,
@@ -71,6 +72,12 @@ urlpatterns = [
         'bot-report/<str:category>/export-excel/',
         export_invoice_bot_report_excel,
         name='export_invoice_bot_report_excel'
+    ),
+
+    path(
+        'bot-report/<str:category>/<int:invoice_id>/planned-payment-date/',
+        update_invoice_bot_report_planned_payment_date,
+        name='update_invoice_bot_report_planned_payment_date'
     ),
 
     path(

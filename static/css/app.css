@@ -165,3 +165,26 @@
 .invoice-bot-report-table-v1 .table-actions {
     min-width: 150px;
 }
+
+/* Invoice bot report quick date v1 */
+
+.invoice-bot-report-date-form-v1 {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 170px;
+}
+
+.invoice-bot-report-date-form-v1 input[type="date"] {
+    width: 100%;
+    min-height: 36px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(15, 23, 42, 0.55);
+    color: inherit;
+}
+
+.invoice-bot-report-date-form-v1 .btn {
+    width: 100%;
+}

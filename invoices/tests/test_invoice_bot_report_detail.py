@@ -1,5 +1,8 @@
 from datetime import date
 from decimal import Decimal
+from io import BytesIO
+
+from openpyxl import load_workbook
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -271,6 +274,105 @@ class InvoiceBotReportDetailTests(TestCase):
         response = self.client.get(
             reverse(
                 "invoice_bot_report_detail",
+                kwargs={
+                    "category": "unknown",
+                },
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            404,
+        )
+
+
+    def test_export_excel_returns_xlsx_for_category(self):
+        matching_invoice = self.create_invoice(
+            title="EXCEL WITHOUT DATE DETAIL INVOICE",
+            planned_payment_date=None,
+        )
+        other_invoice = self.create_invoice(
+            title="EXCEL WITH DATE DETAIL INVOICE",
+        )
+
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.get(
+            reverse(
+                "export_invoice_bot_report_excel",
+                kwargs={
+                    "category": "without-planned-payment-date",
+                },
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+        self.assertEqual(
+            response[
+                "Content-Type"
+            ],
+            (
+                "application/vnd.openxmlformats-officedocument."
+                "spreadsheetml.sheet"
+            ),
+        )
+        self.assertIn(
+            "invoice_bot_report_without-planned-payment-date",
+            response[
+                "Content-Disposition"
+            ],
+        )
+
+        workbook = load_workbook(
+            BytesIO(
+                response.content
+            )
+        )
+        sheet = workbook.active
+
+        self.assertEqual(
+            sheet["A1"].value,
+            "ID",
+        )
+        self.assertEqual(
+            sheet["B1"].value,
+            "Название",
+        )
+        self.assertEqual(
+            sheet["I1"].value,
+            "Причины блокировки",
+        )
+
+        values = [
+            row[1]
+            for row in sheet.iter_rows(
+                min_row=2,
+                values_only=True,
+            )
+        ]
+
+        self.assertIn(
+            matching_invoice.title,
+            values,
+        )
+        self.assertNotIn(
+            other_invoice.title,
+            values,
+        )
+
+    def test_export_excel_unknown_category_returns_404(self):
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.get(
+            reverse(
+                "export_invoice_bot_report_excel",
                 kwargs={
                     "category": "unknown",
                 },

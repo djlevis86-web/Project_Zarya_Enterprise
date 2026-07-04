@@ -47,6 +47,7 @@ from .view_modules.invoice_list_views import (
 )
 
 from .view_modules.invoice_bot_report_views import (
+    export_invoice_bot_report_excel,
     invoice_bot_report_detail,
 )
 
@@ -122,6 +123,7 @@ __all__ = (
     'invoice_list',
     'clear_recent_invoice_filters',
     'invoice_bot_report_detail',
+    'export_invoice_bot_report_excel',
     'upload_invoice',
     'upload_result',
     'upload_batches',

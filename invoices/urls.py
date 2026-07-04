@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     invoice_list,
     clear_recent_invoice_filters,
+    export_invoice_bot_report_excel,
     invoice_bot_report_detail,
     upload_invoice,
     upload_result,
@@ -64,6 +65,12 @@ urlpatterns = [
         'bot-report/<str:category>/',
         invoice_bot_report_detail,
         name='invoice_bot_report_detail'
+    ),
+
+    path(
+        'bot-report/<str:category>/export-excel/',
+        export_invoice_bot_report_excel,
+        name='export_invoice_bot_report_excel'
     ),
 
     path(

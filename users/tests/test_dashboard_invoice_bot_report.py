@@ -134,3 +134,105 @@ class DashboardInvoiceBotReportTests(TestCase):
             response,
             "Отчёт бота",
         )
+
+    def test_dashboard_invoice_bot_report_cards_link_to_detail_pages(self):
+        with TemporaryDirectory() as temp_dir:
+            base_dir = Path(
+                temp_dir
+            )
+
+            report_path = (
+                base_dir
+                / "var"
+                / "invoice_bot"
+                / "latest_report.json"
+            )
+            report_path.parent.mkdir(
+                parents=True,
+                exist_ok=True,
+            )
+            report_path.write_text(
+                json.dumps(
+                    {
+                        "generated_at": "2026-07-03T22:17:29.001994+00:00",
+                        "total_count": 201,
+                        "without_planned_payment_date_count": 146,
+                        "without_counterparty_count": 12,
+                        "unverified_amount_count": 121,
+                        "without_ocr_text_count": 8,
+                        "ready_for_registry_count": 36,
+                        "not_ready_for_registry_count": 165,
+                        "mode": "audit_only",
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+
+            self.client.force_login(
+                self.user
+            )
+
+            with self.settings(
+                BASE_DIR=base_dir
+            ):
+                response = self.client.get(
+                    reverse(
+                        "dashboard"
+                    )
+                )
+
+        self.assertContains(
+            response,
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "ready",
+                },
+            ),
+        )
+        self.assertContains(
+            response,
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "not-ready",
+                },
+            ),
+        )
+        self.assertContains(
+            response,
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "without-planned-payment-date",
+                },
+            ),
+        )
+        self.assertContains(
+            response,
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "without-counterparty",
+                },
+            ),
+        )
+        self.assertContains(
+            response,
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "unverified-amount",
+                },
+            ),
+        )
+        self.assertContains(
+            response,
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "without-ocr-text",
+                },
+            ),
+        )

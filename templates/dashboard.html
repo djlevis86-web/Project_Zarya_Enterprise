@@ -140,6 +140,101 @@
 
 </div>
 
+{% if invoice_bot_report %}
+<div class="card dashboard-bot-report-v1">
+
+    <div class="registry-table-header">
+        <div>
+            <h3>
+                <span class="dashboard-bot-title-v1">Отчёт бота</span>
+            </h3>
+
+            <span>
+                Последний автоматический аудит счетов
+                {% if invoice_bot_report.generated_at_datetime %}
+                    · {{ invoice_bot_report.generated_at_datetime|date:"d.m.Y H:i" }}
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <div class="registry-summary dashboard-bot-summary-v1">
+
+        <div class="registry-summary-card">
+            <span class="registry-summary-label">
+                Активных счетов
+            </span>
+
+            <strong>
+                {{ invoice_bot_report.total_count }}
+            </strong>
+        </div>
+
+        <div class="registry-summary-card">
+            <span class="registry-summary-label">
+                Готовы к реестру
+            </span>
+
+            <strong class="text-success">
+                {{ invoice_bot_report.ready_for_registry_count }}
+            </strong>
+        </div>
+
+        <div class="registry-summary-card">
+            <span class="registry-summary-label">
+                Не готовы
+            </span>
+
+            <strong class="summary-warning">
+                {{ invoice_bot_report.not_ready_for_registry_count }}
+            </strong>
+        </div>
+
+        <div class="registry-summary-card">
+            <span class="registry-summary-label">
+                Без даты оплаты
+            </span>
+
+            <strong>
+                {{ invoice_bot_report.without_planned_payment_date_count }}
+            </strong>
+        </div>
+
+        <div class="registry-summary-card">
+            <span class="registry-summary-label">
+                Без контрагента
+            </span>
+
+            <strong>
+                {{ invoice_bot_report.without_counterparty_count }}
+            </strong>
+        </div>
+
+        <div class="registry-summary-card">
+            <span class="registry-summary-label">
+                Сумма не подтверждена
+            </span>
+
+            <strong>
+                {{ invoice_bot_report.unverified_amount_count }}
+            </strong>
+        </div>
+
+        <div class="registry-summary-card">
+            <span class="registry-summary-label">
+                Без OCR-текста
+            </span>
+
+            <strong>
+                {{ invoice_bot_report.without_ocr_text_count }}
+            </strong>
+        </div>
+
+    </div>
+
+</div>
+{% endif %}
+
 <div class="dashboard-grid-two">
 
     <section class="dashboard-attention-v1">

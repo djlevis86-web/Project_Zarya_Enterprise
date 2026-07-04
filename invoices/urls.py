@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     invoice_list,
     clear_recent_invoice_filters,
+    confirm_invoice_bot_report_amount,
     export_invoice_bot_report_excel,
     invoice_bot_report_detail,
     update_invoice_bot_report_planned_payment_date,
@@ -78,6 +79,12 @@ urlpatterns = [
         'bot-report/<str:category>/<int:invoice_id>/planned-payment-date/',
         update_invoice_bot_report_planned_payment_date,
         name='update_invoice_bot_report_planned_payment_date'
+    ),
+
+    path(
+        'bot-report/<str:category>/<int:invoice_id>/confirm-amount/',
+        confirm_invoice_bot_report_amount,
+        name='confirm_invoice_bot_report_amount'
     ),
 
     path(

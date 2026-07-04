@@ -188,3 +188,14 @@
 .invoice-bot-report-date-form-v1 .btn {
     width: 100%;
 }
+
+/* Invoice bot report quick amount v1 */
+
+.invoice-bot-report-confirm-form-v1 {
+    margin: 0;
+    width: 100%;
+}
+
+.invoice-bot-report-confirm-form-v1 .btn {
+    width: 100%;
+}

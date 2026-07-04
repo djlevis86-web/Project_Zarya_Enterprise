@@ -206,6 +206,20 @@
                                         >
                                             Изменить
                                         </a>
+
+                                        {% if category == "unverified-amount" and not item.invoice.amount_verified %}
+                                            <form
+                                                method="post"
+                                                action="{% url 'confirm_invoice_bot_report_amount' category item.invoice.id %}"
+                                                class="invoice-bot-report-confirm-form-v1"
+                                            >
+                                                {% csrf_token %}
+
+                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                    Подтвердить сумму
+                                                </button>
+                                            </form>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                             </td>

@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
+from invoices.bot_report_services import read_latest_invoice_bot_report
 from invoices.models import Invoice
 
 from .permissions import admin_required
@@ -124,6 +125,7 @@ def dashboard(request):
         "latest_invoices": latest_invoices,
         "paid_count": paid_count,
         "attention_items": attention_items,
+        "invoice_bot_report": read_latest_invoice_bot_report(),
     }
 
     return render(

@@ -61,6 +61,19 @@ class Command(BaseCommand):
             Q(ocr_text="")
         ).count()
 
+        unknown_document_type_count = (
+            invoices
+            .filter(
+                document_type=Invoice.DOCUMENT_TYPE_UNKNOWN,
+            )
+            .exclude(
+                Q(ocr_text__isnull=True)
+                |
+                Q(ocr_text="")
+            )
+            .count()
+        )
+
         ready_for_registry_count = 0
         not_ready_for_registry_count = 0
 
@@ -81,6 +94,7 @@ class Command(BaseCommand):
             "without_counterparty_count": without_counterparty_count,
             "unverified_amount_count": unverified_amount_count,
             "without_ocr_text_count": without_ocr_text_count,
+            "unknown_document_type_count": unknown_document_type_count,
             "ready_for_registry_count": ready_for_registry_count,
             "not_ready_for_registry_count": not_ready_for_registry_count,
             "mode": "audit_only",
@@ -106,6 +120,9 @@ class Command(BaseCommand):
         )
         self.stdout.write(
             f"Без OCR-текста: {without_ocr_text_count}"
+        )
+        self.stdout.write(
+            f"Неизвестный тип документа: {unknown_document_type_count}"
         )
         self.stdout.write(
             f"Готовы к реестру оплаты: {ready_for_registry_count}"

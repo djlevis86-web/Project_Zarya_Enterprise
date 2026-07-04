@@ -21,6 +21,7 @@ BOT_REPORT_CATEGORY_WITHOUT_PLANNED_PAYMENT_DATE = "without-planned-payment-date
 BOT_REPORT_CATEGORY_WITHOUT_COUNTERPARTY = "without-counterparty"
 BOT_REPORT_CATEGORY_UNVERIFIED_AMOUNT = "unverified-amount"
 BOT_REPORT_CATEGORY_WITHOUT_OCR_TEXT = "without-ocr-text"
+BOT_REPORT_CATEGORY_UNKNOWN_DOCUMENT_TYPE = "unknown-document-type"
 
 INVOICE_BOT_REPORT_CATEGORIES = {
     BOT_REPORT_CATEGORY_READY: {
@@ -47,6 +48,10 @@ INVOICE_BOT_REPORT_CATEGORIES = {
         "title": "Без OCR-текста",
         "description": "Счета, у которых нет сохранённого OCR-текста.",
     },
+    BOT_REPORT_CATEGORY_UNKNOWN_DOCUMENT_TYPE: {
+        "title": "Неизвестный тип документа",
+        "description": "Документы, у которых OCR-текст есть, но тип документа не распознан.",
+    },
 }
 
 REPORT_COUNT_FIELDS = (
@@ -55,6 +60,7 @@ REPORT_COUNT_FIELDS = (
     "without_counterparty_count",
     "unverified_amount_count",
     "without_ocr_text_count",
+    "unknown_document_type_count",
     "ready_for_registry_count",
     "not_ready_for_registry_count",
 )
@@ -201,6 +207,19 @@ def _apply_category_filter(invoices, category):
             Q(ocr_text__isnull=True)
             |
             Q(ocr_text="")
+        )
+
+    if category == BOT_REPORT_CATEGORY_UNKNOWN_DOCUMENT_TYPE:
+        return (
+            invoices
+            .filter(
+                document_type=Invoice.DOCUMENT_TYPE_UNKNOWN,
+            )
+            .exclude(
+                Q(ocr_text__isnull=True)
+                |
+                Q(ocr_text="")
+            )
         )
 
     return invoices.none()

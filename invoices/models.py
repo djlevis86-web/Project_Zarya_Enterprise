@@ -284,10 +284,14 @@ class Invoice(models.Model):
 
     DOCUMENT_TYPE_INVOICE = 'invoice'
     DOCUMENT_TYPE_UPD = 'upd'
+    DOCUMENT_TYPE_WAYBILL = 'waybill'
+    DOCUMENT_TYPE_UNKNOWN = 'unknown'
 
     DOCUMENT_TYPE_CHOICES = [
         (DOCUMENT_TYPE_INVOICE, 'Счёт'),
         (DOCUMENT_TYPE_UPD, 'УПД'),
+        (DOCUMENT_TYPE_WAYBILL, 'Товарная накладная'),
+        (DOCUMENT_TYPE_UNKNOWN, 'Неизвестный тип'),
     ]
 
     STATUS_CHOICES = [

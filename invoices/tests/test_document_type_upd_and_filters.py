@@ -262,3 +262,57 @@ class InvoiceListDocumentFilterTests(TestCase):
         self.assertContains(response, "Загрузил")
         self.assertContains(response, "Иван Петров")
 
+
+
+    def test_detects_waybill_text(self):
+        self.assertEqual(
+            detect_document_type(
+                "Товарная накладная № 45 от 01.07.2026"
+            ),
+            "waybill",
+        )
+
+    def test_detects_unknown_document_type_for_supported_ocr_text_without_known_markers(self):
+        self.assertEqual(
+            detect_document_type(
+                "Акт сверки взаимных расчетов за период июль 2026"
+            ),
+            "unknown",
+        )
+
+    def test_parse_invoice_data_returns_waybill_document_type(self):
+        parsed = parse_invoice_data(
+            "Товарная накладная № 45 от 01.07.2026\n"
+            "Поставщик: ООО РОМАШКА\n"
+            "Грузополучатель: ОАО ЗАРЯ\n"
+            "Итого 1250,00"
+        )
+
+        self.assertEqual(
+            parsed["document_type"],
+            "waybill",
+        )
+        self.assertEqual(
+            parsed["invoice_number"],
+            "45",
+        )
+        self.assertEqual(
+            parsed["amount"],
+            "1250.00",
+        )
+
+    def test_invoice_model_has_waybill_and_unknown_document_type_choices(self):
+        self.assertIn(
+            (
+                Invoice.DOCUMENT_TYPE_WAYBILL,
+                "Товарная накладная",
+            ),
+            Invoice.DOCUMENT_TYPE_CHOICES,
+        )
+        self.assertIn(
+            (
+                Invoice.DOCUMENT_TYPE_UNKNOWN,
+                "Неизвестный тип",
+            ),
+            Invoice.DOCUMENT_TYPE_CHOICES,
+        )

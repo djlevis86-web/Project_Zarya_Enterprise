@@ -1,14 +1,23 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import Http404, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.dateparse import parse_date
+from django.views.decorators.http import require_POST
 
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
-from ..bot_report_services import get_invoice_bot_report_items
+from ..bot_report_services import (
+    BOT_REPORT_CATEGORY_WITHOUT_PLANNED_PAYMENT_DATE,
+    get_invoice_bot_report_category,
+    get_invoice_bot_report_items,
+)
+from ..log_service import create_invoice_log
+from ..models import Invoice
 from ..payment_registry_permissions import (
     require_payment_registry_permission,
     user_can_manage_payment_registry,
@@ -58,6 +67,125 @@ def invoice_bot_report_detail(request, category):
                 invoice_items
             ),
         }
+    )
+
+
+@login_required
+@require_POST
+@require_payment_registry_permission(
+    user_can_manage_payment_registry,
+    "Нет прав на быстрое исправление отчёта бота.",
+)
+def update_invoice_bot_report_planned_payment_date(
+    request,
+    category,
+    invoice_id,
+):
+    category_data = get_invoice_bot_report_category(
+        category
+    )
+
+    if category_data is None:
+        raise Http404(
+            "Категория отчёта бота не найдена."
+        )
+
+    if category != BOT_REPORT_CATEGORY_WITHOUT_PLANNED_PAYMENT_DATE:
+        raise Http404(
+            "Быстрое исправление даты доступно только для категории без даты оплаты."
+        )
+
+    invoice = get_object_or_404(
+        Invoice,
+        id=invoice_id,
+        is_deleted=False,
+    )
+
+    planned_payment_date_raw = request.POST.get(
+        "planned_payment_date",
+        "",
+    )
+
+    if not planned_payment_date_raw:
+        messages.error(
+            request,
+            "Укажите плановую дату оплаты."
+        )
+
+        return redirect(
+            "invoice_bot_report_detail",
+            category=category,
+        )
+
+    new_planned_payment_date = parse_date(
+        planned_payment_date_raw
+    )
+
+    if not new_planned_payment_date:
+        messages.error(
+            request,
+            "Введите корректную плановую дату оплаты."
+        )
+
+        return redirect(
+            "invoice_bot_report_detail",
+            category=category,
+        )
+
+    old_planned_payment_date = invoice.planned_payment_date
+
+    if old_planned_payment_date == new_planned_payment_date:
+        messages.info(
+            request,
+            f"По счёту #{invoice.id} дата оплаты не изменилась."
+        )
+
+        return redirect(
+            "invoice_bot_report_detail",
+            category=category,
+        )
+
+    invoice.planned_payment_date = new_planned_payment_date
+
+    update_fields = [
+        "planned_payment_date",
+    ]
+
+    if any(field.name == "updated_at" for field in invoice._meta.fields):
+        update_fields.append(
+            "updated_at"
+        )
+
+    invoice.save(
+        update_fields=update_fields
+    )
+
+    old_date_display = (
+        old_planned_payment_date.strftime("%d.%m.%Y")
+        if old_planned_payment_date
+        else "не указана"
+    )
+    new_date_display = new_planned_payment_date.strftime(
+        "%d.%m.%Y"
+    )
+
+    create_invoice_log(
+        invoice,
+        request.user,
+        (
+            "Плановая дата оплаты изменена из отчёта бота: "
+            f"{old_date_display} → {new_date_display}."
+        )
+    )
+
+    messages.success(
+        request,
+        f"Плановая дата оплаты по счёту #{invoice.id} сохранена."
+    )
+
+    return redirect(
+        "invoice_bot_report_detail",
+        category=category,
     )
 
 

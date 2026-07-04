@@ -383,3 +383,167 @@ class InvoiceBotReportDetailTests(TestCase):
             response.status_code,
             404,
         )
+
+
+    def test_without_planned_payment_date_page_shows_quick_date_form(self):
+        invoice = self.create_invoice(
+            title="QUICK DATE FORM INVOICE",
+            planned_payment_date=None,
+        )
+
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.get(
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "without-planned-payment-date",
+                },
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+        self.assertContains(
+            response,
+            reverse(
+                "update_invoice_bot_report_planned_payment_date",
+                kwargs={
+                    "category": "without-planned-payment-date",
+                    "invoice_id": invoice.id,
+                },
+            ),
+        )
+        self.assertContains(
+            response,
+            "Сохранить дату",
+        )
+
+    def test_quick_date_update_saves_date_and_removes_invoice_from_category(self):
+        invoice = self.create_invoice(
+            title="QUICK DATE UPDATE INVOICE",
+            planned_payment_date=None,
+        )
+
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.post(
+            reverse(
+                "update_invoice_bot_report_planned_payment_date",
+                kwargs={
+                    "category": "without-planned-payment-date",
+                    "invoice_id": invoice.id,
+                },
+            ),
+            {
+                "planned_payment_date": "2026-07-30",
+            },
+        )
+
+        self.assertRedirects(
+            response,
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "without-planned-payment-date",
+                },
+            ),
+        )
+
+        invoice.refresh_from_db()
+
+        self.assertEqual(
+            invoice.planned_payment_date,
+            date(
+                2026,
+                7,
+                30,
+            ),
+        )
+
+        response = self.client.get(
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "without-planned-payment-date",
+                },
+            )
+        )
+
+        self.assertNotContains(
+            response,
+            invoice.title,
+        )
+
+    def test_quick_date_update_rejects_invalid_date(self):
+        invoice = self.create_invoice(
+            title="QUICK DATE INVALID INVOICE",
+            planned_payment_date=None,
+        )
+
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.post(
+            reverse(
+                "update_invoice_bot_report_planned_payment_date",
+                kwargs={
+                    "category": "without-planned-payment-date",
+                    "invoice_id": invoice.id,
+                },
+            ),
+            {
+                "planned_payment_date": "bad-date",
+            },
+        )
+
+        self.assertRedirects(
+            response,
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "without-planned-payment-date",
+                },
+            ),
+        )
+
+        invoice.refresh_from_db()
+
+        self.assertIsNone(
+            invoice.planned_payment_date,
+        )
+
+    def test_quick_date_update_is_not_available_for_other_categories(self):
+        invoice = self.create_invoice(
+            title="QUICK DATE WRONG CATEGORY INVOICE",
+            planned_payment_date=None,
+        )
+
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.post(
+            reverse(
+                "update_invoice_bot_report_planned_payment_date",
+                kwargs={
+                    "category": "not-ready",
+                    "invoice_id": invoice.id,
+                },
+            ),
+            {
+                "planned_payment_date": "2026-07-30",
+            },
+        )
+
+        self.assertEqual(
+            response.status_code,
+            404,
+        )

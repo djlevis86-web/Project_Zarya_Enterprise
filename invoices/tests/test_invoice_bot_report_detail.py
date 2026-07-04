@@ -547,3 +547,131 @@ class InvoiceBotReportDetailTests(TestCase):
             response.status_code,
             404,
         )
+
+
+    def test_unverified_amount_page_shows_confirm_amount_button(self):
+        invoice = self.create_invoice(
+            title="QUICK AMOUNT FORM INVOICE",
+            amount_verified=False,
+        )
+
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.get(
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "unverified-amount",
+                },
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+        self.assertContains(
+            response,
+            reverse(
+                "confirm_invoice_bot_report_amount",
+                kwargs={
+                    "category": "unverified-amount",
+                    "invoice_id": invoice.id,
+                },
+            ),
+        )
+        self.assertContains(
+            response,
+            "Подтвердить сумму",
+        )
+
+    def test_confirm_amount_sets_amount_verified_and_removes_invoice_from_category(self):
+        invoice = self.create_invoice(
+            title="QUICK AMOUNT UPDATE INVOICE",
+            amount_verified=False,
+            ocr_verified=False,
+        )
+
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.post(
+            reverse(
+                "confirm_invoice_bot_report_amount",
+                kwargs={
+                    "category": "unverified-amount",
+                    "invoice_id": invoice.id,
+                },
+            )
+        )
+
+        self.assertRedirects(
+            response,
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "unverified-amount",
+                },
+            ),
+        )
+
+        invoice.refresh_from_db()
+
+        self.assertTrue(
+            invoice.amount_verified,
+        )
+        self.assertFalse(
+            invoice.ocr_verified,
+        )
+        self.assertIn(
+            "Сумма подтверждена вручную из отчёта бота",
+            invoice.ocr_comment,
+        )
+
+        response = self.client.get(
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "unverified-amount",
+                },
+            )
+        )
+
+        self.assertNotContains(
+            response,
+            invoice.title,
+        )
+
+    def test_confirm_amount_is_not_available_for_other_categories(self):
+        invoice = self.create_invoice(
+            title="QUICK AMOUNT WRONG CATEGORY INVOICE",
+            amount_verified=False,
+        )
+
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.post(
+            reverse(
+                "confirm_invoice_bot_report_amount",
+                kwargs={
+                    "category": "not-ready",
+                    "invoice_id": invoice.id,
+                },
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            404,
+        )
+
+        invoice.refresh_from_db()
+
+        self.assertFalse(
+            invoice.amount_verified,
+        )

@@ -21,11 +21,18 @@
         </div>
 
         <div class="registry-actions">
+            <a
+                href="{% url 'export_invoice_bot_report_excel' category %}"
+                class="btn btn-primary"
+            >
+                Скачать Excel
+            </a>
+
             <a href="{% url 'dashboard' %}" class="btn btn-secondary">
                 Назад на панель
             </a>
 
-            <a href="{% url 'payment_registry' %}" class="btn btn-primary">
+            <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
                 Реестр оплаты
             </a>
         </div>

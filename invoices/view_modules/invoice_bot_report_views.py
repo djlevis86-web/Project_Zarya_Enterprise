@@ -12,6 +12,7 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
 from ..bot_report_services import (
+    BOT_REPORT_CATEGORY_UNVERIFIED_AMOUNT,
     BOT_REPORT_CATEGORY_WITHOUT_PLANNED_PAYMENT_DATE,
     get_invoice_bot_report_category,
     get_invoice_bot_report_items,
@@ -181,6 +182,85 @@ def update_invoice_bot_report_planned_payment_date(
     messages.success(
         request,
         f"Плановая дата оплаты по счёту #{invoice.id} сохранена."
+    )
+
+    return redirect(
+        "invoice_bot_report_detail",
+        category=category,
+    )
+
+
+@login_required
+@require_POST
+@require_payment_registry_permission(
+    user_can_manage_payment_registry,
+    "Нет прав на быстрое подтверждение суммы из отчёта бота.",
+)
+def confirm_invoice_bot_report_amount(
+    request,
+    category,
+    invoice_id,
+):
+    category_data = get_invoice_bot_report_category(
+        category
+    )
+
+    if category_data is None:
+        raise Http404(
+            "Категория отчёта бота не найдена."
+        )
+
+    if category != BOT_REPORT_CATEGORY_UNVERIFIED_AMOUNT:
+        raise Http404(
+            "Быстрое подтверждение суммы доступно только для категории с неподтверждённой суммой."
+        )
+
+    invoice = get_object_or_404(
+        Invoice,
+        id=invoice_id,
+        is_deleted=False,
+    )
+
+    if invoice.amount_verified:
+        messages.info(
+            request,
+            f"Сумма по счёту #{invoice.id} уже подтверждена."
+        )
+
+        return redirect(
+            "invoice_bot_report_detail",
+            category=category,
+        )
+
+    invoice.amount_verified = True
+    invoice.ocr_comment = (
+        "Сумма подтверждена вручную из отчёта бота. "
+        "OCR-статус не изменялся."
+    )
+
+    update_fields = [
+        "amount_verified",
+        "ocr_comment",
+    ]
+
+    if any(field.name == "updated_at" for field in invoice._meta.fields):
+        update_fields.append(
+            "updated_at"
+        )
+
+    invoice.save(
+        update_fields=update_fields
+    )
+
+    create_invoice_log(
+        invoice,
+        request.user,
+        "Сумма счёта подтверждена вручную из отчёта бота."
+    )
+
+    messages.success(
+        request,
+        f"Сумма по счёту #{invoice.id} подтверждена."
     )
 
     return redirect(

@@ -1752,6 +1752,9 @@ def extract_kpp(text):
 def detect_document_type(text):
     normalized = normalize_ocr_text(text or '').lower()
 
+    if not normalized:
+        return 'invoice'
+
     upd_markers = (
         'упд',
         'универсальный передаточный документ',
@@ -1764,7 +1767,34 @@ def detect_document_type(text):
         if marker in normalized:
             return 'upd'
 
-    return 'invoice'
+    waybill_markers = (
+        'товарная накладная',
+        'торг-12',
+        'торг 12',
+        'форма торг',
+        'грузоотправитель',
+        'грузополучатель',
+    )
+
+    for marker in waybill_markers:
+        if marker in normalized:
+            return 'waybill'
+
+    invoice_markers = (
+        'счет на оплату',
+        'счёт на оплату',
+        'счет №',
+        'счёт №',
+        'счет-фактура',
+        'счёт-фактура',
+        'заказу клиента',
+    )
+
+    for marker in invoice_markers:
+        if marker in normalized:
+            return 'invoice'
+
+    return 'unknown'
 
 
 def parse_document_date_value(value):
@@ -1981,6 +2011,10 @@ def parse_invoice_data(text):
     # =====================================
 
     invoice_patterns = [
+
+        r'Товарная\s+накладная\s*№\s*([^\s]+)',
+        r'ТОРГ\s*[-–—]?\s*12\s*№\s*([^\s]+)',
+        r'Накладная\s*№\s*([^\s]+)',
 
         r'Счет\s+на\s+оплату\s*№\s*([^\s]+)',
 

@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from invoices.models import Counterparty, Invoice
+from invoices.models import Counterparty, Invoice, OCRJob
 
 
 class InvoiceBotReportDetailTests(TestCase):
@@ -725,4 +725,165 @@ class InvoiceBotReportDetailTests(TestCase):
 
         self.assertFalse(
             invoice.amount_verified,
+        )
+
+
+    def test_without_ocr_text_page_shows_retry_ocr_button(self):
+        invoice = self.create_invoice(
+            title="OCR RETRY FORM INVOICE",
+            ocr_text="",
+        )
+
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.get(
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "without-ocr-text",
+                },
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+        self.assertContains(
+            response,
+            reverse(
+                "retry_invoice_bot_report_ocr",
+                kwargs={
+                    "category": "without-ocr-text",
+                    "invoice_id": invoice.id,
+                },
+            ),
+        )
+        self.assertContains(
+            response,
+            "Повторить OCR",
+        )
+
+    def test_retry_ocr_creates_pending_job_from_bot_report(self):
+        invoice = self.create_invoice(
+            title="OCR RETRY CREATE JOB INVOICE",
+            ocr_text="",
+        )
+
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.post(
+            reverse(
+                "retry_invoice_bot_report_ocr",
+                kwargs={
+                    "category": "without-ocr-text",
+                    "invoice_id": invoice.id,
+                },
+            )
+        )
+
+        self.assertRedirects(
+            response,
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "without-ocr-text",
+                },
+            ),
+        )
+
+        job = OCRJob.objects.get(
+            invoice=invoice
+        )
+
+        self.assertEqual(
+            job.status,
+            OCRJob.STATUS_PENDING,
+        )
+        self.assertEqual(
+            job.source,
+            OCRJob.SOURCE_SINGLE,
+        )
+        self.assertEqual(
+            job.user,
+            self.user,
+        )
+
+    def test_retry_ocr_does_not_create_duplicate_active_job(self):
+        invoice = self.create_invoice(
+            title="OCR RETRY DUPLICATE JOB INVOICE",
+            ocr_text="",
+        )
+
+        OCRJob.objects.create(
+            invoice=invoice,
+            user=self.user,
+            status=OCRJob.STATUS_PENDING,
+            source=OCRJob.SOURCE_SINGLE,
+        )
+
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.post(
+            reverse(
+                "retry_invoice_bot_report_ocr",
+                kwargs={
+                    "category": "without-ocr-text",
+                    "invoice_id": invoice.id,
+                },
+            )
+        )
+
+        self.assertRedirects(
+            response,
+            reverse(
+                "invoice_bot_report_detail",
+                kwargs={
+                    "category": "without-ocr-text",
+                },
+            ),
+        )
+
+        self.assertEqual(
+            OCRJob.objects.filter(
+                invoice=invoice
+            ).count(),
+            1,
+        )
+
+    def test_retry_ocr_is_not_available_for_other_categories(self):
+        invoice = self.create_invoice(
+            title="OCR RETRY WRONG CATEGORY INVOICE",
+            ocr_text="",
+        )
+
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.post(
+            reverse(
+                "retry_invoice_bot_report_ocr",
+                kwargs={
+                    "category": "not-ready",
+                    "invoice_id": invoice.id,
+                },
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            404,
+        )
+
+        self.assertFalse(
+            OCRJob.objects.filter(
+                invoice=invoice
+            ).exists()
         )

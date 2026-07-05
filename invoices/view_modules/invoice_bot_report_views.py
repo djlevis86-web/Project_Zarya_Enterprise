@@ -13,12 +13,13 @@ from openpyxl.utils import get_column_letter
 
 from ..bot_report_services import (
     BOT_REPORT_CATEGORY_UNVERIFIED_AMOUNT,
+    BOT_REPORT_CATEGORY_WITHOUT_OCR_TEXT,
     BOT_REPORT_CATEGORY_WITHOUT_PLANNED_PAYMENT_DATE,
     get_invoice_bot_report_category,
     get_invoice_bot_report_items,
 )
 from ..log_service import create_invoice_log
-from ..models import Invoice
+from ..models import Invoice, OCRJob
 from ..payment_registry_permissions import (
     require_payment_registry_permission,
     user_can_manage_payment_registry,
@@ -46,6 +47,11 @@ def invoice_bot_report_detail(request, category):
             "Категория отчёта бота не найдена."
         )
 
+    _attach_ocr_job_diagnostics(
+        category,
+        invoice_items,
+    )
+
     paginator = Paginator(
         invoice_items,
         50,
@@ -69,6 +75,62 @@ def invoice_bot_report_detail(request, category):
             ),
         }
     )
+
+
+def _attach_ocr_job_diagnostics(category, invoice_items):
+    if category != BOT_REPORT_CATEGORY_WITHOUT_OCR_TEXT:
+        return
+
+    invoice_ids = [
+        item["invoice"].id
+        for item in invoice_items
+    ]
+
+    if not invoice_ids:
+        return
+
+    latest_jobs_by_invoice_id = {}
+
+    latest_jobs = (
+        OCRJob.objects
+        .filter(
+            invoice_id__in=invoice_ids,
+        )
+        .select_related(
+            "user",
+        )
+        .order_by(
+            "invoice_id",
+            "-created_at",
+            "-id",
+        )
+    )
+
+    for job in latest_jobs:
+        if job.invoice_id not in latest_jobs_by_invoice_id:
+            latest_jobs_by_invoice_id[job.invoice_id] = job
+
+    active_invoice_ids = set(
+        OCRJob.objects
+        .filter(
+            invoice_id__in=invoice_ids,
+            status__in=[
+                OCRJob.STATUS_PENDING,
+                OCRJob.STATUS_PROCESSING,
+            ],
+        )
+        .values_list(
+            "invoice_id",
+            flat=True,
+        )
+    )
+
+    for item in invoice_items:
+        invoice = item["invoice"]
+        item["latest_ocr_job"] = latest_jobs_by_invoice_id.get(
+            invoice.id
+        )
+        item["has_active_ocr_job"] = invoice.id in active_invoice_ids
 
 
 @login_required
@@ -261,6 +323,96 @@ def confirm_invoice_bot_report_amount(
     messages.success(
         request,
         f"Сумма по счёту #{invoice.id} подтверждена."
+    )
+
+    return redirect(
+        "invoice_bot_report_detail",
+        category=category,
+    )
+
+
+@login_required
+@require_POST
+@require_payment_registry_permission(
+    user_can_manage_payment_registry,
+    "Нет прав на повторный запуск OCR из отчёта бота.",
+)
+def retry_invoice_bot_report_ocr(
+    request,
+    category,
+    invoice_id,
+):
+    category_data = get_invoice_bot_report_category(
+        category
+    )
+
+    if category_data is None:
+        raise Http404(
+            "Категория отчёта бота не найдена."
+        )
+
+    if category != BOT_REPORT_CATEGORY_WITHOUT_OCR_TEXT:
+        raise Http404(
+            "Повтор OCR доступен только для категории без OCR-текста."
+        )
+
+    invoice = get_object_or_404(
+        Invoice,
+        id=invoice_id,
+        is_deleted=False,
+    )
+
+    if invoice.ocr_text:
+        messages.info(
+            request,
+            f"По счёту #{invoice.id} OCR-текст уже есть."
+        )
+
+        return redirect(
+            "invoice_bot_report_detail",
+            category=category,
+        )
+
+    existing_job = (
+        OCRJob.objects
+        .filter(
+            invoice=invoice,
+            status__in=[
+                OCRJob.STATUS_PENDING,
+                OCRJob.STATUS_PROCESSING,
+            ],
+        )
+        .first()
+    )
+
+    if existing_job:
+        messages.info(
+            request,
+            f"OCR по счёту #{invoice.id} уже стоит в очереди."
+        )
+
+        return redirect(
+            "invoice_bot_report_detail",
+            category=category,
+        )
+
+    ocr_job = OCRJob.objects.create(
+        invoice=invoice,
+        user=request.user,
+        status=OCRJob.STATUS_PENDING,
+        source=OCRJob.SOURCE_SINGLE,
+        message="OCR поставлен в очередь из отчёта бота.",
+    )
+
+    create_invoice_log(
+        invoice,
+        request.user,
+        f"OCR повторно поставлен в очередь из отчёта бота. OCRJob #{ocr_job.id}."
+    )
+
+    messages.success(
+        request,
+        f"OCR по счёту #{invoice.id} поставлен в очередь."
     )
 
     return redirect(

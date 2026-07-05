@@ -187,6 +187,30 @@
                                         {% endfor %}
                                     {% endif %}
 
+                                    {% if category == "without-ocr-text" %}
+                                        {% if item.latest_ocr_job %}
+                                            <div class="invoice-bot-report-reason-v1 invoice-bot-report-reason-warning-v1">
+                                                Последняя OCR-задача:
+                                                {{ item.latest_ocr_job.get_status_display }},
+                                                попыток: {{ item.latest_ocr_job.attempts }}
+                                            </div>
+
+                                            {% if item.latest_ocr_job.error_message %}
+                                                <div class="invoice-bot-report-reason-v1 invoice-bot-report-reason-error-v1">
+                                                    {{ item.latest_ocr_job.error_message }}
+                                                </div>
+                                            {% elif item.latest_ocr_job.message %}
+                                                <div class="invoice-bot-report-reason-v1 invoice-bot-report-reason-warning-v1">
+                                                    {{ item.latest_ocr_job.message }}
+                                                </div>
+                                            {% endif %}
+                                        {% else %}
+                                            <div class="invoice-bot-report-reason-v1 invoice-bot-report-reason-warning-v1">
+                                                OCR-задач по документу ещё не было.
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+
                                 </div>
                             </td>
 
@@ -217,6 +241,28 @@
 
                                                 <button type="submit" class="btn btn-primary btn-sm">
                                                     Подтвердить сумму
+                                                </button>
+                                            </form>
+                                        {% endif %}
+
+                                        {% if category == "without-ocr-text" %}
+                                            <form
+                                                method="post"
+                                                action="{% url 'retry_invoice_bot_report_ocr' category item.invoice.id %}"
+                                                class="invoice-bot-report-ocr-retry-form-v1"
+                                            >
+                                                {% csrf_token %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-primary btn-sm"
+                                                    {% if item.has_active_ocr_job %}disabled{% endif %}
+                                                >
+                                                    {% if item.has_active_ocr_job %}
+                                                        OCR уже в очереди
+                                                    {% else %}
+                                                        Повторить OCR
+                                                    {% endif %}
                                                 </button>
                                             </form>
                                         {% endif %}

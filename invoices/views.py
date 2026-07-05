@@ -50,6 +50,7 @@ from .view_modules.invoice_bot_report_views import (
     confirm_invoice_bot_report_amount,
     export_invoice_bot_report_excel,
     invoice_bot_report_detail,
+    retry_invoice_bot_report_ocr,
     update_invoice_bot_report_planned_payment_date,
 )
 
@@ -127,6 +128,7 @@ __all__ = (
     'invoice_bot_report_detail',
     'export_invoice_bot_report_excel',
     'confirm_invoice_bot_report_amount',
+    'retry_invoice_bot_report_ocr',
     'update_invoice_bot_report_planned_payment_date',
     'upload_invoice',
     'upload_result',

@@ -6,6 +6,7 @@ from .views import (
     confirm_invoice_bot_report_amount,
     export_invoice_bot_report_excel,
     invoice_bot_report_detail,
+    retry_invoice_bot_report_ocr,
     update_invoice_bot_report_planned_payment_date,
     upload_invoice,
     upload_result,
@@ -79,6 +80,12 @@ urlpatterns = [
         'bot-report/<str:category>/<int:invoice_id>/planned-payment-date/',
         update_invoice_bot_report_planned_payment_date,
         name='update_invoice_bot_report_planned_payment_date'
+    ),
+
+    path(
+        'bot-report/<str:category>/<int:invoice_id>/retry-ocr/',
+        retry_invoice_bot_report_ocr,
+        name='retry_invoice_bot_report_ocr'
     ),
 
     path(

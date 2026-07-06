@@ -7,7 +7,7 @@
 
     <div>
         <h2 class="page-title">
-            Счета
+            Документы к оплате
         </h2>
 
         <p class="page-subtitle">
@@ -17,7 +17,7 @@
 
     <div class="registry-actions invoice-top-actions-v1">
         <a href="{% url 'upload_invoice' %}" class="btn btn-primary">
-            Загрузить счет
+            Загрузить документ
         </a>
 
         <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
@@ -35,7 +35,7 @@
 
     <div class="stat-card">
         <div class="stat-label">
-            Всего счетов
+            Всего документов
         </div>
 
         <div class="stat-value">
@@ -55,7 +55,7 @@
 
     <div class="stat-card">
         <div class="stat-label">
-            На проверке
+            В работе
         </div>
 
         <div class="stat-value text-warning">
@@ -89,7 +89,7 @@
                 type="text"
                 name="search"
                 value="{{ search }}"
-                placeholder="Название, файл, поставщик, номер счета"
+                placeholder="Название, файл, поставщик, номер документа"
                 class="form-control"
             >
         </div>
@@ -318,7 +318,7 @@
         method="post"
         action="{% url 'bulk_repeat_ocr' %}"
         class="bulk-ocr-form"
-        onsubmit="return confirm('Повторить OCR для выбранных счетов?');"
+        onsubmit="return confirm('Повторить OCR для выбранных документов?');"
     >
 
         {% csrf_token %}
@@ -333,7 +333,7 @@
 
         <div>
             <h3>
-                Загруженные счета
+                Загруженные документы
             </h3>
 
             <span>
@@ -391,7 +391,7 @@
                             type="checkbox"
                             class="bulk-select-all"
                             data-target=".invoice-bulk-checkbox"
-                            aria-label="Выбрать все счета на странице"
+                            aria-label="Выбрать все документы на странице"
                         >
                     </th>
 
@@ -436,7 +436,7 @@
                                 name="invoice_ids"
                                 value="{{ invoice.id }}"
                                 class="invoice-bulk-checkbox"
-                                aria-label="Выбрать счет #{{ invoice.id }}"
+                                aria-label="Выбрать документ #{{ invoice.id }}"
                             >
                         </td>
 
@@ -651,7 +651,7 @@
                                         method="post"
                                         action="{% url 'delete_invoice' invoice.id %}"
                                         class="registry-action-form"
-                                        onsubmit="return confirm('Удалить счёт #{{ invoice.id }} из рабочих списков? Запись останется в базе для истории.');"
+                                        onsubmit="return confirm('Удалить документ #{{ invoice.id }} из рабочих списков? Запись останется в базе для истории.');"
                                     >
                                         {% csrf_token %}
 

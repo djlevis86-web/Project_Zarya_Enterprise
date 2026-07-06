@@ -11,7 +11,7 @@
         </h1>
 
         <p>
-            Планирование оплат по счетам: сроки, просрочки, приоритеты и суммы к оплате.
+            Планирование оплат по документам: сроки, просрочки, приоритеты и суммы к оплате.
         </p>
     </div>
 
@@ -21,7 +21,7 @@
         </a>
 
         <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
-            Все счета
+            Все документы
         </a>
     </div>
 
@@ -162,7 +162,7 @@
                 type="text"
                 name="q"
                 value="{{ search_query }}"
-                placeholder="Контрагент, счет, файл, описание"
+                placeholder="Контрагент, документ, файл, описание"
                 class="form-control"
             >
         </div>
@@ -191,7 +191,7 @@
             </h3>
 
             <span>
-                Отобрано счетов: {{ filtered_count }} · сумма: {{ filtered_amount|money_ru }}
+                Отобрано документов: {{ filtered_count }} · сумма: {{ filtered_amount|money_ru }}
             </span>
         </div>
 
@@ -225,7 +225,7 @@
 
                         <th>Контрагент</th>
 
-                        <th>Счет</th>
+                        <th>Документ</th>
 
                         <th>Сумма</th>
 

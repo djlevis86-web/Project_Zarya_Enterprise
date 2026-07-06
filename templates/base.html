@@ -62,7 +62,7 @@
                     <a href="{% url 'invoice_list' %}"
                        class="nav-link {% if current == 'invoice_list' or current == 'invoice_detail' or current == 'edit_invoice' or current == 'invoice_assign_counterparty' %}is-active{% endif %}">
                         <span class="nav-icon">▦</span>
-                        <span>Счета</span>
+                        <span>Документы к оплате</span>
                     </a>
 
                     <a href="{% url 'upload_invoice' %}"
@@ -232,13 +232,13 @@
                     {% if current == 'dashboard' %}
                         Панель управления
                     {% elif current == 'invoice_list' %}
-                        Счета
+                        Документы к оплате
                     {% elif current == 'invoice_detail' %}
-                        Карточка счета
+                        Карточка документа
                     {% elif current == 'edit_invoice' %}
-                        Редактирование счета
+                        Редактирование документа
                     {% elif current == 'upload_invoice' %}
-                        Загрузка счетов
+                        Загрузка документов
                     {% elif current == 'upload_result' %}
                         Результат загрузки
                     {% elif current == 'upload_batches' %}

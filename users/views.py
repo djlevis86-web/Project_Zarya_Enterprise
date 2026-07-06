@@ -97,7 +97,7 @@ def dashboard(request):
 
     attention_items = [
         {
-            "label": "Новые счета",
+            "label": "Новые документы",
             "value": new_count,
             "hint": "Ожидают OCR и первичной проверки",
             "url_name": "invoice_list",
@@ -105,7 +105,7 @@ def dashboard(request):
         {
             "label": "На проверке",
             "value": review_count,
-            "hint": "Нужно принять решение по счетам",
+            "hint": "Нужно принять решение по документам",
             "url_name": "invoice_list",
         },
         {

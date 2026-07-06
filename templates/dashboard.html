@@ -10,7 +10,7 @@
         </h1>
 
         <p class="page-subtitle">
-            Краткая сводка по счетам, проверке OCR, контрагентам и подготовке оплат
+            Краткая сводка по документам к оплате, проверке OCR, контрагентам и подготовке оплат
         </p>
     </div>
 
@@ -31,7 +31,7 @@
         </span>
 
         <h2>
-            Управление счетами и оплатами
+            Управление документами к оплате и оплатами
         </h2>
 
         <p>
@@ -40,11 +40,11 @@
 
         <div class="dashboard-hero-actions">
             <a href="{% url 'upload_invoice' %}" class="btn btn-primary">
-                Загрузить новый счет
+                Загрузить новый документ
             </a>
 
                 <a href="{% url 'invoice_list' %}" class="btn btn-secondary dashboard-hero-all-invoices">
-                    Все счета
+                    Все документы
                 </a>
 
             <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
@@ -84,7 +84,7 @@
 
     <a href="{% url 'invoice_list' %}" class="stat-card stat-link">
         <div class="stat-label">
-            Счетов за месяц
+            Документов за месяц
         </div>
 
         <div class="stat-value">
@@ -110,9 +110,9 @@
         </div>
     </a>
 
-    <a href="{% url 'invoice_list' %}?status=review" class="stat-card stat-link">
+    <a href="{% url 'invoice_list' %}?status=in_work" class="stat-card stat-link">
         <div class="stat-label">
-            На проверке
+            В работе
         </div>
 
         <div class="stat-value text-warning">
@@ -126,7 +126,7 @@
 
     <a href="{% url 'invoice_list' %}?status=approved" class="stat-card stat-link">
         <div class="stat-label">
-            Подтверждено
+            Утверждено
         </div>
 
         <div class="stat-value text-success">
@@ -150,7 +150,7 @@
             </h3>
 
             <span>
-                Последний автоматический аудит счетов
+                Последний автоматический аудит документов
                 {% if invoice_bot_report.generated_at_datetime %}
                     · {{ invoice_bot_report.generated_at_datetime|date:"d.m.Y H:i" }}
                 {% endif %}
@@ -162,7 +162,7 @@
 
         <a href="{% url 'invoice_list' %}" class="registry-summary-card stat-link">
             <span class="registry-summary-label">
-                Активных счетов
+                Активных документов
             </span>
 
             <strong>
@@ -251,7 +251,7 @@
     <div class="dashboard-attention-header-v1">
         <div>
             <h2>Требуют внимания</h2>
-            <p>Короткая сводка по счетам, с которыми нужно работать</p>
+            <p>Короткая сводка по документам, с которыми нужно работать</p>
         </div>
     </div>
 
@@ -294,7 +294,7 @@
 
                 <div>
                     <strong>
-                        Загрузить счета
+                        Загрузить документы
                     </strong>
 
                     <p>
@@ -314,7 +314,7 @@
                     </strong>
 
                     <p>
-                        Проверить счета без официального контрагента.
+                        Проверить документы без официального контрагента.
                     </p>
                 </div>
             </a>
@@ -346,7 +346,7 @@
                     </strong>
 
                     <p>
-                        Подготовить счета к выгрузке Excel или 1С TXT.
+                        Подготовить документы к выгрузке Excel или 1С TXT.
                     </p>
                 </div>
             </a>
@@ -378,7 +378,7 @@
 
                 <div>
                     <strong>
-                        Загрузка счета
+                        Загрузка документа
                     </strong>
 
                     <p>
@@ -430,7 +430,7 @@
                     </strong>
 
                     <p>
-                        Подтвержденные счета попадают в платежный реестр.
+                        Утверждённые документы попадают в реестр оплаты.
                     </p>
                 </div>
             </div>
@@ -445,7 +445,7 @@
 
         <div>
             <h3>
-                <span class="dashboard-latest-title-v1">Последние счета</span>
+                <span class="dashboard-latest-title-v1">Последние документы</span>
             </h3>
 
             <span>
@@ -538,7 +538,7 @@
 
                     <tr>
                         <td colspan="5" class="empty-table">
-                            Счетов пока нет.
+                            Документов пока нет.
                         </td>
                     </tr>
 

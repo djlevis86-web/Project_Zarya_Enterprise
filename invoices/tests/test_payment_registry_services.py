@@ -141,7 +141,7 @@ class PaymentRegistryServiceTests(TestCase):
         self.assertIsNone(item)
         self.assertTrue(errors)
         self.assertIn(
-            "Сумма счёта не подтверждена после OCR-проверки.",
+            "Сумма документа не подтверждена после OCR-проверки.",
             errors,
         )
         self.assertFalse(
@@ -252,7 +252,7 @@ class PaymentRegistryServiceTests(TestCase):
         self.assertIsNone(second_item)
         self.assertTrue(second_errors)
         self.assertIn(
-            f"Счёт уже есть в реестре №{registry.id}.",
+            f"Документ уже есть в реестре №{registry.id}.",
             second_errors,
         )
 
@@ -300,7 +300,7 @@ class PaymentRegistryServiceTests(TestCase):
         self.assertEqual(restored_item.id, item.id)
         self.assertEqual(restored_item.status, PaymentRegistryItem.STATUS_ADDED)
         self.assertIn(
-            "Счёт был ранее удалён из черновика и теперь восстановлен.",
+            "Документ был ранее удалён из черновика и теперь восстановлен.",
             restore_warnings,
         )
 

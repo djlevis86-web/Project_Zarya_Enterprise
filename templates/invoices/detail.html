@@ -31,7 +31,7 @@
                 method="post"
                 action="{% url 'delete_invoice' invoice.id %}"
                 class="registry-action-form"
-                onsubmit="return confirm('Удалить счёт #{{ invoice.id }} из рабочих списков? Запись останется в базе для истории.');"
+                onsubmit="return confirm('Удалить документ #{{ invoice.id }} из рабочих списков? Запись останется в базе для истории.');"
             >
                 {% csrf_token %}
 
@@ -54,7 +54,7 @@
             method="post"
             action="{% url 'repeat_ocr' invoice.id %}"
             class="registry-action-form"
-            onsubmit="return confirm('Повторить OCR для этого счета? Текущие OCR-данные будут обновлены.');"
+            onsubmit="return confirm('Повторить OCR для этого документа? Текущие OCR-данные будут обновлены.');"
         >
 
             {% csrf_token %}
@@ -74,7 +74,7 @@
             method="post"
             action="{% url 'enqueue_ocr_jobs' %}"
             class="registry-action-form"
-            onsubmit="return confirm('Поставить OCR этого счета в очередь?');"
+            onsubmit="return confirm('Поставить OCR этого документа в очередь?');"
         >
 
             {% csrf_token %}
@@ -104,7 +104,7 @@
             href="{% url 'invoice_list' %}"
             class="btn btn-secondary"
         >
-            Назад к счетам
+            Назад к документам
         </a>
 
     </div>
@@ -124,7 +124,7 @@
                     </h3>
 
                     <span>
-                        Данные счета и файла
+                        Данные документа и файла
                     </span>
                 </div>
 
@@ -370,14 +370,14 @@
 <section class="invoice-payment-left-panel">
     <div class="payment-left-header">
         <div>
-            <h3>Оплаты по счёту</h3>
+            <h3>Оплаты по документу</h3>
             <p>Частичная оплата, остаток и история платежей.</p>
         </div>
     </div>
 
     <div class="payment-left-summary">
         <div>
-            <span>Сумма счёта</span>
+            <span>Сумма документа</span>
             <strong>{{ payment_summary.invoice_amount|money_ru }}</strong>
         </div>
 
@@ -431,7 +431,7 @@
         </form>
     {% else %}
         <div class="payment-left-complete">
-            Счёт закрыт по оплате.
+            Документ закрыт по оплате.
         </div>
     {% endif %}
 
@@ -465,7 +465,7 @@
                         <button
                             type="submit"
                             class="btn btn-secondary btn-xs"
-                            onclick="return confirm('Отменить эту оплату? Остаток по счёту будет пересчитан.');"
+                            onclick="return confirm('Отменить эту оплату? Остаток по документу будет пересчитан.');"
                         >
                             Отменить
                         </button>
@@ -474,7 +474,7 @@
             </div>
         {% empty %}
             <div class="payment-left-empty">
-                Оплат по этому счёту пока нет.
+                Оплат по этому документу пока нет.
             </div>
         {% endfor %}
     </div>
@@ -491,7 +491,7 @@
                     </h3>
 
                     <span>
-                        Контроль распознавания суммы и данных счета
+                        Контроль распознавания суммы и данных документа
                     </span>
                 </div>
 
@@ -627,7 +627,7 @@
                     </h3>
 
                     <span>
-                        Журнал действий по счету
+                        Журнал действий по документу
                     </span>
                 </div>
             </div>
@@ -667,7 +667,7 @@
                     </h3>
 
                     <span>
-                        Внутреннее обсуждение счета
+                        Внутреннее обсуждение документа
                     </span>
                 </div>
             </div>
@@ -747,7 +747,7 @@
                     </h3>
 
                     <span>
-                        Оригинальный файл счета
+                        Оригинальный файл документа
                     </span>
                 </div>
             </div>
@@ -785,7 +785,7 @@
                 <img
                     src="{{ invoice.file.url }}"
                     class="preview-image"
-                    alt="Документ счета"
+                    alt="Документ к оплате"
                 >
 
             {% endif %}

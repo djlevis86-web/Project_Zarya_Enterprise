@@ -7,7 +7,7 @@ class User(AbstractUser):
     class Role(models.TextChoices):
         ADMIN = "ADMIN", "Администратор"
         MANAGER = "MANAGER", "Финансовый директор"
-        USER = "USER", "Загрузчик счетов"
+        USER = "USER", "Загрузчик документов"
         ANALYST = "ANALYST", "Аналитик"
 
     class Theme(models.TextChoices):

@@ -26,27 +26,27 @@ BOT_REPORT_CATEGORY_UNKNOWN_DOCUMENT_TYPE = "unknown-document-type"
 INVOICE_BOT_REPORT_CATEGORIES = {
     BOT_REPORT_CATEGORY_READY: {
         "title": "Готовы к реестру",
-        "description": "Счета, которые проходят проверку готовности к добавлению в реестр оплаты.",
+        "description": "Документы, которые проходят проверку готовности к добавлению в реестр оплаты.",
     },
     BOT_REPORT_CATEGORY_NOT_READY: {
         "title": "Не готовы к реестру",
-        "description": "Счета, по которым есть блокирующие причины перед добавлением в реестр оплаты.",
+        "description": "Документы, по которым есть блокирующие причины перед добавлением в реестр оплаты.",
     },
     BOT_REPORT_CATEGORY_WITHOUT_PLANNED_PAYMENT_DATE: {
         "title": "Без даты оплаты",
-        "description": "Счета без плановой даты оплаты.",
+        "description": "Документы без плановой даты оплаты.",
     },
     BOT_REPORT_CATEGORY_WITHOUT_COUNTERPARTY: {
         "title": "Без контрагента",
-        "description": "Счета, к которым не привязан контрагент.",
+        "description": "Документы, к которым не привязан контрагент.",
     },
     BOT_REPORT_CATEGORY_UNVERIFIED_AMOUNT: {
         "title": "Сумма не подтверждена",
-        "description": "Счета, по которым сумма требует ручной проверки.",
+        "description": "Документы, по которым сумма требует ручной проверки.",
     },
     BOT_REPORT_CATEGORY_WITHOUT_OCR_TEXT: {
         "title": "Без OCR-текста",
-        "description": "Счета, у которых нет сохранённого OCR-текста.",
+        "description": "Документы, у которых нет сохранённого OCR-текста.",
     },
     BOT_REPORT_CATEGORY_UNKNOWN_DOCUMENT_TYPE: {
         "title": "Неизвестный тип документа",

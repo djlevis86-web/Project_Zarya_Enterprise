@@ -60,7 +60,7 @@ def quick_update_invoice(request, invoice_id):
     if new_status not in status_choices:
         messages.error(
             request,
-            'Некорректный статус счёта.'
+            'Некорректный статус документа.'
         )
 
         return _redirect_after_quick_update(
@@ -127,7 +127,7 @@ def quick_update_invoice(request, invoice_id):
                 invoice,
                 request.user,
                 (
-                    'Статус счёта изменён из списка: '
+                    'Статус документа изменён из списка: '
                     f'{status_choices.get(old_status, old_status)} → '
                     f'{status_choices.get(new_status, new_status)}.'
                 )
@@ -154,13 +154,13 @@ def quick_update_invoice(request, invoice_id):
 
         messages.success(
             request,
-            f'Счёт #{invoice.id} обновлён.'
+            f'Документ #{invoice.id} обновлён.'
         )
 
     else:
         messages.info(
             request,
-            f'По счёту #{invoice.id} изменений нет.'
+            f'По документу #{invoice.id} изменений нет.'
         )
 
     return _redirect_after_quick_update(
@@ -191,13 +191,13 @@ def edit_invoice(request, invoice_id):
 
             verification_changed, verification_message = sync_invoice_amount_verification(
                 invoice,
-                source_label='редактирования счёта'
+                source_label='редактирования документа'
             )
 
             create_invoice_log(
                 invoice,
                 request.user,
-                'Счет отредактирован'
+                'Документ отредактирован'
             )
 
             if amount_changed or verification_changed:
@@ -235,7 +235,7 @@ def edit_invoice(request, invoice_id):
                         invoice,
                         request.user,
                         (
-                            "Сумма счёта изменена при наличии активного "
+                            "Сумма документа изменена при наличии активного "
                             f"реестра оплаты: {registry_numbers}."
                         )
                     )
@@ -243,7 +243,7 @@ def edit_invoice(request, invoice_id):
                     messages.warning(
                         request,
                         (
-                            "Счёт уже есть в активном реестре оплаты "
+                            "Документ уже есть в активном реестре оплаты "
                             f"{registry_numbers}. Проверь реестр повторно: "
                             "сумма строки может быть устаревшей."
                         )

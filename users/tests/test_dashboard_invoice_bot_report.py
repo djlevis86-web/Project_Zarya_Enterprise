@@ -76,7 +76,7 @@ class DashboardInvoiceBotReportTests(TestCase):
         )
         self.assertContains(
             response,
-            "Активных счетов",
+            "Активных документов",
         )
         self.assertContains(
             response,

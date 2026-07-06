@@ -490,9 +490,15 @@ def invoice_list(request):
         status=Invoice.STATUS_NEW
     ).count()
 
-    review_count = stats_queryset.filter(
-        status=Invoice.STATUS_REVIEW
+    in_work_count = stats_queryset.filter(
+        status=Invoice.STATUS_IN_WORK
     ).count()
+
+    on_approval_count = stats_queryset.filter(
+        status=Invoice.STATUS_ON_APPROVAL
+    ).count()
+
+    review_count = in_work_count
 
     approved_count = stats_queryset.filter(
         status=Invoice.STATUS_APPROVED
@@ -561,6 +567,8 @@ def invoice_list(request):
             'total_count': total_count,
             'new_count': new_count,
             'review_count': review_count,
+            'in_work_count': in_work_count,
+            'on_approval_count': on_approval_count,
             'approved_count': approved_count,
             'paid_count': paid_count,
             'rejected_count': rejected_count,

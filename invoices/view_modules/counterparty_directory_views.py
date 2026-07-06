@@ -96,7 +96,8 @@ def counterparty_directory(request):
 
     payment_statuses = [
         Invoice.STATUS_NEW,
-        Invoice.STATUS_REVIEW,
+        Invoice.STATUS_IN_WORK,
+        Invoice.STATUS_ON_APPROVAL,
         Invoice.STATUS_APPROVED,
     ]
 

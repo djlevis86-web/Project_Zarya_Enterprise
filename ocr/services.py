@@ -237,6 +237,7 @@ def is_ocr_timeout_error(error):
     return (
         "timeout" in message
         or "timed out" in message
+        or "таймаут" in message
         or "превысил лимит времени" in message
     )
 
@@ -648,6 +649,65 @@ def extract_text_from_pdf_hard(pdf_path):
     return extract_text_from_pdf(
         pdf_path
     )
+
+
+def extract_text_from_pdf_light(pdf_path):
+    variants = []
+
+    for dpi in [
+        90,
+        100,
+        110,
+    ]:
+        try:
+            page = convert_pdf_page(
+                pdf_path,
+                dpi=dpi,
+                page_number=1,
+            )
+        except Exception:
+            continue
+
+        if not page:
+            continue
+
+        for config in [
+            "--oem 3 --psm 11",
+        ]:
+            try:
+                prepared_page = preprocess_image(
+                    page.copy()
+                )
+
+                page_text = image_to_text(
+                    prepared_page,
+                    config=config,
+                )
+
+                normalized = normalize_ocr_text(
+                    page_text
+                )
+
+                if normalized:
+                    variants.append(
+                        normalized
+                    )
+
+            except Exception:
+                continue
+
+    if not variants:
+        return ""
+
+    best_text = max(
+        variants,
+        key=ocr_score,
+    )
+
+    return normalize_ocr_text(
+        best_text
+    )
+
 
 def extract_text_from_image(image_path):
     variants = []

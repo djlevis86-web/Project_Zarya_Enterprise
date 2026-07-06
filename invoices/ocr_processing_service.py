@@ -7,23 +7,56 @@ from .ocr_verification_service import apply_ocr_amount_to_invoice
 from ocr.services import (
     extract_text_from_image,
     extract_text_from_pdf,
+    extract_text_from_pdf_light,
+    is_ocr_timeout_error,
     parse_invoice_data,
 )
 
 
-def read_and_parse_invoice_file(file_path):
+def extract_invoice_text_with_light_fallback(file_path):
     file_path = str(file_path)
 
-    if file_path.lower().endswith(
+    if not file_path.lower().endswith(
         ".pdf"
     ):
-        text = extract_text_from_pdf(
+        return (
+            extract_text_from_image(
+                file_path
+            ),
+            False,
+        )
+
+    try:
+        return (
+            extract_text_from_pdf(
+                file_path
+            ),
+            False,
+        )
+
+    except Exception as error:
+        if not is_ocr_timeout_error(
+            error
+        ):
+            raise
+
+        light_text = extract_text_from_pdf_light(
             file_path
         )
-    else:
-        text = extract_text_from_image(
-            file_path
+
+        if not light_text:
+            raise
+
+        return (
+            light_text,
+            True,
         )
+
+
+def read_and_parse_invoice_file(file_path):
+    text, _used_light_ocr = extract_invoice_text_with_light_fallback(
+        file_path
+    )
 
     parsed = parse_invoice_data(
         text
@@ -121,6 +154,8 @@ def apply_ocr_identity_to_invoice(invoice, parsed):
     if parsed_document_type in (
         Invoice.DOCUMENT_TYPE_INVOICE,
         Invoice.DOCUMENT_TYPE_UPD,
+        Invoice.DOCUMENT_TYPE_WAYBILL,
+        Invoice.DOCUMENT_TYPE_UNKNOWN,
     ):
         invoice.document_type = parsed_document_type
 
@@ -150,19 +185,9 @@ def run_invoice_ocr_processing(invoice, user, log_action):
 
         file_path = invoice.file.path
 
-        if file_path.lower().endswith(
-            '.pdf'
-        ):
-
-            text = extract_text_from_pdf(
-                file_path
-            )
-
-        else:
-
-            text = extract_text_from_image(
-                file_path
-            )
+        text, used_light_ocr = extract_invoice_text_with_light_fallback(
+            file_path
+        )
 
         parsed = parse_invoice_data(
             text
@@ -185,6 +210,11 @@ def run_invoice_ocr_processing(invoice, user, log_action):
         ocr_comments = [
             log_action
         ]
+
+        if used_light_ocr:
+            ocr_comments.append(
+                "OCR выполнен облегчённым режимом после таймаута обычного OCR."
+            )
 
         if number_warning:
 
@@ -241,6 +271,9 @@ def run_invoice_ocr_processing(invoice, user, log_action):
         if number_warning:
 
             return True, number_warning
+
+        if used_light_ocr:
+            return True, 'OCR успешно обновлен облегчённым режимом'
 
         return True, 'OCR успешно обновлен'
 

@@ -277,10 +277,15 @@ class InvoiceUploadBatch(models.Model):
 class Invoice(models.Model):
 
     STATUS_NEW = 'new'
-    STATUS_REVIEW = 'review'
+    STATUS_IN_WORK = 'in_work'
+    STATUS_ON_APPROVAL = 'on_approval'
     STATUS_APPROVED = 'approved'
     STATUS_PAID = 'paid'
     STATUS_REJECTED = 'rejected'
+
+    # Legacy alias. Старый STATUS_REVIEW больше не показываем в choices,
+    # но оставляем имя константы, чтобы старый код/тесты не падали сразу.
+    STATUS_REVIEW = STATUS_IN_WORK
 
     DOCUMENT_TYPE_INVOICE = 'invoice'
     DOCUMENT_TYPE_UPD = 'upd'
@@ -296,10 +301,11 @@ class Invoice(models.Model):
 
     STATUS_CHOICES = [
         (STATUS_NEW, 'Новый'),
-        (STATUS_REVIEW, 'На проверке'),
-        (STATUS_APPROVED, 'Подтвержден'),
+        (STATUS_IN_WORK, 'В работе'),
+        (STATUS_ON_APPROVAL, 'На согласовании'),
+        (STATUS_APPROVED, 'Утверждён'),
         (STATUS_PAID, 'Оплачен'),
-        (STATUS_REJECTED, 'Отклонен'),
+        (STATUS_REJECTED, 'Отклонён'),
     ]
 
     COUNTERPARTY_MATCH_NOT_PROCESSED = 'not_processed'

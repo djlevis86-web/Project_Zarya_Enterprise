@@ -28,7 +28,7 @@ from ..payment_registry_services import (
 @login_required
 @require_payment_registry_permission(
     user_can_manage_payment_registry,
-    'Нет прав на добавление счетов в реестр оплаты.',
+    'Нет прав на добавление документов в реестр оплаты.',
 )
 def add_to_payment_registry(request):
 
@@ -36,7 +36,7 @@ def add_to_payment_registry(request):
 
         messages.warning(
             request,
-            'Добавлять счета в реестр можно только из формы.'
+            'Добавлять документы в реестр можно только из формы.'
         )
 
         return redirect(
@@ -51,7 +51,7 @@ def add_to_payment_registry(request):
 
         messages.warning(
             request,
-            'Выбери хотя бы один счет для добавления в реестр.'
+            'Выбери хотя бы один документ для добавления в реестр.'
         )
 
         return redirect(
@@ -109,7 +109,7 @@ def add_to_payment_registry(request):
 
         messages.success(
             request,
-            f'Добавлено счетов в реестр №{registry.id}: {added_count}.'
+            f'Добавлено документов в реестр №{registry.id}: {added_count}.'
         )
 
     if skipped_messages:
@@ -137,7 +137,7 @@ def add_to_payment_registry(request):
 @login_required
 @require_payment_registry_permission(
     user_can_manage_payment_registry,
-    'Нет прав на удаление счетов из редактируемого реестра.',
+    'Нет прав на удаление документов из редактируемого реестра.',
 )
 def remove_from_payment_registry_item(request, item_id):
 
@@ -145,7 +145,7 @@ def remove_from_payment_registry_item(request, item_id):
 
         messages.warning(
             request,
-            'Удалять счета из реестра можно только из формы.'
+            'Удалять документы из реестра можно только из формы.'
         )
 
         return redirect(
@@ -202,7 +202,7 @@ def remove_from_payment_registry_item(request, item_id):
 
     messages.success(
         request,
-        f'Счёт #{invoice_id} удалён из реестра №{registry.id}. Если реестр уже выгружался, выгрузи его заново.'
+        f'Документ #{invoice_id} удалён из реестра №{registry.id}. Если реестр уже выгружался, выгрузи его заново.'
     )
 
     return redirect(
@@ -259,7 +259,7 @@ def check_payment_registry_view(request, registry_id):
 
         messages.warning(
             request,
-            f'Реестр №{registry.id} пуст. Сначала добавь счета.'
+            f'Реестр №{registry.id} пуст. Сначала добавь документы.'
         )
 
         return redirect(
@@ -277,14 +277,14 @@ def check_payment_registry_view(request, registry_id):
 
             messages.warning(
                 request,
-                f'Счёт #{error["invoice_id"]}: ' + '; '.join(error['messages'])
+                f'Документ #{error["invoice_id"]}: ' + '; '.join(error['messages'])
             )
 
     else:
 
         messages.success(
             request,
-            f'Реестр №{registry.id} проверен: к выгрузке готово {result["ready_count"]} счетов.'
+            f'Реестр №{registry.id} проверен: к выгрузке готово {result["ready_count"]} документов.'
         )
 
     if result['warnings_count']:
@@ -343,7 +343,7 @@ def mark_payment_registry_paid(request, registry_id):
         (
             "Реестр отмечен оплаченным. "
             f"Создано оплат: {result.get('paid_count', 0)}. "
-            f"Пропущено закрытых счетов: {result.get('skipped_count', 0)}."
+            f"Пропущено закрытых документов: {result.get('skipped_count', 0)}."
         )
     )
 

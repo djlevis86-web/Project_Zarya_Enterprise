@@ -83,12 +83,12 @@ def validate_invoice_for_payment_registry(invoice):
 
     if duplicate_item:
         errors.append(
-            f"Счёт уже есть в реестре №{duplicate_item.registry_id}."
+            f"Документ уже есть в реестре №{duplicate_item.registry_id}."
         )
 
     if getattr(invoice, "paid_at", None):
         errors.append(
-            "Счёт уже отмечен как оплаченный."
+            "Документ уже отмечен как оплаченный."
         )
 
     if hasattr(Invoice, "STATUS_PAID") and invoice.status == Invoice.STATUS_PAID:
@@ -105,7 +105,7 @@ def validate_invoice_for_payment_registry(invoice):
 
     if not getattr(invoice, "amount_verified", False):
         errors.append(
-            "Сумма счёта не подтверждена после OCR-проверки."
+            "Сумма документа не подтверждена после OCR-проверки."
         )
 
     if amount <= 0:
@@ -233,7 +233,7 @@ def add_invoice_to_payment_registry(invoice, registry):
 
     if remaining_amount <= 0:
         errors.append(
-            "Счёт уже полностью оплачен или имеет переплату."
+            "Документ уже полностью оплачен или имеет переплату."
         )
 
     if errors:
@@ -270,13 +270,13 @@ def add_invoice_to_payment_registry(invoice, registry):
             )
 
             warnings.append(
-                "Счёт был ранее удалён из черновика и теперь восстановлен."
+                "Документ был ранее удалён из черновика и теперь восстановлен."
             )
 
             return existing_item, errors, warnings
 
         warnings.append(
-            "Счёт уже есть в текущем черновике реестра."
+            "Документ уже есть в текущем черновике реестра."
         )
 
         return existing_item, errors, warnings
@@ -327,7 +327,7 @@ def check_payment_registry(registry):
 
         if not getattr(invoice, "amount_verified", False):
             row_errors.append(
-                "сумма счёта не подтверждена после OCR-проверки"
+                "сумма документа не подтверждена после OCR-проверки"
             )
 
         if not item.amount or item.amount <= 0:
@@ -343,7 +343,7 @@ def check_payment_registry(registry):
 
         if expected_amount <= 0:
             row_errors.append(
-                "счёт уже полностью оплачен или имеет переплату"
+                "документ уже полностью оплачен или имеет переплату"
             )
         elif normalize_registry_money(item.amount) != normalize_registry_money(expected_amount):
             row_errors.append(
@@ -458,7 +458,7 @@ def mark_payment_registry_as_paid(registry, user=None):
 
     if check_result["items_count"] == 0:
         raise ValueError(
-            "Реестр пуст. Сначала добавь счета."
+            "Реестр пуст. Сначала добавь документы."
         )
 
     if check_result["errors_count"]:

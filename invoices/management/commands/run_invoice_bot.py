@@ -14,7 +14,7 @@ DEFAULT_REPORT_PATH = Path("var") / "invoice_bot" / "latest_report.json"
 
 
 class Command(BaseCommand):
-    help = "Запускает безопасный аудит счетов без изменения данных"
+    help = "Запускает безопасный аудит документов к оплате без изменения данных"
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -107,7 +107,7 @@ class Command(BaseCommand):
             "=================="
         )
         self.stdout.write(
-            f"Всего активных счетов: {total_count}"
+            f"Всего активных документов: {total_count}"
         )
         self.stdout.write(
             f"Без плановой даты оплаты: {without_planned_payment_date_count}"

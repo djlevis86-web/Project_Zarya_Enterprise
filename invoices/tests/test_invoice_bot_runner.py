@@ -100,7 +100,7 @@ class InvoiceBotRunnerTests(TestCase):
             output,
         )
         self.assertIn(
-            "Всего активных счетов: 4",
+            "Всего активных документов: 4",
             output,
         )
         self.assertIn(
@@ -241,7 +241,7 @@ class InvoiceBotRunnerTests(TestCase):
         output = out.getvalue()
 
         self.assertIn(
-            "Всего активных счетов: 2",
+            "Всего активных документов: 2",
             output,
         )
         self.assertIn(

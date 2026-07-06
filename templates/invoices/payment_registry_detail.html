@@ -16,7 +16,7 @@
             </h1>
 
             <p>
-                Состав реестра, статус, сумма, строки счетов и данные выгрузки.
+                Состав реестра, статус, сумма, строки документов и данные выгрузки.
             </p>
         </div>
 
@@ -45,7 +45,7 @@
 
         <div class="registry-summary-card">
             <span>
-                Счетов
+                Документов
             </span>
 
             <strong>
@@ -117,7 +117,7 @@
                     </a>
 
                     <a href="{% url 'payment_schedule' %}" class="btn btn-secondary">
-                        Добавить счета
+                        Добавить документы
                     </a>
                 {% endif %}
                 {% if request.user.is_staff or request.user.is_superuser or can_cancel_payment_registry %}
@@ -137,7 +137,7 @@
                         <button
                             type="submit"
                             class="btn btn-danger"
-                            onclick="return confirm('Отменить этот реестр? Счета снова будут доступны для нового реестра.');"
+                            onclick="return confirm('Отменить этот реестр? Документы снова будут доступны для нового реестра.');"
                         >
                             Отменить реестр
                         </button>
@@ -319,7 +319,7 @@
                         {% for error in check_result.errors %}
                             <div class="payment-registry-check-row">
                                 <a href="{% url 'invoice_detail' error.invoice_id %}">
-                                    Счёт #{{ error.invoice_id }}
+                                    Документ #{{ error.invoice_id }}
                                 </a>
 
                                 <span>
@@ -347,7 +347,7 @@
                 </h2>
 
                 <p>
-                    Счета, включённые в этот реестр оплаты.
+                    Документы, включённые в этот реестр оплаты.
                 </p>
             </div>
         </div>
@@ -357,7 +357,7 @@
                 <thead>
                     <tr>
                         <th>
-                            Счёт
+                            Документ
                         </th>
 
                         <th>

@@ -200,7 +200,7 @@ def update_invoice_bot_report_planned_payment_date(
     if old_planned_payment_date == new_planned_payment_date:
         messages.info(
             request,
-            f"По счёту #{invoice.id} дата оплаты не изменилась."
+            f"По документу #{invoice.id} дата оплаты не изменилась."
         )
 
         return redirect(
@@ -243,7 +243,7 @@ def update_invoice_bot_report_planned_payment_date(
 
     messages.success(
         request,
-        f"Плановая дата оплаты по счёту #{invoice.id} сохранена."
+        f"Плановая дата оплаты по документу #{invoice.id} сохранена."
     )
 
     return redirect(
@@ -286,7 +286,7 @@ def confirm_invoice_bot_report_amount(
     if invoice.amount_verified:
         messages.info(
             request,
-            f"Сумма по счёту #{invoice.id} уже подтверждена."
+            f"Сумма по документу #{invoice.id} уже подтверждена."
         )
 
         return redirect(
@@ -317,12 +317,12 @@ def confirm_invoice_bot_report_amount(
     create_invoice_log(
         invoice,
         request.user,
-        "Сумма счёта подтверждена вручную из отчёта бота."
+        "Сумма документа подтверждена вручную из отчёта бота."
     )
 
     messages.success(
         request,
-        f"Сумма по счёту #{invoice.id} подтверждена."
+        f"Сумма по документу #{invoice.id} подтверждена."
     )
 
     return redirect(
@@ -365,7 +365,7 @@ def retry_invoice_bot_report_ocr(
     if invoice.ocr_text:
         messages.info(
             request,
-            f"По счёту #{invoice.id} OCR-текст уже есть."
+            f"По документу #{invoice.id} OCR-текст уже есть."
         )
 
         return redirect(
@@ -388,7 +388,7 @@ def retry_invoice_bot_report_ocr(
     if existing_job:
         messages.info(
             request,
-            f"OCR по счёту #{invoice.id} уже стоит в очереди."
+            f"OCR по документу #{invoice.id} уже стоит в очереди."
         )
 
         return redirect(
@@ -412,7 +412,7 @@ def retry_invoice_bot_report_ocr(
 
     messages.success(
         request,
-        f"OCR по счёту #{invoice.id} поставлен в очередь."
+        f"OCR по документу #{invoice.id} поставлен в очередь."
     )
 
     return redirect(

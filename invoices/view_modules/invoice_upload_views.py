@@ -328,14 +328,14 @@ def upload_invoice(request):
             create_invoice_log(
                 invoice,
                 request.user,
-                'Счет загружен'
+                'Документ загружен'
             )
 
             log_action(
                 request=request,
                 action=AuditLog.ACTION_UPLOAD,
                 obj=invoice,
-                message='Счет загружен.',
+                message='Документ загружен.',
                 metadata={
                     'filename': uploaded_file.name,
                     'batch_id': batch.id,
@@ -353,7 +353,7 @@ def upload_invoice(request):
 
                 invoice.ocr_comment = (
                     "OCR отложен: пакетная загрузка или большой файл. "
-                    "Счет сохранен и доступен в разделе Счета. "
+                    "Документ сохранен и доступен в разделе «Документы к оплате». "
                     f"OCR поставлен в очередь #{ocr_job.id}."
                 )
                 invoice.save(
@@ -366,7 +366,7 @@ def upload_invoice(request):
                 create_invoice_log(
                     invoice,
                     request.user,
-                    "Счет загружен без inline OCR: OCR поставлен в очередь"
+                    "Документ загружен без inline OCR: OCR поставлен в очередь"
                 )
 
                 if ocr_job_created:
@@ -410,7 +410,7 @@ def upload_invoice(request):
                             'invoice_id': duplicate_invoice.id,
                             'invoice_title': duplicate_invoice.title,
                             'duplicate_reason': (
-                                'Найден существующий счёт с таким же '
+                                'Найден существующий документ с таким же '
                                 'номером и датой.'
                             ),
                         }
@@ -514,8 +514,8 @@ def upload_invoice(request):
         if created_count > 0:
             messages.success(
                 request,
-                f"Загружено счетов: {created_count}. "
-                "Если OCR был отложен, счета уже доступны в разделе Счета."
+                f"Загружено документов: {created_count}. "
+                "Если OCR был отложен, документы уже доступны в разделе «Документы к оплате»."
             )
 
         if duplicate_files:
@@ -533,7 +533,7 @@ def upload_invoice(request):
         if created_count == 0:
             messages.warning(
                 request,
-                "Новые счета не созданы. Проверьте список дубликатов и пропущенных файлов."
+                "Новые документы не созданы. Проверьте список дубликатов и пропущенных файлов."
             )
 
         request.session['last_upload_result'] = {

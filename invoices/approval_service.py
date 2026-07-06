@@ -20,21 +20,21 @@ def auto_approve_invoice(invoice):
 
         return (
             Invoice.STATUS_APPROVED,
-            'Автоматически подтвержден'
+            'Автоматически утверждён'
         )
 
     if amount <= 50000:
 
-        invoice.status = Invoice.STATUS_REVIEW
+        invoice.status = Invoice.STATUS_IN_WORK
 
         return (
-            Invoice.STATUS_REVIEW,
-            'Требуется проверка менеджером'
+            Invoice.STATUS_IN_WORK,
+            'Требуется работа менеджера'
         )
 
-    invoice.status = Invoice.STATUS_REVIEW
+    invoice.status = Invoice.STATUS_ON_APPROVAL
 
     return (
-        Invoice.STATUS_REVIEW,
+        Invoice.STATUS_ON_APPROVAL,
         'Большая сумма, требуется согласование'
     )

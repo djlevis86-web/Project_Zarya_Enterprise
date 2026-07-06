@@ -19,7 +19,8 @@ def change_invoice_status(request, invoice_id, status):
 
     allowed_statuses = [
         Invoice.STATUS_NEW,
-        Invoice.STATUS_REVIEW,
+        Invoice.STATUS_IN_WORK,
+        Invoice.STATUS_ON_APPROVAL,
         Invoice.STATUS_APPROVED,
         Invoice.STATUS_PAID,
         Invoice.STATUS_REJECTED,
@@ -48,14 +49,14 @@ def change_invoice_status(request, invoice_id, status):
     create_invoice_log(
         invoice,
         request.user,
-        f'Статус изменен на "{invoice.get_status_display()}"'
+        f'Статус изменён на "{invoice.get_status_display()}"'
     )
 
     log_action(
         request=request,
         action=AuditLog.ACTION_UPDATE,
         obj=invoice,
-        message=f'Статус счета изменен: {old_status_label} -> {new_status_label}.',
+        message=f'Статус документа изменён: {old_status_label} -> {new_status_label}.',
         metadata={
             'field': 'status',
             'old_status': old_status,

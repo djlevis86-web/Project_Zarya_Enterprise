@@ -93,7 +93,12 @@ def validate_invoice_for_payment_registry(invoice):
 
     if hasattr(Invoice, "STATUS_PAID") and invoice.status == Invoice.STATUS_PAID:
         errors.append(
-            "Счёт уже находится в статусе оплаты."
+            "Документ уже находится в статусе оплаты."
+        )
+
+    elif invoice.status != Invoice.STATUS_APPROVED:
+        errors.append(
+            "Документ должен быть утверждён перед добавлением в реестр оплаты."
         )
 
     amount = invoice.amount or Decimal("0")

@@ -1839,8 +1839,6 @@ def detect_document_type(text):
         'торг-12',
         'торг 12',
         'форма торг',
-        'грузоотправитель',
-        'грузополучатель',
     )
 
     for marker in waybill_markers:
@@ -1900,6 +1898,15 @@ def detect_document_type(text):
 
     for marker in invoice_compact_markers:
         if marker in compact:
+            return 'invoice'
+
+    noisy_invoice_patterns = (
+        r'\bна\s+оплату\s*№\s*[a-zа-яё0-9\-_/]+\s+от\s+\d{1,2}\s+[а-яё]+\s+\d{4}',
+        r'\bоплату\s*№\s*[a-zа-яё0-9\-_/]+\s+от\s+\d{1,2}\s+[а-яё]+\s+\d{4}',
+    )
+
+    for pattern in noisy_invoice_patterns:
+        if re.search(pattern, normalized, re.IGNORECASE):
             return 'invoice'
 
     if re.search(

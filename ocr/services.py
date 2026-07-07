@@ -1815,6 +1815,13 @@ def detect_document_type(text):
     if not normalized:
         return 'invoice'
 
+    compact = re.sub(
+        r'[\W_]+',
+        '',
+        normalized,
+        flags=re.UNICODE
+    )
+
     upd_markers = (
         'упд',
         'универсальный передаточный документ',
@@ -1840,22 +1847,69 @@ def detect_document_type(text):
         if marker in normalized:
             return 'waybill'
 
+    payment_document_markers = (
+        'платежный документ',
+        'платёжный документ',
+        'извещение на оплату жку',
+        'извещение на оплату',
+        'квитанция',
+        'исполнитель услуг',
+        'получатель платежа',
+        'данные по оплате',
+    )
+
+    for marker in payment_document_markers:
+        if marker in normalized:
+            return 'payment_document'
+
+    if (
+        'извещениенаоплату' in compact
+        and (
+            'жку' in compact
+            or 'квитанция' in compact
+        )
+    ):
+        return 'payment_document'
+
     invoice_markers = (
         'счет на оплату',
         'счёт на оплату',
         'счет №',
         'счёт №',
+        'сч. №',
+        'сч №',
         'счет-фактура',
         'счёт-фактура',
         'заказу клиента',
+        'оплата данного счета',
+        'оплата данного счёта',
+        'счет действителен',
+        'счёт действителен',
     )
 
     for marker in invoice_markers:
         if marker in normalized:
             return 'invoice'
 
-    return 'unknown'
+    invoice_compact_markers = (
+        'счетнаоплату',
+        'счётнаоплату',
+        'счетфактура',
+        'счётфактура',
+    )
 
+    for marker in invoice_compact_markers:
+        if marker in compact:
+            return 'invoice'
+
+    if re.search(
+        r'(^|\s)[il1]\s*сч\.?\s*№?',
+        normalized,
+        re.IGNORECASE
+    ):
+        return 'invoice'
+
+    return 'unknown'
 
 def parse_document_date_value(value):
     if not value:

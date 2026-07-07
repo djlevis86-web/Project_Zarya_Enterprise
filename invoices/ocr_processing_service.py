@@ -155,6 +155,7 @@ def apply_ocr_identity_to_invoice(invoice, parsed):
         Invoice.DOCUMENT_TYPE_INVOICE,
         Invoice.DOCUMENT_TYPE_UPD,
         Invoice.DOCUMENT_TYPE_WAYBILL,
+        Invoice.DOCUMENT_TYPE_PAYMENT_DOCUMENT,
         Invoice.DOCUMENT_TYPE_UNKNOWN,
     ):
         invoice.document_type = parsed_document_type

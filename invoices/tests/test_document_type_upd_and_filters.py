@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from invoices.models import Invoice
+from invoices.ocr_processing_service import apply_ocr_identity_to_invoice
 from ocr.services import detect_document_type, parse_invoice_data
 
 
@@ -98,6 +99,57 @@ class DocumentTypeOCRTests(TestCase):
             parsed["kpp"],
             "532101001",
         )
+
+
+    def test_detects_utility_payment_document_text(self):
+        self.assertEqual(
+            detect_document_type(
+                "Платежный документ за Июнь 2026 г. "
+                "Исполнитель услуг: ООО Аквалайн "
+                "Получатель платежа"
+            ),
+            "payment_document",
+        )
+
+    def test_detects_utility_notice_text(self):
+        self.assertEqual(
+            detect_document_type(
+                "Извещение на оплату ЖКУ Квитанция "
+                "Получатель: МУП ЖКХ Новленское ВМО"
+            ),
+            "payment_document",
+        )
+
+    def test_detects_noisy_invoice_with_split_word(self):
+        self.assertEqual(
+            detect_document_type(
+                "С чет на оплату № 433 от 04 июля 2026 "
+                "Оплата данного счета означает согласие"
+            ),
+            "invoice",
+        )
+
+    def test_detects_noisy_invoice_with_i_sch_marker(self):
+        self.assertEqual(
+            detect_document_type(
+                "IСч. № 711 Банк получателя ООО ЦЕНТР НТУиК"
+            ),
+            "invoice",
+        )
+
+    def test_parse_invoice_data_returns_payment_document_type(self):
+        parsed = parse_invoice_data(
+            "Платежный документ за Июнь 2026 г. "
+            "Исполнитель услуг: ООО Аквалайн "
+            "Получатель платежа "
+            "Итого к оплате 115,57"
+        )
+
+        self.assertEqual(
+            parsed["document_type"],
+            "payment_document",
+        )
+
 
 
 class InvoiceListDocumentFilterTests(TestCase):
@@ -261,6 +313,25 @@ class InvoiceListDocumentFilterTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Загрузил")
         self.assertContains(response, "Иван Петров")
+
+
+    def test_apply_ocr_identity_sets_payment_document_type(self):
+        warning = apply_ocr_identity_to_invoice(
+            self.invoice,
+            {
+                "invoice_number": None,
+                "invoice_date": None,
+                "document_date": None,
+                "document_type": Invoice.DOCUMENT_TYPE_PAYMENT_DOCUMENT,
+                "vendor": None,
+            },
+        )
+
+        self.assertEqual(warning, "")
+        self.assertEqual(
+            self.invoice.document_type,
+            Invoice.DOCUMENT_TYPE_PAYMENT_DOCUMENT,
+        )
 
 
 

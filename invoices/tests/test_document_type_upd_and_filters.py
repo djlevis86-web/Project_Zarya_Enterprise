@@ -152,6 +152,61 @@ class DocumentTypeOCRTests(TestCase):
 
 
 
+    def test_detects_noisy_invoice_without_word_invoice_but_with_payment_number_and_date(self):
+        self.assertEqual(
+            detect_document_type(
+                "оплату № Br30622001 от 22 июня 2026 г. "
+                "Итого с НДС 43 342,34"
+            ),
+            "invoice",
+        )
+
+    def test_detects_noisy_invoice_with_payment_phrase_and_number_and_date(self):
+        self.assertEqual(
+            detect_document_type(
+                "ще на оплату № Br3C0617003 от 17 июня 2026 г. "
+                "Итого с НДС 27 328,44"
+            ),
+            "invoice",
+        )
+
+    def test_invoice_with_cargo_words_and_invoice_marker_stays_invoice(self):
+        self.assertEqual(
+            detect_document_type(
+                "Счет на оплату № 77 от 01 июля 2026 "
+                "Поставщик ООО Ромашка "
+                "Грузоотправитель ООО Ромашка "
+                "Грузополучатель ОАО Заря"
+            ),
+            "invoice",
+        )
+
+
+
+    def test_invoice_offer_with_future_upd_mention_stays_invoice(self):
+        self.assertEqual(
+            detect_document_type(
+                "Счет-Оферта № 0232229936-0044 от 04.07.2026 "
+                "Всего к оплате с учетом НДС 5 296,00 "
+                "Сумма НДС выделяется отдельной строкой в УПД после получения заказа"
+            ),
+            "invoice",
+        )
+
+    def test_invoice_offer_with_future_upd_mention_parse_stays_invoice(self):
+        parsed = parse_invoice_data(
+            "Счет-Оферта № 0232229936-0044 от 04.07.2026 "
+            "Всего к оплате с учетом НДС 5 296,00 "
+            "Сумма НДС выделяется отдельной строкой в УПД после получения заказа"
+        )
+
+        self.assertEqual(
+            parsed["document_type"],
+            "invoice",
+        )
+
+
+
 class InvoiceListDocumentFilterTests(TestCase):
     def setUp(self):
         User = get_user_model()

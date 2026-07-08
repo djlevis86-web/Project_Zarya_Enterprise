@@ -1822,6 +1822,17 @@ def detect_document_type(text):
         flags=re.UNICODE
     )
 
+    invoice_offer_markers = (
+        'счет-оферта',
+        'счёт-оферта',
+        'счет оферта',
+        'счёт оферта',
+    )
+
+    for marker in invoice_offer_markers:
+        if marker in normalized:
+            return 'invoice'
+
     upd_markers = (
         'упд',
         'универсальный передаточный документ',

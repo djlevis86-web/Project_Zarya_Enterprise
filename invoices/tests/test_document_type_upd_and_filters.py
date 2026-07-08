@@ -183,6 +183,30 @@ class DocumentTypeOCRTests(TestCase):
 
 
 
+    def test_invoice_offer_with_future_upd_mention_stays_invoice(self):
+        self.assertEqual(
+            detect_document_type(
+                "Счет-Оферта № 0232229936-0044 от 04.07.2026 "
+                "Всего к оплате с учетом НДС 5 296,00 "
+                "Сумма НДС выделяется отдельной строкой в УПД после получения заказа"
+            ),
+            "invoice",
+        )
+
+    def test_invoice_offer_with_future_upd_mention_parse_stays_invoice(self):
+        parsed = parse_invoice_data(
+            "Счет-Оферта № 0232229936-0044 от 04.07.2026 "
+            "Всего к оплате с учетом НДС 5 296,00 "
+            "Сумма НДС выделяется отдельной строкой в УПД после получения заказа"
+        )
+
+        self.assertEqual(
+            parsed["document_type"],
+            "invoice",
+        )
+
+
+
 class InvoiceListDocumentFilterTests(TestCase):
     def setUp(self):
         User = get_user_model()

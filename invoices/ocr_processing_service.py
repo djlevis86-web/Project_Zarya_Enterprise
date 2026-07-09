@@ -247,12 +247,20 @@ def run_invoice_ocr_processing(invoice, user, log_action):
 
             invoice.counterparty = counterparty
 
+            update_fields = [
+                'counterparty',
+                'counterparty_match_status',
+                'counterparty_match_comment',
+            ]
+
+            if counterparty:
+                invoice.vendor = counterparty.name
+                update_fields.append(
+                    'vendor'
+                )
+
             invoice.save(
-                update_fields=[
-                    'counterparty',
-                    'counterparty_match_status',
-                    'counterparty_match_comment',
-                ]
+                update_fields=update_fields
             )
 
         except Exception as match_error:
@@ -289,4 +297,3 @@ def run_invoice_ocr_processing(invoice, user, log_action):
         )
 
         return False, str(error)
-

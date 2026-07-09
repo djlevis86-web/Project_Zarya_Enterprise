@@ -686,6 +686,72 @@ def find_counterparty_by_name(vendor_name):
     return None
 
 
+def extract_all_inns_from_ocr_text(text):
+
+    result = []
+
+    if not text:
+
+        return result
+
+    chunks = re.findall(
+        r'\d[\d\s\\/\-]{8,}\d',
+        str(text)
+    )
+
+    for chunk in chunks:
+
+        inn = re.sub(
+            r'\D+',
+            '',
+            chunk
+        )
+
+        if len(inn) not in (10, 12):
+
+            continue
+
+        if is_own_company_inn(
+            inn
+        ):
+
+            continue
+
+        if inn not in result:
+
+            result.append(
+                inn
+            )
+
+    return result
+
+
+def find_counterparties_by_all_ocr_inns(text):
+
+    matches = []
+
+    for inn in extract_all_inns_from_ocr_text(
+        text
+    ):
+
+        queryset = get_official_counterparties_queryset().exclude(
+            inn=OWN_COMPANY_INN
+        ).filter(
+            inn=inn
+        )
+
+        for counterparty in queryset:
+
+            if counterparty.id not in [
+                item.id for item in matches
+            ]:
+
+                matches.append(
+                    counterparty
+                )
+
+    return matches
+
 def get_or_create_counterparty_from_invoice(invoice):
 
     source_text = invoice.ocr_text or ''
@@ -699,6 +765,38 @@ def get_or_create_counterparty_from_invoice(invoice):
     )
 
     if not inn:
+
+        fallback_counterparties = find_counterparties_by_all_ocr_inns(
+            source_text
+        )
+
+        if len(fallback_counterparties) == 1:
+
+            counterparty = fallback_counterparties[0]
+
+            invoice.counterparty_match_status = (
+                Invoice.COUNTERPARTY_MATCH_FOUND
+            )
+
+            invoice.counterparty_match_comment = (
+                f'Контрагент найден по единственному ИНН из OCR {counterparty.inn} '
+                'без использования имени файла'
+            )
+
+            return counterparty
+
+        if len(fallback_counterparties) > 1:
+
+            invoice.counterparty_match_status = (
+                Invoice.COUNTERPARTY_MATCH_AMBIGUOUS
+            )
+
+            invoice.counterparty_match_comment = (
+                'В OCR найдено несколько возможных контрагентов по ИНН; '
+                'автоматическое сопоставление не выполнено'
+            )
+
+            return None
 
         counterparty = find_counterparty_by_name(
             invoice.vendor
@@ -742,6 +840,38 @@ def get_or_create_counterparty_from_invoice(invoice):
         )
 
         return counterparty
+
+    fallback_counterparties = find_counterparties_by_all_ocr_inns(
+        source_text
+    )
+
+    if len(fallback_counterparties) == 1:
+
+        counterparty = fallback_counterparties[0]
+
+        invoice.counterparty_match_status = (
+            Invoice.COUNTERPARTY_MATCH_FOUND
+        )
+
+        invoice.counterparty_match_comment = (
+            f'Контрагент найден по дополнительному ИНН из OCR {counterparty.inn} '
+            'без использования имени файла'
+        )
+
+        return counterparty
+
+    if len(fallback_counterparties) > 1:
+
+        invoice.counterparty_match_status = (
+            Invoice.COUNTERPARTY_MATCH_AMBIGUOUS
+        )
+
+        invoice.counterparty_match_comment = (
+            'В OCR найдено несколько возможных контрагентов по ИНН; '
+            'автоматическое сопоставление не выполнено'
+        )
+
+        return None
 
     counterparty = find_counterparty_by_name(
         invoice.vendor

@@ -47,9 +47,25 @@ class Command(BaseCommand):
             planned_payment_date__isnull=True,
         ).count()
 
+        without_vendor_count = invoices.filter(
+            Q(vendor__isnull=True)
+            |
+            Q(vendor="")
+        ).count()
+
         without_counterparty_count = invoices.filter(
             counterparty__isnull=True,
         ).count()
+
+        waiting_1c_sync_count = invoices.filter(
+            counterparty__isnull=True,
+            counterparty_match_status=Invoice.COUNTERPARTY_MATCH_NOT_FOUND,
+        ).count()
+
+        counterparty_action_required_count = (
+            without_counterparty_count
+            - waiting_1c_sync_count
+        )
 
         unverified_amount_count = invoices.filter(
             amount_verified=False,
@@ -87,9 +103,28 @@ class Command(BaseCommand):
             else:
                 ready_for_registry_count += 1
 
+        technical_audit = {
+            "without_ocr_text_count": without_ocr_text_count,
+            "unknown_document_type_count": unknown_document_type_count,
+            "without_vendor_count": without_vendor_count,
+            "without_counterparty_count": without_counterparty_count,
+            "counterparty_action_required_count": counterparty_action_required_count,
+            "waiting_1c_sync_count": waiting_1c_sync_count,
+        }
+
+        user_work_queue = {
+            "without_planned_payment_date_count": without_planned_payment_date_count,
+            "unverified_amount_count": unverified_amount_count,
+            "ready_for_registry_count": ready_for_registry_count,
+            "not_ready_for_registry_count": not_ready_for_registry_count,
+        }
+
         report = {
+            "report_version": 2,
             "generated_at": timezone.now().isoformat(),
             "total_count": total_count,
+
+            # Старые плоские ключи оставляем для совместимости dashboard/API.
             "without_planned_payment_date_count": without_planned_payment_date_count,
             "without_counterparty_count": without_counterparty_count,
             "unverified_amount_count": unverified_amount_count,
@@ -97,6 +132,14 @@ class Command(BaseCommand):
             "unknown_document_type_count": unknown_document_type_count,
             "ready_for_registry_count": ready_for_registry_count,
             "not_ready_for_registry_count": not_ready_for_registry_count,
+
+            # Новые v2-ключи.
+            "without_vendor_count": without_vendor_count,
+            "counterparty_action_required_count": counterparty_action_required_count,
+            "waiting_1c_sync_count": waiting_1c_sync_count,
+            "technical_audit": technical_audit,
+            "user_work_queue": user_work_queue,
+
             "mode": "audit_only",
         }
 
@@ -110,13 +153,13 @@ class Command(BaseCommand):
             f"Всего активных документов: {total_count}"
         )
         self.stdout.write(
-            f"Без плановой даты оплаты: {without_planned_payment_date_count}"
+            ""
         )
         self.stdout.write(
-            f"Без контрагента: {without_counterparty_count}"
+            "Технический аудит"
         )
         self.stdout.write(
-            f"С неподтверждённой суммой: {unverified_amount_count}"
+            "-----------------"
         )
         self.stdout.write(
             f"Без OCR-текста: {without_ocr_text_count}"
@@ -125,10 +168,40 @@ class Command(BaseCommand):
             f"Неизвестный тип документа: {unknown_document_type_count}"
         )
         self.stdout.write(
+            f"Без заполненного поставщика: {without_vendor_count}"
+        )
+        self.stdout.write(
+            f"Без контрагента: {without_counterparty_count}"
+        )
+        self.stdout.write(
+            f"Требуют проверки контрагента: {counterparty_action_required_count}"
+        )
+        self.stdout.write(
+            f"Ожидают синхронизацию справочника 1С: {waiting_1c_sync_count}"
+        )
+        self.stdout.write(
+            ""
+        )
+        self.stdout.write(
+            "Рабочая очередь пользователя"
+        )
+        self.stdout.write(
+            "--------------------------"
+        )
+        self.stdout.write(
+            f"Без плановой даты оплаты: {without_planned_payment_date_count}"
+        )
+        self.stdout.write(
+            f"Сумма ожидает подтверждения: {unverified_amount_count}"
+        )
+        self.stdout.write(
             f"Готовы к реестру оплаты: {ready_for_registry_count}"
         )
         self.stdout.write(
             f"Не готовы к реестру оплаты: {not_ready_for_registry_count}"
+        )
+        self.stdout.write(
+            ""
         )
         self.stdout.write(
             "Режим: только аудит, без изменения данных"

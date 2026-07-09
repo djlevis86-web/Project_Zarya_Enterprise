@@ -45,6 +45,7 @@ class InvoiceBotRunnerTests(TestCase):
             "document_type": Invoice.DOCUMENT_TYPE_INVOICE,
             "document_date": date(2026, 7, 1),
             "planned_payment_date": date(2026, 7, 10),
+            "vendor": self.counterparty.name,
             "counterparty": self.counterparty,
             "ocr_text": "OCR TEXT",
         }
@@ -69,6 +70,19 @@ class InvoiceBotRunnerTests(TestCase):
         self.create_invoice(
             title="NO COUNTERPARTY BOT INVOICE",
             counterparty=None,
+            counterparty_match_status=Invoice.COUNTERPARTY_MATCH_NOT_PROCESSED,
+        )
+
+        self.create_invoice(
+            title="WAITING 1C SYNC BOT INVOICE",
+            counterparty=None,
+            counterparty_match_status=Invoice.COUNTERPARTY_MATCH_NOT_FOUND,
+            counterparty_match_comment="Контрагент не найден в справочнике 1С",
+        )
+
+        self.create_invoice(
+            title="NO VENDOR BOT INVOICE",
+            vendor=None,
         )
 
         self.create_invoice(
@@ -100,19 +114,11 @@ class InvoiceBotRunnerTests(TestCase):
             output,
         )
         self.assertIn(
-            "Всего активных документов: 4",
+            "Всего активных документов: 6",
             output,
         )
         self.assertIn(
-            "Без плановой даты оплаты: 1",
-            output,
-        )
-        self.assertIn(
-            "Без контрагента: 1",
-            output,
-        )
-        self.assertIn(
-            "С неподтверждённой суммой: 1",
+            "Технический аудит",
             output,
         )
         self.assertIn(
@@ -124,11 +130,39 @@ class InvoiceBotRunnerTests(TestCase):
             output,
         )
         self.assertIn(
-            "Готовы к реестру оплаты: 1",
+            "Без заполненного поставщика: 1",
             output,
         )
         self.assertIn(
-            "Не готовы к реестру оплаты: 3",
+            "Без контрагента: 2",
+            output,
+        )
+        self.assertIn(
+            "Требуют проверки контрагента: 1",
+            output,
+        )
+        self.assertIn(
+            "Ожидают синхронизацию справочника 1С: 1",
+            output,
+        )
+        self.assertIn(
+            "Рабочая очередь пользователя",
+            output,
+        )
+        self.assertIn(
+            "Без плановой даты оплаты: 1",
+            output,
+        )
+        self.assertIn(
+            "Сумма ожидает подтверждения: 1",
+            output,
+        )
+        self.assertIn(
+            "Готовы к реестру оплаты: 2",
+            output,
+        )
+        self.assertIn(
+            "Не готовы к реестру оплаты: 4",
             output,
         )
         self.assertIn(
@@ -177,9 +211,15 @@ class InvoiceBotRunnerTests(TestCase):
                 report,
             )
             self.assertEqual(
+                report["report_version"],
+                2,
+            )
+            self.assertEqual(
                 report["total_count"],
                 2,
             )
+
+            # Старые ключи сохраняем для dashboard-совместимости.
             self.assertEqual(
                 report["without_planned_payment_date_count"],
                 1,
@@ -208,6 +248,48 @@ class InvoiceBotRunnerTests(TestCase):
                 report["not_ready_for_registry_count"],
                 1,
             )
+
+            # Новая v2-структура разделяет техаудит и ручную очередь.
+            self.assertEqual(
+                report["technical_audit"]["without_ocr_text_count"],
+                0,
+            )
+            self.assertEqual(
+                report["technical_audit"]["unknown_document_type_count"],
+                0,
+            )
+            self.assertEqual(
+                report["technical_audit"]["without_vendor_count"],
+                0,
+            )
+            self.assertEqual(
+                report["technical_audit"]["without_counterparty_count"],
+                0,
+            )
+            self.assertEqual(
+                report["technical_audit"]["counterparty_action_required_count"],
+                0,
+            )
+            self.assertEqual(
+                report["technical_audit"]["waiting_1c_sync_count"],
+                0,
+            )
+            self.assertEqual(
+                report["user_work_queue"]["without_planned_payment_date_count"],
+                1,
+            )
+            self.assertEqual(
+                report["user_work_queue"]["unverified_amount_count"],
+                0,
+            )
+            self.assertEqual(
+                report["user_work_queue"]["ready_for_registry_count"],
+                1,
+            )
+            self.assertEqual(
+                report["user_work_queue"]["not_ready_for_registry_count"],
+                1,
+            )
             self.assertEqual(
                 report["mode"],
                 "audit_only",
@@ -216,7 +298,6 @@ class InvoiceBotRunnerTests(TestCase):
                 "JSON-отчёт сохранён",
                 out.getvalue(),
             )
-
 
     def test_run_invoice_bot_counts_unknown_document_type(self):
         self.create_invoice(

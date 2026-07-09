@@ -63,6 +63,9 @@ REPORT_COUNT_FIELDS = (
     "unknown_document_type_count",
     "ready_for_registry_count",
     "not_ready_for_registry_count",
+    "without_vendor_count",
+    "counterparty_action_required_count",
+    "waiting_1c_sync_count",
 )
 
 

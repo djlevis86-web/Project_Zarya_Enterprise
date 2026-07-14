@@ -141,7 +141,7 @@
 </div>
 
 {% if invoice_bot_report %}
-<div class="card dashboard-bot-report-v1">
+<div class="card dashboard-bot-report-v2">
 
     <div class="registry-table-header">
         <div>
@@ -169,6 +169,96 @@
                 {{ invoice_bot_report.total_count }}
             </strong>
         </a>
+
+    </div>
+
+    <div class="dashboard-attention-header-v1">
+        <div>
+            <h2>
+                Технический аудит
+            </h2>
+            <p>
+                Ошибки OCR, типа документа и сопоставления поставщика. Это техническая зона контроля.
+            </p>
+        </div>
+    </div>
+
+    <div class="registry-summary dashboard-bot-summary-v1">
+
+        <a href="{% url 'invoice_bot_report_detail' 'without-ocr-text' %}" class="registry-summary-card stat-link">
+            <span class="registry-summary-label">
+                Без OCR-текста
+            </span>
+
+            <strong>
+                {{ invoice_bot_report.without_ocr_text_count }}
+            </strong>
+        </a>
+
+        <a href="{% url 'invoice_bot_report_detail' 'unknown-document-type' %}" class="registry-summary-card stat-link">
+            <span class="registry-summary-label">
+                Неизвестный тип
+            </span>
+
+            <strong>
+                {{ invoice_bot_report.unknown_document_type_count }}
+            </strong>
+        </a>
+
+        <div class="registry-summary-card">
+            <span class="registry-summary-label">
+                Без заполненного поставщика
+            </span>
+
+            <strong>
+                {{ invoice_bot_report.without_vendor_count }}
+            </strong>
+        </div>
+
+        <a href="{% url 'invoice_bot_report_detail' 'without-counterparty' %}" class="registry-summary-card stat-link">
+            <span class="registry-summary-label">
+                Без контрагента
+            </span>
+
+            <strong>
+                {{ invoice_bot_report.without_counterparty_count }}
+            </strong>
+        </a>
+
+        <div class="registry-summary-card">
+            <span class="registry-summary-label">
+                Требуют проверки контрагента
+            </span>
+
+            <strong>
+                {{ invoice_bot_report.counterparty_action_required_count }}
+            </strong>
+        </div>
+
+        <div class="registry-summary-card">
+            <span class="registry-summary-label">
+                Ожидают синхронизацию 1С
+            </span>
+
+            <strong>
+                {{ invoice_bot_report.waiting_1c_sync_count }}
+            </strong>
+        </div>
+
+    </div>
+
+    <div class="dashboard-attention-header-v1">
+        <div>
+            <h2>
+                Рабочая очередь пользователя
+            </h2>
+            <p>
+                Документы, которые требуют ручной обработки: дата оплаты, подтверждение суммы и готовность к реестру.
+            </p>
+        </div>
+    </div>
+
+    <div class="registry-summary dashboard-bot-summary-v1">
 
         <a href="{% url 'invoice_bot_report_detail' 'ready' %}" class="registry-summary-card stat-link">
             <span class="registry-summary-label">
@@ -200,43 +290,13 @@
             </strong>
         </a>
 
-        <a href="{% url 'invoice_bot_report_detail' 'without-counterparty' %}" class="registry-summary-card stat-link">
-            <span class="registry-summary-label">
-                Без контрагента
-            </span>
-
-            <strong>
-                {{ invoice_bot_report.without_counterparty_count }}
-            </strong>
-        </a>
-
         <a href="{% url 'invoice_bot_report_detail' 'unverified-amount' %}" class="registry-summary-card stat-link">
             <span class="registry-summary-label">
-                Сумма не подтверждена
+                Сумма ожидает подтверждения
             </span>
 
             <strong>
                 {{ invoice_bot_report.unverified_amount_count }}
-            </strong>
-        </a>
-
-        <a href="{% url 'invoice_bot_report_detail' 'without-ocr-text' %}" class="registry-summary-card stat-link">
-            <span class="registry-summary-label">
-                Без OCR-текста
-            </span>
-
-            <strong>
-                {{ invoice_bot_report.without_ocr_text_count }}
-            </strong>
-        </a>
-
-        <a href="{% url 'invoice_bot_report_detail' 'unknown-document-type' %}" class="registry-summary-card stat-link">
-            <span class="registry-summary-label">
-                Неизвестный тип
-            </span>
-
-            <strong>
-                {{ invoice_bot_report.unknown_document_type_count }}
             </strong>
         </a>
 

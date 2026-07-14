@@ -7,7 +7,13 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from invoices.models import Counterparty, Invoice, PaymentRegistry, PaymentRegistryItem
+from invoices.models import (
+    Counterparty,
+    Invoice,
+    PaymentRegistry,
+    PaymentRegistryItem,
+    ResponsiblePerson,
+)
 from invoices.payment_registry_services import (
     add_invoice_to_payment_registry,
     get_or_create_draft_payment_registry,
@@ -45,6 +51,11 @@ class PaymentRegistryServiceTests(TestCase):
             bik="044525225",
         )
 
+        self.responsible = ResponsiblePerson.objects.create(
+            full_name="Ответственный реестра",
+            is_active=True,
+        )
+
     def _create_invoice(
         self,
         title="REGISTRY-INVOICE-TEST",
@@ -63,6 +74,7 @@ class PaymentRegistryServiceTests(TestCase):
 
         return Invoice.objects.create(
             user=self.user,
+            responsible=self.responsible,
             title=title,
             original_filename=f"{title}.pdf",
             file=SimpleUploadedFile(
@@ -174,6 +186,39 @@ class PaymentRegistryServiceTests(TestCase):
         self.assertIsNone(item)
         self.assertIn(
             "Не указана плановая дата оплаты.",
+            errors,
+        )
+        self.assertFalse(
+            PaymentRegistryItem.objects.filter(
+                registry=registry,
+                invoice=invoice,
+            ).exists()
+        )
+
+    def test_invoice_without_responsible_is_not_added(self):
+        invoice = self._create_invoice(
+            title="REGISTRY-NO-RESPONSIBLE",
+        )
+
+        invoice.responsible = None
+        invoice.save(
+            update_fields=[
+                "responsible",
+            ]
+        )
+
+        registry, _ = get_or_create_draft_payment_registry(
+            self.user
+        )
+
+        item, errors, warnings = add_invoice_to_payment_registry(
+            invoice,
+            registry,
+        )
+
+        self.assertIsNone(item)
+        self.assertIn(
+            "Ответственный не назначен.",
             errors,
         )
         self.assertFalse(

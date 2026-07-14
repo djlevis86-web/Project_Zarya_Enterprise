@@ -98,6 +98,22 @@
 
             <div class="form-group">
 
+                <label for="{{ form.responsible.id_for_label }}">
+                    Ответственный
+                </label>
+
+                {{ form.responsible }}
+
+                {% if form.responsible.errors %}
+                    <div class="form-error">
+                        {{ form.responsible.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+            <div class="form-group">
+
                 <label>Приоритет оплаты</label>
 
                 {{ form.payment_priority }}

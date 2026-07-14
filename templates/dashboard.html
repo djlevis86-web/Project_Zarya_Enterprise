@@ -150,9 +150,10 @@
             </h3>
 
             <span>
-                Последний автоматический аудит документов
-                {% if invoice_bot_report.generated_at_datetime %}
-                    · {{ invoice_bot_report.generated_at_datetime|date:"d.m.Y H:i" }}
+                Актуальное состояние документов
+                {% if invoice_bot_report.snapshot_generated_at_datetime %}
+                    · последний автоматический аудит
+                    {{ invoice_bot_report.snapshot_generated_at_datetime|date:"d.m.Y H:i" }}
                 {% endif %}
             </span>
         </div>

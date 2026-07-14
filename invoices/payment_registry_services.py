@@ -79,11 +79,25 @@ def validate_invoice_for_payment_registry(invoice):
     errors = []
     warnings = []
 
-    duplicate_item = get_active_registry_item_for_invoice(invoice)
+    if hasattr(
+        invoice,
+        "active_registry_id",
+    ):
+        active_registry_id = invoice.active_registry_id
+    else:
+        duplicate_item = get_active_registry_item_for_invoice(
+            invoice
+        )
 
-    if duplicate_item:
+        active_registry_id = (
+            duplicate_item.registry_id
+            if duplicate_item
+            else None
+        )
+
+    if active_registry_id:
         errors.append(
-            f"Документ уже есть в реестре №{duplicate_item.registry_id}."
+            f"Документ уже есть в реестре №{active_registry_id}."
         )
 
     if getattr(invoice, "paid_at", None):

@@ -3,11 +3,9 @@ from pathlib import Path
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.db.models import Q
-from django.utils import timezone
-
-from invoices.models import Invoice
-from invoices.payment_registry_services import validate_invoice_for_payment_registry
+from invoices.bot_report_services import (
+    build_live_invoice_bot_report,
+)
 
 
 DEFAULT_REPORT_PATH = Path("var") / "invoice_bot" / "latest_report.json"
@@ -31,117 +29,40 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        invoices = (
-            Invoice.objects
-            .select_related(
-                "counterparty",
-            )
-            .filter(
-                is_deleted=False,
-            )
-        )
+        report = build_live_invoice_bot_report()
+        report["mode"] = "audit_only"
 
-        total_count = invoices.count()
-
-        without_planned_payment_date_count = invoices.filter(
-            planned_payment_date__isnull=True,
-        ).count()
-
-        without_vendor_count = invoices.filter(
-            Q(vendor__isnull=True)
-            |
-            Q(vendor="")
-        ).count()
-
-        without_counterparty_count = invoices.filter(
-            counterparty__isnull=True,
-        ).count()
-
-        waiting_1c_sync_count = invoices.filter(
-            counterparty__isnull=True,
-            counterparty_match_status=Invoice.COUNTERPARTY_MATCH_NOT_FOUND,
-        ).count()
-
-        counterparty_action_required_count = (
-            without_counterparty_count
-            - waiting_1c_sync_count
-        )
-
-        unverified_amount_count = invoices.filter(
-            amount_verified=False,
-        ).count()
-
-        without_ocr_text_count = invoices.filter(
-            Q(ocr_text__isnull=True)
-            |
-            Q(ocr_text="")
-        ).count()
-
-        unknown_document_type_count = (
-            invoices
-            .filter(
-                document_type=Invoice.DOCUMENT_TYPE_UNKNOWN,
-            )
-            .exclude(
-                Q(ocr_text__isnull=True)
-                |
-                Q(ocr_text="")
-            )
-            .count()
-        )
-
-        ready_for_registry_count = 0
-        not_ready_for_registry_count = 0
-
-        for invoice in invoices:
-            errors, warnings = validate_invoice_for_payment_registry(
-                invoice
-            )
-
-            if errors:
-                not_ready_for_registry_count += 1
-            else:
-                ready_for_registry_count += 1
-
-        technical_audit = {
-            "without_ocr_text_count": without_ocr_text_count,
-            "unknown_document_type_count": unknown_document_type_count,
-            "without_vendor_count": without_vendor_count,
-            "without_counterparty_count": without_counterparty_count,
-            "counterparty_action_required_count": counterparty_action_required_count,
-            "waiting_1c_sync_count": waiting_1c_sync_count,
-        }
-
-        user_work_queue = {
-            "without_planned_payment_date_count": without_planned_payment_date_count,
-            "unverified_amount_count": unverified_amount_count,
-            "ready_for_registry_count": ready_for_registry_count,
-            "not_ready_for_registry_count": not_ready_for_registry_count,
-        }
-
-        report = {
-            "report_version": 2,
-            "generated_at": timezone.now().isoformat(),
-            "total_count": total_count,
-
-            # Старые плоские ключи оставляем для совместимости dashboard/API.
-            "without_planned_payment_date_count": without_planned_payment_date_count,
-            "without_counterparty_count": without_counterparty_count,
-            "unverified_amount_count": unverified_amount_count,
-            "without_ocr_text_count": without_ocr_text_count,
-            "unknown_document_type_count": unknown_document_type_count,
-            "ready_for_registry_count": ready_for_registry_count,
-            "not_ready_for_registry_count": not_ready_for_registry_count,
-
-            # Новые v2-ключи.
-            "without_vendor_count": without_vendor_count,
-            "counterparty_action_required_count": counterparty_action_required_count,
-            "waiting_1c_sync_count": waiting_1c_sync_count,
-            "technical_audit": technical_audit,
-            "user_work_queue": user_work_queue,
-
-            "mode": "audit_only",
-        }
+        total_count = report["total_count"]
+        without_planned_payment_date_count = report[
+            "without_planned_payment_date_count"
+        ]
+        without_vendor_count = report[
+            "without_vendor_count"
+        ]
+        without_counterparty_count = report[
+            "without_counterparty_count"
+        ]
+        waiting_1c_sync_count = report[
+            "waiting_1c_sync_count"
+        ]
+        counterparty_action_required_count = report[
+            "counterparty_action_required_count"
+        ]
+        unverified_amount_count = report[
+            "unverified_amount_count"
+        ]
+        without_ocr_text_count = report[
+            "without_ocr_text_count"
+        ]
+        unknown_document_type_count = report[
+            "unknown_document_type_count"
+        ]
+        ready_for_registry_count = report[
+            "ready_for_registry_count"
+        ]
+        not_ready_for_registry_count = report[
+            "not_ready_for_registry_count"
+        ]
 
         self.stdout.write(
             "Invoice Bot Report"

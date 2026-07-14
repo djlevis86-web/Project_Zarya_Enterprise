@@ -319,6 +319,9 @@ def upload_invoice(request):
                 planned_payment_date=form.cleaned_data.get(
                     'planned_payment_date'
                 ),
+                responsible=form.cleaned_data.get(
+                    'responsible'
+                ),
                 file=uploaded_file,
                 original_filename=uploaded_file.name,
                 file_hash=file_hash,
@@ -555,4 +558,3 @@ def upload_invoice(request):
         request,
         form
     )
-

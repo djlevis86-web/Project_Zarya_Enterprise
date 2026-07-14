@@ -191,6 +191,32 @@ class CompanyRequisites(models.Model):
         return self.name
 
 
+class ResponsiblePerson(models.Model):
+
+    full_name = models.CharField(
+        "ФИО",
+        max_length=255,
+        db_index=True
+    )
+
+    is_active = models.BooleanField(
+        "Активен",
+        default=True,
+        db_index=True
+    )
+
+    class Meta:
+        ordering = (
+            "full_name",
+            "id",
+        )
+        verbose_name = "Ответственный"
+        verbose_name_plural = "Ответственные"
+
+    def __str__(self):
+        return self.full_name
+
+
 class InvoiceUploadBatch(models.Model):
 
     STATUS_COMPLETED = 'completed'
@@ -458,6 +484,15 @@ class Invoice(models.Model):
         choices=STATUS_CHOICES,
         default=STATUS_NEW,
         verbose_name='Статус'
+    )
+
+    responsible = models.ForeignKey(
+        ResponsiblePerson,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="invoices",
+        verbose_name="Ответственный"
     )
 
     planned_payment_date = models.DateField(

@@ -3,6 +3,7 @@ from decimal import Decimal, InvalidOperation
 from .models import (
     Invoice,
     Counterparty,
+    ResponsiblePerson,
 )
 
 ALLOWED_EXTENSIONS = [
@@ -152,6 +153,27 @@ class UploadInvoiceForm(forms.Form):
         error_messages={
             'required': 'Укажите плановую дату оплаты.',
             'invalid': 'Введите корректную плановую дату оплаты.',
+        },
+    )
+
+    responsible = forms.ModelChoiceField(
+        label="Ответственный",
+        queryset=ResponsiblePerson.objects.filter(
+            is_active=True
+        ).order_by(
+            "full_name",
+            "id",
+        ),
+        required=True,
+        empty_label="Выберите ответственного",
+        widget=forms.Select(
+            attrs={
+                "class": "form-control",
+            }
+        ),
+        error_messages={
+            "required": "Выберите ответственного.",
+            "invalid_choice": "Выбранный ответственный недоступен.",
         },
     )
 

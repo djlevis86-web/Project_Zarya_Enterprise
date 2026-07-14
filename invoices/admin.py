@@ -7,6 +7,7 @@ from .models import (
     InvoiceUploadBatch,
     Counterparty,
     CompanyRequisites,
+    ResponsiblePerson,
 )
 
 from .comment_models import InvoiceComment
@@ -47,6 +48,28 @@ class CounterpartyAdmin(admin.ModelAdmin):
         'synced_at',
     )
 
+@admin.register(ResponsiblePerson)
+class ResponsiblePersonAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "full_name",
+        "is_active",
+    )
+
+    list_filter = (
+        "is_active",
+    )
+
+    search_fields = (
+        "full_name",
+    )
+
+    ordering = (
+        "full_name",
+        "id",
+    )
+
+
 from .models import (
     PaymentRegistry,
     PaymentRegistryItem,
@@ -74,6 +97,7 @@ class InvoiceAdmin(admin.ModelAdmin):
         'title',
         'user',
         'counterparty',
+        'responsible',
         'amount',
         'status',
         'invoice_number',
@@ -84,6 +108,7 @@ class InvoiceAdmin(admin.ModelAdmin):
 
     list_filter = (
         'status',
+        'responsible',
         'created_at',
     )
 
@@ -95,6 +120,7 @@ class InvoiceAdmin(admin.ModelAdmin):
         'user__username',
         'counterparty_match_status',
         'counterparty_match_comment',
+        'responsible__full_name',
     )
 
     ordering = (
@@ -112,6 +138,7 @@ class InvoiceAdmin(admin.ModelAdmin):
         ('Invoice Information', {
             'fields': (
                 'user',
+                'responsible',
                 'title',
                 'description',
                 'file',

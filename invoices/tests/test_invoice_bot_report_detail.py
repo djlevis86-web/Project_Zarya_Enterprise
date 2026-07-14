@@ -8,7 +8,12 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from invoices.models import Counterparty, Invoice, OCRJob
+from invoices.models import (
+    Counterparty,
+    Invoice,
+    OCRJob,
+    ResponsiblePerson,
+)
 
 
 class InvoiceBotReportDetailTests(TestCase):
@@ -35,6 +40,11 @@ class InvoiceBotReportDetailTests(TestCase):
             is_active=True,
         )
 
+        self.responsible = ResponsiblePerson.objects.create(
+            full_name="Ответственный детализации бота",
+            is_active=True,
+        )
+
     def create_invoice(self, **kwargs):
         defaults = {
             "user": self.user,
@@ -45,6 +55,7 @@ class InvoiceBotReportDetailTests(TestCase):
             "document_type": Invoice.DOCUMENT_TYPE_INVOICE,
             "document_date": date(2026, 7, 1),
             "planned_payment_date": date(2026, 7, 10),
+            "responsible": self.responsible,
             "counterparty": self.counterparty,
             "ocr_text": "OCR TEXT",
         }

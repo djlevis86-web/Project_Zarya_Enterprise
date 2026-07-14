@@ -157,6 +157,20 @@
 
                 <div class="info-row">
                     <span>
+                        Ответственный
+                    </span>
+
+                    <strong>
+                        {% if invoice.responsible %}
+                            {{ invoice.responsible.full_name }}
+                        {% else %}
+                            Не назначен
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <div class="info-row">
+                    <span>
                         Номер документа
                     </span>
 

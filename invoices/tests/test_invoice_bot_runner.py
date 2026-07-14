@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test import TestCase
 
-from invoices.models import Counterparty, Invoice
+from invoices.models import Counterparty, Invoice, ResponsiblePerson
 
 
 class InvoiceBotRunnerTests(TestCase):
@@ -35,6 +35,11 @@ class InvoiceBotRunnerTests(TestCase):
             is_active=True,
         )
 
+        self.responsible = ResponsiblePerson.objects.create(
+            full_name="Ответственный отчёта бота",
+            is_active=True,
+        )
+
     def create_invoice(self, **kwargs):
         defaults = {
             "user": self.user,
@@ -45,6 +50,7 @@ class InvoiceBotRunnerTests(TestCase):
             "document_type": Invoice.DOCUMENT_TYPE_INVOICE,
             "document_date": date(2026, 7, 1),
             "planned_payment_date": date(2026, 7, 10),
+            "responsible": self.responsible,
             "vendor": self.counterparty.name,
             "counterparty": self.counterparty,
             "ocr_text": "OCR TEXT",

@@ -8,7 +8,13 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
-from invoices.models import Counterparty, Invoice, PaymentRegistry, PaymentRegistryItem
+from invoices.models import (
+    Counterparty,
+    Invoice,
+    PaymentRegistry,
+    PaymentRegistryItem,
+    ResponsiblePerson,
+)
 from invoices.payment_registry_services import (
     add_invoice_to_payment_registry,
     get_or_create_draft_payment_registry,
@@ -61,6 +67,11 @@ class PaymentRegistryViewTests(TestCase):
             bik="044525225",
         )
 
+        self.responsible = ResponsiblePerson.objects.create(
+            full_name="Ответственный страницы реестра",
+            is_active=True,
+        )
+
     def _create_invoice(
         self,
         user,
@@ -80,6 +91,7 @@ class PaymentRegistryViewTests(TestCase):
 
         return Invoice.objects.create(
             user=user,
+            responsible=self.responsible,
             title=title,
             original_filename=f"{title}.pdf",
             file=SimpleUploadedFile(

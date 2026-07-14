@@ -14,6 +14,7 @@ from invoices.models import Counterparty
 from invoices.models import Invoice
 from invoices.models import PaymentRegistry
 from invoices.models import PaymentRegistryItem
+from invoices.models import ResponsiblePerson
 from invoices.payment_registry_services import (
     add_invoice_to_payment_registry,
     get_or_create_draft_payment_registry,
@@ -67,9 +68,15 @@ class PaymentRegistrySharedLifecycleTests(TestCase):
             bik="044525225",
         )
 
+        self.responsible = ResponsiblePerson.objects.create(
+            full_name="Ответственный общего реестра",
+            is_active=True,
+        )
+
     def _create_invoice(self, user, title="REGISTRY-SHARED-INVOICE"):
         return Invoice.objects.create(
             user=user,
+            responsible=self.responsible,
             title=title,
             original_filename=f"{title}.pdf",
             file=SimpleUploadedFile(

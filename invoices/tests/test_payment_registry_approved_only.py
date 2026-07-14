@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 
-from invoices.models import Counterparty, Invoice
+from invoices.models import Counterparty, Invoice, ResponsiblePerson
 from invoices.payment_registry_services import validate_invoice_for_payment_registry
 
 
@@ -35,6 +35,11 @@ class PaymentRegistryApprovedOnlyTests(TestCase):
             account_number="40702810000000000001",
         )
 
+        self.responsible = ResponsiblePerson.objects.create(
+            full_name="Ответственный approved-only",
+            is_active=True,
+        )
+
     def tearDown(self):
         self.override.disable()
         self.temp_dir.cleanup()
@@ -42,6 +47,7 @@ class PaymentRegistryApprovedOnlyTests(TestCase):
     def create_ready_invoice(self, status):
         return Invoice.objects.create(
             user=self.user,
+            responsible=self.responsible,
             title="Документ к оплате",
             amount=Decimal("1000.00"),
             amount_verified=True,

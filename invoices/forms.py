@@ -267,8 +267,45 @@ class UploadInvoiceForm(forms.Form):
 
 class InvoiceEditForm(forms.ModelForm):
 
+    responsible = forms.ModelChoiceField(
+        queryset=ResponsiblePerson.objects.none(),
+        label='Ответственный',
+        required=True,
+        empty_label='Выберите ответственного',
+        widget=forms.Select(
+            attrs={
+                'class': 'form-control',
+            }
+        ),
+        error_messages={
+            'required': 'Выберите ответственного.',
+            'invalid_choice': 'Выбранный ответственный недоступен.',
+        },
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        responsible_queryset = ResponsiblePerson.objects.filter(
+            is_active=True
+        )
+
+        if (
+            self.instance
+            and self.instance.pk
+            and self.instance.responsible_id
+        ):
+            responsible_queryset = (
+                responsible_queryset
+                | ResponsiblePerson.objects.filter(
+                    pk=self.instance.responsible_id
+                )
+            )
+
+        self.fields['responsible'].queryset = (
+            responsible_queryset
+            .order_by('full_name', 'id')
+        )
 
         self.fields['planned_payment_date'].required = True
         self.fields['planned_payment_date'].error_messages.update(
@@ -292,6 +329,7 @@ class InvoiceEditForm(forms.ModelForm):
             'amount',
 
             'planned_payment_date',
+            'responsible',
             'payment_priority',
             'paid_at',
 

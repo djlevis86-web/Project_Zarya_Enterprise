@@ -12,7 +12,11 @@ from ..payment_services import get_invoice_payment_summary
 def invoice_detail(request, invoice_id):
 
     invoice = get_object_or_404(
-        Invoice,
+        Invoice.objects.select_related(
+            'user',
+            'responsible',
+            'counterparty',
+        ),
         id=invoice_id,
         is_deleted=False
     )

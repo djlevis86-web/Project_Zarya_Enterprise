@@ -118,6 +118,11 @@ def validate_invoice_for_payment_registry(invoice):
             "Не указана плановая дата оплаты."
         )
 
+    if not invoice.responsible_id:
+        errors.append(
+            "Ответственный не назначен."
+        )
+
     if not invoice.counterparty:
         errors.append(
             "Контрагент не сопоставлен со справочником."

@@ -2,11 +2,13 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
+from django.views.decorators.http import require_POST
 from audit.models import AuditLog
 from audit.services import log_action
 from ..comment_forms import InvoiceCommentForm
 from ..log_service import create_invoice_log
 from ..models import Invoice
+from ..selectors import get_visible_invoices_for_user
 
 
 @staff_member_required
@@ -77,35 +79,36 @@ def change_invoice_status(request, invoice_id, status):
     )
 
 @login_required
+@require_POST
 def add_comment(request, invoice_id):
 
     invoice = get_object_or_404(
-        Invoice,
-        id=invoice_id
+        get_visible_invoices_for_user(
+            request.user
+        ),
+        id=invoice_id,
     )
 
-    if request.method == 'POST':
+    form = InvoiceCommentForm(
+        request.POST
+    )
 
-        form = InvoiceCommentForm(
-            request.POST
+    if form.is_valid():
+
+        comment = form.save(
+            commit=False
         )
 
-        if form.is_valid():
+        comment.invoice = invoice
+        comment.user = request.user
 
-            comment = form.save(
-                commit=False
-            )
+        comment.save()
 
-            comment.invoice = invoice
-            comment.user = request.user
-
-            comment.save()
-
-            create_invoice_log(
-                invoice,
-                request.user,
-                'Добавлен комментарий'
-            )
+        create_invoice_log(
+            invoice,
+            request.user,
+            'Добавлен комментарий'
+        )
 
     return redirect(
         'invoice_detail',

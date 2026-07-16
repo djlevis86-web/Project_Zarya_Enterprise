@@ -12,6 +12,7 @@ from ..selectors import get_visible_invoices_for_user
 
 
 @staff_member_required
+@require_POST
 def change_invoice_status(request, invoice_id, status):
 
     invoice = get_object_or_404(

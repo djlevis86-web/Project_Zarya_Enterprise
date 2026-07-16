@@ -4,6 +4,11 @@ import uuid
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+
+from users.permissions import (
+    require_user_permission,
+    user_can_upload_invoices,
+)
 from audit.models import AuditLog
 from audit.services import log_action
 from ..forms import UploadInvoiceForm
@@ -139,6 +144,10 @@ def match_counterparty_after_upload_ocr(invoice, user):
         )
 
 @login_required
+@require_user_permission(
+    user_can_upload_invoices,
+    "Нет прав на загрузку документов.",
+)
 def upload_invoice(request):
 
     if request.method == 'POST':

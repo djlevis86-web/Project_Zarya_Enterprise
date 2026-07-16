@@ -149,12 +149,12 @@ class InvoiceStatusChangeViewTests(TestCase):
         self.override.disable()
         self.temp_dir.cleanup()
 
-    def test_staff_can_change_status_to_in_work(self):
+    def test_staff_can_change_status_to_in_work_with_post(self):
         self.client.force_login(
             self.staff_user
         )
 
-        response = self.client.get(
+        response = self.client.post(
             reverse(
                 "change_invoice_status",
                 kwargs={
@@ -176,12 +176,12 @@ class InvoiceStatusChangeViewTests(TestCase):
             Invoice.STATUS_IN_WORK,
         )
 
-    def test_staff_can_change_status_to_on_approval(self):
+    def test_staff_can_change_status_to_on_approval_with_post(self):
         self.client.force_login(
             self.staff_user
         )
 
-        response = self.client.get(
+        response = self.client.post(
             reverse(
                 "change_invoice_status",
                 kwargs={
@@ -201,4 +201,31 @@ class InvoiceStatusChangeViewTests(TestCase):
         self.assertEqual(
             self.invoice.status,
             Invoice.STATUS_ON_APPROVAL,
+        )
+
+    def test_get_does_not_change_invoice_status(self):
+        self.client.force_login(
+            self.staff_user
+        )
+
+        response = self.client.get(
+            reverse(
+                "change_invoice_status",
+                kwargs={
+                    "invoice_id": self.invoice.id,
+                    "status": Invoice.STATUS_IN_WORK,
+                },
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            405,
+        )
+
+        self.invoice.refresh_from_db()
+
+        self.assertEqual(
+            self.invoice.status,
+            Invoice.STATUS_NEW,
         )

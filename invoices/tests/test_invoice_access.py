@@ -103,14 +103,14 @@ class InvoiceAccessTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "OWNER-INVOICE-ACCESS-TEST")
 
-    def test_regular_user_cannot_open_foreign_invoice_detail(self):
+    def test_regular_user_gets_404_for_foreign_invoice_detail(self):
         self.client.force_login(self.owner)
 
         response = self.client.get(
             reverse("invoice_detail", args=[self.foreign_invoice.id])
         )
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
 
     def test_staff_user_can_open_foreign_invoice_detail(self):
         self.client.force_login(self.staff)

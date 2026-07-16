@@ -1,36 +1,26 @@
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, render
 from ..comment_forms import InvoiceCommentForm
 from ..comment_models import InvoiceComment
 from ..forms import InvoicePaymentForm
-from ..models import Invoice, InvoicePayment
+from ..models import InvoicePayment
 from ..payment_services import get_invoice_payment_summary
+from ..selectors import get_visible_invoices_for_user
 
 
 @login_required
 def invoice_detail(request, invoice_id):
 
     invoice = get_object_or_404(
-        Invoice.objects.select_related(
+        get_visible_invoices_for_user(
+            request.user
+        ).select_related(
             'user',
             'responsible',
             'counterparty',
         ),
         id=invoice_id,
-        is_deleted=False
     )
-
-    if (
-        not request.user.is_staff
-        and invoice.user != request.user
-    ):
-
-        raise PermissionDenied
-
-
-
-
 
     payment_summary = get_invoice_payment_summary(
         invoice

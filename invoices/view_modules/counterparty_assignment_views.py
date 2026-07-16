@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from ..forms import InvoiceCounterpartyAssignForm
 from ..log_service import create_invoice_log
@@ -111,7 +112,16 @@ def invoice_assign_counterparty(request, invoice_id):
                 'next'
             )
 
-            if next_url:
+            if (
+                next_url
+                and url_has_allowed_host_and_scheme(
+                    url=next_url,
+                    allowed_hosts={
+                        request.get_host(),
+                    },
+                    require_https=request.is_secure(),
+                )
+            ):
 
                 return redirect(
                     next_url

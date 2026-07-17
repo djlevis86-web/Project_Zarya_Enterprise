@@ -2,6 +2,9 @@ from django.core.management.base import BaseCommand
 
 from invoices.models import Invoice
 from invoices.models import Counterparty
+from invoices.ocr_verification_service import (
+    apply_ocr_amount_to_invoice,
+)
 
 from invoices.counterparty_service import (
     get_or_create_counterparty_from_invoice
@@ -147,41 +150,18 @@ class Command(BaseCommand):
                     'vendor'
                 )
 
-                amount = parsed.get(
-                    'amount'
+                amount_warning = apply_ocr_amount_to_invoice(
+                    invoice,
+                    parsed.get(
+                        'amount'
+                    )
                 )
 
-                if amount:
-
-                    try:
-
-                        invoice.ocr_amount = float(
-                            str(amount).replace(
-                                ',',
-                                '.'
-                            )
-                        )
-
-                        if (
-                            invoice.amount is None
-                            or
-                            float(invoice.amount) == 0
-                        ):
-
-                            invoice.amount = invoice.ocr_amount
-
-                            invoice.amount_verified = False
-                            invoice.ocr_verified = False
-
-                        else:
-
-                            invoice.amount_verified = False
-                            invoice.ocr_verified = False
-
-                    except Exception:
-
-                        invoice.amount_verified = False
-                        invoice.ocr_verified = False
+                if amount_warning:
+                    invoice.ocr_comment = (
+                        f"{invoice.ocr_comment or ''} "
+                        f"{amount_warning}"
+                    ).strip()
 
                 invoice.counterparty = (
                     get_or_create_counterparty_from_invoice(

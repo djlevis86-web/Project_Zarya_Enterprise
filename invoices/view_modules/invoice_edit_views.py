@@ -189,10 +189,17 @@ def edit_invoice(request, invoice_id):
 
             invoice = form.save()
 
-            verification_changed, verification_message = sync_invoice_amount_verification(
-                invoice,
-                source_label='редактирования документа'
-            )
+            if amount_changed:
+                (
+                    verification_changed,
+                    verification_message,
+                ) = sync_invoice_amount_verification(
+                    invoice,
+                    source_label='редактирования документа'
+                )
+            else:
+                verification_changed = False
+                verification_message = ""
 
             create_invoice_log(
                 invoice,
@@ -208,14 +215,41 @@ def edit_invoice(request, invoice_id):
                 )
 
                 if invoice.amount_verified:
-                    messages.success(
-                        request,
-                        'Сумма подтверждена: совпадает с OCR-суммой.'
-                    )
+                    if invoice.ocr_verified:
+                        messages.success(
+                            request,
+                            (
+                                'Сумма подтверждена вручную '
+                                'и совпадает с OCR-суммой.'
+                            )
+                        )
+
+                    elif invoice.ocr_amount is None:
+                        messages.success(
+                            request,
+                            (
+                                'Сумма подтверждена вручную. '
+                                'OCR-сумма не определена.'
+                            )
+                        )
+
+                    else:
+                        messages.warning(
+                            request,
+                            (
+                                'Сумма подтверждена вручную '
+                                'и будет использоваться для оплаты. '
+                                'Она отличается от OCR-суммы.'
+                            )
+                        )
+
                 else:
                     messages.warning(
                         request,
-                        'Сумма требует проверки: отличается от OCR-суммы.'
+                        (
+                            'Сумма не подтверждена. '
+                            'Укажите положительную сумму.'
+                        )
                     )
 
             if amount_changed:

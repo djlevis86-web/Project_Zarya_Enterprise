@@ -20,44 +20,66 @@ def sync_invoice_amount_verification(
     save=True,
 ):
     """
-    Синхронизирует OCR-статус суммы после изменения подтвержденной суммы.
+    Подтверждает итоговую сумму после её ручного изменения.
 
     Правило:
-    - если OCR-суммы нет: сумма не подтверждена;
-    - если amount == ocr_amount: сумма подтверждена;
-    - если amount != ocr_amount: сумма требует проверки.
+    - положительная сумма, изменённая пользователем, считается подтверждённой;
+    - OCR используется только для дополнительного сравнения;
+    - несовпадение с OCR не отменяет ручное подтверждение;
+    - ocr_verified показывает только факт совпадения с OCR.
     """
 
     old_amount_verified = invoice.amount_verified
     old_ocr_verified = invoice.ocr_verified
     old_ocr_comment = invoice.ocr_comment or ""
 
-    amount = normalize_money(invoice.amount)
-    ocr_amount = normalize_money(invoice.ocr_amount)
+    amount = normalize_money(
+        invoice.amount
+    )
+    ocr_amount = normalize_money(
+        invoice.ocr_amount
+    )
 
-    if ocr_amount is None:
+    if (
+        amount is None
+        or amount <= Decimal("0.00")
+    ):
         invoice.amount_verified = False
         invoice.ocr_verified = False
-        message = (
-            f"Сумма требует ручной проверки после {source_label}: "
-            "OCR сумма не определена."
-        )
 
-    elif amount == ocr_amount:
-        invoice.amount_verified = True
-        invoice.ocr_verified = True
         message = (
-            f"Сумма подтверждена после {source_label}: "
-            "подтвержденная сумма совпадает с OCR-суммой."
+            f"Сумма не подтверждена после {source_label}: "
+            "укажите положительную сумму."
         )
 
     else:
-        invoice.amount_verified = False
-        invoice.ocr_verified = False
-        message = (
-            f"Сумма требует проверки после {source_label}: "
-            "подтвержденная сумма отличается от OCR-суммы."
-        )
+        invoice.amount_verified = True
+
+        if ocr_amount is None:
+            invoice.ocr_verified = False
+
+            message = (
+                f"Сумма подтверждена вручную после {source_label}. "
+                "OCR-сумма не определена."
+            )
+
+        elif amount == ocr_amount:
+            invoice.ocr_verified = True
+
+            message = (
+                f"Сумма подтверждена вручную после {source_label} "
+                "и совпадает с OCR-суммой."
+            )
+
+        else:
+            invoice.ocr_verified = False
+
+            message = (
+                f"Сумма подтверждена вручную после {source_label}: "
+                f"подтверждённая сумма {amount} отличается "
+                f"от OCR-суммы {ocr_amount}. "
+                "Приоритет имеет сумма, проверенная пользователем."
+            )
 
     invoice.ocr_comment = message
 
@@ -86,17 +108,29 @@ def apply_ocr_amount_to_invoice(
     prefill_amount_from_ocr=False,
 ):
     """
-    Применяет OCR-сумму к счету и обновляет признаки проверки суммы.
+    Применяет результат OCR, не отменяя ручное подтверждение.
 
     Правило:
-    - OCR-суммы нет -> сумма требует проверки;
-    - prefill_amount_from_ocr=True -> подставляем OCR-сумму, но не подтверждаем автоматически;
-    - сумма в системе пустая/нулевая -> подставляем OCR-сумму, но не подтверждаем автоматически;
-    - сумма в системе есть -> сравниваем ее с OCR-суммой, но не подтверждаем автоматически.
+    - новый документ может получить OCR-сумму как предварительную;
+    - предварительная OCR-сумма не подтверждается автоматически;
+    - ранее подтверждённая пользователем сумма сохраняет приоритет;
+    - повторный OCR обновляет ocr_amount и ocr_verified,
+      но не снимает amount_verified.
     """
 
-    if raw_amount:
+    current_amount = (
+        normalize_money(
+            invoice.amount
+        )
+        or Decimal("0.00")
+    )
 
+    manual_amount_was_verified = bool(
+        invoice.amount_verified
+        and current_amount > Decimal("0.00")
+    )
+
+    if raw_amount:
         try:
             ocr_amount = normalize_money(
                 str(raw_amount).replace(
@@ -112,10 +146,6 @@ def apply_ocr_amount_to_invoice(
 
             invoice.ocr_amount = ocr_amount
 
-            current_amount = normalize_money(
-                invoice.amount
-            ) or Decimal("0.00")
-
             if (
                 prefill_amount_from_ocr
                 or current_amount == Decimal("0.00")
@@ -125,8 +155,28 @@ def apply_ocr_amount_to_invoice(
                 invoice.ocr_verified = False
 
                 return (
-                    "OCR сумма автоматически подставлена. "
+                    "OCR-сумма автоматически подставлена. "
                     "Требуется ручное подтверждение."
+                )
+
+            if manual_amount_was_verified:
+                invoice.amount_verified = True
+                invoice.ocr_verified = (
+                    current_amount == ocr_amount
+                )
+
+                if invoice.ocr_verified:
+                    return (
+                        "OCR-сумма совпадает с подтверждённой "
+                        "пользователем суммой. "
+                        "Ручное подтверждение сохранено."
+                    )
+
+                return (
+                    f"OCR-сумма {ocr_amount} отличается от "
+                    f"подтверждённой пользователем суммы "
+                    f"{current_amount}. "
+                    "Ручное подтверждение сохранено и имеет приоритет."
                 )
 
             invoice.amount_verified = False
@@ -142,16 +192,33 @@ def apply_ocr_amount_to_invoice(
 
         except Exception:
             invoice.ocr_amount = None
-            invoice.amount_verified = False
+            invoice.amount_verified = (
+                manual_amount_was_verified
+            )
             invoice.ocr_verified = False
 
+            if manual_amount_was_verified:
+                return (
+                    "OCR нашёл сумму, но не удалось преобразовать "
+                    "её в число. Ручное подтверждение сохранено."
+                )
+
             return (
-                "OCR нашел сумму, но не удалось преобразовать ее в число."
+                "OCR нашёл сумму, но не удалось преобразовать "
+                "её в число."
             )
 
     invoice.ocr_amount = None
-    invoice.amount_verified = False
+    invoice.amount_verified = (
+        manual_amount_was_verified
+    )
     invoice.ocr_verified = False
 
-    return "OCR сумма не определена."
+    if manual_amount_was_verified:
+        return (
+            "OCR-сумма не определена. "
+            "Ручное подтверждение суммы сохранено."
+        )
+
+    return "OCR-сумма не определена."
 

@@ -15,12 +15,20 @@
     </div>
 
     <div class="registry-actions">
-        <a
-            href="{% url 'create_backup' %}"
-            class="btn btn-primary"
+        <form
+            method="post"
+            action="{% url 'create_backup' %}"
+            class="inline-form"
         >
-            Создать новый бэкап
-        </a>
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Создать новый бэкап
+            </button>
+        </form>
 
         <a
             href="{% url 'system_dashboard' %}"
@@ -90,13 +98,21 @@
                                         Скачать
                                     </a>
 
-                                    <a
-                                        href="{% url 'delete_backup' backup.name %}"
-                                        class="btn btn-sm btn-danger"
-                                        onclick="return confirm('Удалить резервную копию?');"
+                                    <form
+                                        method="post"
+                                        action="{% url 'delete_backup' backup.name %}"
+                                        class="inline-form"
+                                        onsubmit="return confirm('Удалить резервную копию?');"
                                     >
-                                        Удалить
-                                    </a>
+                                        {% csrf_token %}
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm btn-danger"
+                                        >
+                                            Удалить
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

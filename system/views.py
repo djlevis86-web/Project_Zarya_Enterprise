@@ -17,6 +17,7 @@ from django.shortcuts import (
     redirect,
     render,
 )
+from django.views.decorators.http import require_POST
 
 from invoices.models import Invoice
 from users.models import User
@@ -362,6 +363,7 @@ def backups_list(request):
 
 
 @system_admin_required
+@require_POST
 def create_backup(request):
 
     try:
@@ -450,6 +452,7 @@ def download_backup(request, filename):
 
 
 @system_admin_required
+@require_POST
 def delete_backup(request, filename):
 
     backup_file = (

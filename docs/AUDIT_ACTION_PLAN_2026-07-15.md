@@ -32,6 +32,17 @@
 
 ---
 
+
+## 1.1. Расширенные аудиты
+
+Дополнительные бизнес-, платёжные, системные и UI-находки
+зафиксированы в:
+
+`docs/AUDIT_BACKLOG_2026-07-17.md`
+
+Каждая новая находка из расширенного backlog требует повторного
+воспроизведения на актуальном `main` перед изменением кода.
+
 ## 2. Статусы
 
 | Статус | Значение |
@@ -71,7 +82,17 @@
 **Файл:** `invoices/view_modules/invoice_status_comment_views.py`
 **Риск:** изменение истории чужого документа.
 **Ветка:** `feature-security-stability-baseline-v1`
-**Статус:** `OPEN`
+**Статус:** `DONE`
+
+**Результат:**
+
+- feature commit: `7c7f14d`;
+- общий feature release: `b097674`;
+- develop merge: `25cb8de`;
+- production release: `50fd58e`;
+- чужой Invoice возвращает `404`;
+- комментарий не создаётся;
+- production-проверка выполнена.
 
 Критерии:
 
@@ -88,7 +109,16 @@
 
 **Файлы:** `users/permissions.py`, `invoices/view_modules/invoice_upload_views.py`
 **Ветка:** `feature-security-stability-baseline-v1`
-**Статус:** `OPEN`
+**Статус:** `DONE`
+
+**Результат:**
+
+- feature commit: `3a6df48`;
+- develop merge: `25cb8de`;
+- production release: `50fd58e`;
+- ANALYST не получает доступ к GET/POST upload;
+- Invoice и OCRJob не создаются;
+- production-проверка выполнена.
 
 Критерии:
 
@@ -104,7 +134,17 @@
 
 **Файл:** `invoices/view_modules/invoice_status_comment_views.py`
 **Ветка:** `feature-security-stability-baseline-v1`
-**Статус:** `OPEN`
+**Статус:** `DONE`
+
+**Результат:**
+
+- feature commit: `83254d3`;
+- develop merge: `25cb8de`;
+- production release: `50fd58e`;
+- GET возвращает `405`;
+- статус документа не изменяется;
+- POST/CSRF regression-тесты пройдены;
+- production-проверка выполнена.
 
 Критерии:
 
@@ -122,7 +162,20 @@
 
 **Файлы:** `system/views.py`, `system/templates/system/backups.html`, `system/templates/system/dashboard.html`
 **Ветка:** `feature-system-backup-http-safety-v1`
-**Статус:** `OPEN`
+**Статус:** `DONE`
+
+**Результат:**
+
+- feature commit: `3919891`;
+- develop merge: `e1a5b27`;
+- production release: `c36d245`;
+- create/delete принимают только POST;
+- формы содержат CSRF;
+- GET create возвращает `405` и не вызывает backup service;
+- GET delete возвращает `405` и не удаляет файл;
+- подтверждение удаления сохранено;
+- полный suite: `214/214 OK`;
+- production SHA и работа сервиса подтверждены.
 
 Критерии:
 
@@ -173,7 +226,17 @@
 
 **Файл:** `invoices/view_modules/payment_registry_action_views.py`
 **Ветка:** `feature-security-stability-baseline-v1`
-**Статус:** `OPEN`
+**Статус:** `DONE`
+
+**Результат:**
+
+- feature commit: `ec7889b`;
+- develop merge: `25cb8de`;
+- production release: `50fd58e`;
+- запрещённый сценарий возвращает `403`;
+- service не вызывается;
+- `NameError` устранён;
+- production-проверка выполнена.
 
 Критерии:
 
@@ -187,7 +250,17 @@
 
 **Файл:** `invoices/view_modules/counterparty_assignment_views.py`
 **Ветка:** `feature-security-stability-baseline-v1`
-**Статус:** `OPEN`
+**Статус:** `DONE`
+
+**Результат:**
+
+- feature commit: `2dbb3b8`;
+- develop merge: `25cb8de`;
+- production release: `50fd58e`;
+- внешний `next` отклоняется;
+- разрешённый внутренний redirect сохраняется;
+- regression-тесты пройдены;
+- production-проверка выполнена.
 
 Критерии:
 

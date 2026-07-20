@@ -34,3 +34,27 @@ class DashboardProcessGridTests(SimpleTestCase):
             expected_rule,
             css,
         )
+
+    def test_bot_report_has_spacing_before_dashboard_workflow_grid(self):
+        css_path = (
+            Path(settings.BASE_DIR)
+            / "static"
+            / "css"
+            / "pages"
+            / "dashboard.css"
+        )
+
+        css = css_path.read_text(
+            encoding="utf-8"
+        )
+
+        expected_rule = """\
+.dashboard-bot-report-v2 + .dashboard-grid-two {
+    margin-top: 22px;
+}
+"""
+
+        self.assertIn(
+            expected_rule,
+            css,
+        )

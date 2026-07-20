@@ -861,3 +861,13 @@ main :is(
     }
 }
 /* DASHBOARD-WORKFLOW-GRID-V1-END */
+
+/* DASHBOARD-BOT-REPORT-SPACING-V1-START */
+/*
+ * Keep a clear section gap between the bot report
+ * and the following dashboard work row.
+ */
+.dashboard-bot-report-v2 + .dashboard-grid-two {
+    margin-top: 22px;
+}
+/* DASHBOARD-BOT-REPORT-SPACING-V1-END */

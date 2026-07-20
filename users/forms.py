@@ -1,6 +1,10 @@
 from django import forms
+from django.contrib.auth import (
+    get_user_model,
+    password_validation,
+)
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -202,6 +206,38 @@ class UserAdminCreateForm(forms.ModelForm):
 
         return cleaned_data
 
+    def _post_clean(self):
+        super()._post_clean()
+
+        password1 = self.cleaned_data.get(
+            "password1"
+        )
+        password2 = self.cleaned_data.get(
+            "password2"
+        )
+        email = self.cleaned_data.get(
+            "email"
+        )
+
+        if email:
+            self.instance.username = make_username_from_email(
+                email
+            )
+
+        if not password1 or password1 != password2:
+            return
+
+        try:
+            password_validation.validate_password(
+                password1,
+                self.instance,
+            )
+        except ValidationError as error:
+            self.add_error(
+                "password1",
+                error,
+            )
+
     def save(self, commit=True):
         user = super().save(commit=False)
 
@@ -319,6 +355,39 @@ class UserAdminEditForm(forms.ModelForm):
                 )
 
         return cleaned_data
+
+    def _post_clean(self):
+        super()._post_clean()
+
+        password1 = self.cleaned_data.get(
+            "password1"
+        )
+        password2 = self.cleaned_data.get(
+            "password2"
+        )
+        email = self.cleaned_data.get(
+            "email"
+        )
+
+        if email:
+            self.instance.username = make_username_from_email(
+                email,
+                instance=self.instance,
+            )
+
+        if not password1 or password1 != password2:
+            return
+
+        try:
+            password_validation.validate_password(
+                password1,
+                self.instance,
+            )
+        except ValidationError as error:
+            self.add_error(
+                "password1",
+                error,
+            )
 
     def save(self, commit=True):
         user = super().save(commit=False)

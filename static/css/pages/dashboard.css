@@ -842,3 +842,22 @@ main :is(
     }
 }
 /* DASHBOARD-ATTENTION-FULLWIDTH-V1-END */
+
+/* DASHBOARD-WORKFLOW-GRID-V1-START */
+/*
+ * Wide Desktop:
+ * compact the four workflow steps into a 2 × 2 grid.
+ *
+ * At 1280px and below .dashboard-grid-two already becomes
+ * a single column, so the original vertical process list remains.
+ */
+@media (min-width: 1281px) {
+    .dashboard-grid-two > .card:has(
+        .dashboard-workflow-title-v1
+    ) .process-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: stretch;
+    }
+}
+/* DASHBOARD-WORKFLOW-GRID-V1-END */

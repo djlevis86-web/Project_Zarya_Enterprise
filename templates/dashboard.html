@@ -54,77 +54,17 @@
 
         <div class="hero-metric">
             <span>
-                Требуют внимания
+                Документов за месяц
             </span>
 
             <strong>
-                {{ review_count }}
+                {{ month_count }}
             </strong>
         </div>
 
     </div>
 
 </section>
-
-<div class="stats-grid dashboard-stats">
-
-    <a href="{% url 'invoice_list' %}" class="stat-card stat-link">
-        <div class="stat-label">
-            Документов за месяц
-        </div>
-
-        <div class="stat-value">
-            {{ month_count }}
-        </div>
-
-        <div class="muted">
-            Создано в текущем месяце
-        </div>
-    </a>
-
-    <a href="{% url 'invoice_list' %}?status=new" class="stat-card stat-link">
-        <div class="stat-label">
-            Новые
-        </div>
-
-        <div class="stat-value text-info">
-            {{ new_count }}
-        </div>
-
-        <div class="muted">
-            Ожидают проверки
-        </div>
-    </a>
-
-    <a href="{% url 'invoice_list' %}?status=in_work" class="stat-card stat-link">
-        <div class="stat-label">
-            В работе
-        </div>
-
-        <div class="stat-value text-warning">
-            {{ review_count }}
-        </div>
-
-        <div class="muted">
-            Нужно принять решение
-        </div>
-    </a>
-
-    <a href="{% url 'invoice_list' %}?status=approved" class="stat-card stat-link">
-        <div class="stat-label">
-            Утверждено
-        </div>
-
-        <div class="stat-value text-success">
-            {{ approved_count }}
-        </div>
-
-        <div class="muted">
-            Можно готовить к оплате
-        </div>
-    </a>
-
-</div>
 
 <section class="dashboard-attention-v1">
     <div class="dashboard-attention-header-v1">

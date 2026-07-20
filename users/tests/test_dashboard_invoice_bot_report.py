@@ -146,6 +146,90 @@ class DashboardInvoiceBotReportTests(TestCase):
             1,
         )
 
+    def test_dashboard_uses_attention_queue_without_status_kpi_duplicates(self):
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.get(
+            reverse(
+                "dashboard"
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        response_html = response.content.decode(
+            "utf-8"
+        )
+
+        self.assertNotContains(
+            response,
+            'class="stats-grid dashboard-stats"',
+        )
+
+        self.assertContains(
+            response,
+            "Документов за месяц",
+        )
+
+        self.assertEqual(
+            response_html.count(
+                "Требуют внимания"
+            ),
+            1,
+        )
+
+        self.assertEqual(
+            response_html.count(
+                'class="hero-metric"'
+            ),
+            2,
+        )
+
+        self.assertEqual(
+            response_html.count(
+                'class="dashboard-attention-item-v1"'
+            ),
+            3,
+        )
+
+        self.assertContains(
+            response,
+            "Новые документы",
+        )
+
+        self.assertContains(
+            response,
+            "На проверке",
+        )
+
+        self.assertContains(
+            response,
+            "Готово к оплате",
+        )
+
+        self.assertNotContains(
+            response,
+            '<div class="stat-label">Новые</div>',
+            html=True,
+        )
+
+        self.assertNotContains(
+            response,
+            '<div class="stat-label">В работе</div>',
+            html=True,
+        )
+
+        self.assertNotContains(
+            response,
+            '<div class="stat-label">Утверждено</div>',
+            html=True,
+        )
+
     def test_dashboard_counts_in_work_documents(self):
         self._create_invoice(
             title="IN WORK DASHBOARD INVOICE",

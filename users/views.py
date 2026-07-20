@@ -82,7 +82,7 @@ def dashboard(request):
     ).count()
 
     review_count = invoices.filter(
-        status="review"
+        status=Invoice.STATUS_IN_WORK
     ).count()
 
     paid_count = invoices.filter(

@@ -146,6 +146,49 @@ class DashboardInvoiceBotReportTests(TestCase):
             1,
         )
 
+    def test_dashboard_counts_in_work_documents(self):
+        self._create_invoice(
+            title="IN WORK DASHBOARD INVOICE",
+            status=Invoice.STATUS_IN_WORK,
+        )
+
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.get(
+            reverse(
+                "dashboard"
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        self.assertEqual(
+            response.context[
+                "review_count"
+            ],
+            1,
+        )
+
+        attention_items = response.context[
+            "attention_items"
+        ]
+
+        review_item = next(
+            item
+            for item in attention_items
+            if item["label"] == "На проверке"
+        )
+
+        self.assertEqual(
+            review_item["value"],
+            1,
+        )
+
     def test_dashboard_prioritizes_user_work_before_technical_audit(self):
         self._create_invoice()
 

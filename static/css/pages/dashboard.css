@@ -92,7 +92,7 @@ body {
     text-transform: uppercase;
 }
 
-.dashboard-hero h2 {
+.dashboard-title {
     max-width: 760px;
     margin: 0;
     font-size: 34px;

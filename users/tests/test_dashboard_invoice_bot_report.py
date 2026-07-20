@@ -103,6 +103,49 @@ class DashboardInvoiceBotReportTests(TestCase):
             encoding="utf-8",
         )
 
+    def test_dashboard_has_single_accessible_primary_heading(self):
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.get(
+            reverse(
+                "dashboard"
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        self.assertContains(
+            response,
+            (
+                '<h1 id="dashboard-title" '
+                'class="dashboard-title">'
+                "Управление документами к оплате и оплатами"
+                "</h1>"
+            ),
+            html=True,
+        )
+
+        self.assertNotContains(
+            response,
+            '<div class="page-header">',
+        )
+
+        response_html = response.content.decode(
+            "utf-8"
+        )
+
+        self.assertEqual(
+            response_html.count(
+                "<h1"
+            ),
+            1,
+        )
+
     def test_dashboard_uses_live_counts_instead_of_stale_json(self):
         self._create_invoice(
             title="READY DASHBOARD INVOICE",

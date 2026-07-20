@@ -139,7 +139,7 @@
         grid-template-columns: 1fr;
     }
 
-    .dashboard-hero h2 {
+    .dashboard-title {
         font-size: 28px;
     }
 

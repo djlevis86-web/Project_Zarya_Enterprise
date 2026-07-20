@@ -187,19 +187,29 @@ def edit_invoice(request, invoice_id):
 
             amount_changed = 'amount' in form.changed_data
 
+            amount_confirmation_requested = (
+                request.POST.get(
+                    'confirm_amount'
+                ) == '1'
+            )
+
+            should_sync_amount_verification = (
+                amount_changed
+                or amount_confirmation_requested
+            )
+
             invoice = form.save()
 
-            if amount_changed:
+            verification_message = ""
+
+            if should_sync_amount_verification:
                 (
-                    verification_changed,
+                    _verification_changed,
                     verification_message,
                 ) = sync_invoice_amount_verification(
                     invoice,
                     source_label='редактирования документа'
                 )
-            else:
-                verification_changed = False
-                verification_message = ""
 
             create_invoice_log(
                 invoice,
@@ -207,7 +217,7 @@ def edit_invoice(request, invoice_id):
                 'Документ отредактирован'
             )
 
-            if amount_changed or verification_changed:
+            if should_sync_amount_verification:
                 create_invoice_log(
                     invoice,
                     request.user,

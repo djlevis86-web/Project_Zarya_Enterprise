@@ -246,6 +246,83 @@ class ManualAmountConfirmationTests(TestCase):
             invoice.ocr_verified
         )
 
+    def test_unchanged_ocr_amount_can_be_confirmed_explicitly(self):
+        invoice = self._create_invoice(
+            amount=Decimal("120000.00"),
+            ocr_amount=Decimal("120000.00"),
+            amount_verified=False,
+            ocr_verified=False,
+        )
+
+        self.client.force_login(
+            self.staff_user
+        )
+
+        payload = self._edit_payload(
+            invoice,
+            amount="120000.00",
+        )
+
+        payload["confirm_amount"] = "1"
+
+        response = self.client.post(
+            reverse(
+                "edit_invoice",
+                args=[
+                    invoice.id,
+                ],
+            ),
+            payload,
+        )
+
+        self.assertEqual(
+            response.status_code,
+            302,
+        )
+
+        invoice.refresh_from_db()
+
+        self.assertEqual(
+            invoice.amount,
+            Decimal("120000.00"),
+        )
+
+        self.assertTrue(
+            invoice.amount_verified
+        )
+
+        self.assertTrue(
+            invoice.ocr_verified
+        )
+
+        self.assertIn(
+            "совпадает с OCR-суммой",
+            invoice.ocr_comment,
+        )
+
+        registry, _ = get_or_create_draft_payment_registry(
+            self.staff_user
+        )
+
+        item, errors, warnings = add_invoice_to_payment_registry(
+            invoice,
+            registry,
+        )
+
+        self.assertIsNotNone(
+            item
+        )
+
+        self.assertEqual(
+            errors,
+            [],
+        )
+
+        self.assertEqual(
+            warnings,
+            [],
+        )
+
     def test_repeat_ocr_preserves_manual_confirmation_on_mismatch(self):
         invoice = self._create_invoice(
             amount=Decimal("125000.00"),

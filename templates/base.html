@@ -24,7 +24,11 @@
 
 <div class="app-shell">
 
-    <aside class="sidebar">
+    <aside
+        id="app-sidebar"
+        class="sidebar"
+        aria-label="Основная навигация"
+    >
 
         <div class="sidebar-brand-area">
             <a href="{% url 'dashboard' %}" class="sidebar-brand">
@@ -42,6 +46,27 @@
                     </small>
                 </span>
             </a>
+
+            <button
+                type="button"
+                class="sidebar-mobile-close"
+                data-sidebar-close
+                aria-label="Закрыть меню"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <path
+                        d="M6 6l12 12M18 6L6 18"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                    />
+                </svg>
+            </button>
         </div>
 
         <div class="sidebar-scroll">
@@ -222,11 +247,42 @@
 
     </aside>
 
+    <button
+        type="button"
+        class="sidebar-mobile-backdrop"
+        data-sidebar-close
+        aria-label="Закрыть меню"
+        tabindex="-1"
+    ></button>
+
     <main class="main">
 
         <header class="topbar">
 
-            <div>
+            <button
+                type="button"
+                id="sidebar-mobile-toggle"
+                class="sidebar-mobile-toggle"
+                aria-controls="app-sidebar"
+                aria-expanded="false"
+                aria-label="Открыть меню"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <path
+                        d="M4 7h16M4 12h16M4 17h16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                    />
+                </svg>
+            </button>
+
+            <div class="topbar-copy">
                 <div class="topbar-title">
 
                     {% if current == 'dashboard' %}
@@ -332,5 +388,6 @@
 {% endwith %}
 
     <script src="{% static 'js/sidebar-floating-highlight.js' %}" defer></script>
+    <script src="{% static 'js/sidebar-mobile-drawer.js' %}" defer></script>
 </body>
 </html>

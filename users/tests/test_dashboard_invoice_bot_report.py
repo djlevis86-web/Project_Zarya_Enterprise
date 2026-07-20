@@ -146,6 +146,61 @@ class DashboardInvoiceBotReportTests(TestCase):
             1,
         )
 
+    def test_dashboard_prioritizes_user_work_before_technical_audit(self):
+        self._create_invoice()
+
+        self.client.force_login(
+            self.user
+        )
+
+        response = self.client.get(
+            reverse(
+                "dashboard"
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        response_html = response.content.decode(
+            "utf-8"
+        )
+
+        attention_position = response_html.index(
+            'class="dashboard-attention-v1"'
+        )
+
+        bot_report_position = response_html.index(
+            'class="card dashboard-bot-report-v2"'
+        )
+
+        user_queue_position = response_html.index(
+            "Рабочая очередь пользователя"
+        )
+
+        technical_audit_position = response_html.index(
+            "Технический аудит"
+        )
+
+        self.assertLess(
+            attention_position,
+            bot_report_position,
+        )
+
+        self.assertLess(
+            user_queue_position,
+            technical_audit_position,
+        )
+
+        self.assertEqual(
+            response_html.count(
+                'class="dashboard-attention-v1"'
+            ),
+            1,
+        )
+
     def test_dashboard_uses_live_counts_instead_of_stale_json(self):
         self._create_invoice(
             title="READY DASHBOARD INVOICE",

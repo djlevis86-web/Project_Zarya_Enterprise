@@ -733,6 +733,7 @@ main :is(
 
 .dashboard-attention-v1 {
     margin-top: 16px !important;
+    margin-bottom: 22px !important;
     padding: 18px 20px !important;
 }
 
@@ -780,7 +781,7 @@ main :is(
         grid-column: 1 / -1 !important;
 
         margin-top: 0 !important;
-        margin-bottom: 0 !important;
+        margin-bottom: 22px !important;
 
         padding: 16px 20px !important;
         min-height: 0 !important;

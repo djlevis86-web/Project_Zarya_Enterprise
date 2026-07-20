@@ -126,6 +126,30 @@
 
 </div>
 
+<section class="dashboard-attention-v1">
+    <div class="dashboard-attention-header-v1">
+        <div>
+            <h2>Требуют внимания</h2>
+            <p>Короткая сводка по документам, с которыми нужно работать</p>
+        </div>
+    </div>
+
+    <div class="dashboard-attention-grid-v1">
+        {% for item in attention_items %}
+            <a href="{% url item.url_name %}" class="dashboard-attention-item-v1">
+                <span class="dashboard-attention-value-v1">
+                    {{ item.value }}
+                </span>
+
+                <span class="dashboard-attention-content-v1">
+                    <strong>{{ item.label }}</strong>
+                    <small>{{ item.hint }}</small>
+                </span>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+
 {% if invoice_bot_report %}
 <div class="card dashboard-bot-report-v2">
 
@@ -160,6 +184,61 @@
     </div>
 
     <div class="dashboard-attention-header-v1">
+        <div>
+            <h2>
+                Рабочая очередь пользователя
+            </h2>
+            <p>
+                Документы, которые требуют ручной обработки: дата оплаты, подтверждение суммы и готовность к реестру.
+            </p>
+        </div>
+    </div>
+
+    <div class="registry-summary dashboard-bot-summary-v1">
+
+        <a href="{% url 'invoice_bot_report_detail' 'ready' %}" class="registry-summary-card stat-link">
+            <span class="registry-summary-label">
+                Готовы к реестру
+            </span>
+
+            <strong class="text-success">
+                {{ invoice_bot_report.ready_for_registry_count }}
+            </strong>
+        </a>
+
+        <a href="{% url 'invoice_bot_report_detail' 'not-ready' %}" class="registry-summary-card stat-link">
+            <span class="registry-summary-label">
+                Не готовы
+            </span>
+
+            <strong class="summary-warning">
+                {{ invoice_bot_report.not_ready_for_registry_count }}
+            </strong>
+        </a>
+
+        <a href="{% url 'invoice_bot_report_detail' 'without-planned-payment-date' %}" class="registry-summary-card stat-link">
+            <span class="registry-summary-label">
+                Без даты оплаты
+            </span>
+
+            <strong>
+                {{ invoice_bot_report.without_planned_payment_date_count }}
+            </strong>
+        </a>
+
+        <a href="{% url 'invoice_bot_report_detail' 'unverified-amount' %}" class="registry-summary-card stat-link">
+            <span class="registry-summary-label">
+                Сумма ожидает подтверждения
+            </span>
+
+            <strong>
+                {{ invoice_bot_report.unverified_amount_count }}
+            </strong>
+        </a>
+
+    </div>
+
+<div class="dashboard-attention-header-v1">
         <div>
             <h2>
                 Технический аудит
@@ -233,90 +312,12 @@
         </div>
 
     </div>
-
-    <div class="dashboard-attention-header-v1">
-        <div>
-            <h2>
-                Рабочая очередь пользователя
-            </h2>
-            <p>
-                Документы, которые требуют ручной обработки: дата оплаты, подтверждение суммы и готовность к реестру.
-            </p>
-        </div>
-    </div>
-
-    <div class="registry-summary dashboard-bot-summary-v1">
-
-        <a href="{% url 'invoice_bot_report_detail' 'ready' %}" class="registry-summary-card stat-link">
-            <span class="registry-summary-label">
-                Готовы к реестру
-            </span>
-
-            <strong class="text-success">
-                {{ invoice_bot_report.ready_for_registry_count }}
-            </strong>
-        </a>
-
-        <a href="{% url 'invoice_bot_report_detail' 'not-ready' %}" class="registry-summary-card stat-link">
-            <span class="registry-summary-label">
-                Не готовы
-            </span>
-
-            <strong class="summary-warning">
-                {{ invoice_bot_report.not_ready_for_registry_count }}
-            </strong>
-        </a>
-
-        <a href="{% url 'invoice_bot_report_detail' 'without-planned-payment-date' %}" class="registry-summary-card stat-link">
-            <span class="registry-summary-label">
-                Без даты оплаты
-            </span>
-
-            <strong>
-                {{ invoice_bot_report.without_planned_payment_date_count }}
-            </strong>
-        </a>
-
-        <a href="{% url 'invoice_bot_report_detail' 'unverified-amount' %}" class="registry-summary-card stat-link">
-            <span class="registry-summary-label">
-                Сумма ожидает подтверждения
-            </span>
-
-            <strong>
-                {{ invoice_bot_report.unverified_amount_count }}
-            </strong>
-        </a>
-
-    </div>
-
 </div>
 {% endif %}
 
 <div class="dashboard-grid-two">
 
-    <section class="dashboard-attention-v1">
-    <div class="dashboard-attention-header-v1">
-        <div>
-            <h2>Требуют внимания</h2>
-            <p>Короткая сводка по документам, с которыми нужно работать</p>
-        </div>
-    </div>
 
-    <div class="dashboard-attention-grid-v1">
-        {% for item in attention_items %}
-            <a href="{% url item.url_name %}" class="dashboard-attention-item-v1">
-                <span class="dashboard-attention-value-v1">
-                    {{ item.value }}
-                </span>
-
-                <span class="dashboard-attention-content-v1">
-                    <strong>{{ item.label }}</strong>
-                    <small>{{ item.hint }}</small>
-                </span>
-            </a>
-        {% endfor %}
-    </div>
-</section>
 
 <div class="card">
 

@@ -70,7 +70,53 @@ strong,
 .sidebar-nav a,
 .nav-link,
 .nav-item,
+.form-group label,
+label {
+    font-weight: 650;
+}
+"""
+
+        self.assertNotIn(
+            unexpected_rule,
+            css,
+        )
+
+        self.assertIn(
+            expected_rule,
+            css,
+        )
+    def test_badges_typography_group_does_not_override_status_badge_weight(
+        self,
+    ):
+        css_path = (
+            Path(settings.BASE_DIR)
+            / "static"
+            / "css"
+            / "components"
+            / "badges.css"
+        )
+
+        css = css_path.read_text(
+            encoding="utf-8"
+        )
+
+        unexpected_rule = """\
+strong,
+.sidebar-nav a,
+.nav-link,
+.nav-item,
 .status-badge,
+.form-group label,
+label {
+    font-weight: 650;
+}
+"""
+
+        expected_rule = """\
+strong,
+.sidebar-nav a,
+.nav-link,
+.nav-item,
 .form-group label,
 label {
     font-weight: 650;

@@ -125,6 +125,11 @@ class PaymentRegistrySharedLifecycleTests(TestCase):
             PaymentRegistry.objects.exists()
         )
 
+        self.assertNotContains(
+            response,
+            'class="status-badge status-draft"',
+        )
+
     def test_second_staff_user_sees_shared_draft_registry(self):
         invoice = self._create_invoice(
             self.first_user,
@@ -166,6 +171,12 @@ class PaymentRegistrySharedLifecycleTests(TestCase):
         self.assertEqual(
             list(response.context["draft_registry_items"]),
             [item],
+        )
+
+        self.assertContains(
+            response,
+            'class="status-badge status-draft"',
+            count=1,
         )
 
     def test_remove_item_redirects_back_to_registry_detail(self):

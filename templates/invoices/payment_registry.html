@@ -225,9 +225,11 @@
                     {% endif %}
                 {% endif %}
 
-                <span class="status-badge status-draft">
-                    {{ draft_registry.get_status_display }}
-                </span>
+                {% if draft_registry and draft_registry.id %}
+                    <span class="status-badge status-draft">
+                        {{ draft_registry.get_status_display }}
+                    </span>
+                {% endif %}
 
             <a href="{% url 'payment_schedule' %}" class="btn btn-secondary">
                 График платежей

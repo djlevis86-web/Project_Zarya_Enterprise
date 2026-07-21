@@ -5,11 +5,6 @@
  * На этом этапе style.css ещё не очищаем.
  */
 
-.status-partial {
-    background: rgba(245, 158, 11, .14);
-    color: #fbbf24;
-    border-color: rgba(245, 158, 11, .25);
-}
 
 .status-badge.status-partially_paid {
     background: rgba(168, 85, 247, 0.16) !important;

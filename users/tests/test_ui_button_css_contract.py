@@ -192,3 +192,60 @@ label {
                 "./pages/payment-schedule.css"
             ),
         )
+    def test_partial_upload_status_is_not_duplicated_in_payment_feature(
+        self,
+    ):
+        base_dir = Path(settings.BASE_DIR)
+
+        component_css = (
+            base_dir
+            / "static"
+            / "css"
+            / "components"
+            / "badges.css"
+        ).read_text(
+            encoding="utf-8"
+        )
+
+        payment_feature_css = (
+            base_dir
+            / "static"
+            / "css"
+            / "features"
+            / "partial-payments.css"
+        ).read_text(
+            encoding="utf-8"
+        )
+
+        generic_partial_rule = """\
+.status-partial {
+    background: rgba(245, 158, 11, .14);
+    color: #fbbf24;
+    border-color: rgba(245, 158, 11, .25);
+}
+"""
+
+        self.assertEqual(
+            component_css.count(
+                generic_partial_rule
+            ),
+            1,
+        )
+
+        self.assertNotIn(
+            generic_partial_rule,
+            payment_feature_css,
+        )
+
+        self.assertIn(
+            ".status-badge.status-partially_paid {",
+            payment_feature_css,
+        )
+
+        self.assertIn(
+            (
+                ".payment-mini-partial "
+                ".payment-mini-status {"
+            ),
+            payment_feature_css,
+        )

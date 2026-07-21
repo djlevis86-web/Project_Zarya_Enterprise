@@ -301,3 +301,64 @@ label {
             ),
             payment_feature_css,
         )
+    def test_partial_payment_mini_status_is_owned_by_payment_feature(
+        self,
+    ):
+        base_dir = Path(settings.BASE_DIR)
+
+        component_css = (
+            base_dir
+            / "static"
+            / "css"
+            / "components"
+            / "badges.css"
+        ).read_text(
+            encoding="utf-8"
+        )
+
+        payment_feature_css = (
+            base_dir
+            / "static"
+            / "css"
+            / "features"
+            / "partial-payments.css"
+        ).read_text(
+            encoding="utf-8"
+        )
+
+        app_css = (
+            base_dir
+            / "static"
+            / "css"
+            / "app.css"
+        ).read_text(
+            encoding="utf-8"
+        )
+
+        partial_mini_rule = """\
+.payment-mini-partial .payment-mini-status {
+    color: #fde68a;
+    background: rgba(202, 138, 4, 0.20);
+}
+"""
+
+        self.assertNotIn(
+            partial_mini_rule,
+            component_css,
+        )
+
+        self.assertEqual(
+            payment_feature_css.count(
+                partial_mini_rule
+            ),
+            1,
+        )
+
+        self.assertLess(
+            app_css.index(
+                "./components/badges.css"
+            ),
+            app_css.index(
+                "./features/partial-payments.css"
+            ),
+        )

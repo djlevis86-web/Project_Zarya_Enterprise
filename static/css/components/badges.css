@@ -362,10 +362,6 @@ label {
     background: rgba(22, 163, 74, 0.20);
 }
 
-.payment-mini-partial .payment-mini-status {
-    color: #fde68a;
-    background: rgba(202, 138, 4, 0.20);
-}
 
 .payment-mini-unpaid .payment-mini-status {
     color: #fecaca;

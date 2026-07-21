@@ -276,15 +276,27 @@ class DashboardInvoiceBotReportTests(TestCase):
     def test_dashboard_prioritizes_user_work_before_technical_audit(self):
         self._create_invoice()
 
-        self.client.force_login(
-            self.user
-        )
-
-        response = self.client.get(
-            reverse(
-                "dashboard"
+        with TemporaryDirectory() as temp_dir:
+            base_dir = Path(
+                temp_dir
             )
-        )
+
+            self._write_stale_report(
+                base_dir
+            )
+
+            self.client.force_login(
+                self.user
+            )
+
+            with self.settings(
+                BASE_DIR=base_dir
+            ):
+                response = self.client.get(
+                    reverse(
+                        "dashboard"
+                    )
+                )
 
         self.assertEqual(
             response.status_code,

@@ -132,3 +132,63 @@ label {
             expected_rule,
             css,
         )
+    def test_payment_schedule_owns_overdue_status_badge_override(
+        self,
+    ):
+        base_dir = Path(settings.BASE_DIR)
+
+        component_css = (
+            base_dir
+            / "static"
+            / "css"
+            / "components"
+            / "badges.css"
+        ).read_text(
+            encoding="utf-8"
+        )
+
+        page_css = (
+            base_dir
+            / "static"
+            / "css"
+            / "pages"
+            / "payment-schedule.css"
+        ).read_text(
+            encoding="utf-8"
+        )
+
+        app_css = (
+            base_dir
+            / "static"
+            / "css"
+            / "app.css"
+        ).read_text(
+            encoding="utf-8"
+        )
+
+        overdue_rule = """\
+.payment-schedule-table .schedule-row-overdue .status-badge.status-rejected {
+    background: rgba(239, 68, 68, 0.22) !important;
+    color: #fecaca !important;
+    border: 1px solid rgba(248, 113, 113, 0.35) !important;
+}
+"""
+
+        self.assertNotIn(
+            overdue_rule,
+            component_css,
+        )
+
+        self.assertEqual(
+            page_css.count(overdue_rule),
+            1,
+        )
+
+        self.assertLess(
+            app_css.index(
+                "./components/badges.css"
+            ),
+            app_css.index(
+                "./pages/payment-schedule.css"
+            ),
+        )

@@ -305,11 +305,6 @@ label {
     border: 1px solid rgba(245, 158, 11, 0.30) !important;
 }
 
-.status-badge.status-partially_paid {
-    background: rgba(168, 85, 247, 0.16) !important;
-    color: #e9d5ff !important;
-    border: 1px solid rgba(192, 132, 252, 0.30) !important;
-}
 
 .status-badge.status-paid {
     background: rgba(34, 197, 94, 0.16) !important;

@@ -249,3 +249,55 @@ label {
             ),
             payment_feature_css,
         )
+    def test_partially_paid_registry_status_is_owned_by_payment_feature(
+        self,
+    ):
+        base_dir = Path(settings.BASE_DIR)
+
+        component_css = (
+            base_dir
+            / "static"
+            / "css"
+            / "components"
+            / "badges.css"
+        ).read_text(
+            encoding="utf-8"
+        )
+
+        payment_feature_css = (
+            base_dir
+            / "static"
+            / "css"
+            / "features"
+            / "partial-payments.css"
+        ).read_text(
+            encoding="utf-8"
+        )
+
+        partially_paid_rule = """\
+.status-badge.status-partially_paid {
+    background: rgba(168, 85, 247, 0.16) !important;
+    color: #e9d5ff !important;
+    border: 1px solid rgba(192, 132, 252, 0.30) !important;
+}
+"""
+
+        self.assertNotIn(
+            partially_paid_rule,
+            component_css,
+        )
+
+        self.assertEqual(
+            payment_feature_css.count(
+                partially_paid_rule
+            ),
+            1,
+        )
+
+        self.assertIn(
+            (
+                ".payment-mini-partial "
+                ".payment-mini-status {"
+            ),
+            payment_feature_css,
+        )

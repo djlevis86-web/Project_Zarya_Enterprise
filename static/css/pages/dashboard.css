@@ -871,3 +871,135 @@ main :is(
     margin-top: 22px;
 }
 /* DASHBOARD-BOT-REPORT-SPACING-V1-END */
+
+/* DASHBOARD-HERO-UX-PILOT-V1-START */
+/*
+ * Page-scoped Dashboard hero refinement.
+ * General layout and shared components are not modified.
+ */
+.dashboard-page .dashboard-hero {
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(250px, 320px);
+    gap: 20px;
+    align-items: stretch;
+    margin-bottom: 28px;
+}
+
+.dashboard-page .dashboard-hero-main {
+    min-width: 0;
+    padding: clamp(24px, 2.4vw, 36px);
+}
+
+.dashboard-page .dashboard-kicker {
+    margin-bottom: 10px;
+    font-size: 11px;
+    letter-spacing: .12em;
+}
+
+.dashboard-page .dashboard-title {
+    max-width: 820px;
+    font-size: clamp(30px, 2.55vw, 42px);
+    line-height: 1.08;
+    text-wrap: balance;
+}
+
+.dashboard-page .dashboard-hero p {
+    max-width: 780px;
+    margin: 14px 0 0;
+    font-size: 15px;
+    line-height: 1.65;
+}
+
+.dashboard-page .dashboard-hero-actions {
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.dashboard-page .dashboard-hero-actions .btn {
+    min-height: 44px;
+}
+
+.dashboard-page .dashboard-hero-side {
+    min-width: 0;
+}
+
+.dashboard-page .hero-metric {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 124px;
+    padding: 22px 24px;
+}
+
+.dashboard-page .hero-metric + .hero-metric {
+    border-top: 1px solid var(--z-border);
+}
+
+.dashboard-page .hero-metric span {
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.dashboard-page .hero-metric strong {
+    font-size: clamp(34px, 3vw, 46px);
+    font-weight: 850;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1280px) {
+    .dashboard-page .dashboard-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-page .dashboard-hero-side {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-page .hero-metric + .hero-metric {
+        border-top: 0;
+        border-left: 1px solid var(--z-border);
+    }
+}
+
+@media (max-width: 720px) {
+    .dashboard-page .dashboard-hero {
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .dashboard-page .dashboard-hero-main {
+        padding: 22px 20px;
+    }
+
+    .dashboard-page .dashboard-title {
+        font-size: clamp(28px, 9vw, 34px);
+    }
+
+    .dashboard-page .dashboard-hero-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+
+    .dashboard-page .dashboard-hero-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .dashboard-page .dashboard-hero-side {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-page .hero-metric + .hero-metric {
+        border-left: 0;
+        border-top: 1px solid var(--z-border);
+    }
+}
+/* DASHBOARD-HERO-UX-PILOT-V1-END */

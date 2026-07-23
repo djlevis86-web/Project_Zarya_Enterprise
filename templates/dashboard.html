@@ -429,7 +429,9 @@
 
     </div>
 
-</div><div class="card">
+</div>
+
+<div class="card dashboard-latest-panel-v1">
 
     <div class="registry-table-header">
 
@@ -451,7 +453,7 @@
 
     </div>
 
-    <div class="table-scroll">
+    <div class="table-scroll dashboard-latest-scroll-v1">
 
         <table class="table registry-table dashboard-latest-table">
 
@@ -483,7 +485,7 @@
 
                 {% for invoice in latest_invoices %}
 
-                    <tr>
+                    <tr class="dashboard-latest-row-v1">
                         <td>
                             <a href="{% url 'invoice_detail' invoice.id %}">
                                 #{{ invoice.id }}

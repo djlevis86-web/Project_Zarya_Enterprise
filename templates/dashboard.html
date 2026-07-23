@@ -78,7 +78,7 @@
 
     <div class="dashboard-attention-grid-v1">
         {% for item in attention_items %}
-            <a href="{% url item.url_name %}" class="dashboard-attention-item-v1">
+            <a href="{% url item.url_name %}" class="dashboard-attention-item-v1" data-attention-state="{% if item.value %}active{% else %}clear{% endif %}">
                 <span class="dashboard-attention-value-v1">
                     {{ item.value }}
                 </span>

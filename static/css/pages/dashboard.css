@@ -1003,3 +1003,129 @@ main :is(
     }
 }
 /* DASHBOARD-HERO-UX-PILOT-V1-END */
+
+/* DASHBOARD-ATTENTION-UX-PILOT-V1-START */
+/*
+ * Page-scoped attention queue refinement.
+ * Active work remains prominent; zero-value items stay available
+ * without competing visually with actionable items.
+ */
+.dashboard-page .dashboard-attention-v1 {
+    margin-top: 0 !important;
+    margin-bottom: 24px !important;
+    padding: 18px 20px !important;
+}
+
+.dashboard-page .dashboard-attention-header-v1 {
+    margin-bottom: 14px !important;
+}
+
+.dashboard-page .dashboard-attention-header-v1 h2 {
+    margin-bottom: 4px !important;
+    font-size: 18px !important;
+}
+
+.dashboard-page .dashboard-attention-header-v1 p {
+    max-width: 720px;
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+}
+
+.dashboard-page .dashboard-attention-grid-v1 {
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+}
+
+.dashboard-page .dashboard-attention-item-v1 {
+    min-height: 64px !important;
+    padding: 12px 14px !important;
+    border-radius: 14px !important;
+}
+
+.dashboard-page .dashboard-attention-item-v1:focus-visible {
+    outline: 2px solid var(--z-accent-2);
+    outline-offset: 3px;
+}
+
+.dashboard-page .dashboard-attention-item-v1[
+    data-attention-state="active"
+] {
+    border-color: rgba(34, 197, 94, .28);
+    background:
+        linear-gradient(
+            135deg,
+            rgba(34, 197, 94, .09),
+            rgba(255, 255, 255, .025)
+        );
+}
+
+.dashboard-page .dashboard-attention-item-v1[
+    data-attention-state="active"
+]:hover {
+    border-color: rgba(34, 197, 94, .46);
+    background:
+        linear-gradient(
+            135deg,
+            rgba(34, 197, 94, .14),
+            rgba(255, 255, 255, .035)
+        );
+}
+
+.dashboard-page .dashboard-attention-item-v1[
+    data-attention-state="clear"
+] {
+    border-color: rgba(148, 163, 184, .12);
+    background: rgba(255, 255, 255, .018);
+}
+
+.dashboard-page .dashboard-attention-item-v1[
+    data-attention-state="clear"
+]:hover {
+    border-color: rgba(148, 163, 184, .24);
+    background: rgba(255, 255, 255, .035);
+}
+
+.dashboard-page .dashboard-attention-item-v1[
+    data-attention-state="clear"
+] .dashboard-attention-value-v1 {
+    background: rgba(148, 163, 184, .10);
+    color: rgba(226, 232, 240, .72);
+}
+
+.dashboard-page .dashboard-attention-item-v1[
+    data-attention-state="clear"
+] .dashboard-attention-content-v1 strong {
+    color: rgba(255, 255, 255, .78);
+}
+
+.dashboard-page .dashboard-attention-item-v1[
+    data-attention-state="clear"
+] .dashboard-attention-content-v1 small {
+    color: rgba(226, 232, 240, .52);
+}
+
+@media (min-width: 721px) and (max-width: 1200px) {
+    .dashboard-page .dashboard-attention-grid-v1 {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 720px) {
+    .dashboard-page .dashboard-attention-v1 {
+        margin-bottom: 20px !important;
+        padding: 16px !important;
+    }
+
+    .dashboard-page .dashboard-attention-grid-v1 {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    .dashboard-page .dashboard-attention-item-v1 {
+        min-height: 62px !important;
+        padding: 11px 12px !important;
+    }
+}
+/* DASHBOARD-ATTENTION-UX-PILOT-V1-END */

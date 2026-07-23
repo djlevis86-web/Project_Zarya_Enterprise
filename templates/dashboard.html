@@ -455,7 +455,7 @@
 
     <div class="table-scroll dashboard-latest-scroll-v1">
 
-        <table class="table registry-table dashboard-latest-table">
+        <table class="table registry-table dashboard-latest-table" aria-label="Последние документы">
 
             <thead>
                 <tr>
@@ -486,13 +486,13 @@
                 {% for invoice in latest_invoices %}
 
                     <tr class="dashboard-latest-row-v1">
-                        <td>
+                        <td class="dashboard-latest-id-v1" data-label="ID">
                             <a href="{% url 'invoice_detail' invoice.id %}">
                                 #{{ invoice.id }}
                             </a>
                         </td>
 
-                        <td>
+                        <td class="dashboard-latest-document-v1" data-label="Документ">
                             <strong>
                                 {{ invoice.title }}
                             </strong>
@@ -504,19 +504,19 @@
                             {% endif %}
                         </td>
 
-                        <td>
+                        <td class="dashboard-latest-amount-v1" data-label="Сумма">
                             <strong class="amount-main">
                                 {{ invoice.amount|floatformat:2 }} ₽
                             </strong>
                         </td>
 
-                        <td>
+                        <td class="dashboard-latest-status-v1" data-label="Статус">
                             <span class="status-badge status-{{ invoice.status }}">
                                 {{ invoice.get_status_display }}
                             </span>
                         </td>
 
-                        <td>
+                        <td class="dashboard-latest-action-v1" data-label="Действие">
                             <a
                                 href="{% url 'invoice_detail' invoice.id %}"
                                 class="btn btn-secondary btn-sm"

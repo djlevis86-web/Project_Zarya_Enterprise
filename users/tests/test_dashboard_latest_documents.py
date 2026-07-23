@@ -188,3 +188,144 @@ class DashboardLatestDocumentsTests(SimpleTestCase):
                 "Действие",
             ],
         )
+
+    def test_latest_documents_visual_layer_is_page_scoped(
+        self,
+    ):
+        template_path = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "dashboard.html"
+        )
+
+        css_path = (
+            Path(settings.BASE_DIR)
+            / "static"
+            / "css"
+            / "pages"
+            / "dashboard.css"
+        )
+
+        template = template_path.read_text(
+            encoding="utf-8"
+        ).replace(
+            "\r\n",
+            "\n",
+        )
+
+        css = css_path.read_text(
+            encoding="utf-8"
+        ).replace(
+            "\r\n",
+            "\n",
+        )
+
+        expected_template_tokens = {
+            (
+                'dashboard-latest-table" '
+                'aria-label="Последние документы"'
+            ): 1,
+            "dashboard-latest-id-v1": 1,
+            "dashboard-latest-document-v1": 1,
+            "dashboard-latest-amount-v1": 1,
+            "dashboard-latest-status-v1": 1,
+            "dashboard-latest-action-v1": 1,
+            'data-label="ID"': 1,
+            'data-label="Документ"': 1,
+            'data-label="Сумма"': 1,
+            'data-label="Статус"': 1,
+            'data-label="Действие"': 1,
+        }
+
+        for token, expected_count in (
+            expected_template_tokens.items()
+        ):
+            with self.subTest(
+                token=token
+            ):
+                self.assertEqual(
+                    template.count(token),
+                    expected_count,
+                )
+
+        start_marker = (
+            "/* DASHBOARD-LATEST-UX-"
+            "PILOT-V1-START */"
+        )
+
+        end_marker = (
+            "/* DASHBOARD-LATEST-UX-"
+            "PILOT-V1-END */"
+        )
+
+        self.assertEqual(
+            css.count(start_marker),
+            1,
+        )
+
+        self.assertEqual(
+            css.count(end_marker),
+            1,
+        )
+
+        block_start = css.index(
+            start_marker
+        )
+
+        block_end = (
+            css.index(
+                end_marker,
+                block_start,
+            )
+            + len(end_marker)
+        )
+
+        pilot_css = css[
+            block_start:block_end
+        ]
+
+        required_css_tokens = (
+            (
+                ".dashboard-page "
+                ".dashboard-latest-panel-v1 {"
+            ),
+            (
+                ".dashboard-page "
+                ".dashboard-latest-scroll-v1 {"
+            ),
+            (
+                ".dashboard-page "
+                ".dashboard-latest-table {"
+            ),
+            "@media (max-width: 900px) {",
+            "@media (max-width: 720px) {",
+            "@media (max-width: 430px) {",
+            "content: attr(data-label);",
+            "grid-template-columns:",
+            "font-variant-numeric: tabular-nums;",
+        )
+
+        for token in required_css_tokens:
+            with self.subTest(
+                token=token
+            ):
+                self.assertIn(
+                    token,
+                    pilot_css,
+                )
+
+        forbidden_css_tokens = (
+            "\n.dashboard-latest-panel-v1 {",
+            "\n.dashboard-latest-scroll-v1 {",
+            "\n.dashboard-latest-table {",
+            ":has(",
+        )
+
+        for token in forbidden_css_tokens:
+            with self.subTest(
+                token=token
+            ):
+                self.assertNotIn(
+                    token,
+                    pilot_css,
+                )

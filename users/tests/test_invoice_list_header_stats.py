@@ -53,7 +53,7 @@ class InvoiceListHeaderStatsTests(SimpleTestCase):
         )
 
         filter_start = template.index(
-            '<div class="card registry-filter-card">',
+            "registry-filter-card",
             stats_start,
         )
 

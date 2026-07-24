@@ -220,3 +220,137 @@ class InvoiceListFiltersScopeTests(
             "onsubmit=",
             filter_block,
         )
+
+    def test_filter_visual_layer_is_page_scoped(
+        self,
+    ):
+        css_path = (
+            Path(settings.BASE_DIR)
+            / "static"
+            / "css"
+            / "pages"
+            / "invoice-list.css"
+        )
+
+        app_css_path = (
+            Path(settings.BASE_DIR)
+            / "static"
+            / "css"
+            / "app.css"
+        )
+
+        css = css_path.read_text(
+            encoding="utf-8-sig"
+        ).replace(
+            "\r\n",
+            "\n",
+        ).replace(
+            "\r",
+            "\n",
+        )
+
+        app_css = app_css_path.read_text(
+            encoding="utf-8-sig"
+        ).replace(
+            "\r\n",
+            "\n",
+        ).replace(
+            "\r",
+            "\n",
+        )
+
+        start_marker = (
+            "/* INVOICE-LIST-FILTERS-"
+            "UX-PILOT-V1-START */"
+        )
+
+        end_marker = (
+            "/* INVOICE-LIST-FILTERS-"
+            "UX-PILOT-V1-END */"
+        )
+
+        self.assertEqual(
+            css.count(start_marker),
+            1,
+        )
+
+        self.assertEqual(
+            css.count(end_marker),
+            1,
+        )
+
+        start = css.index(
+            start_marker
+        )
+
+        end = (
+            css.index(
+                end_marker,
+                start,
+            )
+            + len(end_marker)
+        )
+
+        block = css[
+            start:end
+        ]
+
+        required_tokens = (
+            ".invoice-list-filter-panel-v1 {",
+            ".invoice-list-filters-v1 {",
+            ".filter-field:focus-within",
+            ".invoice-list-recent-filters-v1 {",
+            "@media (max-width: 1100px)",
+            "@media (max-width: 720px)",
+            "grid-column: 1 / -1 !important;",
+            "grid-template-columns: 1fr !important;",
+        )
+
+        for token in required_tokens:
+            with self.subTest(
+                token=token
+            ):
+                self.assertIn(
+                    token,
+                    block,
+                )
+
+        forbidden_tokens = (
+            ".registry-filter-card",
+            ".invoice-table",
+            ".invoice-table-compact",
+            ":has(",
+        )
+
+        for token in forbidden_tokens:
+            with self.subTest(
+                token=token
+            ):
+                self.assertNotIn(
+                    token,
+                    block,
+                )
+
+        page_import_position = (
+            app_css.index(
+                "./pages/invoice-list.css"
+            )
+        )
+
+        late_filter_import_position = (
+            app_css.index(
+                "./features/ui-polish-filters.css"
+            )
+        )
+
+        self.assertLess(
+            page_import_position,
+            late_filter_import_position,
+        )
+
+        self.assertGreaterEqual(
+            block.count(
+                ".invoice-list-filter-panel-v1"
+            ),
+            20,
+        )

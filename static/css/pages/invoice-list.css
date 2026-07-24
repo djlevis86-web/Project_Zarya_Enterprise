@@ -707,3 +707,206 @@
     }
 }
 /* INVOICE-LIST-HEADER-STATS-UX-PILOT-V1-END */
+
+/* INVOICE-LIST-FILTERS-UX-PILOT-V1-START */
+/*
+ * Page-specific presentation for the invoice-list filters.
+ *
+ * The selectors intentionally include the semantic page scope
+ * because ui-polish-filters.css is imported later than this file.
+ *
+ * Document-table styles and filters on other pages are outside
+ * this visual scope.
+ */
+.invoice-list-filter-panel-v1 {
+    margin-bottom: 20px;
+    padding: 20px 22px !important;
+    border-color: rgba(148, 163, 184, 0.16);
+}
+
+.invoice-list-filter-panel-v1
+.invoice-list-filters-v1 {
+    display: grid !important;
+    grid-template-columns:
+        minmax(270px, 2fr)
+        repeat(4, minmax(150px, 1fr)) !important;
+    gap: 14px 16px !important;
+    align-items: end !important;
+}
+
+.invoice-list-filter-panel-v1
+.invoice-list-filters-v1
+.filter-field {
+    display: grid !important;
+    min-width: 0 !important;
+    gap: 7px !important;
+}
+
+.invoice-list-filter-panel-v1
+.invoice-list-filters-v1
+.filter-field
+label {
+    margin: 0 !important;
+    color: var(--z-muted) !important;
+    font-size: 11px !important;
+    line-height: 1.25 !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.025em !important;
+}
+
+.invoice-list-filter-panel-v1
+.invoice-list-filters-v1
+.form-control {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 42px !important;
+    height: 42px !important;
+    padding-inline: 13px !important;
+    border-radius: 11px !important;
+}
+
+.invoice-list-filter-panel-v1
+.invoice-list-filters-v1
+input[type="date"] {
+    cursor: pointer;
+}
+
+.invoice-list-filter-panel-v1
+.invoice-list-filters-v1
+.filter-field:focus-within
+label {
+    color: rgba(134, 239, 172, 0.90) !important;
+}
+
+.invoice-list-filter-panel-v1
+.invoice-list-filters-v1
+.invoice-filter-actions-v5 {
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-top: 3px !important;
+}
+
+.invoice-list-filter-panel-v1
+.invoice-list-filters-v1
+.invoice-filter-actions-v5
+.btn {
+    min-height: 40px !important;
+    height: 40px !important;
+    min-width: 110px;
+    padding-inline: 17px !important;
+    justify-content: center;
+}
+
+.invoice-list-filter-panel-v1
+.invoice-list-recent-filters-v1 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 15px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.invoice-list-filter-panel-v1
+.invoice-list-recent-filters-v1
+> .muted {
+    margin-right: auto;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.invoice-list-filter-panel-v1
+.invoice-list-recent-filters-v1
+.btn {
+    min-height: 36px;
+    height: 36px;
+    padding-inline: 14px;
+    border-radius: 10px;
+}
+
+.light-theme
+.invoice-list-filter-panel-v1 {
+    border-color: rgba(15, 23, 42, 0.10);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.light-theme
+.invoice-list-filter-panel-v1
+.invoice-list-recent-filters-v1 {
+    border-top-color: rgba(15, 23, 42, 0.08);
+}
+
+@media (max-width: 1100px) {
+    .invoice-list-filter-panel-v1
+    .invoice-list-filters-v1 {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .invoice-list-filter-panel-v1
+    .invoice-list-filters-v1
+    .filter-field-search-v5 {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 720px) {
+    .invoice-list-filter-panel-v1 {
+        padding: 17px !important;
+    }
+
+    .invoice-list-filter-panel-v1
+    .invoice-list-filters-v1 {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .invoice-list-filter-panel-v1
+    .invoice-list-filters-v1
+    .filter-field-search-v5 {
+        grid-column: auto;
+    }
+
+    .invoice-list-filter-panel-v1
+    .invoice-list-filters-v1
+    .invoice-filter-actions-v5 {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+    }
+
+    .invoice-list-filter-panel-v1
+    .invoice-list-filters-v1
+    .invoice-filter-actions-v5
+    .btn {
+        width: 100% !important;
+    }
+
+    .invoice-list-filter-panel-v1
+    .invoice-list-recent-filters-v1 {
+        display: grid;
+        grid-template-columns: 1fr;
+        align-items: stretch;
+    }
+
+    .invoice-list-filter-panel-v1
+    .invoice-list-recent-filters-v1
+    > .muted {
+        margin-right: 0;
+    }
+
+    .invoice-list-filter-panel-v1
+    .invoice-list-recent-filters-v1
+    .btn,
+    .invoice-list-filter-panel-v1
+    .invoice-list-recent-filters-v1
+    .inline-form {
+        width: 100%;
+    }
+}
+/* INVOICE-LIST-FILTERS-UX-PILOT-V1-END */

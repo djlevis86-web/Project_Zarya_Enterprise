@@ -213,16 +213,51 @@ class DashboardPageHeaderSemanticScopeV1Tests(
             )
         )
 
-        for css_path in self.css_root.rglob(
-            "*.css"
-        ):
-            css_text = css_path.read_text(
-                encoding="utf-8-sig",
-                errors="replace",
-            )
+        visual_relative_path = (
+            "static/css/features/"
+            "dashboard-page-header-visual-v1.css"
+        )
 
-            for token in required_tokens:
-                self.assertNotIn(
-                    "." + token,
-                    css_text,
+        visual_path = (
+            self.repo_root
+            / visual_relative_path
+        )
+
+        self.assertTrue(
+            visual_path.is_file()
+        )
+
+        for token in sorted(
+            required_tokens
+        ):
+            selector_files = []
+
+            for css_path in self.css_root.rglob(
+                "*.css"
+            ):
+                css_text = css_path.read_text(
+                    encoding="utf-8-sig",
+                    errors="replace",
                 )
+
+                if (
+                    "."
+                    + token
+                ) in css_text:
+                    selector_files.append(
+                        css_path.relative_to(
+                            self.repo_root
+                        ).as_posix()
+                    )
+
+            self.assertEqual(
+                selector_files,
+                [
+                    visual_relative_path
+                ],
+                msg=(
+                    "Dashboard semantic selector "
+                    "ownership mismatch: "
+                    + token
+                ),
+            )

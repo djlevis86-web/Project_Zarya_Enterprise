@@ -60,6 +60,7 @@
 @import url("./features/sidebar-fixed-left.css");
 @import "./features/page-header-visual-v1.css";
 @import "./features/invoice-list-table-responsive-v1.css";
+@import "./features/dashboard-page-header-visual-v1.css";
 
 /* Counterparty search on invoice assign page */
 .counterparty-search-form {

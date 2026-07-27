@@ -97,14 +97,14 @@ class InvoiceListTableResponsiveV1Tests(
 
         self.assertEqual(
             len(imports),
-            37,
+            38,
         )
 
         self.assertEqual(
             imports[-1],
             (
                 "./features/"
-                "invoice-list-table-responsive-v1.css"
+                "dashboard-page-header-visual-v1.css"
             ),
         )
 
@@ -140,7 +140,7 @@ class InvoiceListTableResponsiveV1Tests(
 
         self.assertEqual(
             len(import_rule_matches),
-            37,
+            38,
         )
 
         import_prelude = app_without_comments[

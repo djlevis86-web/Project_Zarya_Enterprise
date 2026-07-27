@@ -1,0 +1,141 @@
+/* PAGE-HEADER-VISUAL-V1-START */
+
+/*
+ * Semantic PageHeader visual layer.
+ * Loaded after the legacy UI-polish bundle so the new semantic scope
+ * can replace generic PageHeader rules without changing unrelated blocks.
+ */
+.page-header-v1 {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center !important;
+    justify-content: stretch !important;
+    gap: var(--zds-space-6) !important;
+    margin-bottom: var(--zds-space-6) !important;
+    padding: var(--zds-space-6);
+    border: 1px solid var(--zds-color-border);
+    border-radius: var(--zds-radius-panel);
+    background:
+        linear-gradient(
+            135deg,
+            var(--zds-color-surface-elevated),
+            var(--zds-color-surface)
+        );
+    box-shadow: var(--zds-shadow-card);
+}
+
+.page-header-copy-v1 {
+    min-width: 0 !important;
+    max-width: 48rem !important;
+}
+
+.page-header-v1 .page-title {
+    margin: 0;
+    color: var(--zds-color-text);
+    font-size: clamp(1.75rem, 2.4vw, 2.25rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+}
+
+.page-header-v1 .page-subtitle {
+    max-width: 45rem;
+    margin: var(--zds-space-2) 0 0;
+    color: var(--zds-color-text-muted);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+}
+
+.page-header-actions-v1 {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: var(--zds-space-2) !important;
+    width: auto;
+    margin: 0 !important;
+}
+
+.page-header-actions-v1 > form {
+    margin: 0;
+}
+
+.page-header-actions-v1 .btn {
+    min-height: var(--zds-control-height-default);
+    padding-inline: var(--zds-space-4) !important;
+    border-radius: var(--zds-radius-control);
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+    line-height: 1 !important;
+}
+
+.invoice-list-header-v1 .page-header-actions-v1 {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: min(100%, 34rem);
+    gap: var(--zds-space-2) !important;
+}
+
+.invoice-list-header-v1 .page-header-actions-v1 .btn {
+    min-width: 0;
+    width: 100%;
+}
+
+@media (max-width: 64rem) {
+    .page-header-v1 {
+        grid-template-columns: minmax(0, 1fr);
+        align-items: stretch !important;
+        gap: var(--zds-space-4) !important;
+    }
+
+    .page-header-copy-v1 {
+        max-width: none !important;
+    }
+
+    .page-header-actions-v1 {
+        width: 100%;
+        justify-content: flex-start !important;
+        margin: 0 !important;
+    }
+
+    .invoice-list-header-v1 .page-header-actions-v1 {
+        width: 100%;
+    }
+}
+
+@media (max-width: 45rem) {
+    .page-header-v1 {
+        gap: var(--zds-space-4) !important;
+        padding: var(--zds-space-4);
+        border-radius: var(--zds-radius-panel);
+    }
+
+    .page-header-v1 .page-title {
+        font-size: clamp(1.5rem, 7vw, 1.75rem);
+    }
+
+    .page-header-v1 .page-subtitle {
+        font-size: 0.875rem;
+    }
+
+    .page-header-actions-v1,
+    .invoice-list-header-v1 .page-header-actions-v1 {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr);
+        width: 100%;
+    }
+
+    .page-header-actions-v1 > form,
+    .page-header-actions-v1 .btn {
+        width: 100%;
+    }
+
+    .page-header-actions-v1 .btn {
+        min-height: var(--zds-touch-target-min);
+    }
+}
+
+/* PAGE-HEADER-VISUAL-V1-END */

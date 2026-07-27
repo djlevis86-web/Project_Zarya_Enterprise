@@ -2,18 +2,18 @@
 
 {% block content %}
 
-<div class="page-header">
-    <div>
-        <h1>
+<div class="page-header page-header-v1">
+    <div class="page-header-copy-v1">
+        <h1 class="page-title">
             {{ page_title }}
         </h1>
 
-        <p>
+        <p class="page-subtitle">
             Авторизация выполняется по e-mail и паролю.
         </p>
     </div>
 
-    <div>
+    <div class="page-header-actions-v1">
         <a href="{% url 'user_admin_list' %}" class="btn btn-secondary">
             Назад к списку
         </a>

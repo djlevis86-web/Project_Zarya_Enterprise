@@ -96,16 +96,51 @@ class PageHeaderVisualLayerV1Tests(
             flags=re.IGNORECASE,
         )
 
-        self.assertEqual(
-            len(imports),
-            36,
-        )
-
-        self.assertEqual(
-            imports[-1],
+        self.assertIn(
             (
                 "./features/"
                 "page-header-visual-v1.css"
+            ),
+            imports,
+        )
+
+        self.assertEqual(
+            imports.count(
+                (
+                    "./features/"
+                    "page-header-visual-v1.css"
+                )
+            ),
+            1,
+        )
+
+        self.assertLess(
+            imports.index(
+                (
+                    "./features/"
+                    "ui-polish-actions.css"
+                )
+            ),
+            imports.index(
+                (
+                    "./features/"
+                    "page-header-visual-v1.css"
+                )
+            ),
+        )
+
+        self.assertLess(
+            imports.index(
+                (
+                    "./features/"
+                    "page-header-visual-v1.css"
+                )
+            ),
+            imports.index(
+                (
+                    "./features/"
+                    "invoice-list-table-responsive-v1.css"
+                )
             ),
         )
 

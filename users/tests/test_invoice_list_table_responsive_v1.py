@@ -97,14 +97,14 @@ class InvoiceListTableResponsiveV1Tests(
 
         self.assertEqual(
             len(imports),
-            38,
+            39,
         )
 
         self.assertEqual(
             imports[-1],
             (
                 "./features/"
-                "dashboard-page-header-visual-v1.css"
+                "sidebar-collapsible-v1.css"
             ),
         )
 
@@ -140,7 +140,7 @@ class InvoiceListTableResponsiveV1Tests(
 
         self.assertEqual(
             len(import_rule_matches),
-            38,
+            39,
         )
 
         import_prelude = app_without_comments[

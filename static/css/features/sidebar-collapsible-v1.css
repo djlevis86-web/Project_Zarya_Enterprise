@@ -1,0 +1,225 @@
+/*
+   Project Zarya — collapsible desktop sidebar v1.
+
+   Desktop:
+   - expanded width comes from the existing fixed-sidebar layer;
+   - collapsed width is 76px;
+   - main content follows the same shared width variable.
+
+   Mobile:
+   - the existing off-canvas drawer remains authoritative.
+*/
+
+:root {
+    --z-sidebar-collapsed-width: 76px;
+}
+
+.sidebar-desktop-toggle {
+    position: absolute;
+    top: 50%;
+    right: -18px;
+    z-index: 8;
+
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    border: 1px solid var(--zds-color-border);
+    border-radius: var(--zds-radius-control);
+
+    background: var(--zds-color-surface-elevated);
+    color: var(--zds-color-text);
+
+    box-shadow: var(--zds-shadow-card);
+    cursor: pointer;
+
+    transform: translateY(-50%);
+}
+
+.sidebar-desktop-toggle:hover {
+    background: var(--zds-color-surface);
+}
+
+.sidebar-desktop-toggle:focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+}
+
+.sidebar-desktop-toggle svg {
+    width: 18px;
+    height: 18px;
+
+    transition: transform 180ms ease;
+}
+
+@media (min-width: 981px) {
+    .sidebar-desktop-toggle {
+        display: inline-flex;
+    }
+
+    .sidebar-brand-area {
+        position: relative !important;
+        padding-right: 30px !important;
+    }
+
+    .sidebar,
+    .main {
+        transition:
+            width 180ms ease,
+            min-width 180ms ease,
+            max-width 180ms ease,
+            margin-left 180ms ease !important;
+    }
+
+    html.sidebar-is-collapsed {
+        --z-sidebar-width:
+            var(--z-sidebar-collapsed-width) !important;
+    }
+
+    html.sidebar-is-collapsed .sidebar-brand-area {
+        padding:
+            var(--zds-space-3)
+            var(--zds-space-2) !important;
+    }
+
+    html.sidebar-is-collapsed .sidebar-brand {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    html.sidebar-is-collapsed
+    .sidebar-brand > span:last-child,
+    html.sidebar-is-collapsed
+    .sidebar .nav-link > span:last-child,
+    html.sidebar-is-collapsed
+    .sidebar-user-action > span:last-child,
+    html.sidebar-is-collapsed
+    .sidebar-user-meta {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip-path: inset(50%) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+    }
+
+    html.sidebar-is-collapsed
+    .nav-section-title {
+        display: none !important;
+    }
+
+    html.sidebar-is-collapsed
+    .sidebar-scroll {
+        padding:
+            var(--zds-space-3)
+            var(--zds-space-2) !important;
+    }
+
+    html.sidebar-is-collapsed
+    .sidebar-nav {
+        gap: var(--zds-space-2) !important;
+    }
+
+    html.sidebar-is-collapsed
+    .sidebar-nav .nav-section {
+        margin: 0 !important;
+    }
+
+    html.sidebar-is-collapsed
+    .sidebar .nav-link,
+    html.sidebar-is-collapsed
+    .sidebar-nav a.nav-link {
+        width: var(--zds-touch-target-min) !important;
+        min-width: var(--zds-touch-target-min) !important;
+        max-width: var(--zds-touch-target-min) !important;
+
+        min-height: var(--zds-touch-target-min) !important;
+
+        justify-content: center !important;
+        gap: 0 !important;
+
+        padding: 0 !important;
+        margin:
+            0 auto
+            var(--zds-space-2) !important;
+    }
+
+    html.sidebar-is-collapsed
+    .sidebar .nav-icon {
+        width: 20px !important;
+        min-width: 20px !important;
+        height: 20px !important;
+    }
+
+    html.sidebar-is-collapsed
+    .sidebar-moving-highlight {
+        left: 50% !important;
+        width: var(--zds-touch-target-min) !important;
+        margin-left:
+            calc(
+                var(--zds-touch-target-min)
+                / -2
+            ) !important;
+    }
+
+    html.sidebar-is-collapsed
+    .sidebar-footer {
+        padding:
+            var(--zds-space-3)
+            var(--zds-space-2) !important;
+    }
+
+    html.sidebar-is-collapsed
+    .sidebar-user-card {
+        display: flex !important;
+        justify-content: center !important;
+    }
+
+    html.sidebar-is-collapsed
+    .sidebar-user-actions {
+        grid-template-columns: 1fr !important;
+        gap: var(--zds-space-2) !important;
+    }
+
+    html.sidebar-is-collapsed
+    .sidebar-user-action {
+        width: var(--zds-touch-target-min) !important;
+        min-width: var(--zds-touch-target-min) !important;
+        max-width: var(--zds-touch-target-min) !important;
+
+        min-height: var(--zds-touch-target-min) !important;
+
+        justify-content: center !important;
+        gap: 0 !important;
+
+        padding: 0 !important;
+        margin: 0 auto !important;
+    }
+
+    html.sidebar-is-collapsed
+    .sidebar-desktop-toggle svg {
+        transform: rotate(180deg);
+    }
+}
+
+@media (max-width: 980px) {
+    .sidebar-desktop-toggle {
+        display: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    .main,
+    .sidebar-desktop-toggle svg {
+        transition: none !important;
+    }
+}

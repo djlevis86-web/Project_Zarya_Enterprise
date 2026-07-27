@@ -13,6 +13,10 @@
 
     {% load static %}
 
+    <script
+        src="{% static 'js/sidebar-collapsible-v1.js' %}"
+    ></script>
+
     <link rel="stylesheet"
           href="{% static 'css/app.css' %}">
     <link rel="stylesheet" href="{% static 'css/features/sidebar-fixed-left.css' %}">
@@ -27,6 +31,7 @@
     <aside
         id="app-sidebar"
         class="sidebar"
+        data-sidebar-collapsed="false"
         aria-label="Основная навигация"
     >
 
@@ -46,6 +51,33 @@
                     </small>
                 </span>
             </a>
+
+            <button
+                type="button"
+                id="sidebar-desktop-toggle"
+                class="sidebar-desktop-toggle"
+                aria-controls="app-sidebar"
+                aria-expanded="true"
+                aria-label="Свернуть меню"
+                title="Свернуть меню"
+                data-collapse-label="Свернуть меню"
+                data-expand-label="Развернуть меню"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <path
+                        d="M14 6l-6 6 6 6"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+            </button>
 
             <button
                 type="button"

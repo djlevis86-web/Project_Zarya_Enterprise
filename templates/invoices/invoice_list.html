@@ -312,12 +312,12 @@
 
 </div>
 
-<div class="card">
+<div class="card invoice-list-table-panel-v1">
 
     <form
         method="post"
         action="{% url 'bulk_repeat_ocr' %}"
-        class="bulk-ocr-form"
+        class="bulk-ocr-form invoice-list-table-form-v1"
         onsubmit="return confirm('Повторить OCR для выбранных документов?');"
     >
 
@@ -329,7 +329,7 @@
             value="{{ request.get_full_path }}"
         >
 
-    <div class="registry-table-header">
+    <div class="registry-table-header invoice-list-table-header-v1">
 
         <div>
             <h3>
@@ -341,7 +341,7 @@
             </span>
         </div>
 
-        <div class="registry-actions invoice-bulk-actions-v1">
+        <div class="registry-actions invoice-bulk-actions-v1 invoice-list-table-bulk-actions-v1">
             <a href="{% url 'unmatched_counterparties' %}" class="btn btn-secondary">
                 Не найдено в 1С
             </a>
@@ -368,12 +368,12 @@
 
     </div>
 
-    <div class="table-scroll table-scroll-fit invoice-table-wrap">
-<table class="table registry-table invoice-table invoice-table-compact">
+    <div class="table-scroll table-scroll-fit invoice-table-wrap invoice-list-table-scroll-v1">
+<table class="table registry-table invoice-table invoice-table-compact invoice-list-table-v1">
 
             
 
-<colgroup>
+<colgroup class="invoice-list-table-columns-v1">
     <col class="col-select">
     <col class="col-id">
     <col class="col-document">
@@ -386,7 +386,7 @@
 
 <thead>
                 <tr>
-                    <th class="bulk-select-column">
+                    <th class="bulk-select-column invoice-list-table-head-select-v1">
                         <input
                             type="checkbox"
                             class="bulk-select-all"
@@ -395,31 +395,31 @@
                         >
                     </th>
 
-                        <th>
+                        <th class="invoice-list-table-head-id-v1">
                         ID
                     </th>
 
-                        <th>
+                        <th class="invoice-list-table-head-document-v1">
                         Документ
                     </th>
 
-                        <th>
+                        <th class="invoice-list-table-head-counterparty-v1">
                         Поставщик / Контрагент
                     </th>
 
-                        <th>
+                        <th class="invoice-list-table-head-amount-v1">
                         Сумма / OCR
                     </th>
 
-                        <th>
+                        <th class="invoice-list-table-head-status-v1">
                         Статус
                     </th>
 
-                        <th class="invoice-payment-column">
+                        <th class="invoice-payment-column invoice-list-table-head-payment-v1">
                         Оплата
                     </th>
 
-                        <th class="invoice-actions-column">
+                        <th class="invoice-actions-column invoice-list-table-head-actions-v1">
                         Действия
                     </th>
                 </tr>
@@ -429,8 +429,8 @@
 
                 {% for invoice in page_obj %}
 
-                    <tr>
-                        <td class="bulk-select-column">
+                    <tr class="invoice-list-table-row-v1">
+                        <td class="bulk-select-column invoice-list-table-cell-select-v1">
                             <input
                                 type="checkbox"
                                 name="invoice_ids"
@@ -440,7 +440,7 @@
                             >
                         </td>
 
-                            <td class="invoice-id-cell">
+                            <td class="invoice-id-cell invoice-list-table-cell-id-v1">
 
 
                                 <span class="invoice-id-text">#{{ invoice.id }}</span>
@@ -448,7 +448,7 @@
 
                             </td>
 
-                            <td class="invoice-document-cell">
+                            <td class="invoice-document-cell invoice-list-table-cell-document-v1">
                             {# DOCUMENT_TYPE_BADGE_V1 #}
                             <div class="muted">
                                 {{ invoice.get_document_type_display }}
@@ -518,7 +518,7 @@
                             </div>
                         </td>
 
-                            <td class="invoice-counterparty-cell">
+                            <td class="invoice-counterparty-cell invoice-list-table-cell-counterparty-v1">
                             {% if invoice.counterparty %}
                                 <strong>
                                     {{ invoice.counterparty.name }}
@@ -542,7 +542,7 @@
                             {% endif %}
                         </td>
 
-                            <td>
+                            <td class="invoice-list-table-cell-amount-v1">
                             <div class="amount-main">
                                 {{ invoice.amount|money_ru }}
                             </div>
@@ -578,7 +578,7 @@
                             {% endif %}
                         </td>
 
-                            <td>
+                            <td class="invoice-list-table-cell-status-v1">
                             {% if user.is_staff %}
                                 <select
                                     name="status"
@@ -600,7 +600,7 @@
                                 </span>
                             {% endif %}
                         </td>
-<td class="invoice-payment-cell">
+<td class="invoice-payment-cell invoice-list-table-cell-payment-v1">
                             <div class="payment-mini payment-mini-registry payment-mini-{{ invoice.payment_status_code }}">
                                 <div class="payment-mini-row">
                                     <span>Оплачено</span>
@@ -618,7 +618,7 @@
                             </div>
                         </td>
 
-                            <td class="invoice-actions-cell">
+                            <td class="invoice-actions-cell invoice-list-table-cell-actions-v1">
                             <div class="table-actions table-actions-vertical">
                                 <a
                                     href="{% url 'invoice_detail' invoice.id %}"

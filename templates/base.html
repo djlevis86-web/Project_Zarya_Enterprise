@@ -8,44 +8,89 @@
           content="width=device-width, initial-scale=1.0">
 
     <title>
-        Project Zarya
+        ОАО «Заря» — Документы и платежи
     </title>
 
     {% load static %}
 
+    <script
+        src="{% static 'js/sidebar-state-v3.js' %}"
+    ></script>
+
     <link rel="stylesheet"
           href="{% static 'css/app.css' %}">
-    <link rel="stylesheet" href="{% static 'css/features/sidebar-fixed-left.css' %}">
 </head>
 
-<body class="{% if user.is_authenticated and user.theme == 'light' %}light-theme{% endif %}">
+<body
+    class="{% if user.is_authenticated and user.theme == 'light' %}light-theme{% endif %}"
+    data-brand-layer="zarya-digital-horizon-v1"
+>
 
 {% with current=request.resolver_match.url_name %}
+
+{% include "components/sidebar_icon_sprite_v3.html" %}
 
 <div class="app-shell">
 
     <aside
         id="app-sidebar"
         class="sidebar"
+        data-sidebar-version="v3"
+        data-sidebar-collapsed="false"
         aria-label="Основная навигация"
     >
 
         <div class="sidebar-brand-area">
             <a href="{% url 'dashboard' %}" class="sidebar-brand">
-                <span class="brand-mark">
-                    З
+                <span class="brand-mark" aria-hidden="true">
+                    <img
+                        class="brand-mark-image"
+                        src="{% static 'images/brand/zarya-logo-v1.webp' %}"
+                        alt=""
+                        width="768"
+                        height="525"
+                        decoding="async"
+                    >
                 </span>
 
-                <span>
+                <span class="sidebar-brand-copy">
                     <strong>
                         ОАО «Заря»
                     </strong>
 
                     <small>
-                        Project Zarya
+                        Документы и платежи
                     </small>
                 </span>
             </a>
+
+            <button
+                type="button"
+                id="sidebar-desktop-toggle"
+                class="sidebar-desktop-toggle"
+                aria-controls="app-sidebar"
+                aria-expanded="true"
+                aria-label="Свернуть меню"
+                title="Свернуть меню"
+                data-collapse-label="Свернуть меню"
+                data-expand-label="Развернуть меню"
+            >
+                <svg
+
+                    class="sidebar-control-icon"
+
+                    viewBox="0 0 24 24"
+
+                    aria-hidden="true"
+
+                    focusable="false"
+
+                >
+
+                    <use href="#z-icon-panel-close"></use>
+
+                </svg>
+            </button>
 
             <button
                 type="button"
@@ -54,17 +99,19 @@
                 aria-label="Закрыть меню"
             >
                 <svg
+
+                    class="sidebar-control-icon"
+
                     viewBox="0 0 24 24"
+
                     aria-hidden="true"
+
                     focusable="false"
+
                 >
-                    <path
-                        d="M6 6l12 12M18 6L6 18"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                    />
+
+                    <use href="#z-icon-close"></use>
+
                 </svg>
             </button>
         </div>
@@ -80,26 +127,54 @@
 
                     <a href="{% url 'dashboard' %}"
                        class="nav-link {% if current == 'dashboard' %}is-active{% endif %}">
-                        <span class="nav-icon">⌂</span>
-                        <span>Панель управления</span>
+                        <svg
+                            class="nav-icon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <use href="#z-icon-dashboard"></use>
+                        </svg>
+                        <span class="nav-label">Панель управления</span>
                     </a>
 
                     <a href="{% url 'invoice_list' %}"
                        class="nav-link {% if current == 'invoice_list' or current == 'invoice_detail' or current == 'edit_invoice' or current == 'invoice_assign_counterparty' %}is-active{% endif %}">
-                        <span class="nav-icon">▦</span>
-                        <span>Документы к оплате</span>
+                        <svg
+                            class="nav-icon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <use href="#z-icon-file-text"></use>
+                        </svg>
+                        <span class="nav-label">Документы к оплате</span>
                     </a>
 
                     <a href="{% url 'upload_invoice' %}"
                        class="nav-link {% if current == 'upload_invoice' %}is-active{% endif %}">
-                        <span class="nav-icon">↑</span>
-                        <span>Загрузка</span>
+                        <svg
+                            class="nav-icon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <use href="#z-icon-upload-cloud"></use>
+                        </svg>
+                        <span class="nav-label">Загрузка</span>
                     </a>
 
                     <a href="{% url 'upload_batches' %}"
                        class="nav-link {% if current == 'upload_batches' or current == 'upload_batch_detail' %}is-active{% endif %}">
-                        <span class="nav-icon">◷</span>
-                        <span>Журнал загрузок</span>
+                        <svg
+                            class="nav-icon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <use href="#z-icon-history"></use>
+                        </svg>
+                        <span class="nav-label">Журнал загрузок</span>
                     </a>
 
                 </div>
@@ -115,14 +190,28 @@
 
                     <a href="{% url 'payment_schedule' %}"
                        class="nav-link {% if current == 'payment_schedule' %}is-active{% endif %}">
-                        <span class="nav-icon">◷</span>
-                        <span>График платежей</span>
+                        <svg
+                            class="nav-icon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <use href="#z-icon-calendar-clock"></use>
+                        </svg>
+                        <span class="nav-label">График платежей</span>
                     </a>
 
                     <a href="{% url 'payment_registry' %}"
                        class="nav-link {% if current == 'payment_registry' %}is-active{% endif %}">
-                        <span class="nav-icon">₽</span>
-                        <span>Реестр оплаты</span>
+                        <svg
+                            class="nav-icon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <use href="#z-icon-wallet"></use>
+                        </svg>
+                        <span class="nav-label">Реестр оплаты</span>
                     </a>
 
                 </div>
@@ -140,26 +229,54 @@
 
                         <a href="{% url 'counterparty_directory' %}"
                            class="nav-link {% if current == 'counterparty_directory' or current == 'counterparty_detail' or current == 'counterparty_create' or current == 'counterparty_edit' %}is-active{% endif %}">
-                            <span class="nav-icon">◎</span>
-                            <span>Контрагенты</span>
+                            <svg
+                                class="nav-icon"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <use href="#z-icon-building"></use>
+                            </svg>
+                            <span class="nav-label">Контрагенты</span>
                         </a>
 
                         <a href="{% url 'unmatched_counterparties' %}"
                            class="nav-link {% if current == 'unmatched_counterparties' %}is-active{% endif %}">
-                            <span class="nav-icon">!</span>
-                            <span>Не найдено в 1С</span>
+                            <svg
+                                class="nav-icon"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <use href="#z-icon-circle-alert"></use>
+                            </svg>
+                            <span class="nav-label">Не найдено в 1С</span>
                         </a>
 
                         <a href="{% url 'counterparties_missing_requisites' %}"
                            class="nav-link {% if current == 'counterparties_missing_requisites' %}is-active{% endif %}">
-                            <span class="nav-icon">⚑</span>
-                            <span>Проверка реквизитов</span>
+                            <svg
+                                class="nav-icon"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <use href="#z-icon-shield-check"></use>
+                            </svg>
+                            <span class="nav-label">Проверка реквизитов</span>
                         </a>
 
                         <a href="{% url 'import_counterparties_1c' %}"
                            class="nav-link {% if current == 'import_counterparties_1c' %}is-active{% endif %}">
-                            <span class="nav-icon">⇄</span>
-                            <span>Импорт из 1С</span>
+                            <svg
+                                class="nav-icon"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <use href="#z-icon-database-sync"></use>
+                            </svg>
+                            <span class="nav-label">Импорт из 1С</span>
                         </a>
 
                     </div>
@@ -176,15 +293,29 @@
 
                         <a href="{% url 'system_dashboard' %}"
                            class="nav-link {% if current == 'system_dashboard' or current == 'backups_list' or current == 'versions_page' or current == 'updates_page' or current == 'maintenance_page' %}is-active{% endif %}">
-                            <span class="nav-icon">⚙</span>
-                            <span>Система</span>
+                            <svg
+                                class="nav-icon"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <use href="#z-icon-settings"></use>
+                            </svg>
+                            <span class="nav-label">Система</span>
                         </a>
 
 {% if request.user.is_superuser or request.user.role == 'ADMIN' %}
                         <a href="{% url 'audit:audit_log_list' %}"
                            class="nav-link {% if current == 'audit_log_list' %}is-active{% endif %}">
-                            <span class="nav-icon">▤</span>
-                            <span>Журнал действий</span>
+                            <svg
+                                class="nav-icon"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <use href="#z-icon-clipboard-list"></use>
+                            </svg>
+                            <span class="nav-label">Журнал действий</span>
                         </a>
                     {% endif %}
 
@@ -192,15 +323,29 @@
 
                             <a href="{% url 'user_admin_list' %}"
                                class="nav-link {% if current == 'user_admin_list' or current == 'user_admin_create' or current == 'user_admin_edit' %}is-active{% endif %}">
-                                <span class="nav-icon">◉</span>
-                                <span>Пользователи</span>
+                                <svg
+                                    class="nav-icon"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                >
+                                    <use href="#z-icon-users"></use>
+                                </svg>
+                                <span class="nav-label">Пользователи</span>
                             </a>
 
                         {% endif %}
 
                         <a href="/admin/" class="nav-link">
-                            <span class="nav-icon">▣</span>
-                            <span>Администрирование</span>
+                            <svg
+                                class="nav-icon"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <use href="#z-icon-shield"></use>
+                            </svg>
+                            <span class="nav-label">Администрирование</span>
                         </a>
 
                     {% endif %}
@@ -231,15 +376,32 @@
             </div>
 
             <div class="sidebar-user-actions">
-                <a href="{% url 'profile' %}"
-                   class="sidebar-user-action {% if current == 'profile' %}is-active{% endif %}">
-                    <span class="nav-icon">⚙</span>
-                    <span>Профиль</span>
+                <a
+                    href="{% url 'profile' %}"
+                    class="sidebar-user-action {% if current == 'profile' %}is-active{% endif %}"
+                    {% if current == 'profile' %}aria-current="page"{% endif %}
+                >
+                    <svg
+                        class="nav-icon"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        focusable="false"
+                    >
+                        <use href="#z-icon-user"></use>
+                    </svg>
+                    <span class="nav-label">Профиль</span>
                 </a>
 
                 <a href="{% url 'logout' %}" class="sidebar-user-action sidebar-user-action-danger">
-                    <span class="nav-icon">↩</span>
-                    <span>Выйти</span>
+                    <svg
+                        class="nav-icon"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        focusable="false"
+                    >
+                        <use href="#z-icon-log-out"></use>
+                    </svg>
+                    <span class="nav-label">Выйти</span>
                 </a>
             </div>
 
@@ -268,17 +430,19 @@
                 aria-label="Открыть меню"
             >
                 <svg
+
+                    class="sidebar-control-icon"
+
                     viewBox="0 0 24 24"
+
                     aria-hidden="true"
+
                     focusable="false"
+
                 >
-                    <path
-                        d="M4 7h16M4 12h16M4 17h16"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                    />
+
+                    <use href="#z-icon-menu"></use>
+
                 </svg>
             </button>
 
@@ -334,15 +498,24 @@
                     {% elif current == 'profile' %}
                         Профиль
                     {% else %}
-                        Project Zarya Enterprise
+                        ОАО «Заря»
                     {% endif %}
 
                 </div>
 
-                <div class="topbar-subtitle">
-                    Пользователь: <strong>{{ request.user.username }}</strong>
-                </div>
             </div>
+
+            <a
+                href="{% url 'profile' %}"
+                class="topbar-profile-action {% if current == 'profile' %}is-active{% endif %}"
+                aria-label="Открыть профиль пользователя {{ request.user.username }}"
+                title="Профиль"
+                {% if current == 'profile' %}aria-current="page"{% endif %}
+            >
+                <span class="topbar-profile-avatar" aria-hidden="true">
+                    {{ request.user.username|first|upper }}
+                </span>
+            </a>
 
         </header>
 
@@ -372,7 +545,7 @@
         <footer class="app-footer">
 
             <div>
-                Project Zarya Enterprise
+                ОАО «Заря» · Документы и платежи
             </div>
 
             <div>
@@ -387,7 +560,7 @@
 
 {% endwith %}
 
-    <script src="{% static 'js/sidebar-floating-highlight.js' %}" defer></script>
     <script src="{% static 'js/sidebar-mobile-drawer.js' %}" defer></script>
+    <script src="{% static 'js/sidebar-tooltip-v3.js' %}" defer></script>
 </body>
 </html>

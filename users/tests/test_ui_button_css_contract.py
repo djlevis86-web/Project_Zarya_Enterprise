@@ -40,51 +40,74 @@ class UIButtonCssContractTests(SimpleTestCase):
     def test_badges_component_does_not_override_base_button_font_weight(
         self,
     ):
-        css_path = (
-            Path(settings.BASE_DIR)
+        base_dir = Path(settings.BASE_DIR)
+
+        badges_css = (
+            base_dir
             / "static"
             / "css"
             / "components"
             / "badges.css"
-        )
-
-        css = css_path.read_text(
+        ).read_text(
             encoding="utf-8"
         )
 
-        unexpected_rule = """\
-strong,
-.sidebar-nav a,
-.nav-link,
-.nav-item,
-.btn,
-.status-badge,
-.form-group label,
-label {
-    font-weight: 650;
-}
-"""
-
-        expected_rule = """\
-strong,
-.sidebar-nav a,
-.nav-link,
-.nav-item,
-.form-group label,
-label {
-    font-weight: 650;
-}
-"""
-
-        self.assertNotIn(
-            unexpected_rule,
-            css,
+        sidebar_css = (
+            base_dir
+            / "static"
+            / "css"
+            / "features"
+            / "sidebar-visual-v3.css"
+        ).read_text(
+            encoding="utf-8"
         )
+
+        typography_selector = """\
+strong,
+.form-group label,
+label {
+"""
+
+        selector_start = badges_css.index(
+            typography_selector
+        )
+        rule_end = badges_css.index(
+            "}",
+            selector_start,
+        )
+        typography_rule = badges_css[
+            selector_start:rule_end + 1
+        ]
 
         self.assertIn(
-            expected_rule,
-            css,
+            "font-weight: 650;",
+            typography_rule,
         )
+
+        for forbidden_selector in (
+            ".sidebar-nav a",
+            ".nav-link",
+            ".nav-item",
+            ".btn",
+            ".status-badge",
+        ):
+            with self.subTest(
+                selector=forbidden_selector
+            ):
+                self.assertNotIn(
+                    forbidden_selector,
+                    typography_rule,
+                )
+
+        self.assertIn(
+            ".sidebar .nav-link",
+            sidebar_css,
+        )
+        self.assertIn(
+            "font-weight: 700;",
+            sidebar_css,
+        )
+
     def test_badges_typography_group_does_not_override_status_badge_weight(
         self,
     ):
@@ -100,38 +123,41 @@ label {
             encoding="utf-8"
         )
 
-        unexpected_rule = """\
+        typography_selector = """\
 strong,
-.sidebar-nav a,
-.nav-link,
-.nav-item,
-.status-badge,
 .form-group label,
 label {
-    font-weight: 650;
-}
 """
 
-        expected_rule = """\
-strong,
-.sidebar-nav a,
-.nav-link,
-.nav-item,
-.form-group label,
-label {
-    font-weight: 650;
-}
-"""
+        selector_start = css.index(
+            typography_selector
+        )
+        rule_end = css.index(
+            "}",
+            selector_start,
+        )
+        typography_rule = css[
+            selector_start:rule_end + 1
+        ]
 
         self.assertNotIn(
-            unexpected_rule,
-            css,
+            ".status-badge",
+            typography_rule,
         )
 
-        self.assertIn(
-            expected_rule,
-            css,
+        status_rule = """\
+.status-badge {
+    font-size: 12px;
+    font-weight: 760;
+    letter-spacing: 0;
+}
+"""
+
+        self.assertEqual(
+            css.count(status_rule),
+            1,
         )
+
     def test_payment_schedule_owns_overdue_status_badge_override(
         self,
     ):

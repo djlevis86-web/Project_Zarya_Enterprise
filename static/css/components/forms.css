@@ -43,11 +43,11 @@ textarea {
     min-height: 46px;
 
     padding: 0 14px;
-    border: 1px solid var(--z-border, rgba(255, 255, 255, .14));
+    border: 1px solid var(--zds-color-border);
     border-radius: 13px;
 
-    background: rgba(255, 255, 255, .035);
-    color: var(--z-text, #ffffff);
+    background: var(--zds-color-control);
+    color: var(--zds-color-text);
 
     font-family: inherit;
     font-size: 14px;
@@ -74,17 +74,18 @@ textarea {
 .form-control::placeholder,
 input::placeholder,
 textarea::placeholder {
-    color: rgba(220, 235, 226, .48);
+    color: var(--zds-color-text-muted);
     font-weight: 500;
+    opacity: 0.74;
 }
 
 .form-control:focus,
 input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]):focus,
 select:focus,
 textarea:focus {
-    border-color: rgba(34, 197, 94, .58);
-    background: rgba(255, 255, 255, .05);
-    box-shadow: 0 0 0 4px rgba(34, 197, 94, .08);
+    border-color: var(--zds-color-border-dawn);
+    background: var(--zds-color-control-hover);
+    box-shadow: var(--zds-shadow-focus);
 }
 
 /* Select */
@@ -151,7 +152,7 @@ input[type="file"],
     padding: 0;
     border: 0;
     background: transparent;
-    color: var(--z-text, #ffffff);
+    color: var(--zds-color-text);
     box-shadow: none;
 }
 
@@ -335,15 +336,9 @@ textarea:disabled {
 
 /* FORM-SELECT-COMPONENT-STABLE-V1-START */
 /*
-   Универсальный select для интерфейса ERP.
-   Работает на всех страницах приложения:
-   - Счета;
-   - График платежей;
-   - Реестр оплаты;
-   - Справочники;
-   - OCR / загрузки;
-   - формы редактирования.
-*/
+ * Canonical select ownership for every application page.
+ * Theme-specific values come only from semantic tokens.
+ */
 
 .main select,
 .page select,
@@ -355,26 +350,22 @@ textarea:disabled {
 .filter-panel select,
 .form-group select,
 .field-group select {
-    min-height: 42px !important;
-
     width: 100%;
+    min-height: 42px;
+    padding: 0 38px 0 14px;
 
-    padding: 0 38px 0 14px !important;
+    border: 1px solid var(--zds-color-border);
+    border-radius: 12px;
 
-    border: 1px solid rgba(148, 163, 184, .24) !important;
-    border-radius: 12px !important;
+    background-color: var(--zds-color-control);
+    color: var(--zds-color-text);
 
-    background-color: rgba(12, 22, 17, .98) !important;
-    color: #f8fafc !important;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
 
-    font-size: 13px !important;
-    font-weight: 700 !important;
-    line-height: 1.2 !important;
-
-    outline: none !important;
-
-    box-shadow: none !important;
-
+    outline: none;
+    box-shadow: none;
     cursor: pointer;
 }
 
@@ -388,7 +379,8 @@ textarea:disabled {
 .filter-panel select:hover,
 .form-group select:hover,
 .field-group select:hover {
-    border-color: rgba(34, 197, 94, .38) !important;
+    border-color: var(--zds-color-border-brand);
+    background-color: var(--zds-color-control-hover);
 }
 
 .main select:focus,
@@ -401,10 +393,9 @@ textarea:disabled {
 .filter-panel select:focus,
 .form-group select:focus,
 .field-group select:focus {
-    border-color: rgba(34, 197, 94, .72) !important;
-    box-shadow: 0 0 0focus {
-    border-color: rgba(34, 197, 94, .72) !important;
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, .12) !important;
+    border-color: var(--zds-color-border-dawn);
+    background-color: var(--zds-color-control-hover);
+    box-shadow: var(--zds-shadow-focus);
 }
 
 .main select option,
@@ -417,8 +408,8 @@ textarea:disabled {
 .filter-panel select option,
 .form-group select option,
 .field-group select option {
-    background-color: #0b1510 !important;
-    color: #f8fafc !important;
+    background-color: var(--zds-color-surface-elevated);
+    color: var(--zds-color-text);
 }
 
 .main select:disabled,
@@ -431,7 +422,11 @@ textarea:disabled {
 .filter-panel select:disabled,
 .form-group select:disabled,
 .field-group select:disabled {
-    opacity: .55;
+    opacity: 0.55;
     cursor: not-allowed;
+}
+
+body.light-theme input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: none;
 }
 /* FORM-SELECT-COMPONENT-STABLE-V1-END */

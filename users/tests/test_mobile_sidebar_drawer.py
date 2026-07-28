@@ -36,12 +36,15 @@ class MobileSidebarDrawerTests(TestCase):
 
         required_markers = (
             'id="app-sidebar"',
+            'data-sidebar-version="v3"',
             'id="sidebar-mobile-toggle"',
             'aria-controls="app-sidebar"',
             'aria-expanded="false"',
             'data-sidebar-close',
             'class="sidebar-mobile-backdrop"',
             'js/sidebar-mobile-drawer.js',
+            'js/sidebar-tooltip-v3.js',
+            'class="sidebar-icon-sprite-v3"',
         )
 
         for marker in required_markers:
@@ -78,7 +81,14 @@ class MobileSidebarDrawerTests(TestCase):
             1,
         )
 
-    def test_mobile_sidebar_css_forces_single_column_navigation(self):
+        self.assertEqual(
+            response_html.count(
+                'class="nav-icon"'
+            ),
+            12,
+        )
+
+    def test_mobile_sidebar_css_defines_production_drawer(self):
         css_path = (
             Path(
                 settings.BASE_DIR
@@ -86,13 +96,13 @@ class MobileSidebarDrawerTests(TestCase):
             / "static"
             / "css"
             / "features"
-            / "sidebar-fixed-left.css"
+            / "sidebar-visual-v3.css"
         )
 
         self.assertTrue(
             css_path.exists(),
             msg=(
-                "Missing sidebar stylesheet: "
+                "Missing Sidebar V3 stylesheet: "
                 f"{css_path}"
             ),
         )
@@ -101,29 +111,29 @@ class MobileSidebarDrawerTests(TestCase):
             encoding="utf-8"
         )
 
-        expected_block = """\
-/* MOBILE-DRAWER-SINGLE-COLUMN-V1-START */
-@media (max-width: 980px) {
-    .sidebar .sidebar-nav {
-        display: flex !important;
-        flex-direction: column !important;
-        grid-template-columns: 1fr !important;
-        align-items: stretch !important;
-        gap: 18px !important;
-    }
-
-    .sidebar .sidebar-nav .nav-section {
-        width: 100% !important;
-        min-width: 0 !important;
-    }
-}
-/* MOBILE-DRAWER-SINGLE-COLUMN-V1-END */
-"""
-
-        self.assertIn(
-            expected_block,
-            css_text,
+        required_markers = (
+            "@media (max-width: 980px)",
+            "body.sidebar-mobile-open",
+            "var(--zds-sidebar-drawer-width)",
+            "calc(100vw - 48px)",
+            ".sidebar-mobile-close",
+            ".sidebar-mobile-toggle",
+            ".sidebar-mobile-backdrop",
+            ".sidebar-account-card",
+            "grid-template-columns:",
+            "minmax(0, 1fr)",
+            "@media (max-width: 520px)",
+            "@media (prefers-reduced-motion: reduce)",
         )
+
+        for marker in required_markers:
+            with self.subTest(
+                marker=marker
+            ):
+                self.assertIn(
+                    marker,
+                    css_text,
+                )
 
     def test_mobile_sidebar_script_defines_required_close_paths(self):
         script_path = (
@@ -165,4 +175,81 @@ class MobileSidebarDrawerTests(TestCase):
                 self.assertIn(
                     marker,
                     script_text,
+                )
+
+    def test_mobile_topbar_keeps_single_row_contract(self):
+        repo_root = Path(
+            settings.BASE_DIR
+        )
+
+        topbar_path = (
+            repo_root
+            / "static"
+            / "css"
+            / "layout"
+            / "topbar.css"
+        )
+
+        topbar_text = topbar_path.read_text(
+            encoding="utf-8-sig"
+        )
+
+        required_markers = (
+            "TOPBAR-PRODUCTION-OWNER-V1-START",
+            "@media (max-width: 980px)",
+            "height: 68px;",
+            "grid-template-columns:",
+            "minmax(0, 1fr)",
+            "grid-column: 2;",
+            "grid-column: 3;",
+        )
+
+        for marker in required_markers:
+            with self.subTest(
+                marker=marker
+            ):
+                self.assertIn(
+                    marker,
+                    topbar_text,
+                )
+
+        legacy_owner_paths = (
+            (
+                repo_root
+                / "static"
+                / "css"
+                / "components"
+                / "filters.css"
+            ),
+            (
+                repo_root
+                / "static"
+                / "css"
+                / "features"
+                / "ocr.css"
+            ),
+            (
+                repo_root
+                / "static"
+                / "css"
+                / "pages"
+                / "payment-registry.css"
+            ),
+        )
+
+        for legacy_path in legacy_owner_paths:
+            with self.subTest(
+                path=str(legacy_path)
+            ):
+                legacy_text = legacy_path.read_text(
+                    encoding="utf-8-sig"
+                )
+
+                self.assertNotRegex(
+                    legacy_text,
+                    r"(?m)^\s*\.topbar\s*\{",
+                    msg=(
+                        "Legacy CSS modules must not own "
+                        "global .topbar geometry."
+                    ),
                 )

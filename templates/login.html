@@ -10,7 +10,7 @@
           content="width=device-width, initial-scale=1.0">
 
     <title>
-        Вход — Project Zarya
+        Вход — ОАО «Заря»
     </title>
 
     <link rel="stylesheet"
@@ -27,9 +27,15 @@
         <section class="login-hero">
 
             <div class="login-brand">
-                <div class="login-brand-mark">
-                    З
-                </div>
+                <span class="login-brand-mark" aria-hidden="true">
+                    <img
+                        src="{% static 'images/brand/zarya-logo-v1.webp' %}"
+                        alt=""
+                        width="768"
+                        height="525"
+                        decoding="async"
+                    >
+                </span>
 
                 <div>
                     <div class="login-brand-title">
@@ -37,7 +43,7 @@
                     </div>
 
                     <div class="login-brand-subtitle">
-                        Project Zarya Enterprise
+                        Документы и платежи
                     </div>
                 </div>
             </div>
@@ -60,7 +66,7 @@
             </div>
 
             <div class="login-hero-footer">
-                ОАО «Заря» · Финансовый контур
+                Цифровой горизонт Зари · Корпоративная система
             </div>
 
         </section>
@@ -147,7 +153,7 @@
             </div>
 
             <div class="login-version">
-                Project Zarya Enterprise · Версия {{ PROJECT_VERSION }}
+                ОАО «Заря» · Версия {{ PROJECT_VERSION }}
             </div>
 
         </section>

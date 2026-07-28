@@ -3,9 +3,9 @@
 
 {% block content %}
 
-<div class="page-header">
+<div class="page-header page-header-v1">
 
-    <div>
+    <div class="page-header-copy-v1">
         <h2 class="page-title">
             Пакет загрузки #{{ batch.id }}
         </h2>
@@ -15,7 +15,7 @@
         </p>
     </div>
 
-    <div class="registry-actions">
+    <div class="registry-actions page-header-actions-v1">
         <a href="{% url 'upload_batches' %}" class="btn btn-secondary">
             Журнал загрузок
         </a>

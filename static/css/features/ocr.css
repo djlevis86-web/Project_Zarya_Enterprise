@@ -5,36 +5,6 @@
  * На этом этапе style.css ещё не очищаем.
  */
 
-.topbar {
-    min-height: var(--z-topbar-height);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    padding: 14px 36px;
-    background: rgba(7, 9, 8, .94);
-    border-bottom: 1px solid var(--z-border);
-    backdrop-filter: blur(18px);
-    position: sticky;
-    top: 0;
-    z-index: 20;
-}
-
-.topbar-actions,
-.registry-actions,
-.registry-filter-actions,
-.table-actions,
-.dashboard-hero-actions,
-.upload-actions-row,
-.import-actions,
-.comment-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
 .amount-ocr {
     margin-top: 3px;
     color: var(--z-muted);
@@ -302,7 +272,6 @@
     }
 
     .registry-actions,
-    .topbar-actions,
     .upload-actions-row,
     .import-actions,
     .registry-filter-actions {
@@ -311,17 +280,12 @@
     }
 
     .registry-actions .btn,
-    .topbar-actions .btn,
     .upload-actions-row .btn,
     .import-actions .btn,
     .registry-filter-actions .btn {
         width: 100%;
     }
 
-    .sidebar-nav,
-    .nav-list {
-        grid-template-columns: 1fr;
-    }
 }
 
 /* =========================================================

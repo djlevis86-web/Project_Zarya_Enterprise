@@ -93,7 +93,7 @@ class DashboardPageHeaderVisualLayerV1Tests(
 
         self.assertEqual(
             len(imports),
-            39,
+            38,
         )
 
         self.assertEqual(
@@ -107,7 +107,7 @@ class DashboardPageHeaderVisualLayerV1Tests(
             imports[-1],
             (
                 "./features/"
-                "sidebar-collapsible-v1.css"
+                "sidebar-visual-v3.css"
             ),
         )
 
@@ -118,7 +118,7 @@ class DashboardPageHeaderVisualLayerV1Tests(
             imports.index(
                 (
                     "./features/"
-                    "sidebar-collapsible-v1.css"
+                    "sidebar-visual-v3.css"
                 )
             ),
         )

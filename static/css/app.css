@@ -57,11 +57,10 @@
  */
 /* Legacy legacy stylesheet disabled during full CSS cleanup */
 /* Legacy stylesheet retired. Import removed intentionally. */
-@import url("./features/sidebar-fixed-left.css");
 @import "./features/page-header-visual-v1.css";
 @import "./features/invoice-list-table-responsive-v1.css";
 @import "./features/dashboard-page-header-visual-v1.css";
-@import "./features/sidebar-collapsible-v1.css";
+@import "./features/sidebar-visual-v3.css";
 
 /* Counterparty search on invoice assign page */
 .counterparty-search-form {

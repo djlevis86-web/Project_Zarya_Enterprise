@@ -109,6 +109,9 @@
                 function (link) {
                     var labelNode = (
                         link.querySelector(
+                            ".nav-label"
+                        )
+                        || link.querySelector(
                             "span:last-child"
                         )
                     );
@@ -126,16 +129,10 @@
                         return;
                     }
 
-                    if (
-                        !link.hasAttribute(
-                            "data-sidebar-label"
-                        )
-                    ) {
-                        link.setAttribute(
-                            "data-sidebar-label",
-                            label
-                        );
-                    }
+                    link.setAttribute(
+                        "data-sidebar-label",
+                        label
+                    );
 
                     if (
                         !link.hasAttribute(
@@ -145,6 +142,20 @@
                         link.setAttribute(
                             "title",
                             label
+                        );
+                    }
+
+                    if (
+                        link.classList.contains(
+                            "is-active"
+                        )
+                        || link.classList.contains(
+                            "active"
+                        )
+                    ) {
+                        link.setAttribute(
+                            "aria-current",
+                            "page"
                         );
                     }
                 }
@@ -214,6 +225,11 @@
         }
 
         labelSidebarLinks();
+
+        sidebar.setAttribute(
+            "data-sidebar-ready",
+            "v3"
+        );
 
         setCollapsed(
             readStoredState(),

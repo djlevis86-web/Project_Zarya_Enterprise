@@ -128,7 +128,7 @@ class DashboardPageScopeTests(SimpleTestCase):
                     pilot_css,
                 )
 
-    def test_dashboard_attention_ux_pilot_uses_value_state_and_page_scope(
+    def test_dashboard_attention_brand_v1_uses_value_state_and_page_scope(
         self,
     ):
         template_path = (
@@ -172,13 +172,13 @@ class DashboardPageScopeTests(SimpleTestCase):
         )
 
         start_marker = (
-            "/* DASHBOARD-ATTENTION-UX-"
-            "PILOT-V1-START */"
+            "/* DASHBOARD-ATTENTION-"
+            "BRAND-V1-START */"
         )
 
         end_marker = (
-            "/* DASHBOARD-ATTENTION-UX-"
-            "PILOT-V1-END */"
+            "/* DASHBOARD-ATTENTION-"
+            "BRAND-V1-END */"
         )
 
         self.assertEqual(

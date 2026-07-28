@@ -1,53 +1,146 @@
 /*
- * ERP Zarya35 — CSS variables
- * 
- * Все новые цвета, радиусы, тени и размеры держим здесь.
- * Старые значения из style.css переносим постепенно.
+ * ОАО «Заря» — Brand Layer V1 / Zarya Digital Horizon.
+ *
+ * Канонический источник цветов, поверхностей, размеров и движения.
+ * Компоненты используют только semantic tokens из этого файла.
  */
 
 :root {
-    /* Font */
-    --font-family-base: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    /* Brand foundation */
+    --font-family-base:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    --zarya-forest-950: #041008;
+    --zarya-forest-900: #07180e;
+    --zarya-forest-800: #0b2817;
+    --zarya-forest-700: #087a36;
+    --zarya-growth-500: #78c442;
+    --zarya-dawn-500: #e3b341;
+    --zarya-dawn-300: #f0d27a;
+    --zarya-linen-100: #f6f1e6;
+    --zarya-linen-50: #fbf8f0;
+    --zarya-graphite-900: #1e2d24;
+    --zarya-graphite-700: #42564a;
 
-    /* Background */
-    --color-bg-main: #020617;
-    --color-bg-panel: rgba(15, 23, 42, 0.72);
-    --color-bg-panel-soft: rgba(15, 23, 42, 0.48);
-    --color-bg-field: rgba(15, 23, 42, 0.65);
+    /* DESIGN-SYSTEM-TOKENS-V1-START */
+    /* Canonical Zarya Digital Horizon semantic tokens. */
+    --zds-font-family-sans: var(--font-family-base);
+    --zds-color-canvas: #060b07;
+    --zds-color-canvas-deep: #020603;
+    --zds-color-surface: #101913;
+    --zds-color-surface-soft: #152119;
+    --zds-color-surface-elevated: #18271d;
+    --zds-color-surface-accent: #0d2d1a;
+    --zds-color-control: #0d1811;
+    --zds-color-control-hover: #13251a;
+    --zds-color-text: #f7faf5;
+    --zds-color-text-soft: #cad6cc;
+    --zds-color-text-muted: #94a49a;
+    --zds-color-text-on-accent: #ffffff;
+    --zds-color-text-on-dark: #f8faf8;
+    --zds-color-border: rgba(158, 177, 165, 0.18);
+    --zds-color-border-strong: rgba(158, 177, 165, 0.32);
+    --zds-color-border-brand: rgba(120, 196, 66, 0.36);
+    --zds-color-border-dawn: rgba(227, 179, 65, 0.54);
+    --zds-color-accent: var(--zarya-forest-700);
+    --zds-color-accent-strong: var(--zarya-growth-500);
+    --zds-color-accent-soft: rgba(8, 122, 54, 0.18);
+    --zds-color-dawn: var(--zarya-dawn-500);
+    --zds-color-dawn-soft: rgba(227, 179, 65, 0.16);
+    --zds-color-success: #39b96a;
+    --zds-color-warning: #e5a632;
+    --zds-color-danger: #e86767;
+    --zds-color-info: #5f9fe8;
+    --zds-space-1: 4px;
+    --zds-space-2: 8px;
+    --zds-space-3: 12px;
+    --zds-space-4: 16px;
+    --zds-space-6: 24px;
+    --zds-space-8: 32px;
+    --zds-radius-badge: 8px;
+    --zds-radius-control: 10px;
+    --zds-radius-panel: 12px;
+    --zds-radius-card: 16px;
+    --zds-radius-pill: 999px;
+    --zds-control-height-compact: 40px;
+    --zds-control-height-default: 42px;
+    --zds-table-row-height-compact: 44px;
+    --zds-table-row-height-default: 48px;
+    --zds-touch-target-min: 40px;
+    --zds-shadow-card: 0 12px 28px rgba(1, 8, 4, 0.18);
+    --zds-shadow-focus: 0 0 0 3px rgba(227, 179, 65, 0.26);
+    --zds-sidebar-width-expanded: 280px;
+    --zds-sidebar-width-collapsed: 84px;
+    --zds-sidebar-drawer-width: 320px;
+    --zds-sidebar-surface: var(--zarya-forest-950);
+    --zds-sidebar-surface-raised: var(--zarya-forest-900);
+    --zds-sidebar-surface-soft: rgba(255, 255, 255, 0.045);
+    --zds-sidebar-surface-hover: rgba(255, 255, 255, 0.075);
+    --zds-sidebar-surface-active: rgba(8, 122, 54, 0.22);
+    --zds-sidebar-border: rgba(181, 204, 189, 0.15);
+    --zds-sidebar-border-strong: rgba(181, 204, 189, 0.28);
+    --zds-sidebar-border-active: rgba(120, 196, 66, 0.42);
+    --zds-sidebar-border-dawn: var(--zds-color-border-dawn);
+    --zds-sidebar-text: #f7faf5;
+    --zds-sidebar-text-soft: #c7d4ca;
+    --zds-sidebar-text-muted: #87988d;
+    --zds-sidebar-accent: var(--zarya-growth-500);
+    --zds-sidebar-active-accent: var(--zarya-dawn-500);
+    --zds-sidebar-danger: #f1a0a0;
+    --zds-sidebar-logo-surface: var(--zarya-linen-50);
+    --zds-sidebar-shadow: 20px 0 56px rgba(1, 8, 4, 0.24);
+    --zds-sidebar-tooltip-shadow: 0 14px 36px rgba(1, 8, 4, 0.30);
+    --zds-topbar-height: 72px;
+    --zds-topbar-surface: rgba(6, 11, 7, 0.94);
+    --zds-topbar-border: var(--zds-color-border);
+    --zds-topbar-profile-surface: var(--zds-color-surface-soft);
+    --zds-transition-fast: 160ms ease;
+    --zds-transition-base: 220ms ease;
+    /* DESIGN-SYSTEM-TOKENS-V1-END */
 
-    /* Text */
-    --color-text-main: #f8fafc;
-    --color-text-muted: #94a3b8;
-    --color-text-soft: #cbd5e1;
-
-    /* Brand */
-    --color-primary: #22c55e;
-    --color-primary-hover: #16a34a;
-    --color-primary-soft: rgba(34, 197, 94, 0.16);
-
-    /* Status */
-    --color-success: #22c55e;
-    --color-warning: #f59e0b;
-    --color-danger: #ef4444;
-    --color-info: #3b82f6;
-
-    /* Border */
-    --color-border: rgba(148, 163, 184, 0.18);
-    --color-border-strong: rgba(148, 163, 184, 0.28);
-
-    /* Radius */
-    --radius-xs: 8px;
-    --radius-sm: 10px;
-    --radius-md: 14px;
-    --radius-lg: 18px;
-    --radius-xl: 24px;
-    --radius-pill: 999px;
-
-    /* Shadow */
-    --shadow-card: 0 18px 60px rgba(0, 0, 0, 0.28);
-    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.18);
-
-    /* Spacing */
+    /* Compatibility aliases for existing modules. */
+    --z-font: var(--font-family-base);
+    --color-bg-main: var(--zds-color-canvas-deep);
+    --color-bg-panel: var(--zds-color-surface);
+    --color-bg-panel-soft: var(--zds-color-surface-soft);
+    --color-bg-field: var(--zds-color-control);
+    --color-text-main: var(--zds-color-text);
+    --color-text-muted: var(--zds-color-text-muted);
+    --color-text-soft: var(--zds-color-text-soft);
+    --color-primary: var(--zds-color-accent);
+    --color-primary-hover: var(--zds-color-accent-strong);
+    --color-primary-soft: var(--zds-color-accent-soft);
+    --color-success: var(--zds-color-success);
+    --color-warning: var(--zds-color-warning);
+    --color-danger: var(--zds-color-danger);
+    --color-info: var(--zds-color-info);
+    --color-border: var(--zds-color-border);
+    --color-border-strong: var(--zds-color-border-strong);
+    --z-bg: var(--zds-color-canvas);
+    --z-bg-deep: var(--zds-color-canvas-deep);
+    --z-surface: var(--zds-color-surface);
+    --z-surface-soft: var(--zds-color-surface-soft);
+    --z-surface-card: var(--zds-color-surface-elevated);
+    --z-text: var(--zds-color-text);
+    --z-text-soft: var(--zds-color-text-soft);
+    --z-muted: var(--zds-color-text-muted);
+    --z-muted-2: var(--zarya-graphite-700);
+    --z-border: var(--zds-color-border);
+    --z-border-strong: var(--zds-color-border-strong);
+    --z-border-2: var(--zds-color-border-brand);
+    --z-accent: var(--zds-color-accent);
+    --z-accent-2: var(--zds-color-accent-strong);
+    --z-accent-soft: var(--zds-color-accent-soft);
+    --z-danger: var(--zds-color-danger);
+    --z-warning: var(--zds-color-warning);
+    --z-info: var(--zds-color-info);
+    --muted-text: var(--z-muted);
+    --surface-card: var(--z-surface-card);
+    --border-color: var(--z-border);
     --space-1: 4px;
     --space-2: 8px;
     --space-3: 12px;
@@ -55,106 +148,86 @@
     --space-5: 20px;
     --space-6: 24px;
     --space-8: 32px;
-
-    /* DESIGN-SYSTEM-TOKENS-V1-START */
-    /*
-     * Project Zarya Design System v1.
-     *
-     * Канонический namespace для новых компонентов.
-     * Legacy-переменные --z-* пока не изменяются и не удаляются.
-     * Эти токены вводятся без немедленного визуального воздействия.
-     */
-
-    /* Typography */
-    --zds-font-family-sans: var(--font-family-base);
-
-    /* Canvas and surfaces */
-    --zds-color-canvas: #060806;
-    --zds-color-canvas-deep: #020617;
-    --zds-color-surface: rgba(15, 23, 42, 0.72);
-    --zds-color-surface-soft: rgba(255, 255, 255, 0.035);
-    --zds-color-surface-elevated: rgba(15, 23, 42, 0.62);
-
-    /* Text */
-    --zds-color-text: #f8fafc;
-    --zds-color-text-soft: #cbd5e1;
-    --zds-color-text-muted: #94a3b8;
-
-    /* Borders */
-    --zds-color-border: rgba(148, 163, 184, 0.18);
-    --zds-color-border-strong: rgba(148, 163, 184, 0.35);
-
-    /* Brand and semantic colors */
-    --zds-color-accent: #27ae60;
-    --zds-color-accent-strong: #22c55e;
-    --zds-color-accent-soft: rgba(39, 174, 96, 0.14);
-    --zds-color-success: #22c55e;
-    --zds-color-warning: #f59e0b;
-    --zds-color-danger: #ef4444;
-    --zds-color-info: #3b82f6;
-
-    /* Spacing scale */
-    --zds-space-1: 4px;
-    --zds-space-2: 8px;
-    --zds-space-3: 12px;
-    --zds-space-4: 16px;
-    --zds-space-6: 24px;
-    --zds-space-8: 32px;
-
-    /* Radius scale */
-    --zds-radius-badge: 8px;
-    --zds-radius-control: 10px;
-    --zds-radius-panel: 12px;
-    --zds-radius-card: 16px;
-
-    /* Control and data density */
-    --zds-control-height-compact: 40px;
-    --zds-control-height-default: 42px;
-    --zds-table-row-height-compact: 44px;
-    --zds-table-row-height-default: 48px;
-    --zds-touch-target-min: 40px;
-
-    /* Shadows and focus */
-    --zds-shadow-card: 0 10px 24px rgba(0, 0, 0, 0.14);
-    --zds-shadow-focus: 0 0 0 3px rgba(34, 197, 94, 0.14);
-
-    /* Motion */
-    --zds-transition-fast: 160ms ease;
-    --zds-transition-base: 220ms ease;
-    /* DESIGN-SYSTEM-TOKENS-V1-END */
+    --radius-xs: 8px;
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+    --radius-pill: 999px;
+    --z-radius: 18px;
+    --z-radius-sm: 12px;
+    --shadow-card: 0 18px 60px rgba(1, 8, 4, 0.28);
+    --shadow-soft: 0 10px 30px rgba(1, 8, 4, 0.18);
+    --z-shadow: var(--shadow-card);
 }
 
-/* VISUAL-BASELINE-START */
-/*
- * ERP Zarya35 — visual compatibility tokens.
- * Эти переменные оставлены для старых классов, перенесённых из legacy CSS.
- */
+/* Independent light composition: morning over the field. */
+body.light-theme {
+    --zds-color-canvas: var(--zarya-linen-100);
+    --zds-color-canvas-deep: #e9e1d2;
+    --zds-color-surface: #ffffff;
+    --zds-color-surface-soft: #f8f5ec;
+    --zds-color-surface-elevated: #ffffff;
+    --zds-color-surface-accent: #eef6e9;
+    --zds-color-control: #ffffff;
+    --zds-color-control-hover: #f4f8f1;
 
-:root {
-    --z-bg: #060806;
-    --z-bg-deep: #020617;
-    --z-surface: rgba(15, 23, 42, 0.72);
-    --z-surface-soft: rgba(255, 255, 255, 0.035);
-    --z-surface-card: rgba(15, 23, 42, 0.62);
+    --zds-color-text: var(--zarya-graphite-900);
+    --zds-color-text-soft: #42564a;
+    --zds-color-text-muted: #6d7d73;
+    --zds-color-text-on-accent: #ffffff;
+    --zds-color-text-on-dark: #f8faf8;
 
-    --z-text: #f8fafc;
-    --z-text-soft: #cbd5e1;
-    --z-muted: #94a3b8;
+    --zds-color-border: rgba(35, 76, 50, 0.14);
+    --zds-color-border-strong: rgba(35, 76, 50, 0.24);
+    --zds-color-border-brand: rgba(8, 122, 54, 0.28);
+    --zds-color-border-dawn: rgba(184, 133, 30, 0.48);
 
-    --z-border: rgba(148, 163, 184, 0.18);
-    --z-border-strong: rgba(148, 163, 184, 0.35);
+    --color-bg-main: var(--zds-color-canvas);
+    --color-bg-panel: var(--zds-color-surface);
+    --color-bg-panel-soft: var(--zds-color-surface-soft);
+    --color-bg-field: var(--zds-color-control);
+    --color-text-main: var(--zds-color-text);
+    --color-text-muted: var(--zds-color-text-muted);
+    --color-text-soft: var(--zds-color-text-soft);
+    --color-border: var(--zds-color-border);
+    --color-border-strong: var(--zds-color-border-strong);
 
-    --z-accent: #27ae60;
-    --z-accent-2: #22c55e;
-    --z-accent-soft: rgba(39, 174, 96, 0.14);
+    --z-bg: var(--zds-color-canvas);
+    --z-bg-deep: var(--zds-color-canvas-deep);
+    --z-surface: var(--zds-color-surface);
+    --z-surface-soft: var(--zds-color-surface-soft);
+    --z-surface-card: var(--zds-color-surface-elevated);
+    --z-text: var(--zds-color-text);
+    --z-text-soft: var(--zds-color-text-soft);
+    --z-muted: var(--zds-color-text-muted);
+    --z-muted-2: #52665a;
+    --z-border: var(--zds-color-border);
+    --z-border-strong: var(--zds-color-border-strong);
+    --z-border-2: var(--zds-color-border-brand);
 
-    --z-danger: #ef4444;
-    --z-warning: #f59e0b;
-    --z-info: #3b82f6;
+    --zds-sidebar-surface: #f6f2e8;
+    --zds-sidebar-surface-raised: #fffdf8;
+    --zds-sidebar-surface-soft: rgba(8, 122, 54, 0.045);
+    --zds-sidebar-surface-hover: rgba(8, 122, 54, 0.075);
+    --zds-sidebar-surface-active: rgba(8, 122, 54, 0.105);
+    --zds-sidebar-border: rgba(35, 76, 50, 0.13);
+    --zds-sidebar-border-strong: rgba(35, 76, 50, 0.22);
+    --zds-sidebar-border-active: rgba(8, 122, 54, 0.30);
+    --zds-sidebar-border-dawn: rgba(184, 133, 30, 0.50);
+    --zds-sidebar-text: #1d2d24;
+    --zds-sidebar-text-soft: #405548;
+    --zds-sidebar-text-muted: #718077;
+    --zds-sidebar-accent: #087a36;
+    --zds-sidebar-active-accent: #a86f00;
+    --zds-sidebar-danger: #a83232;
+    --zds-sidebar-logo-surface: #ffffff;
+    --zds-sidebar-shadow:
+        18px 0 48px rgba(35, 76, 50, 0.12);
+    --zds-sidebar-tooltip-shadow:
+        0 14px 36px rgba(35, 76, 50, 0.18);
 
-    --muted-text: var(--z-muted);
-    --surface-card: var(--z-surface-card);
-    --border-color: var(--z-border);
+    --zds-topbar-surface: rgba(251, 248, 240, 0.94);
+    --zds-topbar-border: rgba(35, 76, 50, 0.14);
+    --zds-topbar-profile-surface: #ffffff;
 }
-
-/* VISUAL-BASELINE-END */

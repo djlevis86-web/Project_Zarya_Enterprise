@@ -123,7 +123,8 @@ class DashboardInvoiceBotReportTests(TestCase):
             response,
             (
                 '<h1 id="dashboard-title" '
-                'class="dashboard-title">'
+                'class="dashboard-title '
+                'dashboard-page-title-v1">'
                 "Управление документами к оплате и оплатами"
                 "</h1>"
             ),

@@ -13,17 +13,17 @@
 .content-card,
 .stat-card,
 .registry-summary-card {
-    background: rgba(16, 21, 18, .94);
-    border: 1px solid var(--z-border);
+    background: var(--zds-color-surface-elevated);
+    border: 1px solid var(--zds-color-border);
     border-radius: var(--z-radius);
     box-shadow: none;
 }
 
-.light-theme .card,
-.light-theme .content-card,
-.light-theme .stat-card,
-.light-theme .registry-summary-card {
-    background: #ffffff;
+body.light-theme .card,
+body.light-theme .content-card,
+body.light-theme .stat-card,
+body.light-theme .registry-summary-card {
+    background: var(--zds-color-surface-elevated);
 }
 
 .card,
@@ -184,7 +184,7 @@
 .content-card,
 .stat-card,
 .registry-summary-card {
-    background: rgba(18, 25, 21, .96);
+    background: var(--zds-color-surface-elevated);
 }
 
 .ocr-comment-box,
@@ -291,82 +291,18 @@
     padding: 24px;
     border: 1px solid var(--z-border);
     border-radius: var(--z-radius);
-    background: rgba(18, 25, 21, .96);
+    background: var(--zds-color-surface-elevated);
 }
 
 /* Light theme compatibility */
-.light-theme .upload-card {
-    background: #ffffff;
+body.light-theme .upload-card {
+    background: var(--zds-color-surface-elevated);
 }
 
-/* === Payment registry draft panel === */
-
-.payment-registry-draft-card {
-    margin-bottom: 22px !important;
-    padding: 22px !important;
-    border: 1px solid rgba(39, 174, 96, 0.22) !important;
-    background: linear-gradient(
-        135deg,
-        rgba(15, 23, 42, 0.98),
-        rgba(13, 92, 47, 0.18)
-    ) !important;
-}
-
-/* === Payment registry check panel === */
-
-.payment-registry-check-panel {
-    margin: 18px 0 20px !important;
-    padding: 16px !important;
-    border-radius: 18px !important;
-    border: 1px solid rgba(148, 163, 184, 0.18) !important;
-    background: rgba(2, 6, 23, 0.28) !important;
-}
-
-.payment-registry-check-cards {
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 12px !important;
-    margin-bottom: 14px !important;
-}
-
-.payment-registry-check-card {
-    padding: 14px 16px !important;
-    border-radius: 14px !important;
-    border: 1px solid rgba(148, 163, 184, 0.18) !important;
-    background: rgba(15, 23, 42, 0.62) !important;
-}
-
-.payment-registry-check-card span {
-    display: block !important;
-    margin-bottom: 8px !important;
-    color: #9ca3af !important;
-    font-size: 13px !important;
-    font-weight: 800 !important;
-}
-
-.payment-registry-check-card strong {
-    display: block !important;
-    color: #f8fafc !important;
-    font-size: 26px !important;
-    line-height: 1 !important;
-}
-
-.payment-registry-check-card.is-ready strong {
-    color: #22c55e !important;
-}
-
-.payment-registry-check-card.is-error strong {
-    color: #ef4444 !important;
-}
-
-.payment-registry-check-card.is-warning strong {
-    color: #f59e0b !important;
-}
-
-.payment-registry-detail-card {
-    margin-bottom: 22px !important;
-    padding: 22px !important;
-}
+/*
+ * Payment registry visual ownership lives in
+ * pages/payment-registry.css.
+ */
 
 /* === Invoice partial payments UI === */
 

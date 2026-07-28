@@ -2,18 +2,18 @@
 
 {% block content %}
 
-<div class="page-header">
-    <div>
-        <h1>
+<div class="page-header page-header-v1">
+    <div class="page-header-copy-v1">
+        <h1 class="page-title">
             Пользователи
         </h1>
 
-        <p>
-            Управление доступом к Project Zarya.
+        <p class="page-subtitle">
+            Управление доступом к корпоративной системе ОАО «Заря».
         </p>
     </div>
 
-    <div>
+    <div class="page-header-actions-v1">
         <a href="{% url 'user_admin_create' %}" class="btn btn-primary">
             Создать пользователя
         </a>

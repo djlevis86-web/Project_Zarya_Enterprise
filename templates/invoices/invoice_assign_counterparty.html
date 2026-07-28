@@ -3,8 +3,8 @@
 
 {% block content %}
 
-<div class="page-header">
-    <div>
+<div class="page-header page-header-v1">
+    <div class="page-header-copy-v1">
         <h2 class="page-title">
             Привязать контрагента
         </h2>
@@ -14,7 +14,7 @@
         </p>
     </div>
 
-    <div class="registry-actions">
+    <div class="registry-actions page-header-actions-v1">
         <a
             href="{% url 'invoice_detail' invoice.id %}"
             class="btn btn-secondary"

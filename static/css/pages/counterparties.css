@@ -36,7 +36,7 @@
     padding: 16px;
     border: 1px solid var(--z-border);
     border-radius: 14px;
-    background: rgba(255, 255, 255, .025);
+    background: var(--zds-color-surface-soft);
 }
 
 .directory-info-item span,
@@ -63,13 +63,13 @@
     padding: 16px;
     border: 1px solid var(--z-border);
     border-radius: 16px;
-    background: rgba(255, 255, 255, .018);
+    background: var(--zds-color-surface-soft);
     transition: .18s ease;
 }
 
 .counterparty-list-card:hover {
-    background: rgba(39, 174, 96, .045);
-    border-color: rgba(39, 174, 96, .24);
+    background: var(--zds-color-accent-soft);
+    border-color: var(--zds-color-border-brand);
 }
 
 .counterparty-title-row,
@@ -130,7 +130,13 @@
     padding: 24px;
     border: 1px solid var(--z-border);
     border-radius: 20px;
-    background: radial-gradient(circle at top left, rgba(39, 174, 96, .12), transparent 26rem), rgba(16, 18, 17, .96);
+    background:
+        radial-gradient(
+            circle at top left,
+            var(--zds-color-accent-soft),
+            transparent 26rem
+        ),
+        var(--zds-color-surface-elevated);
 }
 
 .counterparty-profile-kicker {
@@ -160,7 +166,7 @@
 }
 
 .counterparty-source-value {
-    color: var(--z-accent-2) !important;
+    color: var(--zds-color-accent-strong) !important;
 }
 
 .counterparty-detail-grid {
@@ -203,24 +209,6 @@
 }
 
 @media (max-width: 1100px) {
-    .layout,
-    .app-shell,
-    .app-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .sidebar {
-        position: relative;
-        height: auto;
-        max-height: none;
-    }
-
-    .sidebar-nav,
-    .nav-list {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
     .directory-info-grid,
     .counterparty-detail-grid {
         grid-template-columns: 1fr;
@@ -272,7 +260,7 @@
     padding: 8px;
     border: 1px solid var(--z-border);
     border-radius: 10px;
-    background: rgba(255, 255, 255, .025);
+    background: var(--zds-color-surface-soft);
 }
 
 .directory-info-grid {

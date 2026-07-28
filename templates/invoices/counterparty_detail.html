@@ -3,19 +3,19 @@
 
 {% block content %}
 
-<div class="page-header">
+<div class="page-header page-header-v1">
 
-    <div>
+    <div class="page-header-copy-v1">
         <h2 class="page-title">
             {{ counterparty.name }}
         </h2>
 
         <p class="page-subtitle">
-            Карточка контрагента из справочника Project Zarya
+            Карточка контрагента из справочника ОАО «Заря»
         </p>
     </div>
 
-    <div class="registry-actions">
+    <div class="registry-actions page-header-actions-v1">
 
         {% if counterparty.source == 'manual' %}
             <a

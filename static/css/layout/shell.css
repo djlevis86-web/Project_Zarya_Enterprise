@@ -131,9 +131,14 @@
 .footer {
     margin-top: auto;
     padding: 18px 36px;
-    border-top: 1px solid var(--z-border);
-    color: var(--z-muted);
+    border-top: 1px solid var(--zds-color-border);
+    color: var(--zds-color-text-muted);
     font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--zds-space-4);
+    background: var(--zds-color-surface-soft);
 }
 /* LEGACY-MIGRATION-FINAL-END */
 
@@ -146,9 +151,20 @@
 .footer {
     margin-top: auto;
     padding: 18px 36px;
-    border-top: 1px solid var(--z-border);
-    color: var(--z-muted);
+    border-top: 1px solid var(--zds-color-border);
+    color: var(--zds-color-text-muted);
     font-size: 12px;
 }
 
 /* VISUAL-BASELINE-END */
+
+
+@media (max-width: 520px) {
+    .app-footer,
+    .footer {
+        padding: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+}

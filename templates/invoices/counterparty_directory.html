@@ -2,19 +2,19 @@
 
 {% block content %}
 
-<div class="page-header">
+<div class="page-header page-header-v1">
 
-    <div>
+    <div class="page-header-copy-v1">
         <h2 class="page-title">
             Справочник контрагентов
         </h2>
 
         <p class="page-subtitle">
-            Официальные контрагенты из 1С и ручной справочник Project Zarya
+            Официальные контрагенты из 1С и ручной справочник ОАО «Заря»
         </p>
     </div>
 
-    <div class="registry-actions">
+    <div class="registry-actions page-header-actions-v1">
         <a href="{% url 'counterparty_create' %}" class="btn btn-primary">
             Добавить вручную
         </a>
@@ -58,7 +58,7 @@
             </strong>
 
             <p>
-                Контрагенты из 1С редактируются в 1С, затем импортируются в Project Zarya.
+                Контрагенты из 1С редактируются в 1С, затем импортируются в корпоративную систему ОАО «Заря».
             </p>
         </div>
 

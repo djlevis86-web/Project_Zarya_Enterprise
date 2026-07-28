@@ -2,8 +2,8 @@
 
 {% block content %}
 
-<div class="page-header">
-    <div>
+<div class="page-header page-header-v1">
+    <div class="page-header-copy-v1">
         <h2 class="page-title">
             {{ page_title }}
         </h2>
@@ -13,7 +13,7 @@
         </p>
     </div>
 
-    <div class="registry-actions">
+    <div class="registry-actions page-header-actions-v1">
         {% if counterparty %}
             <a
                 href="{% url 'counterparty_detail' counterparty.id %}"

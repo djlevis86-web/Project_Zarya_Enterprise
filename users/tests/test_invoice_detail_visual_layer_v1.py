@@ -219,6 +219,114 @@ class InvoiceDetailVisualLayerV1Tests(
             40,
         )
 
+
+    def test_visual_acceptance_v1_1_contract(
+        self,
+    ):
+        css = self.read(
+            self.css_relative_path
+        )
+
+        self.assertEqual(
+            css.count(
+                (
+                    "INVOICE-DETAIL-VISUAL-"
+                    "ACCEPTANCE-V1-1-START"
+                )
+            ),
+            1,
+        )
+
+        self.assertEqual(
+            css.count(
+                (
+                    "INVOICE-DETAIL-VISUAL-"
+                    "ACCEPTANCE-V1-1-END"
+                )
+            ),
+            1,
+        )
+
+        required_acceptance_contracts = (
+            (
+                ".invoice-detail-explainable-ocr-v1\n"
+                ".invoice-detail-ocr-fact-v1 > strong"
+            ),
+            (
+                "body.light-theme\n"
+                ".invoice-detail-page-v1\n"
+                ".invoice-detail-payments-v1"
+            ),
+            (
+                ".comment-list > .empty-state"
+            ),
+            (
+                ".payment-left-history-item span"
+            ),
+            (
+                ".pdf-toolbar .btn"
+            ),
+            (
+                ".invoice-detail-actions-v1 "
+                "> :first-child"
+            ),
+            (
+                ".invoice-detail-actions-v1 "
+                "> :last-child"
+            ),
+            (
+                "repeat(2, minmax(0, 1fr))"
+            ),
+            (
+                "white-space: normal"
+            ),
+            (
+                "var(--zds-touch-target-min)"
+            ),
+        )
+
+        for contract in (
+            required_acceptance_contracts
+        ):
+            with self.subTest(
+                contract=contract
+            ):
+                self.assertIn(
+                    contract,
+                    css,
+                )
+
+        self.assertEqual(
+            css.count(
+                "@media (max-width: 1280px)"
+            ),
+            1,
+        )
+
+        self.assertEqual(
+            css.count(
+                "@media (max-width: 900px)"
+            ),
+            1,
+        )
+
+        self.assertEqual(
+            css.count(
+                "@media (max-width: 640px)"
+            ),
+            1,
+        )
+
+        self.assertNotIn(
+            "!important",
+            css,
+        )
+
+        self.assertNotRegex(
+            css,
+            r"#[0-9a-fA-F]{3,8}\b",
+        )
+
     def test_template_and_import_contract_are_preserved(
         self,
     ):

@@ -594,6 +594,206 @@ strong {
     );
 }
 
+
+/* INVOICE-DETAIL-VISUAL-ACCEPTANCE-V1-1-START */
+
+/*
+ * Visual acceptance fixes:
+ * 1. readable OCR facts and state badges in the dark theme;
+ * 2. a truly light payment card in the light theme;
+ * 3. page-scoped empty states;
+ * 4. compact mobile actions and payment history;
+ * 5. minimum PDF toolbar touch targets.
+ */
+
+.invoice-detail-page-v1
+.invoice-detail-explainable-ocr-v1
+.invoice-detail-ocr-fact-v1 > span {
+    color: var(--invoice-detail-text-muted);
+}
+
+.invoice-detail-page-v1
+.invoice-detail-explainable-ocr-v1
+.invoice-detail-ocr-fact-v1 > strong {
+    color: var(--invoice-detail-text);
+}
+
+.invoice-detail-page-v1
+.invoice-detail-explainable-ocr-v1
+.invoice-detail-ocr-fact-v1 > small {
+    color: var(--invoice-detail-text-soft);
+}
+
+.invoice-detail-page-v1
+.invoice-detail-explainable-ocr-v1
+.status-badge.status-approved {
+    border: 1px solid var(--invoice-detail-accent-strong);
+    background: var(--invoice-detail-accent-soft);
+    color: var(--invoice-detail-accent-strong);
+}
+
+.invoice-detail-page-v1
+.invoice-detail-explainable-ocr-v1
+.status-badge.status-rejected,
+.invoice-detail-page-v1
+.invoice-detail-explainable-ocr-v1
+.ocr-badge-error {
+    border: 1px solid var(--invoice-detail-danger);
+    background: var(--invoice-detail-panel-soft);
+    color: var(--invoice-detail-danger);
+}
+
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-explainable-ocr-v1
+.status-badge.status-approved {
+    color: var(--zds-color-accent);
+}
+
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-explainable-ocr-v1
+.status-badge.status-rejected,
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-explainable-ocr-v1
+.ocr-badge-error {
+    color: var(--zds-color-text);
+}
+
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-payments-v1 {
+    border-color: var(--zds-color-border-dawn);
+    background: var(--zds-color-surface-elevated);
+    color: var(--zds-color-text);
+}
+
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-payments-v1
+.payment-left-header {
+    border-bottom-color: var(--zds-color-border);
+}
+
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-payments-v1
+.payment-left-header h3 {
+    color: var(--zds-color-text);
+}
+
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-payments-v1
+.payment-left-header p {
+    color: var(--zds-color-text-muted);
+}
+
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-payments-v1
+.payment-left-summary > div {
+    border-color: var(--zds-color-border);
+    background: var(--zds-color-surface-soft);
+}
+
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-payments-v1
+.payment-left-summary span {
+    color: var(--zds-color-text-muted);
+}
+
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-payments-v1
+.payment-left-summary strong {
+    color: var(--zds-color-text);
+}
+
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-payments-v1
+.payment-left-summary > div:nth-child(2) strong {
+    color: var(--zds-color-accent);
+}
+
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-payments-v1
+.payment-left-summary > div:nth-child(3) strong {
+    color: var(--zds-color-dawn);
+}
+
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-payments-v1
+.payment-left-form {
+    border-color: var(--zds-color-border-brand);
+    background: var(--zds-color-surface-soft);
+}
+
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-payments-v1
+.payment-left-form label,
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-payments-v1
+.payment-left-history-item span,
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-payments-v1
+.payment-left-history-item small {
+    color: var(--zds-color-text-muted);
+}
+
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-payments-v1
+.payment-left-form input,
+body.light-theme
+.invoice-detail-page-v1
+.invoice-detail-payments-v1
+.payment-left-form textarea {
+    border-color: var(--zds-color-border-strong);
+    background: var(--zds-color-control);
+    color: var(--zds-color-text);
+}
+
+.invoice-detail-page-v1
+.timeline-list > .empty-state,
+.invoice-detail-page-v1
+.comment-list > .empty-state {
+    padding: var(--zds-space-4);
+    border: 1px solid var(--invoice-detail-border);
+    border-radius: var(--zds-radius-panel);
+    background: var(--invoice-detail-panel-soft);
+    color: var(--invoice-detail-text-muted);
+}
+
+.invoice-detail-page-v1
+.payment-left-history-item span,
+.invoice-detail-page-v1
+.payment-left-history-item small {
+    display: block;
+}
+
+.invoice-detail-page-v1
+.payment-left-history-item
+.payment-cancel-form {
+    margin-top: var(--zds-space-1);
+}
+
+.invoice-detail-page-v1
+.pdf-toolbar .btn {
+    min-width: var(--zds-touch-target-min);
+    min-height: var(--zds-touch-target-min);
+}
+
+/* INVOICE-DETAIL-VISUAL-ACCEPTANCE-V1-1-END */
+
 @media (max-width: 1280px) {
     .invoice-detail-page-v1
     .invoice-detail-workspace-v1 {
@@ -645,8 +845,16 @@ strong {
     .invoice-detail-page-v1
     .invoice-detail-actions-v1 {
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
         width: 100%;
+    }
+
+    .invoice-detail-page-v1
+    .invoice-detail-actions-v1 > :first-child,
+    .invoice-detail-page-v1
+    .invoice-detail-actions-v1 > :last-child {
+        grid-column: 1 / -1;
     }
 
     .invoice-detail-page-v1
@@ -655,7 +863,9 @@ strong {
     .invoice-detail-actions-v1 > form,
     .invoice-detail-page-v1
     .invoice-detail-actions-v1 > form > .btn {
+        min-width: 0;
         width: 100%;
+        white-space: normal;
     }
 
     .invoice-detail-page-v1

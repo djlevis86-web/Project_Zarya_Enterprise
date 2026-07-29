@@ -75,26 +75,6 @@
     margin-top: var(--zds-space-2);
 }
 
-.invoice-detail-page-v1 .invoice-detail-actions-v1 {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: var(--zds-space-2);
-    max-width: 620px;
-    margin: 0;
-}
-
-.invoice-detail-page-v1 .invoice-detail-actions-v1 > .btn,
-.invoice-detail-page-v1 .invoice-detail-actions-v1 > form > .btn {
-    min-height: var(--zds-control-height-compact);
-    white-space: nowrap;
-}
-
-.invoice-detail-page-v1 .invoice-detail-actions-v1
-.registry-action-form {
-    margin: 0;
-}
-
 .invoice-detail-page-v1 .invoice-detail-workspace-v1 {
     display: grid;
     grid-template-columns:
@@ -602,7 +582,7 @@ strong {
  * 1. readable OCR facts and state badges in the dark theme;
  * 2. a truly light payment card in the light theme;
  * 3. page-scoped empty states;
- * 4. compact mobile actions and payment history;
+ * 4. compact mobile payment history;
  * 5. minimum PDF toolbar touch targets.
  */
 
@@ -823,12 +803,6 @@ body.light-theme
     .invoice-detail-header-v1 {
         display: grid;
         gap: var(--zds-space-4);
-    }
-
-    .invoice-detail-page-v1
-    .invoice-detail-actions-v1 {
-        justify-content: flex-start;
-        max-width: none;
     }
 
     .invoice-detail-page-v1

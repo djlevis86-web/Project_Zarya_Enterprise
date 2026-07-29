@@ -19,19 +19,11 @@ class InvoiceDetailVisualLayerV1Tests(
     app_css_relative_path = (
         "static/css/app.css"
     )
-    page_header_css_relative_path = (
-        "static/css/features/"
-        "page-header-visual-v1.css"
-    )
 
     required_selectors = (
         (
             ".invoice-detail-page-v1 "
             ".invoice-detail-workspace-v1"
-        ),
-        (
-            ".invoice-detail-page-v1 "
-            ".invoice-detail-actions-v1"
         ),
         (
             ".invoice-detail-page-v1 "
@@ -317,131 +309,6 @@ class InvoiceDetailVisualLayerV1Tests(
             r"#[0-9a-fA-F]{3,8}\b",
         )
 
-    def test_mobile_actions_v1_2_use_page_header_owner(
-        self,
-    ):
-        template = self.read(
-            self.template_relative_path
-        )
-        invoice_css = self.read(
-            self.css_relative_path
-        )
-        page_header_css = self.read(
-            self.page_header_css_relative_path
-        )
-
-        action_tokens = (
-            "invoice-detail-action-edit-v1",
-            "invoice-detail-action-delete-v1",
-            "invoice-detail-action-counterparty-v1",
-            "invoice-detail-action-repeat-ocr-v1",
-            "invoice-detail-action-enqueue-ocr-v1",
-            "invoice-detail-action-back-v1",
-        )
-
-        self.assertEqual(
-            template.count(
-                "invoice-detail-action-v1"
-            ),
-            6,
-        )
-
-        for token in action_tokens:
-            with self.subTest(
-                action_token=token
-            ):
-                self.assertEqual(
-                    template.count(token),
-                    1,
-                )
-
-        self.assertNotIn(
-            (
-                "invoice-detail-actions-v1 "
-                "> :first-child"
-            ),
-            invoice_css,
-        )
-
-        self.assertEqual(
-            page_header_css.count(
-                (
-                    "INVOICE-DETAIL-MOBILE-"
-                    "ACTIONS-V1-2-START"
-                )
-            ),
-            1,
-        )
-
-        self.assertEqual(
-            page_header_css.count(
-                (
-                    "INVOICE-DETAIL-MOBILE-"
-                    "ACTIONS-V1-2-END"
-                )
-            ),
-            1,
-        )
-
-        required_mobile_contracts = (
-            ".invoice-detail-actions-v1 {",
-            "repeat(2, minmax(0, 1fr))",
-            "> .invoice-detail-action-edit-v1",
-            "> .invoice-detail-action-delete-v1",
-            "> .invoice-detail-action-repeat-ocr-v1",
-            "> .invoice-detail-action-counterparty-v1",
-            "> .invoice-detail-action-enqueue-ocr-v1",
-            "> .invoice-detail-action-back-v1",
-            "order: 1",
-            "order: 2",
-            "order: 3",
-            "order: 4",
-            "order: 5",
-            "order: 6",
-        )
-
-        for contract in (
-            required_mobile_contracts
-        ):
-            with self.subTest(
-                mobile_contract=contract
-            ):
-                self.assertIn(
-                    contract,
-                    page_header_css,
-                )
-
-        mobile_media_position = (
-            page_header_css.index(
-                "@media (max-width: 45rem)"
-            )
-        )
-
-        owner_position = (
-            page_header_css.index(
-                (
-                    "INVOICE-DETAIL-MOBILE-"
-                    "ACTIONS-V1-2-START"
-                )
-            )
-        )
-
-        self.assertGreater(
-            owner_position,
-            mobile_media_position,
-        )
-
-        self.assertEqual(
-            page_header_css.count(
-                "!important"
-            ),
-            29,
-        )
-
-        self.assertNotIn(
-            "nth-child(",
-            page_header_css,
-        )
 
     def test_template_and_import_contract_are_preserved(
         self,

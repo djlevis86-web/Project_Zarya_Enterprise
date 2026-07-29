@@ -10,6 +10,15 @@
 <div class="page-header page-header-v1 invoice-detail-header-v1">
 
     <div class="page-header-copy-v1 invoice-detail-header-copy-v1">
+        <a
+            href="{% url 'invoice_list' %}"
+            class="invoice-detail-back-link"
+            aria-label="Вернуться к списку документов"
+        >
+            <span aria-hidden="true">←</span>
+            <span>Документы</span>
+        </a>
+
         <h2 class="page-title invoice-detail-title-v1">
             {{ invoice.title }}
         </h2>
@@ -19,97 +28,141 @@
         </p>
     </div>
 
-    <div class="registry-actions page-header-actions-v1 invoice-detail-actions-v1" role="toolbar" aria-label="Действия с документом">
-
-        {% if user.is_staff %}
-            <a
-                href="{% url 'edit_invoice' invoice.id %}"
-                class="btn btn-primary invoice-detail-action-v1 invoice-detail-action-edit-v1"
-            >
-                Редактировать
-            </a>
-
-            <form
-                method="post"
-                action="{% url 'delete_invoice' invoice.id %}"
-                class="registry-action-form invoice-detail-action-v1 invoice-detail-action-delete-v1"
-                onsubmit="return confirm('Удалить документ #{{ invoice.id }} из рабочих списков? Запись останется в базе для истории.');"
-            >
-                {% csrf_token %}
-
-                <button
-                    type="submit"
-                    class="btn btn-secondary"
+    {% if show_invoice_action_bar %}
+        <div
+            class="page-header-actions-v1 invoice-detail-actions-v1 invoice-detail-production-action-bar"
+            role="toolbar"
+            aria-label="Действия с документом"
+        >
+            {% if can_edit_invoice %}
+                <a
+                    href="{% url 'edit_invoice' invoice.id %}"
+                    class="btn btn-primary invoice-detail-action-edit"
                 >
-                    Удалить
-                </button>
-            </form>
-        {% endif %}
+                    Редактировать
+                </a>
+            {% endif %}
 
-        <a
-            href="{% url 'invoice_assign_counterparty' invoice.id %}"
-            class="btn btn-secondary invoice-detail-action-v1 invoice-detail-action-counterparty-v1"
-        >
-            Привязать контрагента
-        </a>
-        <form
-            method="post"
-            action="{% url 'repeat_ocr' invoice.id %}"
-            class="registry-action-form invoice-detail-action-v1 invoice-detail-action-repeat-ocr-v1"
-            onsubmit="return confirm('Повторить OCR для этого документа? Текущие OCR-данные будут обновлены.');"
-        >
+            {% if show_invoice_counterparty_primary_action %}
+                <a
+                    href="{% url 'invoice_assign_counterparty' invoice.id %}"
+                    class="btn btn-secondary invoice-detail-action-counterparty"
+                >
+                    Привязать контрагента
+                </a>
+            {% endif %}
 
-            {% csrf_token %}
+            {% if show_invoice_action_menu %}
+                <details
+                    class="invoice-detail-action-menu"
+                    data-invoice-detail-action-menu
+                >
+                    <summary
+                        class="btn btn-secondary invoice-detail-action-menu-trigger"
+                        data-invoice-detail-action-trigger
+                        aria-haspopup="menu"
+                        aria-expanded="false"
+                        aria-controls="invoice-detail-action-menu-{{ invoice.id }}"
+                    >
+                        Ещё
+                    </summary>
 
-            <button
-                type="submit"
-                class="btn btn-primary"
-            >
-                Повторить OCR
-            </button>
+                    <div
+                        id="invoice-detail-action-menu-{{ invoice.id }}"
+                        class="invoice-detail-action-menu-panel"
+                        data-invoice-detail-action-panel
+                        role="menu"
+                        aria-label="Дополнительные действия"
+                    >
+                        {% if show_invoice_counterparty_menu_action %}
+                            <a
+                                href="{% url 'invoice_assign_counterparty' invoice.id %}"
+                                class="invoice-detail-action-menu-item"
+                                role="menuitem"
+                            >
+                                Изменить контрагента
+                            </a>
+                        {% endif %}
 
-        </form>
+                        {% if can_process_invoice_ocr %}
+                            <form
+                                method="post"
+                                action="{% url 'repeat_ocr' invoice.id %}"
+                                class="invoice-detail-action-menu-form"
+                                role="none"
+                                data-confirm-message="Повторить OCR для этого документа? Текущие OCR-данные будут обновлены."
+                            >
+                                {% csrf_token %}
 
+                                <button
+                                    type="submit"
+                                    class="invoice-detail-action-menu-item"
+                                    role="menuitem"
+                                >
+                                    Повторить OCR
+                                </button>
+                            </form>
 
+                            <form
+                                method="post"
+                                action="{% url 'enqueue_ocr_jobs' %}"
+                                class="invoice-detail-action-menu-form"
+                                role="none"
+                                data-confirm-message="Поставить OCR этого документа в очередь?"
+                            >
+                                {% csrf_token %}
 
-        <form
-            method="post"
-            action="{% url 'enqueue_ocr_jobs' %}"
-            class="registry-action-form invoice-detail-action-v1 invoice-detail-action-enqueue-ocr-v1"
-            onsubmit="return confirm('Поставить OCR этого документа в очередь?');"
-        >
+                                <input
+                                    type="hidden"
+                                    name="invoice_id"
+                                    value="{{ invoice.id }}"
+                                >
 
-            {% csrf_token %}
+                                <input
+                                    type="hidden"
+                                    name="next"
+                                    value="{{ request.get_full_path }}"
+                                >
 
-            <input
-                type="hidden"
-                name="invoice_id"
-                value="{{ invoice.id }}"
-            >
+                                <button
+                                    type="submit"
+                                    class="invoice-detail-action-menu-item"
+                                    role="menuitem"
+                                >
+                                    Поставить OCR в очередь
+                                </button>
+                            </form>
+                        {% endif %}
 
-            <input
-                type="hidden"
-                name="next"
-                value="{{ request.get_full_path }}"
-            >
+                        {% if can_delete_invoice %}
+                            <div
+                                class="invoice-detail-action-menu-separator"
+                                role="separator"
+                            ></div>
 
-            <button
-                type="submit"
-                class="btn btn-secondary"
-            >
-                OCR в очередь
-            </button>
+                            <form
+                                method="post"
+                                action="{% url 'delete_invoice' invoice.id %}"
+                                class="invoice-detail-action-menu-form"
+                                role="none"
+                                data-confirm-message="Удалить документ #{{ invoice.id }} из рабочих списков? Запись останется в базе для истории."
+                            >
+                                {% csrf_token %}
 
-        </form>
-
-        <a
-            href="{% url 'invoice_list' %}"
-            class="btn btn-secondary invoice-detail-action-v1 invoice-detail-action-back-v1"
-        >
-            Назад к документам
-        </a>
-
-    </div>
+                                <button
+                                    type="submit"
+                                    class="invoice-detail-action-menu-item btn-danger"
+                                    role="menuitem"
+                                >
+                                    Удалить документ
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </details>
+            {% endif %}
+        </div>
+    {% endif %}
 
 </div>
 
@@ -267,14 +320,16 @@
                                 Не привязан
                             </span>
 
-                            <div class="invoice-section-action">
-                                <a
-                                    href="{% url 'invoice_assign_counterparty' invoice.id %}"
-                                    class="btn btn-secondary btn-sm"
-                                >
-                                    Привязать вручную
-                                </a>
-                            </div>
+                            {% if can_assign_invoice_counterparty %}
+                                <div class="invoice-section-action">
+                                    <a
+                                        href="{% url 'invoice_assign_counterparty' invoice.id %}"
+                                        class="btn btn-secondary btn-sm"
+                                    >
+                                        Привязать вручную
+                                    </a>
+                                </div>
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>
@@ -960,4 +1015,12 @@ renderPdf();
 {% endif %}
 
 </div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script
+        src="{% static 'js/invoice-detail-action-menu.js' %}"
+        defer
+    ></script>
 {% endblock %}

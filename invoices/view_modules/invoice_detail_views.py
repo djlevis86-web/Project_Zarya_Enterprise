@@ -6,6 +6,9 @@ from ..forms import InvoicePaymentForm
 from ..models import InvoicePayment
 from ..payment_services import get_invoice_payment_summary
 from ..selectors import get_visible_invoices_for_user
+from ..invoice_action_context import (
+    get_invoice_detail_action_context,
+)
 
 
 @login_required
@@ -57,6 +60,13 @@ def invoice_detail(request, invoice_id):
 
     comment_form = InvoiceCommentForm()
 
+    action_context = (
+        get_invoice_detail_action_context(
+            request.user,
+            invoice,
+        )
+    )
+
     return render(
         request,
         'invoices/detail.html',
@@ -68,5 +78,6 @@ def invoice_detail(request, invoice_id):
             'payment_summary': payment_summary,
             'payments': payments,
             'payment_form': payment_form,
+            **action_context,
         }
     )

@@ -58,6 +58,7 @@
 /* Legacy legacy stylesheet disabled during full CSS cleanup */
 /* Legacy stylesheet retired. Import removed intentionally. */
 @import "./features/page-header-visual-v1.css";
+@import "./features/invoice-detail-action-bar.css";
 @import "./features/invoice-list-table-responsive-v1.css";
 @import "./features/dashboard-page-header-visual-v1.css";
 @import "./features/sidebar-visual-v3.css";

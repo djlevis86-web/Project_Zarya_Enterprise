@@ -5,19 +5,21 @@
 
 {% block content %}
 
-<div class="page-header page-header-v1">
+<div class="invoice-detail-page-v1">
 
-    <div class="page-header-copy-v1">
-        <h2 class="page-title">
+<div class="page-header page-header-v1 invoice-detail-header-v1">
+
+    <div class="page-header-copy-v1 invoice-detail-header-copy-v1">
+        <h2 class="page-title invoice-detail-title-v1">
             {{ invoice.title }}
         </h2>
 
-        <p class="page-subtitle">
+        <p class="page-subtitle invoice-detail-subtitle-v1">
             Карточка документа #{{ invoice.id }}
         </p>
     </div>
 
-    <div class="registry-actions page-header-actions-v1">
+    <div class="registry-actions page-header-actions-v1 invoice-detail-actions-v1" role="toolbar" aria-label="Действия с документом">
 
         {% if user.is_staff %}
             <a
@@ -111,15 +113,15 @@
 
 </div>
 
-<div class="invoice-detail-layout">
+<main class="invoice-detail-layout invoice-detail-workspace-v1">
 
-    <div class="invoice-detail-left">
+    <div class="invoice-detail-left invoice-detail-primary-v1">
 
-        <div class="card invoice-section-card">
+        <div class="card invoice-section-card invoice-detail-overview-v1" role="region" aria-labelledby="invoice-detail-overview-title-v1">
 
             <div class="section-title-row">
                 <div>
-                    <h3>
+                    <h3 id="invoice-detail-overview-title-v1">
                         Основная информация
                     </h3>
 
@@ -213,11 +215,11 @@
 
         </div>
 
-        <div class="card invoice-section-card">
+        <div class="card invoice-section-card invoice-detail-counterparty-v1" role="region" aria-labelledby="invoice-detail-counterparty-title-v1">
 
             <div class="section-title-row">
                 <div>
-                    <h3>
+                    <h3 id="invoice-detail-counterparty-title-v1">
                         Контрагент
                     </h3>
 
@@ -299,11 +301,11 @@
 
         </div>
 
-        <div class="card invoice-section-card">
+        <div class="card invoice-section-card invoice-detail-payment-v1" role="region" aria-labelledby="invoice-detail-payment-title-v1">
 
             <div class="section-title-row">
                 <div>
-                    <h3>
+                    <h3 id="invoice-detail-payment-title-v1">
                         Оплата
                     </h3>
 
@@ -381,10 +383,10 @@
 
         </div>
 
-<section class="invoice-payment-left-panel">
+<section class="invoice-payment-left-panel invoice-detail-payments-v1" aria-labelledby="invoice-detail-payments-title-v1">
     <div class="payment-left-header">
         <div>
-            <h3>Оплаты по документу</h3>
+            <h3 id="invoice-detail-payments-title-v1">Оплаты по документу</h3>
             <p>Частичная оплата, остаток и история платежей.</p>
         </div>
     </div>
@@ -496,11 +498,11 @@
 
 
 
-        <div class="card invoice-section-card">
+        <div class="card invoice-section-card invoice-detail-explainable-ocr-v1" role="region" aria-labelledby="invoice-detail-ocr-title-v1">
 
             <div class="section-title-row">
                 <div>
-                    <h3>
+                    <h3 id="invoice-detail-ocr-title-v1">
                         OCR-проверка
                     </h3>
 
@@ -520,9 +522,9 @@
                 {% endif %}
             </div>
 
-            <div class="ocr-check-grid">
+            <div class="ocr-check-grid invoice-detail-ocr-facts-v1">
 
-                <div class="ocr-check-item">
+                <div class="ocr-check-item invoice-detail-ocr-fact-v1">
                     <span>
                         Сумма в системе
                     </span>
@@ -532,7 +534,7 @@
                     </strong>
                 </div>
 
-                <div class="ocr-check-item">
+                <div class="ocr-check-item invoice-detail-ocr-fact-v1">
                     <span>
                         Сумма из OCR
                     </span>
@@ -546,7 +548,7 @@
                     </strong>
                 </div>
 
-                <div class="ocr-check-item">
+                <div class="ocr-check-item invoice-detail-ocr-fact-v1">
                     <span>
                         Номер и дата
                     </span>
@@ -560,7 +562,7 @@
                     </small>
                 </div>
 
-                <div class="ocr-check-item">
+                <div class="ocr-check-item invoice-detail-ocr-fact-v1">
                     <span>
                         Контрагент
                     </span>
@@ -587,11 +589,11 @@
             {% if invoice.ocr_amount %}
 
                 {% if invoice.amount_verified %}
-                    <div class="ocr-result-card ocr-result-success">
+                    <div class="ocr-result-card ocr-result-success invoice-detail-ocr-decision-v1">
                         Сумма подтверждена: OCR-сумма совпадает с суммой в системе.
                     </div>
                 {% else %}
-                    <div class="ocr-result-card ocr-result-warning">
+                    <div class="ocr-result-card ocr-result-warning invoice-detail-ocr-decision-v1">
                         <strong>
                             Оплата заблокирована до подтверждения суммы.
                         </strong>
@@ -608,7 +610,7 @@
 
             {% else %}
 
-                <div class="ocr-result-card ocr-result-muted">
+                <div class="ocr-result-card ocr-result-muted invoice-detail-ocr-decision-v1">
                     OCR сумма не определена. Перед оплатой сумму нужно проверить вручную.
                 </div>
 
@@ -632,11 +634,11 @@
 
         </div>
 
-        <div class="card invoice-section-card">
+        <div class="card invoice-section-card invoice-detail-history-v1" role="region" aria-labelledby="invoice-detail-history-title-v1">
 
             <div class="section-title-row">
                 <div>
-                    <h3>
+                    <h3 id="invoice-detail-history-title-v1">
                         История
                     </h3>
 
@@ -672,11 +674,11 @@
 
         </div>
 
-        <div class="card invoice-section-card">
+        <div class="card invoice-section-card invoice-detail-comments-v1" role="region" aria-labelledby="invoice-detail-comments-title-v1">
 
             <div class="section-title-row">
                 <div>
-                    <h3>
+                    <h3 id="invoice-detail-comments-title-v1">
                         Комментарии
                     </h3>
 
@@ -750,13 +752,13 @@
 
     </div>
 
-    <div class="invoice-detail-right">
+    <div class="invoice-detail-right invoice-detail-preview-v1">
 
-        <div class="card invoice-document-card">
+        <div class="card invoice-document-card invoice-detail-document-v1" role="region" aria-labelledby="invoice-detail-document-title-v1">
 
             <div class="section-title-row">
                 <div>
-<h3>
+<h3 id="invoice-detail-document-title-v1">
                         Просмотр документа
                     </h3>
 
@@ -808,7 +810,7 @@
 
     </div>
 
-</div>
+</main>
 
 {% if invoice.is_pdf %}
 
@@ -956,4 +958,6 @@ renderPdf();
 </script>
 
 {% endif %}
+
+</div>
 {% endblock %}

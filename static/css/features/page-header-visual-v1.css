@@ -136,6 +136,53 @@
     .page-header-actions-v1 .btn {
         min-height: var(--zds-touch-target-min);
     }
+
+    /* INVOICE-DETAIL-MOBILE-ACTIONS-V1-2-START */
+
+    .invoice-detail-actions-v1 {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .invoice-detail-actions-v1
+    > .invoice-detail-action-v1 {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .invoice-detail-actions-v1
+    > .invoice-detail-action-edit-v1 {
+        order: 1;
+        grid-column: 1 / -1;
+    }
+
+    .invoice-detail-actions-v1
+    > .invoice-detail-action-delete-v1 {
+        order: 2;
+    }
+
+    .invoice-detail-actions-v1
+    > .invoice-detail-action-repeat-ocr-v1 {
+        order: 3;
+    }
+
+    .invoice-detail-actions-v1
+    > .invoice-detail-action-counterparty-v1 {
+        order: 4;
+        grid-column: 1 / -1;
+    }
+
+    .invoice-detail-actions-v1
+    > .invoice-detail-action-enqueue-ocr-v1 {
+        order: 5;
+    }
+
+    .invoice-detail-actions-v1
+    > .invoice-detail-action-back-v1 {
+        order: 6;
+    }
+
+    /* INVOICE-DETAIL-MOBILE-ACTIONS-V1-2-END */
 }
 
 /* PAGE-HEADER-VISUAL-V1-END */

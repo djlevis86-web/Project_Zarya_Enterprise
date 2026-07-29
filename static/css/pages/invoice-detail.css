@@ -843,32 +843,6 @@ body.light-theme
 
 @media (max-width: 640px) {
     .invoice-detail-page-v1
-    .invoice-detail-actions-v1 {
-        display: grid;
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-        width: 100%;
-    }
-
-    .invoice-detail-page-v1
-    .invoice-detail-actions-v1 > :first-child,
-    .invoice-detail-page-v1
-    .invoice-detail-actions-v1 > :last-child {
-        grid-column: 1 / -1;
-    }
-
-    .invoice-detail-page-v1
-    .invoice-detail-actions-v1 > .btn,
-    .invoice-detail-page-v1
-    .invoice-detail-actions-v1 > form,
-    .invoice-detail-page-v1
-    .invoice-detail-actions-v1 > form > .btn {
-        min-width: 0;
-        width: 100%;
-        white-space: normal;
-    }
-
-    .invoice-detail-page-v1
     .invoice-section-card,
     .invoice-detail-page-v1
     .invoice-detail-payments-v1,

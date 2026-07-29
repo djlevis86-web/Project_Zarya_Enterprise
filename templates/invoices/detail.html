@@ -24,7 +24,7 @@
         {% if user.is_staff %}
             <a
                 href="{% url 'edit_invoice' invoice.id %}"
-                class="btn btn-primary"
+                class="btn btn-primary invoice-detail-action-v1 invoice-detail-action-edit-v1"
             >
                 Редактировать
             </a>
@@ -32,7 +32,7 @@
             <form
                 method="post"
                 action="{% url 'delete_invoice' invoice.id %}"
-                class="registry-action-form"
+                class="registry-action-form invoice-detail-action-v1 invoice-detail-action-delete-v1"
                 onsubmit="return confirm('Удалить документ #{{ invoice.id }} из рабочих списков? Запись останется в базе для истории.');"
             >
                 {% csrf_token %}
@@ -48,14 +48,14 @@
 
         <a
             href="{% url 'invoice_assign_counterparty' invoice.id %}"
-            class="btn btn-secondary"
+            class="btn btn-secondary invoice-detail-action-v1 invoice-detail-action-counterparty-v1"
         >
             Привязать контрагента
         </a>
         <form
             method="post"
             action="{% url 'repeat_ocr' invoice.id %}"
-            class="registry-action-form"
+            class="registry-action-form invoice-detail-action-v1 invoice-detail-action-repeat-ocr-v1"
             onsubmit="return confirm('Повторить OCR для этого документа? Текущие OCR-данные будут обновлены.');"
         >
 
@@ -75,7 +75,7 @@
         <form
             method="post"
             action="{% url 'enqueue_ocr_jobs' %}"
-            class="registry-action-form"
+            class="registry-action-form invoice-detail-action-v1 invoice-detail-action-enqueue-ocr-v1"
             onsubmit="return confirm('Поставить OCR этого документа в очередь?');"
         >
 
@@ -104,7 +104,7 @@
 
         <a
             href="{% url 'invoice_list' %}"
-            class="btn btn-secondary"
+            class="btn btn-secondary invoice-detail-action-v1 invoice-detail-action-back-v1"
         >
             Назад к документам
         </a>

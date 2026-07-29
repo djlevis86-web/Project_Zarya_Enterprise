@@ -5,11 +5,14 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 from django.test import SimpleTestCase
 
 from config.storage import (
     ZaryaCompressedManifestStaticFilesStorage,
+    ZaryaStaticCompressor,
 )
 
 
@@ -114,6 +117,84 @@ print({output_expression})
             storage.directory_permissions_mode,
             0o755,
         )
+
+    def test_storage_creates_project_compressor_with_static_mode(
+        self,
+    ):
+        storage = (
+            ZaryaCompressedManifestStaticFilesStorage()
+        )
+
+        compressor = storage.create_compressor(
+            quiet=True,
+            use_brotli=False,
+        )
+
+        self.assertIsInstance(
+            compressor,
+            ZaryaStaticCompressor,
+        )
+        self.assertEqual(
+            compressor.file_permissions_mode,
+            0o644,
+        )
+
+    def test_compressed_sidecar_receives_static_file_mode(
+        self,
+    ):
+        storage = (
+            ZaryaCompressedManifestStaticFilesStorage()
+        )
+
+        compressor = storage.create_compressor(
+            quiet=True,
+            use_brotli=False,
+        )
+
+        with TemporaryDirectory() as temporary_directory:
+            source_path = (
+                Path(temporary_directory)
+                / "static-permissions.css"
+            )
+
+            source_path.write_bytes(
+                (
+                    b".zarya-static-permissions"
+                    b"{display:block;}"
+                )
+                * 1024
+            )
+
+            with patch(
+                "config.storage.os.chmod"
+            ) as chmod_mock:
+                compressed_paths = (
+                    compressor.compress(
+                        str(source_path)
+                    )
+                )
+
+            self.assertEqual(
+                len(compressed_paths),
+                1,
+            )
+
+            compressed_path = Path(
+                compressed_paths[0]
+            )
+
+            self.assertEqual(
+                compressed_path.suffix,
+                ".gz",
+            )
+            self.assertTrue(
+                compressed_path.is_file()
+            )
+
+            chmod_mock.assert_called_once_with(
+                str(compressed_path),
+                0o644,
+            )
 
     def test_production_uses_project_static_storage_only(
         self,

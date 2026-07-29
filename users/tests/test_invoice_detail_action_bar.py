@@ -71,7 +71,6 @@ class InvoiceDetailActionBarRenderTests(
 
         for context_key in (
             "can_edit_invoice",
-            "can_assign_invoice_counterparty",
             "show_invoice_counterparty_primary_action",
             "can_process_invoice_ocr",
             "can_delete_invoice",
@@ -172,12 +171,6 @@ class InvoiceDetailActionBarRenderTests(
                 "show_invoice_action_menu"
             ]
         )
-        self.assertFalse(
-            response.context[
-                "can_assign_invoice_counterparty"
-            ]
-        )
-
         self.assertContains(
             response,
             "invoice-detail-back-link",
@@ -378,6 +371,73 @@ class InvoiceDetailActionBarStaticTests(
                 r"|rgba?\([^)]*\)"
                 r"|hsla?\([^)]*\)"
             ),
+        )
+
+    def test_action_bar_final_visual_contract(
+        self,
+    ):
+        action_css = self.read(
+            (
+                "static/css/features/"
+                "invoice-detail-action-bar.css"
+            )
+        )
+        detail_template = self.read(
+            "templates/invoices/detail.html"
+        )
+        context_source = self.read(
+            "invoices/invoice_action_context.py"
+        )
+
+        explicit_color_contract = (
+            "background: transparent;\n"
+            "    color: var(--zds-color-text);\n"
+            "    font: inherit;"
+        )
+
+        self.assertEqual(
+            action_css.count(
+                explicit_color_contract
+            ),
+            1,
+        )
+
+        self.assertNotIn(
+            "Привязать вручную",
+            detail_template,
+        )
+
+        self.assertNotIn(
+            "invoice-section-action",
+            detail_template,
+        )
+
+        self.assertNotIn(
+            "can_assign_invoice_counterparty",
+            detail_template,
+        )
+
+        self.assertNotIn(
+            (
+                '"can_assign_invoice_counterparty"'
+            ),
+            context_source,
+        )
+
+        self.assertIn(
+            (
+                "show_invoice_counterparty_"
+                "primary_action"
+            ),
+            detail_template,
+        )
+
+        self.assertIn(
+            (
+                "show_invoice_counterparty_"
+                "menu_action"
+            ),
+            detail_template,
         )
 
     def test_action_menu_script_is_accessible_and_page_specific(

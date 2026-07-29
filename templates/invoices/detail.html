@@ -320,16 +320,6 @@
                                 Не привязан
                             </span>
 
-                            {% if can_assign_invoice_counterparty %}
-                                <div class="invoice-section-action">
-                                    <a
-                                        href="{% url 'invoice_assign_counterparty' invoice.id %}"
-                                        class="btn btn-secondary btn-sm"
-                                    >
-                                        Привязать вручную
-                                    </a>
-                                </div>
-                            {% endif %}
                         </div>
                     {% endif %}
                 </div>

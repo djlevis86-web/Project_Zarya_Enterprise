@@ -47,9 +47,6 @@ def get_invoice_detail_action_context(
     return {
         "can_edit_invoice": can_manage_invoice,
         (
-            "can_assign_invoice_counterparty"
-        ): can_manage_invoice,
-        (
             "show_invoice_counterparty_primary_action"
         ): show_counterparty_primary_action,
         (

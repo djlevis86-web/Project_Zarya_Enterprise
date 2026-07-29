@@ -271,7 +271,7 @@ class InvoiceDetailSemanticScopeV1Tests(
                     flags=re.IGNORECASE,
                 )
             ),
-            7,
+            6,
         )
 
         self.assertEqual(

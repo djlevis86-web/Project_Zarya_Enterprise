@@ -9,6 +9,7 @@ from ..log_service import create_invoice_log
 from ..models import Invoice
 from ..ocr_verification_service import sync_invoice_amount_verification
 from ..payment_registry_services import get_active_registry_items_for_invoice
+from ..readiness_services import evaluate_document_readiness
 
 
 def _redirect_after_quick_update(request):
@@ -93,6 +94,35 @@ def quick_update_invoice(request, invoice_id):
 
     old_status = invoice.status
     old_planned_payment_date = invoice.planned_payment_date
+    approval_blocked = False
+
+    if (
+        old_status != new_status
+        and new_status == Invoice.STATUS_APPROVED
+    ):
+        invoice.planned_payment_date = (
+            new_planned_payment_date
+        )
+        readiness = evaluate_document_readiness(
+            invoice
+        )
+        invoice.planned_payment_date = (
+            old_planned_payment_date
+        )
+
+        if not readiness.can_approve:
+            approval_blocked = True
+            new_status = old_status
+            primary = readiness.primary_blocker
+            message = (
+                primary.message
+                if primary
+                else "Требуется проверка данных документа."
+            )
+            messages.error(
+                request,
+                "Документ нельзя утвердить: " + message,
+            )
 
     changed_fields = []
 
@@ -152,10 +182,19 @@ def quick_update_invoice(request, invoice_id):
                 )
             )
 
-        messages.success(
-            request,
-            f'Документ #{invoice.id} обновлён.'
-        )
+        if approval_blocked:
+            messages.warning(
+                request,
+                (
+                    f'Документ #{invoice.id} обновлён, '
+                    'но статус не изменён.'
+                )
+            )
+        else:
+            messages.success(
+                request,
+                f'Документ #{invoice.id} обновлён.'
+            )
 
     else:
         messages.info(
@@ -198,8 +237,39 @@ def edit_invoice(request, invoice_id):
                 or amount_confirmation_requested
             )
 
-            invoice = form.save()
+            old_status_before_edit = (
+                Invoice.objects.values_list(
+                    "status",
+                    flat=True,
+                ).get(
+                    pk=invoice.pk
+                )
+            )
+            requested_status = (
+                form.cleaned_data.get(
+                    "status"
+                )
+            )
+            approval_requested = bool(
+                old_status_before_edit
+                != Invoice.STATUS_APPROVED
+                and requested_status
+                == Invoice.STATUS_APPROVED
+            )
 
+            invoice = form.save(
+                commit=False
+            )
+
+            if approval_requested:
+                invoice.status = (
+                    old_status_before_edit
+                )
+
+            invoice.save()
+            form.save_m2m()
+
+            approval_blocked = False
             verification_message = ""
 
             if should_sync_amount_verification:
@@ -210,6 +280,51 @@ def edit_invoice(request, invoice_id):
                     invoice,
                     source_label='редактирования документа'
                 )
+
+            if approval_requested:
+                readiness = evaluate_document_readiness(
+                    invoice
+                )
+
+                if readiness.can_approve:
+                    invoice.status = (
+                        Invoice.STATUS_APPROVED
+                    )
+                    status_update_fields = [
+                        "status",
+                    ]
+
+                    if any(
+                        field.name == "updated_at"
+                        for field in invoice._meta.fields
+                    ):
+                        status_update_fields.append(
+                            "updated_at"
+                        )
+
+                    invoice.save(
+                        update_fields=status_update_fields
+                    )
+                else:
+                    approval_blocked = True
+                    primary = (
+                        readiness.primary_blocker
+                    )
+                    message = (
+                        primary.message
+                        if primary
+                        else (
+                            "Требуется проверка "
+                            "данных документа."
+                        )
+                    )
+                    messages.error(
+                        request,
+                        (
+                            "Документ нельзя утвердить: "
+                            + message
+                        ),
+                    )
 
             create_invoice_log(
                 invoice,
@@ -293,10 +408,20 @@ def edit_invoice(request, invoice_id):
                         )
                     )
 
-            messages.success(
-                request,
-                'Изменения сохранены.'
-            )
+            if approval_blocked:
+                messages.warning(
+                    request,
+                    (
+                        "Изменения сохранены, "
+                        "но статус документа "
+                        "не изменён."
+                    )
+                )
+            else:
+                messages.success(
+                    request,
+                    'Изменения сохранены.'
+                )
 
             return redirect(
                 'invoice_detail',

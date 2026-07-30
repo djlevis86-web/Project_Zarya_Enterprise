@@ -95,7 +95,7 @@ class InvoiceStatusWorkflowTests(TestCase):
             message,
         )
 
-    def test_auto_approval_routes_small_amount_to_approved(self):
+    def test_auto_approval_routes_incomplete_small_amount_to_in_work(self):
         invoice = SimpleNamespace(
             amount=Decimal("1000.00"),
             status=Invoice.STATUS_NEW,
@@ -107,11 +107,15 @@ class InvoiceStatusWorkflowTests(TestCase):
 
         self.assertEqual(
             status,
-            Invoice.STATUS_APPROVED,
+            Invoice.STATUS_IN_WORK,
         )
         self.assertEqual(
             invoice.status,
-            Invoice.STATUS_APPROVED,
+            Invoice.STATUS_IN_WORK,
+        )
+        self.assertIn(
+            "требует проверки",
+            message,
         )
 
 
@@ -221,6 +225,33 @@ class InvoiceStatusChangeViewTests(TestCase):
         self.assertEqual(
             response.status_code,
             405,
+        )
+
+        self.invoice.refresh_from_db()
+
+        self.assertEqual(
+            self.invoice.status,
+            Invoice.STATUS_NEW,
+        )
+
+    def test_staff_cannot_approve_incomplete_document(self):
+        self.client.force_login(
+            self.staff_user
+        )
+
+        response = self.client.post(
+            reverse(
+                "change_invoice_status",
+                kwargs={
+                    "invoice_id": self.invoice.id,
+                    "status": Invoice.STATUS_APPROVED,
+                },
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            302,
         )
 
         self.invoice.refresh_from_db()

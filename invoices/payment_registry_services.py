@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from .payment_services import create_invoice_payment, get_invoice_payment_summary
 from .models import Invoice, PaymentRegistry, PaymentRegistryItem
+from .readiness_services import evaluate_payment_readiness
 
 
 ACTIVE_REGISTRY_STATUSES = (
@@ -75,10 +76,11 @@ def get_active_registry_item_for_invoice(invoice):
     return get_active_registry_items_for_invoice(invoice).first()
 
 
-def validate_invoice_for_payment_registry(invoice):
-    errors = []
-    warnings = []
-
+def validate_invoice_for_payment_registry(
+    invoice,
+    *,
+    payment_summary=None,
+):
     if hasattr(
         invoice,
         "active_registry_id",
@@ -95,73 +97,17 @@ def validate_invoice_for_payment_registry(invoice):
             else None
         )
 
-    if active_registry_id:
-        errors.append(
-            f"Документ уже есть в реестре №{active_registry_id}."
-        )
+    result = evaluate_payment_readiness(
+        invoice,
+        active_registry_id=active_registry_id,
+        payment_summary=payment_summary,
+    )
 
-    if getattr(invoice, "paid_at", None):
-        errors.append(
-            "Документ уже отмечен как оплаченный."
-        )
+    return (
+        result.blocker_messages,
+        result.warning_messages,
+    )
 
-    if hasattr(Invoice, "STATUS_PAID") and invoice.status == Invoice.STATUS_PAID:
-        errors.append(
-            "Документ уже находится в статусе оплаты."
-        )
-
-    elif invoice.status != Invoice.STATUS_APPROVED:
-        errors.append(
-            "Документ должен быть утверждён перед добавлением в реестр оплаты."
-        )
-
-    amount = invoice.amount or Decimal("0")
-
-    if not getattr(invoice, "amount_verified", False):
-        errors.append(
-            "Сумма документа не подтверждена после OCR-проверки."
-        )
-
-    if amount <= 0:
-        errors.append(
-            "Не указана сумма к оплате."
-        )
-
-    if not invoice.planned_payment_date:
-        errors.append(
-            "Не указана плановая дата оплаты."
-        )
-
-    if not invoice.responsible_id:
-        errors.append(
-            "Ответственный не назначен."
-        )
-
-    if not invoice.counterparty:
-        errors.append(
-            "Контрагент не сопоставлен со справочником."
-        )
-
-    if invoice.counterparty:
-        missing = []
-
-        for field_name, title in (
-            ("inn", "ИНН"),
-            ("bank_name", "банк"),
-            ("account_number", "расчётный счёт"),
-            ("bik", "БИК"),
-        ):
-            value = getattr(invoice.counterparty, field_name, "")
-
-            if not value:
-                missing.append(title)
-
-        if missing:
-            errors.append(
-                "У контрагента не заполнено: " + ", ".join(missing) + "."
-            )
-
-    return errors, warnings
 
 
 def get_active_editable_payment_registry():
@@ -237,23 +183,19 @@ def add_invoice_to_payment_registry(invoice, registry):
             id=registry_id
         )
 
-    validation_errors, validation_warnings = validate_invoice_for_payment_registry(
+    summary = get_invoice_payment_summary(
         invoice
+    )
+
+    validation_errors, validation_warnings = validate_invoice_for_payment_registry(
+        invoice,
+        payment_summary=summary,
     )
 
     errors.extend(validation_errors)
     warnings.extend(validation_warnings)
 
-    summary = get_invoice_payment_summary(
-        invoice
-    )
-
     remaining_amount = summary["remaining_amount"]
-
-    if remaining_amount <= 0:
-        errors.append(
-            "Документ уже полностью оплачен или имеет переплату."
-        )
 
     if errors:
         return None, errors, warnings
@@ -595,4 +537,3 @@ def cancel_payment_registry(registry, user=None, reason=""):
     )
 
     return True
-

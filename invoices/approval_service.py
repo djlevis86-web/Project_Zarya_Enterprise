@@ -1,4 +1,5 @@
 from .models import Invoice
+from .readiness_services import evaluate_document_readiness
 
 
 def auto_approve_invoice(invoice):
@@ -15,6 +16,23 @@ def auto_approve_invoice(invoice):
     amount = float(invoice.amount)
 
     if amount <= 5000:
+
+        readiness = evaluate_document_readiness(
+            invoice
+        )
+
+        if not readiness.can_approve:
+            invoice.status = Invoice.STATUS_IN_WORK
+            primary = readiness.primary_blocker
+            message = (
+                primary.message
+                if primary
+                else "Требуется проверка данных документа."
+            )
+            return (
+                Invoice.STATUS_IN_WORK,
+                "Документ требует проверки: " + message,
+            )
 
         invoice.status = Invoice.STATUS_APPROVED
 

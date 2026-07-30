@@ -318,3 +318,43 @@ class ResponsibleInvoiceWorkflowTests(TestCase):
         self.assertIsNone(
             invoice.responsible
         )
+
+    def test_edit_cannot_approve_incomplete_document(self):
+        invoice = self._create_invoice(
+            responsible=self.active_responsible,
+            title="INCOMPLETE APPROVAL EDIT",
+        )
+        invoice.status = Invoice.STATUS_NEW
+        invoice.save(
+            update_fields=[
+                "status",
+            ]
+        )
+
+        self.client.force_login(
+            self.staff_user
+        )
+
+        response = self.client.post(
+            reverse(
+                "edit_invoice",
+                args=[
+                    invoice.id,
+                ],
+            ),
+            self._edit_payload(
+                self.active_responsible.id
+            ),
+        )
+
+        self.assertEqual(
+            response.status_code,
+            302,
+        )
+
+        invoice.refresh_from_db()
+
+        self.assertEqual(
+            invoice.status,
+            Invoice.STATUS_NEW,
+        )

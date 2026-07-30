@@ -9,6 +9,7 @@ from ..comment_forms import InvoiceCommentForm
 from ..log_service import create_invoice_log
 from ..models import Invoice
 from ..selectors import get_visible_invoices_for_user
+from ..readiness_services import evaluate_document_readiness
 
 
 @staff_member_required
@@ -44,6 +45,27 @@ def change_invoice_status(request, invoice_id, status):
     old_status = invoice.status
     old_status_label = dict(Invoice.STATUS_CHOICES).get(old_status, old_status)
     new_status_label = dict(Invoice.STATUS_CHOICES).get(status, status)
+
+    if status == Invoice.STATUS_APPROVED:
+        readiness = evaluate_document_readiness(
+            invoice
+        )
+
+        if not readiness.can_approve:
+            primary = readiness.primary_blocker
+            message = (
+                primary.message
+                if primary
+                else "Требуется проверка данных документа."
+            )
+            messages.error(
+                request,
+                "Документ нельзя утвердить: " + message,
+            )
+            return redirect(
+                "invoice_detail",
+                invoice_id=invoice.id,
+            )
 
     invoice.status = status
 

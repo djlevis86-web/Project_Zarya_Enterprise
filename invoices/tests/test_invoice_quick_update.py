@@ -5,7 +5,11 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from invoices.models import Invoice
+from invoices.models import (
+    Counterparty,
+    Invoice,
+    ResponsiblePerson,
+)
 
 
 class InvoiceQuickUpdateTests(TestCase):
@@ -34,7 +38,7 @@ class InvoiceQuickUpdateTests(TestCase):
             planned_payment_date=date(2026, 7, 10),
         )
 
-    def test_staff_can_quick_update_status_and_planned_payment_date(self):
+    def test_staff_cannot_quick_approve_incomplete_document(self):
         self.client.force_login(
             self.staff
         )
@@ -68,7 +72,7 @@ class InvoiceQuickUpdateTests(TestCase):
 
         self.assertEqual(
             self.invoice.status,
-            Invoice.STATUS_APPROVED,
+            Invoice.STATUS_NEW,
         )
         self.assertEqual(
             self.invoice.planned_payment_date,
@@ -143,4 +147,63 @@ class InvoiceQuickUpdateTests(TestCase):
         self.assertEqual(
             self.invoice.planned_payment_date,
             date(2026, 7, 10),
+        )
+
+    def test_staff_can_quick_approve_complete_document(self):
+        counterparty = Counterparty.objects.create(
+            name="ГОТОВЫЙ ПОСТАВЩИК",
+            inn="3525001001",
+            bank_name="ТЕСТОВЫЙ БАНК",
+            account_number="40702810000000000001",
+            bik="044705615",
+            source=Counterparty.SOURCE_1C,
+        )
+        responsible = ResponsiblePerson.objects.create(
+            full_name="Ответственный за оплату",
+            is_active=True,
+        )
+        invoice = Invoice.objects.create(
+            user=self.user,
+            title="Готовый документ",
+            amount=Decimal("1000.00"),
+            amount_verified=True,
+            document_type=Invoice.DOCUMENT_TYPE_INVOICE,
+            counterparty=counterparty,
+            responsible=responsible,
+            status=Invoice.STATUS_NEW,
+            planned_payment_date=date(2026, 7, 10),
+        )
+
+        self.client.force_login(
+            self.staff
+        )
+
+        response = self.client.post(
+            reverse(
+                "quick_update_invoice",
+                args=[
+                    invoice.id,
+                ],
+            ),
+            {
+                "status": Invoice.STATUS_APPROVED,
+                "planned_payment_date": "2026-07-25",
+                "next": "/invoices/",
+            },
+        )
+
+        self.assertEqual(
+            response.status_code,
+            302,
+        )
+
+        invoice.refresh_from_db()
+
+        self.assertEqual(
+            invoice.status,
+            Invoice.STATUS_APPROVED,
+        )
+        self.assertEqual(
+            invoice.planned_payment_date,
+            date(2026, 7, 25),
         )

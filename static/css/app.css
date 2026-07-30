@@ -1,11 +1,4 @@
-/*
- * ERP Zarya35 CSS entry point.
- *
- * Правило:
- * 1. Новые стили пишем только в модульные файлы.
- * 2. Старый legacy stylesheet временно остаётся как legacy.
- * 3. Постепенно переносим блоки из legacy stylesheet в модули.
- */
+/* ОАО «Заря» — production CSS entry point. */
 
 /* Base */
 @import url("./base/variables.css");
@@ -30,18 +23,7 @@
 @import url("./components/modals.css");
 @import url("./components/alerts.css");
 
-/* Pages */
-@import url("./pages/dashboard.css");
-@import url("./pages/invoice-list.css");
-@import url("./pages/invoice-detail.css");
-@import url("./pages/payment-schedule.css");
-@import url("./pages/payment-registry.css");
-@import url("./pages/counterparties.css");
-@import url("./pages/profile.css");
-@import url("./pages/system.css");
-@import url("./pages/audit.css");
-
-/* Features */
+/* Shared features retained for the rest of the application */
 @import url("./features/partial-payments.css");
 @import url("./features/ocr.css");
 @import url("./features/users-roles.css");
@@ -50,178 +32,16 @@
 @import url("./features/ui-polish-actions.css");
 @import url("./features/ui-polish-badges.css");
 @import url("./features/ui-polish-filters.css");
-
-/*
- * Legacy CSS.
- * Временно оставляем последним, чтобы ничего визуально не сломать.
- */
-/* Legacy legacy stylesheet disabled during full CSS cleanup */
-/* Legacy stylesheet retired. Import removed intentionally. */
 @import "./features/page-header-visual-v1.css";
-@import "./features/invoice-detail-action-bar.css";
-@import "./features/invoice-list-table-responsive-v1.css";
-@import "./features/dashboard-page-header-visual-v1.css";
 @import "./features/sidebar-visual-v3.css";
 
-/* Counterparty search on invoice assign page */
-.counterparty-search-form {
-    display: grid;
-    gap: 14px;
-}
-
-.counterparty-search-hint {
-    margin-top: 14px;
-}
-
-.counterparty-result-form {
-    margin-top: 18px;
-}
-
-.counterparty-search-results {
-    display: grid;
-    gap: 12px;
-    margin-top: 16px;
-}
-
-.counterparty-search-result {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    padding: 14px 16px;
-    border: 1px solid #e5e7eb;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
-}
-
-.counterparty-search-result:hover {
-    border-color: #27ae60;
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-    transform: translateY(-1px);
-}
-
-.counterparty-search-result input {
-    margin-top: 4px;
-}
-
-.counterparty-search-result-body {
-    display: grid;
-    gap: 5px;
-}
-
-.empty-state {
-    margin-top: 18px;
-    padding: 18px;
-    border: 1px dashed #d1d5db;
-    border-radius: 14px;
-    color: #64748b;
-    background: #f8fafc;
-}
-
-/* Invoice bot report detail v1 */
-
-.invoice-bot-report-table-v1 th:nth-child(7),
-.invoice-bot-report-table-v1 td:nth-child(7) {
-    min-width: 320px;
-    text-align: left;
-}
-
-.invoice-bot-report-table-v1 th:nth-child(8),
-.invoice-bot-report-table-v1 td:nth-child(8) {
-    width: 160px;
-}
-
-.invoice-bot-report-reasons-v1 {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-}
-
-.invoice-bot-report-reason-v1 {
-    display: block;
-    max-width: 420px;
-    padding: 6px 8px;
-    border-radius: 10px;
-    font-size: 12px;
-    line-height: 1.35;
-    font-weight: 700;
-}
-
-.invoice-bot-report-reason-error-v1 {
-    color: #fecaca;
-    background: rgba(127, 29, 29, 0.35);
-    border: 1px solid rgba(248, 113, 113, 0.35);
-}
-
-.invoice-bot-report-reason-warning-v1 {
-    color: #fde68a;
-    background: rgba(120, 53, 15, 0.35);
-    border: 1px solid rgba(251, 191, 36, 0.35);
-}
-
-.invoice-bot-report-reason-ok-v1 {
-    color: #bbf7d0;
-    background: rgba(20, 83, 45, 0.35);
-    border: 1px solid rgba(74, 222, 128, 0.35);
-}
-
-.invoice-bot-report-table-v1 .table-actions {
-    min-width: 150px;
-}
-
-/* Invoice bot report quick date v1 */
-
-.invoice-bot-report-date-form-v1 {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-width: 170px;
-}
-
-.invoice-bot-report-date-form-v1 input[type="date"] {
-    width: 100%;
-    min-height: 36px;
-    padding: 8px 10px;
-    border-radius: 10px;
-    border: 1px solid rgba(148, 163, 184, 0.28);
-    background: rgba(15, 23, 42, 0.55);
-    color: inherit;
-}
-
-.invoice-bot-report-date-form-v1 .btn {
-    width: 100%;
-}
-
-/* Invoice bot report quick amount v1 */
-
-.invoice-bot-report-confirm-form-v1 {
-    margin: 0;
-    width: 100%;
-}
-
-.invoice-bot-report-confirm-form-v1 .btn {
-    width: 100%;
-}
-
-/* Invoice bot report OCR retry v1 */
-
-.invoice-bot-report-ocr-retry-form-v1 {
-    margin: 0;
-    width: 100%;
-}
-
-.invoice-bot-report-ocr-retry-form-v1 .btn {
-    width: 100%;
-}
-
-/* Invoice bot report OCR retry v1 */
-
-.invoice-bot-report-ocr-retry-form-v1 {
-    margin: 0;
-    width: 100%;
-}
-
-.invoice-bot-report-ocr-retry-form-v1 .btn {
-    width: 100%;
-}
+/* Final page owners */
+@import url("./pages/payment-schedule.css");
+@import url("./pages/payment-registry.css");
+@import url("./pages/counterparties.css");
+@import url("./pages/profile.css");
+@import url("./pages/system.css");
+@import url("./pages/audit.css");
+@import url("./pages/dashboard.css");
+@import url("./pages/invoice-list.css");
+@import url("./pages/invoice-detail.css");

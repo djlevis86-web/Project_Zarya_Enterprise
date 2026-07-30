@@ -11,6 +11,8 @@ class PageHeaderSemanticScopeV1Tests(
     SimpleTestCase
 ):
     expected_template_files = (
+        "templates/dashboard.html",
+
         "templates/invoices/"
         "counterparties_missing_requisites.html",
 
@@ -279,25 +281,25 @@ class PageHeaderSemanticScopeV1Tests(
 
         self.assertEqual(
             total_outer,
-            19,
+            20,
         )
 
         self.assertEqual(
             total_copy,
-            19,
+            20,
         )
 
         self.assertEqual(
             total_actions,
-            17,
+            18,
         )
 
         self.assertEqual(
             total_title,
-            19,
+            20,
         )
 
         self.assertEqual(
             total_subtitle,
-            19,
+            20,
         )

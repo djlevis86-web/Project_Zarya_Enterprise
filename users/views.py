@@ -4,10 +4,12 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
-from invoices.bot_report_services import (
-    get_dashboard_invoice_bot_report,
-)
 from invoices.models import Invoice
+from invoices.presentation_services import (
+    annotate_invoice_workspace,
+    build_dashboard_workspace,
+)
+from invoices.selectors import get_visible_invoices_for_user
 
 from .permissions import admin_required
 
@@ -53,88 +55,59 @@ def login_view(request):
 
 
 @login_required
+
+@login_required
 def dashboard(request):
-
-    invoices = Invoice.objects.all()
-
-    if not request.user.is_staff:
-
-        invoices = invoices.filter(
-            user=request.user
+    invoices = list(
+        annotate_invoice_workspace(
+            get_visible_invoices_for_user(
+                request.user
+            )
+        ).order_by(
+            "-created_at",
+            "-id",
         )
-
-    total_count = invoices.count()
-
-    month_start = timezone.now().replace(
-        day=1,
-        hour=0,
-        minute=0,
-        second=0,
-        microsecond=0
     )
 
-    month_count = invoices.filter(
-        created_at__gte=month_start
-    ).count()
-
-    new_count = invoices.filter(
-        status="new"
-    ).count()
-
-    review_count = invoices.filter(
-        status=Invoice.STATUS_IN_WORK
-    ).count()
-
-    paid_count = invoices.filter(
-        status="paid"
-    ).count()
-
-    approved_count = invoices.filter(
-        status="approved"
-    ).count()
-
-    latest_invoices = invoices.order_by(
-        "-created_at"
-    )[:5]
-
-    attention_items = [
-        {
-            "label": "Новые документы",
-            "value": new_count,
-            "hint": "Ожидают OCR и первичной проверки",
-            "url_name": "invoice_list",
-        },
-        {
-            "label": "На проверке",
-            "value": review_count,
-            "hint": "Нужно принять решение по документам",
-            "url_name": "invoice_list",
-        },
-        {
-            "label": "Готово к оплате",
-            "value": approved_count,
-            "hint": "Можно включать в платежный реестр",
-            "url_name": "payment_registry",
-        },
-    ]
+    workspace = build_dashboard_workspace(
+        invoices
+    )
 
     context = {
-        "total_count": total_count,
-        "month_count": month_count,
-        "new_count": new_count,
-        "review_count": review_count,
-        "approved_count": approved_count,
-        "latest_invoices": latest_invoices,
-        "paid_count": paid_count,
-        "attention_items": attention_items,
-        "invoice_bot_report": get_dashboard_invoice_bot_report(),
+        "dashboard_workspace": workspace,
+        "total_count": workspace["total_count"],
+        "new_count": sum(
+            1
+            for invoice in invoices
+            if invoice.status == Invoice.STATUS_NEW
+        ),
+        "review_count": sum(
+            1
+            for invoice in invoices
+            if invoice.status == Invoice.STATUS_IN_WORK
+        ),
+        "approved_count": sum(
+            1
+            for invoice in invoices
+            if invoice.status == Invoice.STATUS_APPROVED
+        ),
+        "paid_count": sum(
+            1
+            for invoice in invoices
+            if invoice.status == Invoice.STATUS_PAID
+        ),
+        "latest_invoices": [
+            item["invoice"]
+            for item in workspace["latest_documents"]
+        ],
     }
 
     return render(
         request,
         "dashboard.html",
-        context
+        context,
     )
+
 
 
 @login_required

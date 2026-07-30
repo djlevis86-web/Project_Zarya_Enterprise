@@ -1,549 +1,139 @@
 {% extends 'base.html' %}
+{% load money %}
 
 {% block content %}
-
-<div class="dashboard-page">
-
-<section
-    class="dashboard-hero dashboard-page-header-v1"
-    aria-labelledby="dashboard-title"
->
-
-    <div class="dashboard-hero-main dashboard-page-header-copy-v1">
-
-        <span class="dashboard-kicker dashboard-page-header-kicker-v1">
-            ОАО «Заря» · Документы и платежи
-        </span>
-
-        <h1
-            id="dashboard-title"
-            class="dashboard-title dashboard-page-title-v1"
-        >
-            Управление документами к оплате и оплатами
-        </h1>
-
-        <p class="dashboard-page-subtitle-v1">
-            Загрузка документов, OCR-распознавание, сверка с 1С, контроль реквизитов и подготовка реестра оплаты.
-        </p>
-
-        <div class="dashboard-hero-actions dashboard-page-header-actions-v1">
+<div class="dashboard-page documents-payments-dashboard">
+    <header class="page-header page-header-v1 dashboard-production-header">
+        <div class="page-header-copy-v1">
+            <span class="production-kicker">Рабочий центр</span>
+            <h1 id="dashboard-title" class="page-title">
+                Документы и платежи
+            </h1>
+            <p class="page-subtitle">
+                Всё, что требует решения сегодня, в одном рабочем маршруте.
+            </p>
+        </div>
+        <div class="page-header-actions-v1">
             <a href="{% url 'upload_invoice' %}" class="btn btn-primary">
-                Загрузить новый документ
+                Загрузить документы
             </a>
-
-                <a href="{% url 'invoice_list' %}" class="btn btn-secondary dashboard-hero-all-invoices">
-                    Все документы
-                </a>
-
-            <a href="{% url 'payment_registry' %}" class="btn btn-secondary">
-                Перейти в реестр оплаты
-            </a>
-        </div>
-
-    </div>
-
-    <div class="dashboard-hero-side dashboard-page-header-summary-v1">
-
-        <div class="hero-metric">
-            <span>
-                Всего в базе
-            </span>
-
-            <strong>
-                {{ total_count }}
-            </strong>
-        </div>
-
-        <div class="hero-metric">
-            <span>
-                Документов за месяц
-            </span>
-
-            <strong>
-                {{ month_count }}
-            </strong>
-        </div>
-
-    </div>
-
-</section>
-
-<section class="dashboard-attention-v1">
-    <div class="dashboard-attention-header-v1">
-        <div>
-            <h2>Требуют внимания</h2>
-            <p>Короткая сводка по документам, с которыми нужно работать</p>
-        </div>
-    </div>
-
-    <div class="dashboard-attention-grid-v1">
-        {% for item in attention_items %}
-            <a href="{% url item.url_name %}" class="dashboard-attention-item-v1" data-attention-state="{% if item.value %}active{% else %}clear{% endif %}">
-                <span class="dashboard-attention-value-v1">
-                    {{ item.value }}
-                </span>
-
-                <span class="dashboard-attention-content-v1">
-                    <strong>{{ item.label }}</strong>
-                    <small>{{ item.hint }}</small>
-                </span>
-            </a>
-        {% endfor %}
-    </div>
-</section>
-
-{% if invoice_bot_report %}
-<div class="card dashboard-bot-report-v2">
-
-    <div class="registry-table-header">
-        <div>
-            <h3>
-                <span class="dashboard-bot-title-v1">Отчёт бота</span>
-            </h3>
-
-            <span>
-                Актуальное состояние документов
-                {% if invoice_bot_report.snapshot_generated_at_datetime %}
-                    · последний автоматический аудит
-                    {{ invoice_bot_report.snapshot_generated_at_datetime|date:"d.m.Y H:i" }}
-                {% endif %}
-            </span>
-        </div>
-    </div>
-
-    <div class="registry-summary dashboard-bot-summary-v1">
-
-        <a href="{% url 'invoice_list' %}" class="registry-summary-card stat-link">
-            <span class="registry-summary-label">
-                Активных документов
-            </span>
-
-            <strong>
-                {{ invoice_bot_report.total_count }}
-            </strong>
-        </a>
-
-    </div>
-
-    <div class="dashboard-attention-header-v1">
-        <div>
-            <h2>
-                Рабочая очередь пользователя
-            </h2>
-            <p>
-                Документы, которые требуют ручной обработки: дата оплаты, подтверждение суммы и готовность к реестру.
-            </p>
-        </div>
-    </div>
-
-    <div class="registry-summary dashboard-bot-summary-v1">
-
-        <a href="{% url 'invoice_bot_report_detail' 'ready' %}" class="registry-summary-card stat-link">
-            <span class="registry-summary-label">
-                Готовы к реестру
-            </span>
-
-            <strong class="text-success">
-                {{ invoice_bot_report.ready_for_registry_count }}
-            </strong>
-        </a>
-
-        <a href="{% url 'invoice_bot_report_detail' 'not-ready' %}" class="registry-summary-card stat-link">
-            <span class="registry-summary-label">
-                Не готовы
-            </span>
-
-            <strong class="summary-warning">
-                {{ invoice_bot_report.not_ready_for_registry_count }}
-            </strong>
-        </a>
-
-        <a href="{% url 'invoice_bot_report_detail' 'without-planned-payment-date' %}" class="registry-summary-card stat-link">
-            <span class="registry-summary-label">
-                Без даты оплаты
-            </span>
-
-            <strong>
-                {{ invoice_bot_report.without_planned_payment_date_count }}
-            </strong>
-        </a>
-
-        <a href="{% url 'invoice_bot_report_detail' 'unverified-amount' %}" class="registry-summary-card stat-link">
-            <span class="registry-summary-label">
-                Сумма ожидает подтверждения
-            </span>
-
-            <strong>
-                {{ invoice_bot_report.unverified_amount_count }}
-            </strong>
-        </a>
-
-    </div>
-
-<div class="dashboard-attention-header-v1">
-        <div>
-            <h2>
-                Технический аудит
-            </h2>
-            <p>
-                Ошибки OCR, типа документа и сопоставления поставщика. Это техническая зона контроля.
-            </p>
-        </div>
-    </div>
-
-    <div class="registry-summary dashboard-bot-summary-v1">
-
-        <a href="{% url 'invoice_bot_report_detail' 'without-ocr-text' %}" class="registry-summary-card stat-link">
-            <span class="registry-summary-label">
-                Без OCR-текста
-            </span>
-
-            <strong>
-                {{ invoice_bot_report.without_ocr_text_count }}
-            </strong>
-        </a>
-
-        <a href="{% url 'invoice_bot_report_detail' 'unknown-document-type' %}" class="registry-summary-card stat-link">
-            <span class="registry-summary-label">
-                Неизвестный тип
-            </span>
-
-            <strong>
-                {{ invoice_bot_report.unknown_document_type_count }}
-            </strong>
-        </a>
-
-        <div class="registry-summary-card">
-            <span class="registry-summary-label">
-                Без заполненного поставщика
-            </span>
-
-            <strong>
-                {{ invoice_bot_report.without_vendor_count }}
-            </strong>
-        </div>
-
-        <a href="{% url 'invoice_bot_report_detail' 'without-counterparty' %}" class="registry-summary-card stat-link">
-            <span class="registry-summary-label">
-                Без контрагента
-            </span>
-
-            <strong>
-                {{ invoice_bot_report.without_counterparty_count }}
-            </strong>
-        </a>
-
-        <div class="registry-summary-card">
-            <span class="registry-summary-label">
-                Требуют проверки контрагента
-            </span>
-
-            <strong>
-                {{ invoice_bot_report.counterparty_action_required_count }}
-            </strong>
-        </div>
-
-        <div class="registry-summary-card">
-            <span class="registry-summary-label">
-                Ожидают синхронизацию 1С
-            </span>
-
-            <strong>
-                {{ invoice_bot_report.waiting_1c_sync_count }}
-            </strong>
-        </div>
-
-    </div>
-</div>
-{% endif %}
-
-<div class="dashboard-grid-two dashboard-work-blocks-v1">
-
-
-
-<div class="card dashboard-work-panel-v1 dashboard-quick-actions-panel-v1">
-
-        <div class="registry-table-header">
-            <div>
-                <h3>
-                    <span class="dashboard-quick-title-v1">Быстрые действия</span>
-                </h3>
-
-                <span>
-                    Основные рабочие маршруты
-                </span>
-            </div>
-        </div>
-
-        <div class="quick-action-grid">
-
-            <a href="{% url 'upload_invoice' %}" class="quick-action-card">
-                <span class="quick-action-icon">
-                    ↑
-                </span>
-
-                <div>
-                    <strong>
-                        Загрузить документы
-                    </strong>
-
-                    <p>
-                        Добавить PDF, JPG или PNG и запустить OCR.
-                    </p>
-                </div>
-            </a>
-
-            <a href="{% url 'unmatched_counterparties' %}" class="quick-action-card">
-                <span class="quick-action-icon">
-                    !
-                </span>
-
-                <div>
-                    <strong>
-                        Не найдено в 1С
-                    </strong>
-
-                    <p>
-                        Проверить документы без официального контрагента.
-                    </p>
-                </div>
-            </a>
-
-            <a href="{% url 'counterparties_missing_requisites' %}" class="quick-action-card">
-                <span class="quick-action-icon">
-                    ⚑
-                </span>
-
-                <div>
-                    <strong>
-                        Проверить реквизиты
-                    </strong>
-
-                    <p>
-                        Найти контрагентов без ИНН, БИК или расчетного счета.
-                    </p>
-                </div>
-            </a>
-
-            <a href="{% url 'payment_registry' %}" class="quick-action-card">
-                <span class="quick-action-icon">
-                    ₽
-                </span>
-
-                <div>
-                    <strong>
-                        Реестр оплаты
-                    </strong>
-
-                    <p>
-                        Подготовить документы к выгрузке Excel или 1С TXT.
-                    </p>
-                </div>
-            </a>
-
-        </div>
-
-    </div>
-
-    <div class="card dashboard-work-panel-v1 dashboard-workflow-panel-v1">
-
-        <div class="registry-table-header">
-            <div>
-                <h3>
-                    <span class="dashboard-workflow-title-v1">Рабочий процесс</span>
-                </h3>
-
-                <span>
-                    Правильная последовательность работы
-                </span>
-            </div>
-        </div>
-
-        <div class="process-list">
-
-            <div class="process-item">
-                <span>
-                    1
-                </span>
-
-                <div>
-                    <strong>
-                        Загрузка документа
-                    </strong>
-
-                    <p>
-                        Файл попадает в систему и получает статус «Новый».
-                    </p>
-                </div>
-            </div>
-
-            <div class="process-item">
-                <span>
-                    2
-                </span>
-
-                <div>
-                    <strong>
-                        OCR и сверка
-                    </strong>
-
-                    <p>
-                        Система ищет сумму, поставщика и контрагента из 1С.
-                    </p>
-                </div>
-            </div>
-
-            <div class="process-item">
-                <span>
-                    3
-                </span>
-
-                <div>
-                    <strong>
-                        Проверка реквизитов
-                    </strong>
-
-                    <p>
-                        Перед оплатой должны быть заполнены ИНН, банк, БИК и счет.
-                    </p>
-                </div>
-            </div>
-
-            <div class="process-item">
-                <span>
-                    4
-                </span>
-
-                <div>
-                    <strong>
-                        Реестр оплаты
-                    </strong>
-
-                    <p>
-                        Утверждённые документы попадают в реестр оплаты.
-                    </p>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<div class="card dashboard-latest-panel-v1">
-
-    <div class="registry-table-header">
-
-        <div>
-            <h3>
-                <span class="dashboard-latest-title-v1">Последние документы</span>
-            </h3>
-
-            <span>
-                Недавно загруженные документы
-            </span>
-        </div>
-
-        <div class="registry-actions">
             <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
-                Смотреть все
+                Все документы
+            </a>
+        </div>
+    </header>
+
+    <section class="production-kpi-grid" aria-label="Сводка рабочего дня">
+        <a class="production-kpi production-kpi-warning" href="{% url 'invoice_list' %}?readiness=attention">
+            <span>Требуют проверки</span>
+            <strong>{{ dashboard_workspace.attention_count }}</strong>
+            <small>Есть блокирующие данные</small>
+        </a>
+        <a class="production-kpi production-kpi-dawn" href="{% url 'invoice_list' %}?planned_payment_date_from={% now 'Y-m-d' %}&planned_payment_date_to={% now 'Y-m-d' %}">
+            <span>К оплате сегодня</span>
+            <strong>{{ dashboard_workspace.due_today_count }}</strong>
+            <small>Остаток больше нуля</small>
+        </a>
+        <a class="production-kpi production-kpi-danger" href="{% url 'invoice_list' %}?readiness=overdue">
+            <span>Просрочено</span>
+            <strong>{{ dashboard_workspace.overdue_count }}</strong>
+            <small>Плановая дата прошла</small>
+        </a>
+        <a class="production-kpi production-kpi-success" href="{% url 'invoice_list' %}?payment_status=paid">
+            <span>Оплачено за месяц</span>
+            <strong>{{ dashboard_workspace.paid_month_count }}</strong>
+            <small>Закрытые обязательства</small>
+        </a>
+    </section>
+
+    <section class="production-panel dashboard-attention-panel" aria-labelledby="dashboard-attention-title">
+        <div class="production-panel-header">
+            <div>
+                <span class="production-eyebrow">Приоритет</span>
+                <h2 id="dashboard-attention-title">Требуют внимания</h2>
+                <p>Документы отсортированы по срочности и причине блокировки.</p>
+            </div>
+            <a href="{% url 'invoice_list' %}?readiness=attention" class="production-text-link">
+                Открыть очередь
             </a>
         </div>
 
-    </div>
+        <div class="dashboard-work-list">
+            {% for item in dashboard_workspace.attention_documents %}
+                <a href="{% url 'invoice_detail' item.invoice.id %}" class="dashboard-work-item">
+                    <span class="readiness-indicator readiness-{{ item.readiness_tone }}" aria-hidden="true"></span>
+                    <span class="dashboard-work-document">
+                        <strong>{{ item.title }}</strong>
+                        <small>{{ item.invoice.counterparty.name|default:"Контрагент не назначен" }}</small>
+                    </span>
+                    <span class="dashboard-work-reason">
+                        <strong>{{ item.readiness_label }}</strong>
+                        <small>{{ item.reason }}</small>
+                    </span>
+                    <span class="dashboard-work-date {% if item.is_overdue %}is-overdue{% endif %}">
+                        {{ item.planned_payment_date_label }}
+                    </span>
+                    <span class="dashboard-work-action">{{ item.next_action }} →</span>
+                </a>
+            {% empty %}
+                <div class="production-empty-state">
+                    Нет документов, требующих срочного действия.
+                </div>
+            {% endfor %}
+        </div>
+    </section>
 
-    <div class="table-scroll dashboard-latest-scroll-v1">
-
-        <table class="table registry-table dashboard-latest-table" aria-label="Последние документы">
-
-            <thead>
-                <tr>
-                    <th>
-                        ID
-                    </th>
-
-                    <th>
-                        Документ
-                    </th>
-
-                    <th>
-                        Сумма
-                    </th>
-
-                    <th>
-                        Статус
-                    </th>
-
-                    <th>
-                        Действие
-                    </th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                {% for invoice in latest_invoices %}
-
-                    <tr class="dashboard-latest-row-v1">
-                        <td class="dashboard-latest-id-v1" data-label="ID">
-                            <a href="{% url 'invoice_detail' invoice.id %}">
-                                #{{ invoice.id }}
-                            </a>
-                        </td>
-
-                        <td class="dashboard-latest-document-v1" data-label="Документ">
-                            <strong>
-                                {{ invoice.title }}
-                            </strong>
-
-                            {% if invoice.invoice_number %}
-                                <div class="muted">
-                                    Счет № {{ invoice.invoice_number }}
-                                </div>
-                            {% endif %}
-                        </td>
-
-                        <td class="dashboard-latest-amount-v1" data-label="Сумма">
-                            <strong class="amount-main">
-                                {{ invoice.amount|floatformat:2 }} ₽
-                            </strong>
-                        </td>
-
-                        <td class="dashboard-latest-status-v1" data-label="Статус">
-                            <span class="status-badge status-{{ invoice.status }}">
-                                {{ invoice.get_status_display }}
-                            </span>
-                        </td>
-
-                        <td class="dashboard-latest-action-v1" data-label="Действие">
-                            <a
-                                href="{% url 'invoice_detail' invoice.id %}"
-                                class="btn btn-secondary btn-sm"
-                            >
-                                Открыть
-                            </a>
-                        </td>
-                    </tr>
-
+    <div class="dashboard-production-columns">
+        <section class="production-panel" aria-labelledby="dashboard-upcoming-title">
+            <div class="production-panel-header">
+                <div>
+                    <span class="production-eyebrow">Платежи</span>
+                    <h2 id="dashboard-upcoming-title">Ближайшие оплаты</h2>
+                </div>
+                <a href="{% url 'payment_schedule' %}" class="production-text-link">График</a>
+            </div>
+            <div class="compact-work-list">
+                {% for item in dashboard_workspace.upcoming_payments %}
+                    <a href="{% url 'invoice_detail' item.invoice.id %}" class="compact-work-item">
+                        <span>
+                            <strong>{{ item.title }}</strong>
+                            <small>{{ item.invoice.counterparty.name|default:"Контрагент не назначен" }}</small>
+                        </span>
+                        <span class="compact-work-value">
+                            <strong>{{ item.payment.remaining_amount|money_ru }}</strong>
+                            <small>{{ item.planned_payment_date_label }}</small>
+                        </span>
+                    </a>
                 {% empty %}
-
-                    <tr>
-                        <td colspan="5" class="empty-table">
-                            Документов пока нет.
-                        </td>
-                    </tr>
-
+                    <div class="production-empty-state">Ближайшие оплаты не назначены.</div>
                 {% endfor %}
+            </div>
+        </section>
 
-            </tbody>
-
-        </table>
-
+        <section class="production-panel" aria-labelledby="dashboard-latest-title">
+            <div class="production-panel-header">
+                <div>
+                    <span class="production-eyebrow">Последние изменения</span>
+                    <h2 id="dashboard-latest-title">Недавние документы</h2>
+                </div>
+                <a href="{% url 'invoice_list' %}" class="production-text-link">Все документы</a>
+            </div>
+            <div class="compact-work-list">
+                {% for item in dashboard_workspace.latest_documents %}
+                    <a href="{% url 'invoice_detail' item.invoice.id %}" class="compact-work-item">
+                        <span>
+                            <strong>{{ item.title }}</strong>
+                            <small>{{ item.invoice.updated_at|date:"d.m.Y H:i" }}</small>
+                        </span>
+                        <span class="production-readiness-badge readiness-{{ item.readiness_tone }}">
+                            {{ item.readiness_label }}
+                        </span>
+                    </a>
+                {% empty %}
+                    <div class="production-empty-state">Документов пока нет.</div>
+                {% endfor %}
+            </div>
+        </section>
     </div>
-
 </div>
-
-</div>
-
 {% endblock %}

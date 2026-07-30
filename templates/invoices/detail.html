@@ -1,1016 +1,296 @@
 {% extends 'base.html' %}
 {% load money %}
-
 {% load static %}
 
 {% block content %}
-
-<div class="invoice-detail-page-v1">
-
-<div class="page-header page-header-v1 invoice-detail-header-v1">
-
-    <div class="page-header-copy-v1 invoice-detail-header-copy-v1">
-        <a
-            href="{% url 'invoice_list' %}"
-            class="invoice-detail-back-link"
-            aria-label="Вернуться к списку документов"
-        >
-            <span aria-hidden="true">←</span>
-            <span>Документы</span>
-        </a>
-
-        <h2 class="page-title invoice-detail-title-v1">
-            {{ invoice.title }}
-        </h2>
-
-        <p class="page-subtitle invoice-detail-subtitle-v1">
-            Карточка документа #{{ invoice.id }}
-        </p>
-    </div>
-
-    {% if show_invoice_action_bar %}
-        <div
-            class="page-header-actions-v1 invoice-detail-actions-v1 invoice-detail-production-action-bar"
-            role="toolbar"
-            aria-label="Действия с документом"
-        >
+<div class="invoice-detail-page documents-production-detail">
+    <header class="page-header page-header-v1 invoice-detail-production-header">
+        <div class="page-header-copy-v1">
+            <a href="{% url 'invoice_list' %}" class="production-back-link">← Документы</a>
+            <h1 class="page-title">{{ workspace.title }}</h1>
+            <p class="page-subtitle">
+                {% if workspace.meta %}{{ workspace.meta }} · {% endif %}{{ workspace.status_label }}
+            </p>
+        </div>
+        <div class="page-header-actions-v1">
             {% if can_edit_invoice %}
-                <a
-                    href="{% url 'edit_invoice' invoice.id %}"
-                    class="btn btn-primary invoice-detail-action-edit"
-                >
-                    Редактировать
+                <a href="{% url 'edit_invoice' invoice.id %}" class="btn btn-primary">Редактировать</a>
+            {% endif %}
+            {% if can_edit_invoice %}
+                <a href="{% url 'invoice_assign_counterparty' invoice.id %}" class="btn btn-secondary">
+                    {% if invoice.counterparty %}Изменить контрагента{% else %}Привязать контрагента{% endif %}
                 </a>
             {% endif %}
-
-            {% if show_invoice_counterparty_primary_action %}
-                <a
-                    href="{% url 'invoice_assign_counterparty' invoice.id %}"
-                    class="btn btn-secondary invoice-detail-action-counterparty"
-                >
-                    Привязать контрагента
-                </a>
-            {% endif %}
-
-            {% if show_invoice_action_menu %}
-                <details
-                    class="invoice-detail-action-menu"
-                    data-invoice-detail-action-menu
-                >
-                    <summary
-                        class="btn btn-secondary invoice-detail-action-menu-trigger"
-                        data-invoice-detail-action-trigger
-                        aria-haspopup="menu"
-                        aria-expanded="false"
-                        aria-controls="invoice-detail-action-menu-{{ invoice.id }}"
-                    >
-                        Ещё
-                    </summary>
-
-                    <div
-                        id="invoice-detail-action-menu-{{ invoice.id }}"
-                        class="invoice-detail-action-menu-panel"
-                        data-invoice-detail-action-panel
-                        role="menu"
-                        aria-label="Дополнительные действия"
-                    >
-                        {% if show_invoice_counterparty_menu_action %}
-                            <a
-                                href="{% url 'invoice_assign_counterparty' invoice.id %}"
-                                class="invoice-detail-action-menu-item"
-                                role="menuitem"
-                            >
-                                Изменить контрагента
-                            </a>
-                        {% endif %}
-
-                        {% if can_process_invoice_ocr %}
-                            <form
-                                method="post"
-                                action="{% url 'repeat_ocr' invoice.id %}"
-                                class="invoice-detail-action-menu-form"
-                                role="none"
-                                data-confirm-message="Повторить OCR для этого документа? Текущие OCR-данные будут обновлены."
-                            >
-                                {% csrf_token %}
-
-                                <button
-                                    type="submit"
-                                    class="invoice-detail-action-menu-item"
-                                    role="menuitem"
-                                >
-                                    Повторить OCR
-                                </button>
-                            </form>
-
-                            <form
-                                method="post"
-                                action="{% url 'enqueue_ocr_jobs' %}"
-                                class="invoice-detail-action-menu-form"
-                                role="none"
-                                data-confirm-message="Поставить OCR этого документа в очередь?"
-                            >
-                                {% csrf_token %}
-
-                                <input
-                                    type="hidden"
-                                    name="invoice_id"
-                                    value="{{ invoice.id }}"
-                                >
-
-                                <input
-                                    type="hidden"
-                                    name="next"
-                                    value="{{ request.get_full_path }}"
-                                >
-
-                                <button
-                                    type="submit"
-                                    class="invoice-detail-action-menu-item"
-                                    role="menuitem"
-                                >
-                                    Поставить OCR в очередь
-                                </button>
-                            </form>
-                        {% endif %}
-
-                        {% if can_delete_invoice %}
-                            <div
-                                class="invoice-detail-action-menu-separator"
-                                role="separator"
-                            ></div>
-
-                            <form
-                                method="post"
-                                action="{% url 'delete_invoice' invoice.id %}"
-                                class="invoice-detail-action-menu-form"
-                                role="none"
-                                data-confirm-message="Удалить документ #{{ invoice.id }} из рабочих списков? Запись останется в базе для истории."
-                            >
-                                {% csrf_token %}
-
-                                <button
-                                    type="submit"
-                                    class="invoice-detail-action-menu-item btn-danger"
-                                    role="menuitem"
-                                >
-                                    Удалить документ
-                                </button>
-                            </form>
-                        {% endif %}
-                    </div>
-                </details>
-            {% endif %}
         </div>
-    {% endif %}
+    </header>
 
-</div>
-
-<main class="invoice-detail-layout invoice-detail-workspace-v1">
-
-    <div class="invoice-detail-left invoice-detail-primary-v1">
-
-        <div class="card invoice-section-card invoice-detail-overview-v1" role="region" aria-labelledby="invoice-detail-overview-title-v1">
-
-            <div class="section-title-row">
-                <div>
-                    <h3 id="invoice-detail-overview-title-v1">
-                        Основная информация
-                    </h3>
-
-                    <span>
-                        Данные документа и файла
-                    </span>
-                </div>
-
-                <span class="status-badge status-{{ invoice.status }}">
-                    {{ invoice.get_status_display }}
-                </span>
-            </div>
-
-            <div class="info-list">
-
-                <div class="info-row">
-                    <span>
-                        ID
-                    </span>
-
-                    <strong>
-                        #{{ invoice.id }}
-                    </strong>
-                </div>
-
-                <div class="info-row">
-                    <span>
-                        Пользователь
-                    </span>
-
-                    <strong>
-                        {{ invoice.user.username }}
-                    </strong>
-                </div>
-
-                <div class="info-row">
-                    <span>
-                        Ответственный
-                    </span>
-
-                    <strong>
-                        {% if invoice.responsible %}
-                            {{ invoice.responsible.full_name }}
-                        {% else %}
-                            Не назначен
-                        {% endif %}
-                    </strong>
-                </div>
-
-                <div class="info-row">
-                    <span>
-                        Номер документа
-                    </span>
-
-                    <strong>
-                        {{ invoice.invoice_number|default:"—" }}
-                    </strong>
-                </div>
-
-                <div class="info-row">
-                    <span>
-                        Дата документа
-                    </span>
-
-                    <strong>
-                        {{ invoice.invoice_date|default:"—" }}
-                    </strong>
-                </div>
-
-                <div class="info-row">
-                    <span>
-                        Файл
-                    </span>
-
-                    {% if invoice.file %}
-                        <a
-                            href="{{ invoice.file.url }}"
-                            target="_blank"
-                            class="file-link"
-                        >
-                            {{ invoice.original_filename|default:"Открыть файл" }}
-                        </a>
-                    {% else %}
-                        <strong>
-                            —
-                        </strong>
-                    {% endif %}
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="card invoice-section-card invoice-detail-counterparty-v1" role="region" aria-labelledby="invoice-detail-counterparty-title-v1">
-
-            <div class="section-title-row">
-                <div>
-                    <h3 id="invoice-detail-counterparty-title-v1">
-                        Контрагент
-                    </h3>
-
-                    <span>
-                        OCR-поставщик и связанный справочник
-                    </span>
-                </div>
-            </div>
-
-            <div class="info-list">
-
-                <div class="info-row info-row-vertical">
-                    <span>
-                        Поставщик из OCR
-                    </span>
-
-                    <strong>
-                        {{ invoice.vendor|default:"—" }}
-                    </strong>
-                </div>
-
-                <div class="info-row info-row-vertical">
-                    <span>
-                        Контрагент справочника
-                    </span>
-
-                    {% if invoice.counterparty %}
-                        <div>
-                            <a
-                                href="{% url 'counterparty_detail' invoice.counterparty.id %}"
-                                class="strong-link"
-                            >
-                                {{ invoice.counterparty.name }}
-                            </a>
-
-                            {% if invoice.counterparty.inn %}
-                                <div class="muted">
-                                    ИНН {{ invoice.counterparty.inn }}
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% else %}
-                        <div>
-                            <span class="status-badge status-rejected">
-                                Не привязан
-                            </span>
-
-                        </div>
-                    {% endif %}
-                </div>
-
-                <div class="info-row info-row-vertical">
-                    <span>
-                        Статус сопоставления
-                    </span>
-
-                    <div>
-                        <strong>
-                            {{ invoice.get_counterparty_match_status_display }}
-                        </strong>
-
-                        {% if invoice.counterparty_match_comment %}
-                            <div class="muted">
-                                {{ invoice.counterparty_match_comment }}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="card invoice-section-card invoice-detail-payment-v1" role="region" aria-labelledby="invoice-detail-payment-title-v1">
-
-            <div class="section-title-row">
-                <div>
-                    <h3 id="invoice-detail-payment-title-v1">
-                        Оплата
-                    </h3>
-
-                    <span>
-                        Сумма, план оплаты и приоритет
-                    </span>
-                </div>
-            </div>
-
-            <div class="info-list">
-
-                <div class="info-row">
-                    <span>
-                        Подтвержденная сумма
-                    </span>
-
-                    <strong class="amount-main">
-                        {{ invoice.amount|money_ru }}
-                    </strong>
-                </div>
-
-                <div class="info-row">
-                    <span>
-                        OCR сумма
-                    </span>
-
-                    <strong>
-                        {% if invoice.ocr_amount %}
-                            {{ invoice.ocr_amount|money_ru }}
-                        {% else %}
-                            —
-                        {% endif %}
-                    </strong>
-                </div>
-
-                <div class="info-row">
-                    <span>
-                        Плановая дата оплаты
-                    </span>
-
-                    <strong>
-                        {% if invoice.planned_payment_date %}
-                            {{ invoice.planned_payment_date|date:"d.m.Y" }}
-                        {% else %}
-                            —
-                        {% endif %}
-                    </strong>
-                </div>
-
-                <div class="info-row">
-                    <span>
-                        Приоритет
-                    </span>
-
-                    <strong>
-                        {{ invoice.payment_priority }}
-                    </strong>
-                </div>
-
-                <div class="info-row">
-                    <span>
-                        Дата оплаты
-                    </span>
-
-                    <strong>
-                        {% if invoice.paid_at %}
-                            {{ invoice.paid_at|date:"d.m.Y" }}
-                        {% else %}
-                            —
-                        {% endif %}
-                    </strong>
-                </div>
-
-            </div>
-
-        </div>
-
-<section class="invoice-payment-left-panel invoice-detail-payments-v1" aria-labelledby="invoice-detail-payments-title-v1">
-    <div class="payment-left-header">
+    <section class="document-summary-strip" aria-label="Ключевые данные документа">
         <div>
-            <h3 id="invoice-detail-payments-title-v1">Оплаты по документу</h3>
-            <p>Частичная оплата, остаток и история платежей.</p>
+            <span>Контрагент</span>
+            <strong>{{ invoice.counterparty.name|default:"Не назначен" }}</strong>
         </div>
-    </div>
-
-    <div class="payment-left-summary">
         <div>
-            <span>Сумма документа</span>
+            <span>Ответственный</span>
+            <strong>{{ invoice.responsible.full_name|default:"Не назначен" }}</strong>
+        </div>
+        <div>
+            <span>Плановая дата</span>
+            <strong class="{% if workspace.is_overdue %}is-overdue{% endif %}">{{ workspace.planned_payment_date_label }}</strong>
+        </div>
+        <div>
+            <span>Сумма</span>
             <strong>{{ payment_summary.invoice_amount|money_ru }}</strong>
         </div>
-
         <div>
             <span>Оплачено</span>
             <strong>{{ payment_summary.paid_amount|money_ru }}</strong>
         </div>
-
         <div>
             <span>Остаток</span>
             <strong>{{ payment_summary.remaining_amount|money_ru }}</strong>
         </div>
+    </section>
 
+    <section class="document-readiness-banner readiness-{{ workspace.readiness_tone }}" aria-labelledby="document-readiness-title">
         <div>
-            <span>Статус оплаты</span>
-            <strong>{{ payment_summary.payment_status_label }}</strong>
+            <span class="production-eyebrow">Готовность документа</span>
+            <h2 id="document-readiness-title">{{ workspace.readiness_label }}</h2>
+            <p>{{ workspace.reason }}</p>
         </div>
-    </div>
-
-    {% if payment_summary.remaining_amount > 0 %}
-        <form
-            method="post"
-            action="{% url 'add_invoice_payment' invoice.id %}"
-            class="payment-left-form"
-        >
-            {% csrf_token %}
-
-            <div class="form-group">
-                <label for="{{ payment_form.amount.id_for_label }}">Сумма оплаты</label>
-                {{ payment_form.amount }}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ payment_form.paid_at.id_for_label }}">Дата оплаты</label>
-                {{ payment_form.paid_at }}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ payment_form.payment_number.id_for_label }}">Платёжный документ</label>
-                {{ payment_form.payment_number }}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ payment_form.comment.id_for_label }}">Комментарий</label>
-                {{ payment_form.comment }}
-            </div>
-
-            <button type="submit" class="btn btn-primary payment-left-submit">
-                Внести оплату
-            </button>
-        </form>
-    {% else %}
-        <div class="payment-left-complete">
-            Документ закрыт по оплате.
+        <div class="document-readiness-next">
+            <span>Следующее действие</span>
+            <strong>{{ workspace.next_action }}</strong>
         </div>
-    {% endif %}
+    </section>
 
-    <div class="payment-left-history">
-        <h4>История оплат</h4>
-
-        {% for payment in payments %}
-            <div class="payment-left-history-item">
-                <div>
-                    <strong>{{ payment.amount|money_ru }}</strong>
-                    <span>{{ payment.paid_at|date:"d.m.Y" }}</span>
+    <main class="document-workspace-grid">
+        <div class="document-workspace-primary">
+            <section class="production-panel" aria-labelledby="document-data-title">
+                <div class="production-panel-header">
+                    <div>
+                        <span class="production-eyebrow">Документ</span>
+                        <h2 id="document-data-title">Основные данные</h2>
+                        <p>Юридическая идентификация и ответственные лица.</p>
+                    </div>
+                    <span class="production-readiness-badge readiness-{{ workspace.readiness_tone }}">{{ workspace.readiness_label }}</span>
                 </div>
+                <dl class="document-fact-grid">
+                    <div><dt>Тип</dt><dd>{{ invoice.get_document_type_display }}</dd></div>
+                    <div><dt>Номер</dt><dd>{{ invoice.invoice_number|default:"Не указан" }}</dd></div>
+                    <div><dt>Дата</dt><dd>{{ workspace.document_date_label }}</dd></div>
+                    <div><dt>Статус</dt><dd>{{ workspace.status_label }}</dd></div>
+                    <div><dt>Загрузил</dt><dd>{{ invoice.user.username }}</dd></div>
+                    <div><dt>Файл</dt><dd>{% if invoice.file %}<a href="{{ invoice.file.url }}" target="_blank">{{ invoice.original_filename|default:"Открыть файл" }}</a>{% else %}Нет файла{% endif %}</dd></div>
+                </dl>
 
-                <div>
-                    <span>{{ payment.payment_number|default:"Без номера" }}</span>
-                    <small>
-                        {% if payment.created_by %}
-                            {{ payment.created_by.get_username }}
+                <div class="counterparty-production-card">
+                    <div>
+                        <span>Контрагент справочника</span>
+                        {% if invoice.counterparty %}
+                            <strong>{{ invoice.counterparty.name }}</strong>
+                            <small>ИНН {{ invoice.counterparty.inn|default:"не указан" }}</small>
                         {% else %}
-                            —
+                            <strong class="missing-value">Не назначен</strong>
+                            <small>Выберите организацию из справочника.</small>
                         {% endif %}
-                    </small>
-
-                    <form
-                        method="post"
-                        action="{% url 'cancel_invoice_payment' payment.id %}"
-                        class="payment-cancel-form"
-                    >
-                        {% csrf_token %}
-
-                        <button
-                            type="submit"
-                            class="btn btn-secondary btn-xs"
-                            onclick="return confirm('Отменить эту оплату? Остаток по документу будет пересчитан.');"
-                        >
-                            Отменить
-                        </button>
-                    </form>
-                </div>
-            </div>
-        {% empty %}
-            <div class="payment-left-empty">
-                Оплат по этому документу пока нет.
-            </div>
-        {% endfor %}
-    </div>
-</section>
-
-
-
-        <div class="card invoice-section-card invoice-detail-explainable-ocr-v1" role="region" aria-labelledby="invoice-detail-ocr-title-v1">
-
-            <div class="section-title-row">
-                <div>
-                    <h3 id="invoice-detail-ocr-title-v1">
-                        OCR-проверка
-                    </h3>
-
-                    <span>
-                        Контроль распознавания суммы и данных документа
-                    </span>
-                </div>
-
-                {% if invoice.ocr_verified %}
-                    <span class="status-badge status-approved">
-                        Пройдена
-                    </span>
-                {% else %}
-                    <span class="status-badge status-rejected">
-                        Не пройдена
-                    </span>
-                {% endif %}
-            </div>
-
-            <div class="ocr-check-grid invoice-detail-ocr-facts-v1">
-
-                <div class="ocr-check-item invoice-detail-ocr-fact-v1">
-                    <span>
-                        Сумма в системе
-                    </span>
-
-                    <strong>
-                        {{ invoice.amount|money_ru }}
-                    </strong>
-                </div>
-
-                <div class="ocr-check-item invoice-detail-ocr-fact-v1">
-                    <span>
-                        Сумма из OCR
-                    </span>
-
-                    <strong>
-                        {% if invoice.ocr_amount %}
-                            {{ invoice.ocr_amount|money_ru }}
-                        {% else %}
-                            —
-                        {% endif %}
-                    </strong>
-                </div>
-
-                <div class="ocr-check-item invoice-detail-ocr-fact-v1">
-                    <span>
-                        Номер и дата
-                    </span>
-
-                    <strong>
-                        № {{ invoice.invoice_number|default:"—" }}
-                    </strong>
-
-                    <small>
-                        {{ invoice.invoice_date|default:"Дата не определена" }}
-                    </small>
-                </div>
-
-                <div class="ocr-check-item invoice-detail-ocr-fact-v1">
-                    <span>
-                        Контрагент
-                    </span>
-
-                    {% if invoice.counterparty %}
-                        <strong>
-                            {{ invoice.counterparty.name }}
-                        </strong>
-
-                        {% if invoice.counterparty.inn %}
-                            <small>
-                                ИНН {{ invoice.counterparty.inn }}
-                            </small>
-                        {% endif %}
-                    {% else %}
-                        <strong>
-                            Не привязан
-                        </strong>
+                    </div>
+                    {% if can_edit_invoice %}
+                        <a href="{% url 'invoice_assign_counterparty' invoice.id %}" class="btn btn-secondary btn-sm">
+                            {% if invoice.counterparty %}Изменить{% else %}Назначить{% endif %}
+                        </a>
                     {% endif %}
                 </div>
+            </section>
 
-            </div>
-
-            {% if invoice.ocr_amount %}
-
-                {% if invoice.amount_verified %}
-                    <div class="ocr-result-card ocr-result-success invoice-detail-ocr-decision-v1">
-                        Сумма подтверждена: OCR-сумма совпадает с суммой в системе.
+            <section class="production-panel payment-workspace-panel" aria-labelledby="document-payment-title">
+                <div class="production-panel-header">
+                    <div>
+                        <span class="production-eyebrow">Оплата</span>
+                        <h2 id="document-payment-title">Состояние и история оплат</h2>
+                        <p>Сумма, проведённые платежи и остаток собраны в одном разделе.</p>
                     </div>
-                {% else %}
-                    <div class="ocr-result-card ocr-result-warning invoice-detail-ocr-decision-v1">
-                        <strong>
-                            Оплата заблокирована до подтверждения суммы.
-                        </strong>
+                    <span class="production-readiness-badge readiness-{{ workspace.readiness_tone }}">{{ payment_summary.payment_status_label }}</span>
+                </div>
 
-                        <span>
-                            {% if invoice.amount == invoice.ocr_amount %}
-                                OCR-сумма совпадает с суммой в системе, но требуется ручное подтверждение.
-                            {% else %}
-                                OCR-сумма отличается от суммы в системе. Проверьте сумму перед добавлением документа в оплату.
-                            {% endif %}
-                        </span>
-                    </div>
+                <div class="payment-summary-grid">
+                    <div><span>Сумма документа</span><strong>{{ payment_summary.invoice_amount|money_ru }}</strong></div>
+                    <div><span>Оплачено</span><strong>{{ payment_summary.paid_amount|money_ru }}</strong></div>
+                    <div><span>Остаток</span><strong>{{ payment_summary.remaining_amount|money_ru }}</strong></div>
+                    <div><span>Плановая дата</span><strong>{{ workspace.planned_payment_date_label }}</strong></div>
+                </div>
+
+                {% if can_manage_invoice_payments and payment_summary.remaining_amount > 0 %}
+                    <details class="payment-entry-details">
+                        <summary>Зафиксировать оплату</summary>
+                        <form method="post" action="{% url 'add_invoice_payment' invoice.id %}" class="payment-entry-form">
+                            {% csrf_token %}
+                            <label><span>Сумма</span>{{ payment_form.amount }}</label>
+                            <label><span>Дата оплаты</span>{{ payment_form.paid_at }}</label>
+                            <label><span>Номер документа</span>{{ payment_form.payment_number }}</label>
+                            <label class="payment-entry-comment"><span>Комментарий</span>{{ payment_form.comment }}</label>
+                            <button type="submit" class="btn btn-primary">Сохранить оплату</button>
+                        </form>
+                    </details>
                 {% endif %}
 
-            {% else %}
-
-                <div class="ocr-result-card ocr-result-muted invoice-detail-ocr-decision-v1">
-                    OCR сумма не определена. Перед оплатой сумму нужно проверить вручную.
+                <div class="payment-history-list">
+                    {% for payment in payments %}
+                        <article class="payment-history-item">
+                            <div><strong>{{ payment.amount|money_ru }}</strong><small>{{ payment.paid_at|date:"d.m.Y" }}</small></div>
+                            <div><span>{{ payment.payment_number|default:"Без номера" }}</span><small>{{ payment.comment|default:"Без комментария" }}</small></div>
+                            {% if can_manage_invoice_payments %}
+                                <form method="post" action="{% url 'cancel_invoice_payment' payment.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-secondary btn-sm">Отменить</button>
+                                </form>
+                            {% endif %}
+                        </article>
+                    {% empty %}
+                        <div class="production-empty-state">Оплат по документу пока нет.</div>
+                    {% endfor %}
                 </div>
+            </section>
 
-            {% endif %}
-
-            {% if invoice.amount_verified %}
-                <span class="ocr-badge ocr-badge-ok">
-                    Сумма подтверждена
-                </span>
-            {% else %}
-                <span class="ocr-badge ocr-badge-error">
-                    Сумма требует проверки
-                </span>
-            {% endif %}
-
-            {% if invoice.ocr_comment %}
-                <div class="ocr-comment-box">
-                    {{ invoice.ocr_comment }}
+            <section class="production-panel" aria-labelledby="document-verification-title">
+                <div class="production-panel-header">
+                    <div>
+                        <span class="production-eyebrow">Проверка данных</span>
+                        <h2 id="document-verification-title">Происхождение значений</h2>
+                        <p>Текущее значение сопоставлено с данными, полученными из файла.</p>
+                    </div>
                 </div>
-            {% endif %}
+                <div class="verification-table" role="table" aria-label="Проверка значений документа">
+                    <div class="verification-row verification-head" role="row">
+                        <span role="columnheader">Поле</span><span role="columnheader">В системе</span><span role="columnheader">Из документа</span><span role="columnheader">Результат</span>
+                    </div>
+                    <div class="verification-row" role="row">
+                        <strong role="cell">Сумма</strong><span role="cell">{{ invoice.amount|money_ru }}</span><span role="cell">{{ invoice.ocr_amount|money_ru }}</span><span role="cell">{% if invoice.amount_verified %}Подтверждена{% else %}Требует проверки{% endif %}</span>
+                    </div>
+                    <div class="verification-row" role="row">
+                        <strong role="cell">Номер</strong><span role="cell">{{ invoice.invoice_number|default:"Не указан" }}</span><span role="cell">{{ invoice.invoice_number|default:"Не определён" }}</span><span role="cell">{% if invoice.invoice_number %}Получен{% else %}Требует проверки{% endif %}</span>
+                    </div>
+                    <div class="verification-row" role="row">
+                        <strong role="cell">Дата</strong><span role="cell">{{ workspace.document_date_label }}</span><span role="cell">{{ invoice.invoice_date|default:"Не определена" }}</span><span role="cell">{% if invoice.document_date or invoice.invoice_date %}Получена{% else %}Требует проверки{% endif %}</span>
+                    </div>
+                    <div class="verification-row" role="row">
+                        <strong role="cell">Контрагент</strong><span role="cell">{{ invoice.counterparty.name|default:"Не назначен" }}</span><span role="cell">{{ invoice.vendor|default:"Не определён" }}</span><span role="cell">{% if invoice.counterparty %}Сопоставлен{% else %}Требует выбора{% endif %}</span>
+                    </div>
+                </div>
+                {% if document_readiness.blockers or document_readiness.warnings %}
+                    <div class="readiness-issue-list">
+                        {% for issue in document_readiness.blockers %}<div class="readiness-issue readiness-danger">{{ issue.message }}</div>{% endfor %}
+                        {% for issue in document_readiness.warnings %}<div class="readiness-issue readiness-warning">{{ issue.message }}</div>{% endfor %}
+                    </div>
+                {% endif %}
+            </section>
 
+            <section class="production-panel activity-panel" aria-labelledby="document-activity-title">
+                <div class="production-panel-header">
+                    <div>
+                        <span class="production-eyebrow">Работа с документом</span>
+                        <h2 id="document-activity-title">История и комментарии</h2>
+                    </div>
+                </div>
+                <div class="activity-columns">
+                    <details open>
+                        <summary>История изменений</summary>
+                        <div class="timeline-list">
+                            {% for log in logs %}
+                                <div class="timeline-item"><time>{{ log.created_at|date:"d.m.Y H:i" }}</time><span>{{ log.action }}</span></div>
+                            {% empty %}<div class="production-empty-state">Истории пока нет.</div>{% endfor %}
+                        </div>
+                    </details>
+                    <details open>
+                        <summary>Комментарии</summary>
+                        <form method="post" action="{% url 'add_comment' invoice.id %}" class="comment-production-form">
+                            {% csrf_token %}
+                            <textarea name="text" class="form-control" rows="3" placeholder="Добавить рабочий комментарий"></textarea>
+                            <button type="submit" class="btn btn-primary btn-sm">Добавить</button>
+                        </form>
+                        <div class="comment-list">
+                            {% for comment in comments %}
+                                <article class="comment-item"><header><strong>{{ comment.user.username }}</strong><time>{{ comment.created_at|date:"d.m.Y H:i" }}</time></header><p>{{ comment.text }}</p></article>
+                            {% empty %}<div class="production-empty-state">Комментариев пока нет.</div>{% endfor %}
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            {% if can_delete_invoice %}
+                <section class="document-danger-zone" aria-labelledby="document-danger-title">
+                    <div><h2 id="document-danger-title">Удаление документа</h2><p>Документ исчезнет из рабочих списков, но сохранится в истории.</p></div>
+                    <form method="post" action="{% url 'delete_invoice' invoice.id %}" class="document-danger-form">
+                        {% csrf_token %}
+                        <label class="document-danger-confirm">
+                            <input type="checkbox" required>
+                            <span>Подтверждаю удаление из рабочих списков</span>
+                        </label>
+                        <button type="submit" class="btn btn-danger">Удалить документ</button>
+                    </form>
+                </section>
+            {% endif %}
         </div>
 
-        <div class="card invoice-section-card invoice-detail-history-v1" role="region" aria-labelledby="invoice-detail-history-title-v1">
-
-            <div class="section-title-row">
-                <div>
-                    <h3 id="invoice-detail-history-title-v1">
-                        История
-                    </h3>
-
-                    <span>
-                        Журнал действий по документу
-                    </span>
-                </div>
-            </div>
-
-            <div class="timeline-list">
-
-                {% for log in logs %}
-
-                    <div class="timeline-item">
-                        <div class="timeline-date">
-                            {{ log.created_at|date:"d.m.Y H:i" }}
-                        </div>
-
-                        <div class="timeline-text">
-                            {{ log.action }}
-                        </div>
+        <aside class="document-preview-column" aria-labelledby="document-preview-title">
+            <section class="production-panel document-preview-panel">
+                <div class="production-panel-header">
+                    <div>
+                        <span class="production-eyebrow">Оригинал</span>
+                        <h2 id="document-preview-title">Документ</h2>
                     </div>
-
-                {% empty %}
-
-                    <div class="empty-state">
-                        Истории пока нет.
+                    {% if invoice.file %}<a href="{{ invoice.file.url }}" target="_blank" class="production-text-link">Открыть файл</a>{% endif %}
+                </div>
+                {% if invoice.is_pdf %}
+                    <div class="pdf-toolbar">
+                        <button id="zoom-out" type="button" class="btn btn-secondary btn-sm" aria-label="Уменьшить">−</button>
+                        <span id="zoom-value">100%</span>
+                        <button id="zoom-in" type="button" class="btn btn-secondary btn-sm" aria-label="Увеличить">+</button>
                     </div>
-
-                {% endfor %}
-
-            </div>
-
-        </div>
-
-        <div class="card invoice-section-card invoice-detail-comments-v1" role="region" aria-labelledby="invoice-detail-comments-title-v1">
-
-            <div class="section-title-row">
-                <div>
-                    <h3 id="invoice-detail-comments-title-v1">
-                        Комментарии
-                    </h3>
-
-                    <span>
-                        Внутреннее обсуждение документа
-                    </span>
-                </div>
-            </div>
-
-            <form
-                method="post"
-                action="{% url 'add_comment' invoice.id %}"
-                class="comment-form-clean"
-            >
-
-                {% csrf_token %}
-
-                <textarea
-                    name="text"
-                    class="form-control"
-                    rows="4"
-                    placeholder="Введите комментарий..."
-                ></textarea>
-
-                <div class="comment-actions">
-                    <button
-                        type="submit"
-                        class="btn btn-primary"
-                    >
-                        Добавить комментарий
-                    </button>
-                </div>
-
-            </form>
-
-            <div class="comment-list">
-
-                {% for comment in comments %}
-
-                    <div class="comment-item">
-
-                        <div class="comment-header">
-
-                            <strong>
-                                {{ comment.user.username }}
-                            </strong>
-
-                            <span>
-                                {{ comment.created_at|date:"d.m.Y H:i" }}
-                            </span>
-
-                        </div>
-
-                        <div class="comment-text">
-                            {{ comment.text }}
-                        </div>
-
-                    </div>
-
-                {% empty %}
-
-                    <div class="empty-state">
-                        Пока нет комментариев.
-                    </div>
-
-                {% endfor %}
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="invoice-detail-right invoice-detail-preview-v1">
-
-        <div class="card invoice-document-card invoice-detail-document-v1" role="region" aria-labelledby="invoice-detail-document-title-v1">
-
-            <div class="section-title-row">
-                <div>
-<h3 id="invoice-detail-document-title-v1">
-                        Просмотр документа
-                    </h3>
-
-                    <span>
-                        Оригинальный файл документа
-                    </span>
-                </div>
-            </div>
-
-            {% if invoice.is_pdf %}
-
-                <div class="pdf-toolbar">
-
-                    <button
-                        id="zoom-out"
-                        type="button"
-                        class="btn btn-secondary btn-sm"
-                    >
-                        −
-                    </button>
-
-                    <span id="zoom-value">
-                        100%
-                    </span>
-
-                    <button
-                        id="zoom-in"
-                        type="button"
-                        class="btn btn-secondary btn-sm"
-                    >
-                        +
-                    </button>
-
-                </div>
-
-                <div id="pdf-container"></div>
-
-            {% else %}
-
-                <img
-                    src="{{ invoice.file.url }}"
-                    class="preview-image"
-                    alt="Документ к оплате"
-                >
-
-            {% endif %}
-
-        </div>
-
-    </div>
-
-</main>
+                    <div id="pdf-container" class="document-pdf-container"></div>
+                {% elif invoice.file %}
+                    <img src="{{ invoice.file.url }}" class="preview-image" alt="Оригинал документа">
+                {% else %}
+                    <div class="production-empty-state">Файл документа отсутствует.</div>
+                {% endif %}
+            </section>
+        </aside>
+    </main>
+</div>
 
 {% if invoice.is_pdf %}
-
 {{ invoice.file.url|json_script:"pdf-url" }}
-
 <script type="module">
-
 import * as pdfjsLib from "{% static 'pdfjs/pdf.mjs' %}";
-
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-"{% static 'pdfjs/pdf.worker.mjs' %}";
-
-const pdfUrl =
-JSON.parse(
-    document.getElementById(
-        "pdf-url"
-    ).textContent
-);
-
-const container =
-document.getElementById(
-    "pdf-container"
-);
-
-let scale = 1.1;
-
+pdfjsLib.GlobalWorkerOptions.workerSrc = "{% static 'pdfjs/pdf.worker.mjs' %}";
+const pdfUrl = JSON.parse(document.getElementById("pdf-url").textContent);
+const container = document.getElementById("pdf-container");
+const zoomValue = document.getElementById("zoom-value");
+let scale = 1.05;
 async function renderPdf() {
-
-    container.innerHTML = "";
-
+    container.replaceChildren();
     try {
-
-        const pdf =
-            await pdfjsLib
-                .getDocument({
-                    url: pdfUrl
-                })
-                .promise;
-
-        for (
-            let pageNumber = 1;
-            pageNumber <= pdf.numPages;
-            pageNumber++
-        ) {
-
-            const page =
-                await pdf.getPage(
-                    pageNumber
-                );
-
-            const viewport =
-                page.getViewport({
-                    scale: scale
-                });
-
-            const canvas =
-                document.createElement(
-                    "canvas"
-                );
-
-            const context =
-                canvas.getContext("2d");
-
-            canvas.width =
-                viewport.width;
-
-            canvas.height =
-                viewport.height;
-
-            await page.render({
-
-                canvasContext:
-                    context,
-
-                viewport:
-                    viewport
-
-            }).promise;
-
-            container.appendChild(
-                canvas
-            );
+        const pdf = await pdfjsLib.getDocument({url: pdfUrl}).promise;
+        for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+            const page = await pdf.getPage(pageNumber);
+            const viewport = page.getViewport({scale});
+            const canvas = document.createElement("canvas");
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            await page.render({canvasContext: canvas.getContext("2d"), viewport}).promise;
+            container.appendChild(canvas);
         }
-
-        document.getElementById(
-            "zoom-value"
-        ).innerText =
-            Math.round(
-                scale * 100
-            ) + "%";
-
-    } catch(error) {
-
-        container.innerHTML = `
-
-            <div class="pdf-error">
-
-                Ошибка загрузки PDF
-
-                <br><br>
-
-                ${error}
-
-            </div>
-
-        `;
-
+        zoomValue.textContent = `${Math.round(scale * 100)}%`;
+    } catch (error) {
+        const message = document.createElement("div");
+        message.className = "production-empty-state";
+        message.textContent = "Не удалось открыть PDF. Используйте ссылку «Открыть файл».";
+        container.appendChild(message);
         console.error(error);
     }
 }
-
-document
-.getElementById(
-    "zoom-in"
-)
-.addEventListener(
-    "click",
-    () => {
-
-        scale += 0.15;
-
-        renderPdf();
-    }
-);
-
-document
-.getElementById(
-    "zoom-out"
-)
-.addEventListener(
-    "click",
-    () => {
-
-        if(scale > 0.45){
-
-            scale -= 0.15;
-
-            renderPdf();
-        }
-    }
-);
-
+document.getElementById("zoom-in").addEventListener("click", () => { scale += 0.15; renderPdf(); });
+document.getElementById("zoom-out").addEventListener("click", () => { if (scale > 0.45) { scale -= 0.15; renderPdf(); } });
 renderPdf();
-
 </script>
-
 {% endif %}
-
-</div>
-{% endblock %}
-
-{% block extra_js %}
-    {{ block.super }}
-    <script
-        src="{% static 'js/invoice-detail-action-menu.js' %}"
-        defer
-    ></script>
 {% endblock %}

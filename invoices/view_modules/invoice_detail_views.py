@@ -1,83 +1,78 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
+
+from users.permissions import user_can_process_invoices
+
 from ..comment_forms import InvoiceCommentForm
 from ..comment_models import InvoiceComment
 from ..forms import InvoicePaymentForm
-from ..models import InvoicePayment
-from ..payment_services import get_invoice_payment_summary
-from ..selectors import get_visible_invoices_for_user
 from ..invoice_action_context import (
     get_invoice_detail_action_context,
 )
+from ..models import InvoicePayment
+from ..presentation_services import (
+    annotate_invoice_workspace,
+    build_invoice_presentation,
+)
+from ..selectors import get_visible_invoices_for_user
 
 
 @login_required
 def invoice_detail(request, invoice_id):
-
     invoice = get_object_or_404(
-        get_visible_invoices_for_user(
-            request.user
-        ).select_related(
-            'user',
-            'responsible',
-            'counterparty',
+        annotate_invoice_workspace(
+            get_visible_invoices_for_user(
+                request.user
+            )
         ),
         id=invoice_id,
     )
 
-    payment_summary = get_invoice_payment_summary(
+    workspace = build_invoice_presentation(
         invoice
     )
+    payment_summary = workspace["payment"]
 
     payments = (
         invoice.payments
         .filter(
             status=InvoicePayment.STATUS_POSTED
         )
-        .select_related(
-            "created_by"
-        )
-        .order_by(
-            "-paid_at",
-            "-created_at"
-        )
+        .select_related("created_by")
+        .order_by("-paid_at", "-created_at")
     )
-
-    payment_form = InvoicePaymentForm()
-
     comments = (
         InvoiceComment.objects
-        .filter(
-            invoice=invoice
-        )
-        .select_related(
-            'user'
-        )
-        .order_by(
-            '-created_at'
-        )
+        .filter(invoice=invoice)
+        .select_related("user")
+        .order_by("-created_at")
     )
-
-    comment_form = InvoiceCommentForm()
-
-    action_context = (
-        get_invoice_detail_action_context(
-            request.user,
-            invoice,
-        )
+    action_context = get_invoice_detail_action_context(
+        request.user,
+        invoice,
+    )
+    action_context["can_manage_invoice_payments"] = bool(
+        user_can_process_invoices(request.user)
     )
 
     return render(
         request,
-        'invoices/detail.html',
+        "invoices/detail.html",
         {
-            'invoice': invoice,
-            'logs': invoice.logs.all(),
-            'comments': comments,
-            'comment_form': comment_form,
-            'payment_summary': payment_summary,
-            'payments': payments,
-            'payment_form': payment_form,
+            "invoice": invoice,
+            "workspace": workspace,
+            "document_readiness": workspace[
+                "document_readiness"
+            ],
+            "payment_readiness": workspace[
+                "payment_readiness"
+            ],
+            "logs": invoice.logs.all(),
+            "comments": comments,
+            "comment_form": InvoiceCommentForm(),
+            "payment_summary": payment_summary,
+            "payments": payments,
+            "payment_form": InvoicePaymentForm(),
             **action_context,
-        }
+        },
     )

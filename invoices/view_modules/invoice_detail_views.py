@@ -56,6 +56,41 @@ def invoice_detail(request, invoice_id):
         user_can_process_invoices(request.user)
     )
 
+    workflow_codes = (
+        "new",
+        "in_work",
+        "on_approval",
+        "approved",
+        "paid",
+    )
+    workflow_labels = {
+        "new": "Новый",
+        "in_work": "В работе",
+        "on_approval": "На согласовании",
+        "approved": "Утверждён",
+        "paid": "Оплачен",
+    }
+    current_workflow_position = (
+        workflow_codes.index(invoice.status)
+        if invoice.status in workflow_codes
+        else -1
+    )
+    workflow_steps = [
+        {
+            "code": code,
+            "label": workflow_labels[code],
+            "is_complete": bool(
+                current_workflow_position > position
+            ),
+            "is_current": bool(
+                current_workflow_position == position
+            ),
+        }
+        for position, code in enumerate(
+            workflow_codes
+        )
+    ]
+
     return render(
         request,
         "invoices/detail.html",
@@ -82,6 +117,7 @@ def invoice_detail(request, invoice_id):
             "payment_summary": payment_summary,
             "payments": payments,
             "payment_form": InvoicePaymentForm(),
+            "workflow_steps": workflow_steps,
             **action_context,
         },
     )

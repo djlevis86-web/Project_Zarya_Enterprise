@@ -7,6 +7,9 @@ from django.db.models import F, Q
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 from ..models import Invoice
+from ..enterprise_analytics_services import (
+    build_enterprise_dashboard_analytics,
+)
 from ..search_helpers import build_multi_variant_search_q
 from .payment_registry_helpers import PAYMENT_STATUS_FILTER_CHOICES, apply_payment_status_filter
 from django.utils import timezone
@@ -548,6 +551,23 @@ def invoice_list(request):
         users_by_id,
     )
 
+    enterprise_list_analytics = (
+        build_enterprise_dashboard_analytics(
+            get_visible_invoices_for_user(
+                request.user
+            ),
+            today=today,
+            series_days=7,
+            task_limit=0,
+            recent_activity_limit=0,
+            largest_payment_limit=0,
+        )
+    )
+    enterprise_metrics = {
+        metric.code: metric
+        for metric in enterprise_list_analytics.metrics
+    }
+
     return render(
         request,
         "invoices/invoice_list.html",
@@ -578,6 +598,8 @@ def invoice_list(request):
             "ready_count": stats["ready_count"],
             "overdue_count": stats["overdue_count"],
             "paid_count": stats["paid_month_count"],
+            "enterprise_list_analytics": enterprise_list_analytics,
+            "enterprise_metrics": enterprise_metrics,
             "new_count": sum(
                 1
                 for invoice in stats_items

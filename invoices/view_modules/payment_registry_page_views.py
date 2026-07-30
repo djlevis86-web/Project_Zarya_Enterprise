@@ -37,6 +37,16 @@ from ..models import (
 )
 
 from ..search_helpers import build_multi_variant_search_q
+from ..enterprise_analytics_services import (
+    build_enterprise_payment_schedule_analytics,
+    build_enterprise_registry_analytics,
+    enterprise_analytics_to_primitive,
+)
+from ..presentation_services import (
+    annotate_invoice_workspace,
+    build_presentations,
+)
+from ..selectors import get_visible_invoices_for_user
 
 from ..payment_registry_permissions import (
     require_payment_registry_permission,
@@ -99,17 +109,29 @@ def payment_schedule(request):
     ]
 
     base_invoices = (
-        Invoice.objects
-        .select_related(
-            'counterparty',
-            'user'
+        get_visible_invoices_for_user(
+            request.user
         )
         .filter(
             status__in=payment_statuses
         )
     )
 
-    today = date.today()
+    today = timezone.localdate()
+
+    schedule_analytics = (
+        build_enterprise_payment_schedule_analytics(
+            base_invoices,
+            today=today,
+            period_days=7,
+            largest_payment_limit=5,
+        )
+    )
+    schedule_payload = (
+        enterprise_analytics_to_primitive(
+            schedule_analytics
+        )
+    )
 
     week_end = today + timedelta(
         days=7
@@ -284,11 +306,19 @@ def payment_schedule(request):
         invoices
     )
 
-    invoices = invoices.order_by(
-        'planned_payment_date',
-        '-payment_priority',
-        'counterparty__name',
-        'id'
+    invoices = list(
+        annotate_invoice_workspace(
+            invoices
+        ).order_by(
+            'planned_payment_date',
+            '-payment_priority',
+            'counterparty__name',
+            'id'
+        )
+    )
+    build_presentations(
+        invoices,
+        today=today,
     )
 
     return render(
@@ -318,6 +348,8 @@ def payment_schedule(request):
             'total_amount': total_amount,
             'filtered_count': filtered_count,
             'filtered_amount': filtered_amount,
+            'schedule_analytics': schedule_analytics,
+            'schedule_payload': schedule_payload,
         }
     )
 
@@ -390,8 +422,24 @@ def payment_registry_detail(request, registry_id):
             registry
         )
 
+    registry_items = list(
+        registry_items
+    )
+    registry_analytics = (
+        build_enterprise_registry_analytics(
+            registry,
+            items=registry_items,
+            check_result=check_result,
+        )
+    )
+
     can_edit_registry = payment_registry_can_be_edited(
         registry
+    )
+    permission_context = (
+        get_payment_registry_permission_context(
+            request.user
+        )
     )
 
     return render(
@@ -403,6 +451,8 @@ def payment_registry_detail(request, registry_id):
             'registry_items': registry_items,
             'check_result': check_result,
             'can_edit_registry': can_edit_registry,
+            'registry_analytics': registry_analytics,
+            **permission_context,
         }
     )
 
@@ -672,14 +722,17 @@ def payment_registry(request):
         or 0
     )
 
-    invoices = invoices.order_by(
-        'planned_payment_date',
-        '-payment_priority',
-        'counterparty__name',
-        'id'
+    invoices = list(
+        annotate_invoice_workspace(
+            invoices
+        ).order_by(
+            'planned_payment_date',
+            '-payment_priority',
+            'counterparty__name',
+            'id'
+        )
     )
-
-    invoices = list(invoices)
+    build_presentations(invoices)
 
     readiness_blocked_count = 0
 
@@ -722,6 +775,25 @@ def payment_registry(request):
         if not invoice.amount_verified
     )
 
+    registry_analytics = None
+
+    if draft_registry:
+        registry_analytics = (
+            build_enterprise_registry_analytics(
+                draft_registry,
+                items=draft_registry_items,
+                check_result=(
+                    draft_registry_check_result
+                ),
+            )
+        )
+
+    permission_context = (
+        get_payment_registry_permission_context(
+            request.user
+        )
+    )
+
     return render(
         request,
         'invoices/payment_registry.html',
@@ -747,5 +819,7 @@ def payment_registry(request):
             'draft_registry_items_count': draft_registry.items_count if draft_registry else 0,
             'draft_registry_total_amount': draft_registry.total_amount if draft_registry else 0,
             'draft_registry_check_result': draft_registry_check_result,
+            'registry_analytics': registry_analytics,
+            **permission_context,
         }
     )

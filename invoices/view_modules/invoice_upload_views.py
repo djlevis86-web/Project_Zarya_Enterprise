@@ -15,6 +15,9 @@ from ..forms import UploadInvoiceForm
 from ..log_service import create_invoice_log
 from ..counterparty_service import get_or_create_counterparty_from_invoice
 from ..models import Invoice, InvoiceUploadBatch, OCRJob
+from ..enterprise_analytics_services import (
+    build_enterprise_upload_journal_analytics,
+)
 from ..ocr_processing_service import apply_ocr_identity_to_invoice, get_duplicate_invoice_by_ocr_identity, read_and_parse_invoice_file
 from ..ocr_verification_service import apply_ocr_amount_to_invoice
 
@@ -96,18 +99,35 @@ def get_latest_upload_batches_for_user(user, limit=5):
 
     return batches[:limit]
 
+
 def render_upload_invoice_form(request, form):
+    batches = (
+        InvoiceUploadBatch.objects
+        .select_related("user")
+        .order_by("-created_at", "-id")
+    )
+
+    if not request.user.is_staff:
+        batches = batches.filter(
+            user=request.user
+        )
+
+    upload_analytics = (
+        build_enterprise_upload_journal_analytics(
+            batches,
+            recent_limit=5,
+        )
+    )
 
     return render(
         request,
-        'invoices/upload_invoice.html',
+        "invoices/upload_invoice.html",
         {
-            'form': form,
-            'upload_token': create_upload_token(request),
-            'latest_upload_batches': get_latest_upload_batches_for_user(
-                request.user
-            ),
-        }
+            "form": form,
+            "upload_token": create_upload_token(request),
+            "latest_upload_batches": upload_analytics.recent_batches,
+            "upload_analytics": upload_analytics,
+        },
     )
 
 

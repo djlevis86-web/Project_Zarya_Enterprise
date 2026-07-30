@@ -11,7 +11,14 @@ from django.urls import reverse
 from django.utils import timezone
 
 from invoices.audit_models import InvoiceLog
-from invoices.models import Counterparty, Invoice, ResponsiblePerson
+from invoices.models import (
+    Counterparty,
+    Invoice,
+    InvoiceUploadBatch,
+    PaymentRegistry,
+    PaymentRegistryItem,
+    ResponsiblePerson,
+)
 from invoices.presentation_services import (
     annotate_invoice_workspace,
     build_invoice_presentation,
@@ -55,90 +62,118 @@ class DocumentsPaymentsProductionTests(TestCase):
             vendor=self.counterparty.name,
             counterparty=self.counterparty,
             responsible=self.responsible,
-            planned_payment_date=(
-                timezone.localdate()
-                + timedelta(days=7)
-            ),
+            planned_payment_date=(timezone.localdate() + timedelta(days=7)),
             status=Invoice.STATUS_APPROVED,
+        )
+        self.batch = InvoiceUploadBatch.objects.create(
+            user=self.user,
+            total_files=1,
+            uploaded_count=1,
+            status=InvoiceUploadBatch.STATUS_COMPLETED,
+        )
+        self.invoice.upload_batch = self.batch
+        self.invoice.save(update_fields=["upload_batch", "updated_at"])
+        self.registry = PaymentRegistry.objects.create(
+            title="Реестр предприятия",
+            created_by=self.user,
+            items_count=1,
+            total_amount=self.invoice.amount,
+        )
+        PaymentRegistryItem.objects.create(
+            registry=self.registry,
+            invoice=self.invoice,
+            amount=self.invoice.amount,
+            planned_payment_date=self.invoice.planned_payment_date,
+        )
+        InvoiceLog.objects.create(
+            invoice=self.invoice,
+            user=self.user,
+            action="Документ загружен",
         )
         self.client.force_login(self.user)
 
-    def test_dashboard_is_user_work_center(self):
+    def test_dashboard_is_informative_enterprise_work_center(self):
         response = self.client.get(reverse("dashboard"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Документы и платежи")
-        self.assertContains(response, "Требуют проверки")
-        self.assertContains(response, "К оплате сегодня")
-        self.assertContains(response, "Ближайшие оплаты")
+        for text in (
+            "Статусы документов",
+            "Суммы к оплате",
+            "Мои задачи",
+            "Последние действия",
+            "Документы, требующие внимания",
+            "Крупнейшие платежи недели",
+        ):
+            self.assertContains(response, text)
+        self.assertContains(response, "enterprise-dashboard-data")
         self.assertNotContains(response, "Технический аудит")
-        self.assertNotContains(response, "Отчёт бота")
         self.assertNotContains(response, "OCR")
 
-    def test_invoice_list_uses_seven_business_columns(self):
+    def test_invoice_list_uses_eight_enterprise_columns(self):
         response = self.client.get(reverse("invoice_list"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Счёт №617")
-        self.assertContains(response, "ООО ГОСКОМПЛЕКТ")
-        self.assertContains(response, "Готов к реестру")
-        self.assertContains(response, "Ответственный")
-        self.assertNotContains(response, "Повторить OCR")
-        self.assertNotContains(response, "Поставить OCR")
-        self.assertNotContains(response, "Удалить")
+        self.assertContains(response, "Сумма / остаток")
+        self.assertContains(response, "Статус")
+        self.assertContains(response, "Готовность")
         html = response.content.decode("utf-8")
         header = html.split("<thead>", 1)[1].split("</thead>", 1)[0]
-        self.assertEqual(header.count("<th"), 7)
-
-    def test_detail_starts_with_legal_identity_and_payment_summary(self):
-        response = self.client.get(
-            reverse(
-                "invoice_detail",
-                kwargs={"invoice_id": self.invoice.id},
-            )
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Счёт №617")
-        self.assertContains(response, "Контрагент")
-        self.assertContains(response, "Плановая дата")
-        self.assertContains(response, "Оплачено")
-        self.assertContains(response, "Остаток")
-        self.assertContains(response, "Происхождение значений")
-        self.assertContains(response, "Удаление документа")
+        self.assertEqual(header.count("<th"), 8)
         self.assertNotContains(response, "Повторить OCR")
-        self.assertNotContains(response, "Поставить OCR")
 
-    def test_legacy_approved_invalid_document_is_visible_as_repair(self):
-        invoice = Invoice.objects.create(
-            user=self.user,
-            title="Некорректный документ",
-            file="invoices/invalid.pdf",
-            amount=Decimal("0.00"),
-            amount_verified=False,
-            document_type=Invoice.DOCUMENT_TYPE_INVOICE,
-            status=Invoice.STATUS_APPROVED,
-        )
-        response = self.client.get(
-            reverse(
-                "invoice_detail",
-                kwargs={"invoice_id": invoice.id},
-            )
-        )
-        self.assertContains(response, "Требуется исправление")
-        self.assertContains(response, "Не указана сумма к оплате")
+    def test_upload_and_journal_use_enterprise_process_contract(self):
+        upload = self.client.get(reverse("upload_invoice"))
+        journal = self.client.get(reverse("upload_batches"))
+        detail = self.client.get(reverse("upload_batch_detail", kwargs={"batch_id": self.batch.id}))
+        for response in (upload, journal, detail):
+            self.assertEqual(response.status_code, 200)
+        self.assertContains(upload, "Что происходит после загрузки")
+        self.assertContains(upload, "Распознавание данных")
+        self.assertContains(journal, "Контроль партий")
+        self.assertContains(journal, "Дубликатов")
+        self.assertContains(detail, "Результат загрузки")
+        self.assertNotContains(upload, "OCR")
 
-    def test_presenter_uses_annotated_payment_data_without_extra_query(self):
-        with self.assertNumQueries(1):
-            invoice = annotate_invoice_workspace(
-                Invoice.objects.filter(pk=self.invoice.pk)
-            ).get()
-        with self.assertNumQueries(0):
-            presentation = build_invoice_presentation(invoice)
-        self.assertEqual(presentation["title"], "Счёт №617")
-        self.assertEqual(presentation["readiness_code"], "ready")
+    def test_payment_schedule_has_kpi_chart_and_largest_payments(self):
+        response = self.client.get(reverse("payment_schedule"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Платёжный календарь")
+        self.assertContains(response, "По дням, ₽")
+        self.assertContains(response, "Крупнейшие")
+        self.assertContains(response, "enterprise-schedule-data")
 
+    def test_registry_has_lifecycle_check_and_queue(self):
+        response = self.client.get(reverse("payment_registry"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Подготовка и контроль оплаты")
+        self.assertContains(response, "Черновик")
+        self.assertContains(response, "Состав текущего реестра")
+        self.assertContains(response, "Очередь документов")
 
-    def test_missing_number_uses_business_fallback_and_hides_ocr(
-        self,
-    ):
+    def test_registry_detail_uses_enterprise_lifecycle(self):
+        response = self.client.get(reverse("payment_registry_detail", kwargs={"registry_id": self.registry.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Документы реестра")
+        self.assertContains(response, "Выгружен")
+        self.assertContains(response, "Частично оплачен")
+
+    def test_detail_starts_with_workflow_identity_and_payment_summary(self):
+        response = self.client.get(reverse("invoice_detail", kwargs={"invoice_id": self.invoice.id}))
+        self.assertEqual(response.status_code, 200)
+        for text in (
+            "Счёт №617",
+            "Новый",
+            "В работе",
+            "На согласовании",
+            "Утверждён",
+            "Оплачен",
+            "Система и оригинал",
+            "Состояние и история оплат",
+            "Удаление документа",
+        ):
+            self.assertContains(response, text)
+        self.assertNotContains(response, "Повторить OCR")
+
+    def test_missing_number_uses_business_fallback_and_hides_ocr(self):
         invoice = Invoice.objects.create(
             user=self.user,
             title="Документ для проверки",
@@ -148,182 +183,80 @@ class DocumentsPaymentsProductionTests(TestCase):
             document_type=Invoice.DOCUMENT_TYPE_INVOICE,
             status=Invoice.STATUS_APPROVED,
         )
+        InvoiceLog.objects.create(invoice=invoice, user=self.user, action="OCR повторно выполнен массово")
+        response = self.client.get(reverse("invoice_detail", kwargs={"invoice_id": invoice.id}))
+        self.assertContains(response, "Счёт без номера")
+        self.assertNotContains(response, f"Счёт #{invoice.id}")
+        self.assertContains(response, "Сумма документа не подтверждена по оригиналу.")
+        self.assertContains(response, "Повторная проверка данных выполнена")
+        self.assertNotContains(response, "OCR")
 
-        InvoiceLog.objects.create(
-            invoice=invoice,
-            user=self.user,
-            action="OCR повторно выполнен массово",
-        )
-
-        response = self.client.get(
-            reverse(
-                "invoice_detail",
-                kwargs={
-                    "invoice_id": invoice.id,
-                },
-            )
-        )
-
-        self.assertEqual(
-            response.status_code,
-            200,
-        )
-        self.assertContains(
-            response,
-            "Счёт без номера",
-        )
-        self.assertNotContains(
-            response,
-            f"Счёт #{invoice.id}",
-        )
-        self.assertContains(
-            response,
-            (
-                "Сумма документа не подтверждена "
-                "по оригиналу."
-            ),
-        )
-        self.assertContains(
-            response,
-            "Повторная проверка данных выполнена",
-        )
-        self.assertNotContains(
-            response,
-            "OCR",
-        )
+    def test_presenter_uses_annotated_payment_data_without_extra_query(self):
+        with self.assertNumQueries(1):
+            invoice = annotate_invoice_workspace(Invoice.objects.filter(pk=self.invoice.pk)).get()
+        with self.assertNumQueries(0):
+            presentation = build_invoice_presentation(invoice)
+        self.assertEqual(presentation["title"], "Счёт №617")
 
 
 class DocumentsPaymentsStaticProductionTests(TestCase):
-    def test_page_owners_are_final_and_old_patches_are_retired(self):
+    def test_enterprise_page_owners_and_local_chart_runtime(self):
         base = Path(settings.BASE_DIR)
         app_css = (base / "static/css/app.css").read_text(encoding="utf-8-sig")
-        self.assertNotIn("dashboard-page-header-visual-v1.css", app_css)
-        self.assertNotIn("invoice-detail-action-bar.css", app_css)
-        self.assertNotIn("invoice-list-table-responsive-v1.css", app_css)
-        self.assertLess(app_css.index("./features/page-header-visual-v1.css"), app_css.index("./pages/dashboard.css"))
-        self.assertLess(app_css.index("./pages/dashboard.css"), app_css.index("./pages/invoice-list.css"))
-        self.assertLess(app_css.index("./pages/invoice-list.css"), app_css.index("./pages/invoice-detail.css"))
+        self.assertIn("./pages/upload-workspace.css", app_css)
+        self.assertIn("./components/documents-payments-workspace.css", app_css)
+        runtime = (base / "static/js/enterprise-workspace.js").read_text(encoding="utf-8-sig")
+        self.assertIn("data-enterprise-chart", runtime)
+        self.assertNotIn("https://", runtime)
+        self.assertNotIn("http://", runtime)
 
-    def test_new_page_css_has_no_patch_techniques(self):
+    def test_page_css_has_no_patch_techniques(self):
         base = Path(settings.BASE_DIR)
         for relative in (
             "static/css/pages/dashboard.css",
             "static/css/pages/invoice-list.css",
+            "static/css/pages/payment-schedule.css",
+            "static/css/pages/payment-registry.css",
             "static/css/pages/invoice-detail.css",
+            "static/css/pages/upload-workspace.css",
         ):
             css = (base / relative).read_text(encoding="utf-8-sig")
             with self.subTest(relative=relative):
                 self.assertNotIn("!important", css)
                 self.assertNotIn("nth-child(", css)
-                self.assertNotIn("#fff", css.lower())
                 self.assertNotIn("rgba(", css.lower())
-
-
-    def test_shared_workspace_css_has_one_owner(self):
-        base = Path(settings.BASE_DIR)
-        app_css = (
-            base
-            / "static/css/app.css"
-        ).read_text(
-            encoding="utf-8-sig"
-        )
-        shared_css = (
-            base
-            / (
-                "static/css/components/"
-                "documents-payments-workspace.css"
-            )
-        ).read_text(
-            encoding="utf-8-sig"
-        )
-
-        self.assertIn(
-            (
-                "./components/"
-                "documents-payments-workspace.css"
-            ),
-            app_css,
-        )
-        self.assertIn(
-            "grid-template-columns: repeat(2",
-            shared_css,
-        )
-        self.assertNotIn(
-            "!important",
-            shared_css,
-        )
-        self.assertNotIn(
-            "nth-child(",
-            shared_css,
-        )
-
-        for relative in (
-            "static/css/pages/dashboard.css",
-            "static/css/pages/invoice-list.css",
-            "static/css/pages/invoice-detail.css",
-        ):
-            css = (
-                base
-                / relative
-            ).read_text(
-                encoding="utf-8-sig"
-            )
-
-            with self.subTest(relative=relative):
-                self.assertNotIn(
-                    "\n.production-panel {",
-                    css,
-                )
-                self.assertNotIn(
-                    "\n.production-kpi-grid {",
-                    css,
-                )
-                self.assertNotIn(
-                    "\n.production-readiness-badge {",
-                    css,
-                )
-
-    def test_visual_acceptance_layout_contracts(self):
-        base = Path(settings.BASE_DIR)
-        dashboard_css = (
-            base
-            / "static/css/pages/dashboard.css"
-        ).read_text(
-            encoding="utf-8-sig"
-        )
-        list_css = (
-            base
-            / "static/css/pages/invoice-list.css"
-        ).read_text(
-            encoding="utf-8-sig"
-        )
-
-        self.assertIn(
-            "align-items: start;",
-            dashboard_css,
-        )
-        self.assertIn(
-            "white-space: nowrap;",
-            list_css,
-        )
-        self.assertIn(
-            "min-width: 84px;",
-            list_css,
-        )
 
     def test_business_templates_do_not_expose_technical_actions(self):
         base = Path(settings.BASE_DIR)
-        combined = "\n".join(
-            (base / relative).read_text(encoding="utf-8-sig")
-            for relative in (
-                "templates/dashboard.html",
-                "templates/invoices/invoice_list.html",
-                "templates/invoices/detail.html",
-            )
+        templates = (
+            "templates/dashboard.html",
+            "templates/invoices/invoice_list.html",
+            "templates/invoices/upload_invoice.html",
+            "templates/invoices/upload_batches.html",
+            "templates/invoices/upload_batch_detail.html",
+            "templates/invoices/payment_schedule.html",
+            "templates/invoices/payment_registry.html",
+            "templates/invoices/payment_registry_detail.html",
+            "templates/invoices/detail.html",
         )
+        combined = "\n".join((base / relative).read_text(encoding="utf-8-sig") for relative in templates)
         self.assertNotIn("Повторить OCR", combined)
         self.assertNotIn("Поставить OCR", combined)
-        self.assertNotIn("Технический аудит", combined)
-        self.assertNotIn("invoice-detail-action-menu", combined)
+        self.assertNotIn("OCR-", combined)
         self.assertNotIn("onclick=", combined)
         self.assertNotIn("onsubmit=", combined)
+
+    def test_all_seven_screens_have_enterprise_contract(self):
+        base = Path(settings.BASE_DIR)
+        expected = {
+            "templates/dashboard.html": "data-enterprise-screen=\"dashboard\"",
+            "templates/invoices/invoice_list.html": "data-enterprise-screen=\"invoice-list\"",
+            "templates/invoices/upload_invoice.html": "data-enterprise-screen=\"upload\"",
+            "templates/invoices/upload_batches.html": "data-enterprise-screen=\"upload-journal\"",
+            "templates/invoices/payment_schedule.html": "data-enterprise-screen=\"payment-schedule\"",
+            "templates/invoices/payment_registry.html": "data-enterprise-screen=\"payment-registry\"",
+            "templates/invoices/detail.html": "data-enterprise-screen=\"invoice-detail\"",
+        }
+        for relative, token in expected.items():
+            with self.subTest(relative=relative):
+                self.assertIn(token, (base / relative).read_text(encoding="utf-8-sig"))

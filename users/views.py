@@ -5,6 +5,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from invoices.models import Invoice
+from invoices.enterprise_analytics_services import (
+    build_enterprise_dashboard_analytics,
+    enterprise_analytics_to_primitive,
+)
 from invoices.presentation_services import (
     annotate_invoice_workspace,
     build_dashboard_workspace,
@@ -54,15 +58,26 @@ def login_view(request):
     )
 
 
-@login_required
 
 @login_required
 def dashboard(request):
+    visible_invoices = get_visible_invoices_for_user(
+        request.user
+    )
+
+    enterprise_dashboard = (
+        build_enterprise_dashboard_analytics(
+            visible_invoices,
+            series_days=7,
+            task_limit=5,
+            recent_activity_limit=5,
+            largest_payment_limit=5,
+        )
+    )
+
     invoices = list(
         annotate_invoice_workspace(
-            get_visible_invoices_for_user(
-                request.user
-            )
+            visible_invoices
         ).order_by(
             "-created_at",
             "-id",
@@ -75,7 +90,13 @@ def dashboard(request):
 
     context = {
         "dashboard_workspace": workspace,
-        "total_count": workspace["total_count"],
+        "enterprise_dashboard": enterprise_dashboard,
+        "enterprise_dashboard_payload": (
+            enterprise_analytics_to_primitive(
+                enterprise_dashboard
+            )
+        ),
+        "total_count": enterprise_dashboard.total_documents,
         "new_count": sum(
             1
             for invoice in invoices

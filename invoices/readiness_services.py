@@ -126,7 +126,7 @@ def evaluate_document_readiness(
             blockers,
             ReadinessIssue(
                 "amount_unverified",
-                "Сумма документа не подтверждена после OCR-проверки.",
+                "Сумма документа не подтверждена по оригиналу.",
                 "amount",
             ),
         )

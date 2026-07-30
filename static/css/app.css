@@ -22,6 +22,7 @@
 @import url("./components/pagination.css");
 @import url("./components/modals.css");
 @import url("./components/alerts.css");
+@import url("./components/documents-payments-workspace.css");
 
 /* Shared features retained for the rest of the application */
 @import url("./features/partial-payments.css");

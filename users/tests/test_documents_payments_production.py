@@ -10,6 +10,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from invoices.audit_models import InvoiceLog
 from invoices.models import Counterparty, Invoice, ResponsiblePerson
 from invoices.presentation_services import (
     annotate_invoice_workspace,
@@ -135,6 +136,63 @@ class DocumentsPaymentsProductionTests(TestCase):
         self.assertEqual(presentation["readiness_code"], "ready")
 
 
+    def test_missing_number_uses_business_fallback_and_hides_ocr(
+        self,
+    ):
+        invoice = Invoice.objects.create(
+            user=self.user,
+            title="Документ для проверки",
+            file="invoices/missing-number.pdf",
+            amount=Decimal("0.00"),
+            amount_verified=False,
+            document_type=Invoice.DOCUMENT_TYPE_INVOICE,
+            status=Invoice.STATUS_APPROVED,
+        )
+
+        InvoiceLog.objects.create(
+            invoice=invoice,
+            user=self.user,
+            action="OCR повторно выполнен массово",
+        )
+
+        response = self.client.get(
+            reverse(
+                "invoice_detail",
+                kwargs={
+                    "invoice_id": invoice.id,
+                },
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+        self.assertContains(
+            response,
+            "Счёт без номера",
+        )
+        self.assertNotContains(
+            response,
+            f"Счёт #{invoice.id}",
+        )
+        self.assertContains(
+            response,
+            (
+                "Сумма документа не подтверждена "
+                "по оригиналу."
+            ),
+        )
+        self.assertContains(
+            response,
+            "Повторная проверка данных выполнена",
+        )
+        self.assertNotContains(
+            response,
+            "OCR",
+        )
+
+
 class DocumentsPaymentsStaticProductionTests(TestCase):
     def test_page_owners_are_final_and_old_patches_are_retired(self):
         base = Path(settings.BASE_DIR)
@@ -159,6 +217,99 @@ class DocumentsPaymentsStaticProductionTests(TestCase):
                 self.assertNotIn("nth-child(", css)
                 self.assertNotIn("#fff", css.lower())
                 self.assertNotIn("rgba(", css.lower())
+
+
+    def test_shared_workspace_css_has_one_owner(self):
+        base = Path(settings.BASE_DIR)
+        app_css = (
+            base
+            / "static/css/app.css"
+        ).read_text(
+            encoding="utf-8-sig"
+        )
+        shared_css = (
+            base
+            / (
+                "static/css/components/"
+                "documents-payments-workspace.css"
+            )
+        ).read_text(
+            encoding="utf-8-sig"
+        )
+
+        self.assertIn(
+            (
+                "./components/"
+                "documents-payments-workspace.css"
+            ),
+            app_css,
+        )
+        self.assertIn(
+            "grid-template-columns: repeat(2",
+            shared_css,
+        )
+        self.assertNotIn(
+            "!important",
+            shared_css,
+        )
+        self.assertNotIn(
+            "nth-child(",
+            shared_css,
+        )
+
+        for relative in (
+            "static/css/pages/dashboard.css",
+            "static/css/pages/invoice-list.css",
+            "static/css/pages/invoice-detail.css",
+        ):
+            css = (
+                base
+                / relative
+            ).read_text(
+                encoding="utf-8-sig"
+            )
+
+            with self.subTest(relative=relative):
+                self.assertNotIn(
+                    "\n.production-panel {",
+                    css,
+                )
+                self.assertNotIn(
+                    "\n.production-kpi-grid {",
+                    css,
+                )
+                self.assertNotIn(
+                    "\n.production-readiness-badge {",
+                    css,
+                )
+
+    def test_visual_acceptance_layout_contracts(self):
+        base = Path(settings.BASE_DIR)
+        dashboard_css = (
+            base
+            / "static/css/pages/dashboard.css"
+        ).read_text(
+            encoding="utf-8-sig"
+        )
+        list_css = (
+            base
+            / "static/css/pages/invoice-list.css"
+        ).read_text(
+            encoding="utf-8-sig"
+        )
+
+        self.assertIn(
+            "align-items: start;",
+            dashboard_css,
+        )
+        self.assertIn(
+            "white-space: nowrap;",
+            list_css,
+        )
+        self.assertIn(
+            "min-width: 84px;",
+            list_css,
+        )
 
     def test_business_templates_do_not_expose_technical_actions(self):
         base = Path(settings.BASE_DIR)

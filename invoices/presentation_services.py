@@ -107,7 +107,7 @@ def _document_identity(invoice: Invoice) -> tuple[str, str]:
     if number:
         title = f"{type_label} №{number}"
     else:
-        title = f"{type_label} #{invoice.id}"
+        title = f"{type_label} без номера"
 
     meta_parts = []
     if document_date_label:
@@ -116,6 +116,59 @@ def _document_identity(invoice: Invoice) -> tuple[str, str]:
         meta_parts.append(invoice.title.strip())
 
     return title, " · ".join(meta_parts)
+
+
+def humanize_invoice_log_action(
+    action: object,
+) -> str:
+    text = str(action or "").strip()
+
+    exact_replacements = {
+        "OCR обработка завершена": (
+            "Распознавание документа завершено"
+        ),
+        "OCR повторно выполнен массово": (
+            "Повторная проверка данных выполнена"
+        ),
+        "OCR повторно выполнен вручную": (
+            "Повторная проверка данных выполнена"
+        ),
+    }
+
+    if text in exact_replacements:
+        return exact_replacements[text]
+
+    if text.startswith(
+        "OCR повторно поставлен в очередь"
+    ):
+        return (
+            "Документ поставлен на повторную "
+            "проверку данных"
+        )
+
+    failed_prefix = "OCR повторно не выполнен:"
+
+    if text.startswith(failed_prefix):
+        detail = text[
+            len(failed_prefix):
+        ].strip()
+
+        if detail:
+            return (
+                "Повторная проверка данных "
+                "не выполнена: "
+                + detail
+            )
+
+        return (
+            "Повторная проверка данных "
+            "не выполнена"
+        )
+
+    return text.replace(
+        "OCR",
+        "распознавание",
+    )
 
 
 def payment_summary_from_invoice(invoice: Invoice) -> dict[str, object]:

@@ -13,6 +13,7 @@ from ..models import InvoicePayment
 from ..presentation_services import (
     annotate_invoice_workspace,
     build_invoice_presentation,
+    humanize_invoice_log_action,
 )
 from ..selectors import get_visible_invoices_for_user
 
@@ -67,7 +68,15 @@ def invoice_detail(request, invoice_id):
             "payment_readiness": workspace[
                 "payment_readiness"
             ],
-            "logs": invoice.logs.all(),
+            "logs": [
+                {
+                    "created_at": log.created_at,
+                    "action": humanize_invoice_log_action(
+                        log.action
+                    ),
+                }
+                for log in invoice.logs.all()
+            ],
             "comments": comments,
             "comment_form": InvoiceCommentForm(),
             "payment_summary": payment_summary,

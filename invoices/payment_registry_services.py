@@ -288,7 +288,7 @@ def check_payment_registry(registry):
 
         if not getattr(invoice, "amount_verified", False):
             row_errors.append(
-                "сумма документа не подтверждена после OCR-проверки"
+                "сумма документа не подтверждена по оригиналу"
             )
 
         if not item.amount or item.amount <= 0:

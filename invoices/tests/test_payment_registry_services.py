@@ -153,7 +153,7 @@ class PaymentRegistryServiceTests(TestCase):
         self.assertIsNone(item)
         self.assertTrue(errors)
         self.assertIn(
-            "Сумма документа не подтверждена после OCR-проверки.",
+            "Сумма документа не подтверждена по оригиналу.",
             errors,
         )
         self.assertFalse(

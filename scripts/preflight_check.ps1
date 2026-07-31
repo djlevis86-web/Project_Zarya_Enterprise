@@ -1,5 +1,6 @@
 param(
-    [string]$ProjectRoot = "D:\Project_Zarya"
+    [string]$ProjectRoot = "D:\Project_Zarya",
+    [string]$PythonPath = "C:\Users\bylev\venv\Scripts\python.exe"
 )
 
 $ErrorActionPreference = "Stop"
@@ -126,7 +127,14 @@ Write-Host ""
 
 Write-Host "4. Django check..." -ForegroundColor Yellow
 
-python manage.py check
+if (-not (Test-Path -LiteralPath $PythonPath -PathType Leaf)) {
+    Write-Host ""
+    Write-Host "ERROR: project Python interpreter not found: $PythonPath" -ForegroundColor Red
+    exit 1
+}
+
+Write-Host "Python: $PythonPath"
+& $PythonPath manage.py check
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""

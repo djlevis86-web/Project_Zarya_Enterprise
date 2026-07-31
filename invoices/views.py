@@ -58,6 +58,10 @@ from .view_modules.invoice_detail_views import (
     invoice_detail,
 )
 
+from .view_modules.invoice_field_review_views import (
+    confirm_invoice_field_view,
+)
+
 from .view_modules.invoice_delete_views import (
     delete_invoice,
 )
@@ -135,6 +139,7 @@ __all__ = (
     'upload_batches',
     'upload_batch_detail',
     'invoice_detail',
+    'confirm_invoice_field_view',
     'delete_invoice',
     'add_invoice_payment',
     'cancel_invoice_payment',

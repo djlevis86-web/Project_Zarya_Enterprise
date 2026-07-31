@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Iterable
 
-from .models import Invoice
+from .models import Invoice, InvoiceFieldReview
 
 
 @dataclass(frozen=True)
@@ -121,7 +121,15 @@ def evaluate_document_readiness(
             ),
         )
 
-    if not bool(getattr(invoice, "amount_verified", False)):
+    amount_is_confirmed = bool(
+        getattr(invoice, "amount_verified", False)
+        or getattr(
+            invoice,
+            "field_review_amount_confirmed",
+            False,
+        )
+    )
+    if not amount_is_confirmed:
         _append_once(
             blockers,
             ReadinessIssue(
@@ -172,6 +180,25 @@ def evaluate_document_readiness(
             ),
         )
 
+    elif (
+        hasattr(invoice, "field_review_invoice_number_confirmed")
+        and not bool(
+            getattr(
+                invoice,
+                "field_review_invoice_number_confirmed",
+                False,
+            )
+        )
+    ):
+        _append_once(
+            warnings,
+            ReadinessIssue(
+                "invoice_number_unconfirmed",
+                "Номер документа не подтверждён по оригиналу.",
+                InvoiceFieldReview.FIELD_INVOICE_NUMBER,
+            ),
+        )
+
     document_date = (
         getattr(invoice, "document_date", None)
         or getattr(invoice, "invoice_date", None)
@@ -183,6 +210,45 @@ def evaluate_document_readiness(
                 "document_date_missing",
                 "Дата документа требует проверки.",
                 "document_date",
+            ),
+        )
+
+    elif (
+        hasattr(invoice, "field_review_document_date_confirmed")
+        and not bool(
+            getattr(
+                invoice,
+                "field_review_document_date_confirmed",
+                False,
+            )
+        )
+    ):
+        _append_once(
+            warnings,
+            ReadinessIssue(
+                "document_date_unconfirmed",
+                "Дата документа не подтверждена по оригиналу.",
+                InvoiceFieldReview.FIELD_DOCUMENT_DATE,
+            ),
+        )
+
+    if (
+        str(getattr(invoice, "vendor", "") or "").strip()
+        and hasattr(invoice, "field_review_vendor_confirmed")
+        and not bool(
+            getattr(
+                invoice,
+                "field_review_vendor_confirmed",
+                False,
+            )
+        )
+    ):
+        _append_once(
+            warnings,
+            ReadinessIssue(
+                "vendor_unconfirmed",
+                "Поставщик не подтверждён по оригиналу.",
+                InvoiceFieldReview.FIELD_VENDOR,
             ),
         )
 

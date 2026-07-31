@@ -6,6 +6,7 @@ from typing import Iterable
 
 from django.db.models import (
     DecimalField,
+    Exists,
     OuterRef,
     Q,
     Subquery,
@@ -17,6 +18,7 @@ from django.utils import timezone
 
 from .models import (
     Invoice,
+    InvoiceFieldReview,
     InvoicePayment,
     PaymentRegistry,
     PaymentRegistryItem,
@@ -44,6 +46,14 @@ READINESS_FILTER_CHOICES = (
 
 
 def annotate_invoice_workspace(queryset):
+    confirmed_field_reviews = (
+        InvoiceFieldReview.objects
+        .filter(
+            invoice_id=OuterRef("pk"),
+            is_confirmed=True,
+        )
+    )
+
     active_registry_items = (
         PaymentRegistryItem.objects
         .filter(
@@ -81,6 +91,30 @@ def annotate_invoice_workspace(queryset):
             ),
             active_registry_id=Subquery(
                 active_registry_items.values("registry_id")[:1],
+            ),
+            field_review_amount_confirmed=Exists(
+                confirmed_field_reviews.filter(
+                    field_name=InvoiceFieldReview.FIELD_AMOUNT,
+                )
+            ),
+            field_review_invoice_number_confirmed=Exists(
+                confirmed_field_reviews.filter(
+                    field_name=(
+                        InvoiceFieldReview.FIELD_INVOICE_NUMBER
+                    ),
+                )
+            ),
+            field_review_document_date_confirmed=Exists(
+                confirmed_field_reviews.filter(
+                    field_name=(
+                        InvoiceFieldReview.FIELD_DOCUMENT_DATE
+                    ),
+                )
+            ),
+            field_review_vendor_confirmed=Exists(
+                confirmed_field_reviews.filter(
+                    field_name=InvoiceFieldReview.FIELD_VENDOR,
+                )
             ),
         )
     )

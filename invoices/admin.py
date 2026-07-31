@@ -4,6 +4,7 @@ from .models import (
     PaymentRegistry,
     PaymentRegistryItem,
     Invoice,
+    InvoiceFieldReview,
     InvoiceUploadBatch,
     Counterparty,
     CompanyRequisites,
@@ -165,6 +166,33 @@ class InvoiceAdmin(admin.ModelAdmin):
             )
         }),
     )
+
+@admin.register(InvoiceFieldReview)
+class InvoiceFieldReviewAdmin(admin.ModelAdmin):
+    list_display = (
+        "invoice",
+        "field_name",
+        "is_confirmed",
+        "confirmed_by",
+        "confirmed_at",
+        "updated_at",
+    )
+    list_filter = (
+        "field_name",
+        "is_confirmed",
+    )
+    search_fields = (
+        "invoice__title",
+        "invoice__invoice_number",
+        "recognized_value",
+        "current_value",
+        "confirmed_value",
+    )
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+    )
+
 
 @admin.register(InvoiceUploadBatch)
 class InvoiceUploadBatchAdmin(admin.ModelAdmin):

@@ -13,6 +13,7 @@ from .views import (
     upload_batches,
     upload_batch_detail,
     invoice_detail,
+    confirm_invoice_field_view,
     delete_invoice,
     add_invoice_payment,
     cancel_invoice_payment,
@@ -272,6 +273,12 @@ urlpatterns = [
         '<int:invoice_id>/delete/',
         delete_invoice,
         name='delete_invoice'
+    ),
+
+    path(
+        '<int:invoice_id>/fields/<str:field_name>/confirm/',
+        confirm_invoice_field_view,
+        name='confirm_invoice_field'
     ),
 
     path(

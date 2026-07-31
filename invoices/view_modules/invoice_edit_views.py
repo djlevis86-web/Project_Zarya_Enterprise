@@ -4,9 +4,13 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
+from ..document_field_review_service import (
+    confirm_invoice_field,
+    sync_manual_field_review,
+)
 from ..forms import InvoiceEditForm
 from ..log_service import create_invoice_log
-from ..models import Invoice
+from ..models import Invoice, InvoiceFieldReview
 from ..ocr_verification_service import sync_invoice_amount_verification
 from ..payment_registry_services import get_active_registry_items_for_invoice
 from ..readiness_services import evaluate_document_readiness
@@ -269,6 +273,29 @@ def edit_invoice(request, invoice_id):
             invoice.save()
             form.save_m2m()
 
+            manually_changed_review_fields = set()
+            if 'invoice_number' in form.changed_data:
+                manually_changed_review_fields.add(
+                    InvoiceFieldReview.FIELD_INVOICE_NUMBER
+                )
+            if (
+                'document_date' in form.changed_data
+                or 'invoice_date' in form.changed_data
+            ):
+                manually_changed_review_fields.add(
+                    InvoiceFieldReview.FIELD_DOCUMENT_DATE
+                )
+            if 'vendor' in form.changed_data:
+                manually_changed_review_fields.add(
+                    InvoiceFieldReview.FIELD_VENDOR
+                )
+
+            for field_name in manually_changed_review_fields:
+                sync_manual_field_review(
+                    invoice,
+                    field_name,
+                )
+
             approval_blocked = False
             verification_message = ""
 
@@ -280,6 +307,18 @@ def edit_invoice(request, invoice_id):
                     invoice,
                     source_label='редактирования документа'
                 )
+
+                if invoice.amount_verified:
+                    confirm_invoice_field(
+                        invoice,
+                        InvoiceFieldReview.FIELD_AMOUNT,
+                        request.user,
+                    )
+                else:
+                    sync_manual_field_review(
+                        invoice,
+                        InvoiceFieldReview.FIELD_AMOUNT,
+                    )
 
             if approval_requested:
                 readiness = evaluate_document_readiness(

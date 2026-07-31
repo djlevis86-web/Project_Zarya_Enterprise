@@ -1,7 +1,13 @@
 import traceback
 
+from .document_field_review_service import (
+    apply_unconfirmed_system_value,
+    is_field_confirmed,
+    sync_ocr_field_review,
+    sync_manual_field_review,
+)
 from .log_service import create_invoice_log
-from .models import Invoice
+from .models import Invoice, InvoiceFieldReview
 from .ocr_verification_service import apply_ocr_amount_to_invoice
 
 from ocr.services import (
@@ -97,60 +103,58 @@ def get_duplicate_invoice_by_ocr_identity(invoice, parsed):
 
 def apply_ocr_identity_to_invoice(invoice, parsed):
     """
-    Применяет к счету номер, дату и поставщика из OCR.
+    Применяет OCR-идентичность, не перезаписывая подтверждённые поля.
 
-    Если OCR нашел номер и дату, но такой активный счет уже есть,
-    номер текущего счета не меняем и возвращаем предупреждение.
+    Распознанные значения сохраняются в InvoiceFieldReview после
+    сохранения документа. Подтверждённые пользователем номер, дата и
+    поставщик остаются источником истины при повторном OCR.
     """
 
-    parsed_invoice_number = parsed.get(
-        'invoice_number'
+    parsed_invoice_number = parsed.get("invoice_number")
+    parsed_invoice_date = parsed.get("invoice_date")
+    number_warning = ""
+    number_is_confirmed = is_field_confirmed(
+        invoice,
+        InvoiceFieldReview.FIELD_INVOICE_NUMBER,
     )
 
-    parsed_invoice_date = parsed.get(
-        'invoice_date'
-    )
-
-    number_warning = ''
-
-    if parsed_invoice_number and parsed_invoice_date:
-
-        duplicate_invoice = get_duplicate_invoice_by_ocr_identity(
-            invoice,
-            parsed
-        )
-
-        if duplicate_invoice:
-
-            number_warning = (
-                f'OCR нашел номер {parsed_invoice_number} '
-                f'от {parsed_invoice_date}, '
-                f'но такой счет уже есть: #{duplicate_invoice.id}. '
-                'Номер текущего счета не изменен.'
+    if not number_is_confirmed:
+        if parsed_invoice_number and parsed_invoice_date:
+            duplicate_invoice = get_duplicate_invoice_by_ocr_identity(
+                invoice,
+                parsed,
             )
-
-        else:
-
+            if duplicate_invoice:
+                number_warning = (
+                    f"OCR нашел номер {parsed_invoice_number} "
+                    f"от {parsed_invoice_date}, "
+                    f"но такой счет уже есть: #{duplicate_invoice.id}. "
+                    "Номер текущего счета не изменен."
+                )
+            else:
+                invoice.invoice_number = parsed_invoice_number
+        elif parsed_invoice_number:
             invoice.invoice_number = parsed_invoice_number
+        else:
+            invoice.invoice_number = None
 
-    elif parsed_invoice_number:
+    date_is_confirmed = is_field_confirmed(
+        invoice,
+        InvoiceFieldReview.FIELD_DOCUMENT_DATE,
+    )
+    if not date_is_confirmed:
+        invoice.invoice_date = parsed_invoice_date
+        parsed_document_date = parsed.get("document_date")
+        if parsed_document_date:
+            invoice.document_date = parsed_document_date
 
-        invoice.invoice_number = parsed_invoice_number
-
-    else:
-
-        invoice.invoice_number = None
-
-    invoice.invoice_date = parsed_invoice_date
-
-    invoice.vendor = parsed.get(
-        'vendor'
+    apply_unconfirmed_system_value(
+        invoice,
+        InvoiceFieldReview.FIELD_VENDOR,
+        parsed.get("vendor"),
     )
 
-    parsed_document_type = parsed.get(
-        'document_type'
-    )
-
+    parsed_document_type = parsed.get("document_type")
     if parsed_document_type in (
         Invoice.DOCUMENT_TYPE_INVOICE,
         Invoice.DOCUMENT_TYPE_UPD,
@@ -160,14 +164,30 @@ def apply_ocr_identity_to_invoice(invoice, parsed):
     ):
         invoice.document_type = parsed_document_type
 
-    parsed_document_date = parsed.get(
-        'document_date'
-    )
-
-    if parsed_document_date:
-        invoice.document_date = parsed_document_date
-
     return number_warning
+
+
+def sync_identity_reviews_after_ocr(invoice, parsed):
+    sync_ocr_field_review(
+        invoice,
+        InvoiceFieldReview.FIELD_INVOICE_NUMBER,
+        parsed.get("invoice_number"),
+    )
+    sync_ocr_field_review(
+        invoice,
+        InvoiceFieldReview.FIELD_DOCUMENT_DATE,
+        parsed.get("document_date") or parsed.get("invoice_date"),
+    )
+    sync_ocr_field_review(
+        invoice,
+        InvoiceFieldReview.FIELD_VENDOR,
+        parsed.get("vendor"),
+    )
+    sync_ocr_field_review(
+        invoice,
+        InvoiceFieldReview.FIELD_AMOUNT,
+        parsed.get("amount"),
+    )
 
 
 def run_invoice_ocr_processing(invoice, user, log_action):
@@ -235,6 +255,11 @@ def run_invoice_ocr_processing(invoice, user, log_action):
 
         invoice.save()
 
+        sync_identity_reviews_after_ocr(
+            invoice,
+            parsed,
+        )
+
         try:
 
             from .counterparty_service import get_or_create_counterparty_from_invoice
@@ -253,8 +278,11 @@ def run_invoice_ocr_processing(invoice, user, log_action):
                 'counterparty_match_comment',
             ]
 
-            if counterparty:
-                invoice.vendor = counterparty.name
+            if counterparty and apply_unconfirmed_system_value(
+                invoice,
+                InvoiceFieldReview.FIELD_VENDOR,
+                counterparty.name,
+            ):
                 update_fields.append(
                     'vendor'
                 )
@@ -262,6 +290,12 @@ def run_invoice_ocr_processing(invoice, user, log_action):
             invoice.save(
                 update_fields=update_fields
             )
+
+            if 'vendor' in update_fields:
+                sync_manual_field_review(
+                    invoice,
+                    InvoiceFieldReview.FIELD_VENDOR,
+                )
 
         except Exception as match_error:
 

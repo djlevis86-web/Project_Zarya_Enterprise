@@ -612,6 +612,91 @@ class Invoice(models.Model):
         )
 
 
+class InvoiceFieldReview(models.Model):
+    FIELD_AMOUNT = "amount"
+    FIELD_INVOICE_NUMBER = "invoice_number"
+    FIELD_DOCUMENT_DATE = "document_date"
+    FIELD_VENDOR = "vendor"
+
+    FIELD_CHOICES = (
+        (FIELD_AMOUNT, "Сумма"),
+        (FIELD_INVOICE_NUMBER, "Номер документа"),
+        (FIELD_DOCUMENT_DATE, "Дата документа"),
+        (FIELD_VENDOR, "Поставщик"),
+    )
+
+    invoice = models.ForeignKey(
+        Invoice,
+        on_delete=models.CASCADE,
+        related_name="field_reviews",
+        verbose_name="Документ",
+    )
+    field_name = models.CharField(
+        max_length=32,
+        choices=FIELD_CHOICES,
+        db_index=True,
+        verbose_name="Поле",
+    )
+    recognized_value = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Распознанное значение",
+    )
+    current_value = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Текущее значение",
+    )
+    confirmed_value = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Подтверждённое значение",
+    )
+    is_confirmed = models.BooleanField(
+        default=False,
+        db_index=True,
+        verbose_name="Подтверждено",
+    )
+    confirmed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="confirmed_invoice_fields",
+        verbose_name="Кем подтверждено",
+    )
+    confirmed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Когда подтверждено",
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Создано",
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Обновлено",
+    )
+
+    class Meta:
+        ordering = ("invoice_id", "field_name")
+        verbose_name = "Проверка поля документа"
+        verbose_name_plural = "Проверки полей документов"
+        constraints = (
+            models.UniqueConstraint(
+                fields=("invoice", "field_name"),
+                name="unique_invoice_field_review",
+            ),
+        )
+
+    def __str__(self):
+        return (
+            f"Документ #{self.invoice_id}: "
+            f"{self.get_field_name_display()}"
+        )
+
+
 class OCRJob(models.Model):
 
     STATUS_PENDING = 'pending'

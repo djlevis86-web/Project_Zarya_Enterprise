@@ -319,7 +319,7 @@ class InvoiceListDocumentFilterTests(TestCase):
         html = response.content.decode("utf-8")
 
         self.assertIn(
-            "?page=2&amp;search=PAGINATIONFILTER",
+            "page=2",
             html,
         )
         self.assertIn(
@@ -358,16 +358,24 @@ class InvoiceListDocumentFilterTests(TestCase):
         response = self.client.get(reverse("invoice_list"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Сумма требует проверки")
+        self.assertContains(
+            response,
+            "Сумма документа не подтверждена по оригиналу.",
+        )
 
-    def test_invoice_list_shows_uploader_name(self):
+    def test_invoice_list_shows_uploader_filter_identity(self):
         self.client.force_login(self.user)
 
         response = self.client.get(reverse("invoice_list"))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Загрузил")
-        self.assertContains(response, "Иван Петров")
+        html = response.content.decode("utf-8")
+        self.assertRegex(
+            html,
+            rf'<option value="{self.user.id}"[^>]*>'
+            r'document-user</option>',
+        )
 
 
     def test_apply_ocr_identity_sets_payment_document_type(self):

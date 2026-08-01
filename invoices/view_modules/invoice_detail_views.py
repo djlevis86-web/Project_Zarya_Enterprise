@@ -5,6 +5,9 @@ from users.permissions import user_can_process_invoices
 
 from ..comment_forms import InvoiceCommentForm
 from ..comment_models import InvoiceComment
+from ..document_field_review_service import (
+    build_invoice_field_review_workspace,
+)
 from ..forms import InvoicePaymentForm
 from ..invoice_action_context import (
     get_invoice_detail_action_context,
@@ -33,6 +36,10 @@ def invoice_detail(request, invoice_id):
         invoice
     )
     payment_summary = workspace["payment"]
+    field_review_workspace = build_invoice_field_review_workspace(
+        invoice,
+        invoice.field_reviews.select_related("confirmed_by").all(),
+    )
 
     payments = (
         invoice.payments
@@ -118,6 +125,8 @@ def invoice_detail(request, invoice_id):
             "payments": payments,
             "payment_form": InvoicePaymentForm(),
             "workflow_steps": workflow_steps,
+            "field_review_workspace": field_review_workspace,
+            "can_confirm_invoice_fields": bool(request.user.is_staff),
             **action_context,
         },
     )

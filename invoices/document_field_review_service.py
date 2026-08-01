@@ -170,6 +170,192 @@ def ensure_field_review(
     return review
 
 
+def _display_review_value(field_name: str, value: object) -> str:
+    raw = str(value or "").strip()
+    if not raw:
+        return "Не указано"
+
+    if field_name == InvoiceFieldReview.FIELD_AMOUNT:
+        try:
+            amount = Decimal(raw.replace(",", ".")).quantize(MONEY_QUANT)
+        except (InvalidOperation, TypeError, ValueError):
+            return raw
+        formatted = f"{amount:,.2f}".replace(",", " ").replace(".", ",")
+        return formatted + " ₽"
+
+    if field_name == InvoiceFieldReview.FIELD_DOCUMENT_DATE:
+        parsed = parse_date(raw)
+        if parsed is not None:
+            return parsed.strftime("%d.%m.%Y")
+
+    return raw
+
+
+def _confirmed_by_label(user) -> str:
+    if user is None:
+        return ""
+    full_name = ""
+    get_full_name = getattr(user, "get_full_name", None)
+    if callable(get_full_name):
+        full_name = str(get_full_name() or "").strip()
+    return full_name or str(getattr(user, "username", "") or "").strip()
+
+
+def build_invoice_field_review_workspace(
+    invoice: Invoice,
+    reviews=None,
+) -> dict[str, object]:
+    """Build the read-only V19 interaction presentation for review fields.
+
+    This helper never writes on GET. Missing rows are represented from the
+    current invoice values so manually-created legacy fixtures remain readable.
+    """
+    review_items = list(
+        reviews
+        if reviews is not None
+        else invoice.field_reviews.select_related("confirmed_by")
+    )
+    reviews_by_field = {item.field_name: item for item in review_items}
+
+    input_contracts = {
+        InvoiceFieldReview.FIELD_AMOUNT: {
+            "input_type": "number",
+            "input_mode": "decimal",
+            "input_step": "0.01",
+            "placeholder": "0,00",
+        },
+        InvoiceFieldReview.FIELD_INVOICE_NUMBER: {
+            "input_type": "text",
+            "input_mode": "text",
+            "input_step": "",
+            "placeholder": "Номер документа",
+        },
+        InvoiceFieldReview.FIELD_DOCUMENT_DATE: {
+            "input_type": "date",
+            "input_mode": "numeric",
+            "input_step": "",
+            "placeholder": "",
+        },
+        InvoiceFieldReview.FIELD_VENDOR: {
+            "input_type": "text",
+            "input_mode": "text",
+            "input_step": "",
+            "placeholder": "Наименование поставщика",
+        },
+    }
+
+    rows = []
+    confirmed_count = 0
+    attention_count = 0
+
+    for field_name, label in InvoiceFieldReview.FIELD_CHOICES:
+        review = reviews_by_field.get(field_name)
+        current_value = serialize_field_value(invoice, field_name)
+        if review is not None:
+            recognized_value = str(review.recognized_value or "").strip()
+            confirmed_value = str(review.confirmed_value or "").strip()
+            is_confirmed = bool(review.is_confirmed)
+            confirmed_by = review.confirmed_by
+            confirmed_at = review.confirmed_at
+        else:
+            recognized_value = (
+                serialize_field_value(invoice, field_name, recognized=True)
+                if field_name == InvoiceFieldReview.FIELD_AMOUNT
+                else current_value
+            )
+            confirmed_value = (
+                current_value
+                if field_name == InvoiceFieldReview.FIELD_AMOUNT
+                and invoice.amount_verified
+                and current_value
+                else ""
+            )
+            is_confirmed = bool(confirmed_value)
+            confirmed_by = None
+            confirmed_at = None
+
+        if is_confirmed:
+            status_code = "confirmed"
+            status_label = "Подтверждено"
+            status_tone = "success"
+            status_detail = "Итоговое значение защищено от повторного распознавания."
+            confirmed_count += 1
+        elif not current_value:
+            status_code = "missing"
+            status_label = "Не заполнено"
+            status_tone = "danger"
+            status_detail = "Заполните итоговое значение и подтвердите его."
+            attention_count += 1
+        elif not recognized_value:
+            status_code = "unrecognized"
+            status_label = "Нет данных из документа"
+            status_tone = "warning"
+            status_detail = "Сверьте значение с оригиналом перед подтверждением."
+            attention_count += 1
+        elif current_value == recognized_value:
+            status_code = "matched"
+            status_label = "Совпадает"
+            status_tone = "info"
+            status_detail = "Значения совпадают, но итог ещё не подтверждён пользователем."
+            attention_count += 1
+        else:
+            status_code = "mismatch"
+            status_label = "Есть расхождение"
+            status_tone = "warning"
+            status_detail = "Выберите итоговое значение после сверки с оригиналом."
+            attention_count += 1
+
+        confirmed_at_label = ""
+        if confirmed_at is not None:
+            display_time = (
+                timezone.localtime(confirmed_at)
+                if timezone.is_aware(confirmed_at)
+                else confirmed_at
+            )
+            confirmed_at_label = display_time.strftime("%d.%m.%Y %H:%M")
+
+        rows.append(
+            {
+                "field_name": field_name,
+                "label": label,
+                "recognized_value": recognized_value,
+                "recognized_display": _display_review_value(
+                    field_name, recognized_value
+                ),
+                "current_value": current_value,
+                "current_display": _display_review_value(
+                    field_name, current_value
+                ),
+                "confirmed_value": confirmed_value,
+                "confirmed_display": _display_review_value(
+                    field_name, confirmed_value
+                ),
+                "confirmation_value": current_value or recognized_value,
+                "is_confirmed": is_confirmed,
+                "status_code": status_code,
+                "status_label": status_label,
+                "status_tone": status_tone,
+                "status_detail": status_detail,
+                "recognized_matches_current": bool(
+                    current_value
+                    and recognized_value
+                    and current_value == recognized_value
+                ),
+                "confirmed_by_label": _confirmed_by_label(confirmed_by),
+                "confirmed_at_label": confirmed_at_label,
+                **input_contracts[field_name],
+            }
+        )
+
+    return {
+        "rows": rows,
+        "total_count": len(rows),
+        "confirmed_count": confirmed_count,
+        "attention_count": attention_count,
+        "is_complete": confirmed_count == len(rows),
+    }
+
+
 def is_field_confirmed(
     invoice: Invoice,
     field_name: str,

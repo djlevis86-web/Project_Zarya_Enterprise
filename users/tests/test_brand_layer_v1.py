@@ -62,6 +62,36 @@ class BrandLayerV1Tests(SimpleTestCase):
         / "payment-registry.css"
     )
 
+    workspace_css = (
+        repo_root
+        / "static"
+        / "css"
+        / "components"
+        / "documents-payments-workspace.css"
+    )
+
+    tables_css = (
+        repo_root
+        / "static"
+        / "css"
+        / "components"
+        / "tables.css"
+    )
+
+    payment_registry_template = (
+        repo_root
+        / "templates"
+        / "invoices"
+        / "payment_registry.html"
+    )
+
+    payment_registry_detail_template = (
+        repo_root
+        / "templates"
+        / "invoices"
+        / "payment_registry_detail.html"
+    )
+
     logo_path = (
         repo_root
         / "static"
@@ -214,43 +244,88 @@ class BrandLayerV1Tests(SimpleTestCase):
             css,
         )
 
-    def test_dashboard_attention_has_one_brand_owner(self) -> None:
-        css = self.dashboard_css.read_text(
+    def test_dashboard_attention_uses_shared_enterprise_surface(self) -> None:
+        template = self.dashboard_template.read_text(
+            encoding="utf-8-sig"
+        )
+        page_css = self.dashboard_css.read_text(
+            encoding="utf-8-sig"
+        )
+        workspace_css = self.workspace_css.read_text(
             encoding="utf-8-sig"
         )
 
         self.assertEqual(
-            css.count(
-                "DASHBOARD-ATTENTION-BRAND-V1-START"
+            template.count(
+                "production-panel enterprise-attention-panel"
             ),
             1,
         )
+        self.assertIn(".production-panel {", workspace_css)
+        self.assertIn(
+            "background:var(--zds-color-surface-elevated)",
+            workspace_css,
+        )
+        self.assertIn(
+            ".dashboard-work-item",
+            page_css,
+        )
         self.assertNotIn(
             "DASHBOARD-ATTENTION-QUEUE-V2",
-            css,
+            page_css,
         )
         self.assertNotIn(
             "DASHBOARD-ATTENTION-UX-PILOT-V1",
-            css,
+            page_css,
         )
 
-    def test_payment_registry_uses_semantic_brand_surfaces(self) -> None:
-        css = self.payment_registry_css.read_text(
+    def test_payment_registry_uses_shared_enterprise_surfaces(self) -> None:
+        page_css = self.payment_registry_css.read_text(
             encoding="utf-8-sig"
         )
+        workspace_css = self.workspace_css.read_text(
+            encoding="utf-8-sig"
+        )
+        tables_css = self.tables_css.read_text(
+            encoding="utf-8-sig"
+        )
+        registry_template = self.payment_registry_template.read_text(
+            encoding="utf-8-sig"
+        )
+        detail_template = (
+            self.payment_registry_detail_template.read_text(
+                encoding="utf-8-sig"
+            )
+        )
 
-        required = (
-            "Payment registry draft panel — Brand Layer V1",
-            "Payment registry check panel — Brand Layer V1",
-            "Payment registry tables — Brand Layer V1",
+        required_page_css = (
+            ".enterprise-registry-grid",
+            ".enterprise-registry-status-list",
+            ".enterprise-registry-queue .enterprise-table",
+        )
+        for marker in required_page_css:
+            with self.subTest(marker=marker):
+                self.assertIn(marker, page_css)
+
+        required_templates = (
+            "production-panel enterprise-registry-summary",
+            "production-panel enterprise-registry-queue",
+            "production-panel enterprise-table-panel",
+            'class="enterprise-table"',
+        )
+        combined_templates = registry_template + detail_template
+        for marker in required_templates:
+            with self.subTest(marker=marker):
+                self.assertIn(marker, combined_templates)
+
+        shared_brand_css = workspace_css + tables_css
+        for marker in (
             "var(--zds-color-surface-elevated)",
             "var(--zds-color-text)",
             "var(--zds-color-border-brand)",
-        )
-
-        for marker in required:
+        ):
             with self.subTest(marker=marker):
-                self.assertIn(marker, css)
+                self.assertIn(marker, shared_brand_css)
 
     def test_topbar_has_one_production_owner(self) -> None:
         owner_text = self.topbar_css.read_text(

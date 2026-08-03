@@ -158,7 +158,7 @@ label {
             1,
         )
 
-    def test_payment_schedule_owns_overdue_status_badge_override(
+    def test_payment_schedule_does_not_restore_legacy_overdue_badge(
         self,
     ):
         base_dir = Path(settings.BASE_DIR)
@@ -183,6 +183,15 @@ label {
             encoding="utf-8"
         )
 
+        template = (
+            base_dir
+            / "templates"
+            / "invoices"
+            / "payment_schedule.html"
+        ).read_text(
+            encoding="utf-8-sig"
+        )
+
         app_css = (
             base_dir
             / "static"
@@ -192,22 +201,31 @@ label {
             encoding="utf-8"
         )
 
-        overdue_rule = """\
-.payment-schedule-table .schedule-row-overdue .status-badge.status-rejected {
-    background: rgba(239, 68, 68, 0.22) !important;
-    color: #fecaca !important;
-    border: 1px solid rgba(248, 113, 113, 0.35) !important;
-}
-"""
-
-        self.assertNotIn(
-            overdue_rule,
-            component_css,
+        legacy_selector = (
+            ".payment-schedule-table "
+            ".schedule-row-overdue "
+            ".status-badge.status-rejected"
         )
 
-        self.assertEqual(
-            page_css.count(overdue_rule),
-            1,
+        self.assertNotIn(
+            legacy_selector,
+            component_css,
+        )
+        self.assertNotIn(
+            legacy_selector,
+            page_css,
+        )
+        self.assertNotIn(
+            "schedule-row-overdue",
+            template,
+        )
+        self.assertIn(
+            "metric-{{ metric.tone }}",
+            template,
+        )
+        self.assertIn(
+            "production-readiness-badge",
+            template,
         )
 
         self.assertLess(

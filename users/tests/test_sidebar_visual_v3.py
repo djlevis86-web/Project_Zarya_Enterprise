@@ -420,7 +420,7 @@ class SidebarVisualV3Tests(
                     script_text,
                 )
 
-    def test_app_import_contract_places_v3_last(
+    def test_app_import_contract_keeps_v3_before_page_owners(
         self,
     ) -> None:
         app_text = self.app_path.read_text(
@@ -440,7 +440,7 @@ class SidebarVisualV3Tests(
 
         self.assertEqual(
             len(imports),
-            38,
+            39,
         )
 
         self.assertEqual(
@@ -450,9 +450,32 @@ class SidebarVisualV3Tests(
             1,
         )
 
+        self.assertIn(
+            "./base/accessibility.css",
+            imports,
+        )
+
+        self.assertLess(
+            imports.index(
+                "./features/page-header-visual-v1.css"
+            ),
+            imports.index(
+                self.import_value
+            ),
+        )
+
+        self.assertLess(
+            imports.index(
+                self.import_value
+            ),
+            imports.index(
+                "./pages/payment-schedule.css"
+            ),
+        )
+
         self.assertEqual(
             imports[-1],
-            self.import_value,
+            "./pages/upload-workspace.css",
         )
 
         self.assertNotIn(

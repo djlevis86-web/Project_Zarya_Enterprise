@@ -87,7 +87,7 @@ class PaymentRegistryEditingRulesTests(TestCase):
         self.assertEqual(registry.status, PaymentRegistry.STATUS_DRAFT)
 
 
-    def test_exported_registry_detail_shows_edit_actions(self):
+    def test_exported_registry_detail_shows_current_edit_actions(self):
         registry, item = self._registry_with_item(PaymentRegistry.STATUS_EXPORTED)
 
         self.client.force_login(self.user)
@@ -97,14 +97,15 @@ class PaymentRegistryEditingRulesTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Редактировать состав")
-        self.assertContains(response, "Добавить документы")
+        self.assertTrue(response.context["can_edit_registry"])
+        self.assertContains(response, "Рабочий реестр")
+        self.assertContains(response, "Убрать")
         self.assertContains(
             response,
             reverse("remove_from_payment_registry_item", args=[item.id]),
         )
 
-    def test_paid_registry_detail_hides_edit_actions(self):
+    def test_paid_registry_detail_hides_current_edit_actions(self):
         registry, item = self._registry_with_item(PaymentRegistry.STATUS_PAID)
 
         self.client.force_login(self.user)
@@ -114,8 +115,8 @@ class PaymentRegistryEditingRulesTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "Редактировать состав")
-        self.assertNotContains(response, "Добавить документы")
+        self.assertFalse(response.context["can_edit_registry"])
+        self.assertNotContains(response, "Убрать")
         self.assertNotContains(
             response,
             reverse("remove_from_payment_registry_item", args=[item.id]),

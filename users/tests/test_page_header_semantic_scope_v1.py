@@ -42,6 +42,11 @@ class PageHeaderSemanticScopeV1Tests(
         "templates/invoices/payment_registry.html",
 
         "templates/invoices/"
+        "payment_registry_detail.html",
+
+        "templates/invoices/payment_schedule.html",
+
+        "templates/invoices/"
         "unmatched_counterparties.html",
 
         "templates/invoices/"
@@ -281,25 +286,25 @@ class PageHeaderSemanticScopeV1Tests(
 
         self.assertEqual(
             total_outer,
-            20,
+            22,
         )
 
         self.assertEqual(
             total_copy,
-            20,
+            22,
         )
 
         self.assertEqual(
             total_actions,
-            18,
+            20,
         )
 
         self.assertEqual(
             total_title,
-            20,
+            22,
         )
 
         self.assertEqual(
             total_subtitle,
-            20,
+            22,
         )

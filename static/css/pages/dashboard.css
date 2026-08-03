@@ -1,1 +1,234 @@
-.enterprise-dashboard-analytics,.enterprise-dashboard-work,.enterprise-dashboard-lower{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--zds-space-6);align-items:start}.enterprise-task-list,.enterprise-activity-list,.compact-work-list{display:grid;gap:8px}.enterprise-task-item{display:grid;grid-template-columns:auto minmax(160px,1fr) minmax(200px,1.2fr) auto;gap:12px;align-items:center;padding:12px;border:1px solid var(--zds-color-border);border-radius:var(--zds-radius-control);color:var(--zds-color-text-soft);text-decoration:none}.enterprise-task-item small,.enterprise-activity-item small{display:block;color:var(--zds-color-text-muted)}.enterprise-task-money{text-align:right}.enterprise-activity-item{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--zds-color-border);color:var(--zds-color-text-soft);text-decoration:none}.dashboard-work-list{display:grid;gap:8px}.dashboard-work-item{display:grid;grid-template-columns:auto 1.05fr 1.25fr auto auto;gap:12px;align-items:center;padding:12px;border:1px solid var(--zds-color-border);border-radius:var(--zds-radius-control);color:var(--zds-color-text-soft);text-decoration:none}.dashboard-work-item small,.compact-work-item small{display:block;color:var(--zds-color-text-muted)}.dashboard-work-action{color:var(--zds-color-accent-strong);font-weight:750}.dashboard-work-date.is-overdue{color:var(--zds-color-danger)}.readiness-indicator{width:6px;height:38px;border-radius:var(--zds-radius-pill);background:var(--zds-color-text-muted)}.readiness-indicator.readiness-danger{background:var(--zds-color-danger)}.readiness-indicator.readiness-warning{background:var(--zds-color-warning)}.readiness-indicator.readiness-success{background:var(--zds-color-success)}.compact-work-item{display:flex;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--zds-color-border);border-radius:var(--zds-radius-control);color:var(--zds-color-text-soft);text-decoration:none}.compact-work-value{text-align:right}@media(max-width:900px){.enterprise-task-item,.dashboard-work-item{grid-template-columns:auto 1fr}.enterprise-task-money,.dashboard-work-date,.dashboard-work-action{grid-column:2;text-align:left}}@media(max-width:760px){.enterprise-dashboard-analytics,.enterprise-dashboard-work,.enterprise-dashboard-lower{grid-template-columns:1fr}.enterprise-task-item,.dashboard-work-item{grid-template-columns:auto 1fr}.enterprise-activity-item{grid-template-columns:1fr}.enterprise-activity-item>small{justify-self:start}}
+.enterprise-dashboard-hero .page-subtitle {
+    max-width: 620px;
+}
+
+.enterprise-dashboard-metrics .enterprise-metric {
+    min-height: 106px;
+    align-content: start;
+}
+
+.enterprise-dashboard-metrics .enterprise-metric strong {
+    margin-top: 2px;
+}
+
+.enterprise-dashboard-metrics .enterprise-metric small {
+    line-height: 1.35;
+}
+
+.enterprise-attention-panel {
+    border-color: var(--zds-color-border-brand);
+}
+
+.enterprise-attention-panel .production-panel-header {
+    align-items: center;
+}
+
+.enterprise-task-list,
+.enterprise-activity-list,
+.compact-work-list,
+.dashboard-work-list {
+    display: grid;
+    gap: 8px;
+}
+
+.dashboard-work-item {
+    display: grid;
+    grid-template-columns: auto minmax(180px, 1.05fr) minmax(220px, 1.25fr) minmax(94px, auto) minmax(190px, auto);
+    gap: 12px;
+    align-items: center;
+    min-height: 62px;
+    padding: 11px 12px;
+    border: 1px solid var(--zds-color-border);
+    border-radius: var(--zds-radius-control);
+    color: var(--zds-color-text-soft);
+    text-decoration: none;
+    background: var(--zds-color-surface-soft);
+}
+
+.dashboard-work-item:hover {
+    border-color: var(--zds-color-border-brand);
+}
+
+.dashboard-work-item strong,
+.enterprise-task-item strong,
+.enterprise-activity-item strong,
+.compact-work-item strong {
+    color: var(--zds-color-text);
+}
+
+.dashboard-work-item small,
+.enterprise-task-item small,
+.enterprise-activity-item small,
+.compact-work-item small {
+    display: block;
+    margin-top: 3px;
+    color: var(--zds-color-text-muted);
+}
+
+.dashboard-work-date {
+    color: var(--zds-color-text-soft);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.dashboard-work-date.is-overdue {
+    color: var(--zds-color-danger);
+}
+
+.dashboard-work-action {
+    color: var(--zds-color-accent-strong);
+    font-weight: 750;
+    text-align: right;
+}
+
+.readiness-indicator {
+    width: 6px;
+    height: 38px;
+    border-radius: var(--zds-radius-pill);
+    background: var(--zds-color-text-muted);
+}
+
+.readiness-indicator.readiness-danger {
+    background: var(--zds-color-danger);
+}
+
+.readiness-indicator.readiness-warning {
+    background: var(--zds-color-warning);
+}
+
+.readiness-indicator.readiness-success {
+    background: var(--zds-color-success);
+}
+
+.enterprise-dashboard-analytics,
+.enterprise-dashboard-work,
+.enterprise-dashboard-lower {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--zds-space-6);
+    align-items: start;
+}
+
+.enterprise-task-item {
+    display: grid;
+    grid-template-columns: auto minmax(160px, 1fr) minmax(200px, 1.2fr) auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid var(--zds-color-border);
+    border-radius: var(--zds-radius-control);
+    color: var(--zds-color-text-soft);
+    text-decoration: none;
+}
+
+.enterprise-task-money,
+.compact-work-value {
+    text-align: right;
+}
+
+.enterprise-activity-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--zds-color-border);
+    color: var(--zds-color-text-soft);
+    text-decoration: none;
+}
+
+.compact-work-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--zds-color-border);
+    border-radius: var(--zds-radius-control);
+    color: var(--zds-color-text-soft);
+    text-decoration: none;
+}
+
+@media (max-width: 1180px) {
+    .dashboard-work-item {
+        grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .dashboard-work-date,
+    .dashboard-work-action {
+        grid-column: 2 / -1;
+        text-align: left;
+    }
+
+    .enterprise-dashboard-analytics,
+    .enterprise-dashboard-work,
+    .enterprise-dashboard-lower {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .enterprise-dashboard-hero .page-header-actions-v1 {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .enterprise-dashboard-hero .btn {
+        width: 100%;
+    }
+
+    .enterprise-dashboard-metrics .enterprise-metric {
+        min-height: 112px;
+    }
+
+    .enterprise-attention-panel .production-panel-header {
+        align-items: stretch;
+    }
+
+    .dashboard-work-item {
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 8px 10px;
+        padding: 12px;
+    }
+
+    .dashboard-work-reason,
+    .dashboard-work-date,
+    .dashboard-work-action {
+        grid-column: 2;
+        text-align: left;
+    }
+
+    .dashboard-work-action {
+        margin-top: 2px;
+    }
+
+    .enterprise-task-item {
+        grid-template-columns: auto 1fr;
+    }
+
+    .enterprise-task-money {
+        grid-column: 2;
+        text-align: left;
+    }
+
+    .enterprise-activity-item {
+        grid-template-columns: 1fr;
+    }
+
+    .enterprise-activity-item > small {
+        justify-self: start;
+    }
+}
+
+@media (max-width: 480px) {
+    .enterprise-dashboard-metrics .enterprise-metric {
+        min-height: 108px;
+    }
+
+    .enterprise-dashboard-metrics .enterprise-metric small {
+        font-size: 11px;
+    }
+
+    .dashboard-work-item {
+        min-height: 0;
+    }
+}

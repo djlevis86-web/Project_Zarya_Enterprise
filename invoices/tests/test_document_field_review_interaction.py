@@ -228,6 +228,15 @@ class InteractionLayerStaticContractTests(TestCase):
         self.assertIn("data-toast-region", template)
         for token in (".z-modal", ".z-drawer", ".z-popover", ".z-toast"):
             self.assertIn(token, css)
+        self.assertRegex(
+            css,
+            r"\.z-drawer\[hidden\]\s*\{[^}]*display\s*:\s*none\s*;?[^}]*\}",
+        )
+        self.assertIn('id="field-review-drawer"', detail)
+        self.assertRegex(
+            detail,
+            r'id="field-review-drawer"[\s\S]*?data-drawer[\s\S]*?aria-hidden="true"[\s\S]*?hidden',
+        )
         for token in (
             "data-modal-open",
             "data-drawer-open",

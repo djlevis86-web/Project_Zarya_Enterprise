@@ -119,6 +119,15 @@ body.has-interaction-overlay {
     grid-template-columns: minmax(0, 1fr) minmax(360px, 520px);
 }
 
+/*
+ * The hidden attribute must remain authoritative after the drawer display rule.
+ * Without this selector, .z-drawer { display: grid; } overrides [hidden]
+ * and leaves the full-screen backdrop visible while the panel stays off-canvas.
+ */
+.z-drawer[hidden] {
+    display: none;
+}
+
 .z-drawer-backdrop {
     grid-column: 1 / -1;
     grid-row: 1;

@@ -927,3 +927,87 @@
 }
 /* INVOICE-LIST-UX-CLEANUP-V1-END */
 
+/* =========================================================
+   V19 mobile payment registry history cards
+   ========================================================= */
+
+@media (max-width: 760px) {
+    .payment-registry-history-responsive {
+        overflow: visible;
+    }
+
+    .payment-registry-history-table {
+        width: 100%;
+        min-width: 0;
+        table-layout: auto;
+    }
+
+    .payment-registry-history-table thead {
+        display: none;
+    }
+
+    .payment-registry-history-table,
+    .payment-registry-history-table tbody,
+    .payment-registry-history-table tr,
+    .payment-registry-history-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .payment-registry-history-table tr {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 12px;
+        padding: 14px;
+        border: 1px solid var(--zds-color-border);
+        border-radius: var(--zds-radius-card);
+        background: var(--zds-color-surface-soft);
+    }
+
+    .payment-registry-history-table td {
+        display: grid;
+        grid-template-columns: minmax(112px, .8fr) minmax(0, 1.2fr);
+        gap: 12px;
+        padding: 4px 0;
+        border: 0;
+        overflow-wrap: break-word;
+        word-break: normal;
+    }
+
+    .payment-registry-history-table td::before {
+        content: attr(data-label);
+        color: var(--zds-color-text-muted);
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .payment-registry-history-table .registry-detail-title,
+    .payment-registry-history-table .registry-detail-link {
+        overflow-wrap: break-word;
+        word-break: normal;
+    }
+
+    .payment-registry-history-table td[data-label="Действия"] .inline-form,
+    .payment-registry-history-table td[data-label="Действия"] .btn {
+        width: 100%;
+    }
+
+    .payment-registry-history-table .empty-table {
+        display: block;
+        text-align: center;
+    }
+
+    .payment-registry-history-table .empty-table::before {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .payment-registry-history-table td {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-registry-history-table td::before {
+        margin-bottom: 2px;
+    }
+}

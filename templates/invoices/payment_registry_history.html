@@ -149,7 +149,7 @@
             </div>
         </div>
 
-        <div class="table-responsive">
+        <div class="table-responsive payment-registry-history-responsive">
             <table class="table payment-registry-history-table">
                 <thead>
                     <tr>
@@ -202,13 +202,13 @@
                 <tbody>
                     {% for registry in registries %}
                         <tr>
-                            <td>
+                            <td data-label="№">
                                 <a href="{% url 'payment_registry_detail' registry.id %}" class="registry-detail-link">
                                     №{{ registry.id }}
                                 </a>
                             </td>
 
-                            <td>
+                            <td data-label="Название">
                                 <a href="{% url 'payment_registry_detail' registry.id %}" class="registry-detail-title">
                                     {{ registry.title|default:"Реестр оплаты" }}
                                 </a>
@@ -220,23 +220,23 @@
                                 {% endif %}
                             </td>
 
-                            <td>
+                            <td data-label="Статус">
                                 <span class="status-badge status-{{ registry.status }}">
                                     {{ registry.get_status_display }}
                                 </span>
                             </td>
 
-                            <td>
+                            <td data-label="Счетов">
                                 {{ registry.items_count }}
                             </td>
 
-                            <td>
+                            <td data-label="Сумма">
                                 <strong>
                                     {{ registry.total_amount|money_ru }}
                                 </strong>
                             </td>
 
-                            <td>
+                            <td data-label="Создал">
                                 {% if registry.created_by %}
                                     {{ registry.created_by.get_username }}
                                 {% else %}
@@ -246,11 +246,11 @@
                                 {% endif %}
                             </td>
 
-                            <td>
+                            <td data-label="Дата создания">
                                 {{ registry.created_at|date:"d.m.Y H:i" }}
                             </td>
 
-                            <td>
+                            <td data-label="Выгрузил">
                                 {% if registry.exported_by %}
                                     {{ registry.exported_by.get_username }}
                                 {% else %}
@@ -260,7 +260,7 @@
                                 {% endif %}
                             </td>
 
-                            <td>
+                            <td data-label="Дата выгрузки">
                                 {% if registry.exported_at %}
                                     {{ registry.exported_at|date:"d.m.Y H:i" }}
                                 {% else %}
@@ -270,7 +270,7 @@
                                 {% endif %}
                             </td>
 
-                            <td>
+                            <td data-label="Факт. оплата">
                                 {% if registry.paid_at %}
                                     {{ registry.paid_at|date:"d.m.Y H:i" }}
                                 {% else %}
@@ -280,7 +280,7 @@
                                 {% endif %}
                             </td>
 
-                            <td>
+                            <td data-label="Действия">
                                 {% if registry.items_count %}
                                     {% if registry.status == 'draft' or registry.status == 'checked' or registry.status == 'exported' %}
                                         <form

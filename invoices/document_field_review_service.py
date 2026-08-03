@@ -138,6 +138,12 @@ def _legacy_confirmation_defaults(
         if field_name == InvoiceFieldReview.FIELD_AMOUNT
         else current_value
     )
+    if not recognized_value:
+        recognized_source = InvoiceFieldReview.SOURCE_UNKNOWN
+    elif field_name == InvoiceFieldReview.FIELD_AMOUNT:
+        recognized_source = InvoiceFieldReview.SOURCE_LEGACY_OCR
+    else:
+        recognized_source = InvoiceFieldReview.SOURCE_LEGACY_CURRENT
     is_confirmed = bool(
         field_name == InvoiceFieldReview.FIELD_AMOUNT
         and invoice.amount_verified
@@ -145,6 +151,8 @@ def _legacy_confirmation_defaults(
     )
     return {
         "recognized_value": recognized_value,
+        "recognized_source": recognized_source,
+        "recognized_at": None,
         "current_value": current_value,
         "confirmed_value": current_value if is_confirmed else "",
         "is_confirmed": is_confirmed,
@@ -201,6 +209,108 @@ def _confirmed_by_label(user) -> str:
     return full_name or str(getattr(user, "username", "") or "").strip()
 
 
+def _normalized_comparison_text(value: object) -> str:
+    return " ".join(str(value or "").split()).casefold()
+
+
+def _recognized_source_contract(review) -> dict[str, object]:
+    source = (
+        str(getattr(review, "recognized_source", "") or "").strip()
+        if review is not None
+        else InvoiceFieldReview.SOURCE_UNKNOWN
+    )
+    labels = {
+        InvoiceFieldReview.SOURCE_OCR: "Распознавание документа",
+        InvoiceFieldReview.SOURCE_LEGACY_OCR: (
+            "Распознавание до фиксации источника"
+        ),
+        InvoiceFieldReview.SOURCE_LEGACY_CURRENT: (
+            "Перенесено из текущих данных"
+        ),
+        InvoiceFieldReview.SOURCE_UNKNOWN: "Источник не подтверждён",
+    }
+    details = {
+        InvoiceFieldReview.SOURCE_OCR: (
+            "Значение сохранено во время фактического распознавания документа."
+        ),
+        InvoiceFieldReview.SOURCE_LEGACY_OCR: (
+            "Значение было получено распознаванием до появления точной фиксации источника."
+        ),
+        InvoiceFieldReview.SOURCE_LEGACY_CURRENT: (
+            "Значение перенесено из прежних полей системы и не считается доказанным результатом распознавания."
+        ),
+        InvoiceFieldReview.SOURCE_UNKNOWN: (
+            "Для значения нет доказанного источника из документа."
+        ),
+    }
+    is_document_evidence = source in {
+        InvoiceFieldReview.SOURCE_OCR,
+        InvoiceFieldReview.SOURCE_LEGACY_OCR,
+    }
+    return {
+        "recognized_source": source,
+        "recognized_source_label": labels.get(
+            source, labels[InvoiceFieldReview.SOURCE_UNKNOWN]
+        ),
+        "recognized_source_detail": details.get(
+            source, details[InvoiceFieldReview.SOURCE_UNKNOWN]
+        ),
+        "recognized_is_document_evidence": is_document_evidence,
+    }
+
+
+def _reference_contract(invoice: Invoice, field_name: str) -> dict[str, object]:
+    empty = {
+        "reference_available": False,
+        "reference_value": "",
+        "reference_display": "Не применяется",
+        "reference_source_label": "Справочник не применяется",
+        "reference_detail": "",
+    }
+    if field_name != InvoiceFieldReview.FIELD_VENDOR:
+        return empty
+
+    counterparty = getattr(invoice, "counterparty", None)
+    if counterparty is None:
+        return {
+            **empty,
+            "reference_display": "Не сопоставлен",
+            "reference_source_label": "Справочник контрагентов",
+            "reference_detail": (
+                "Документ ещё не сопоставлен с записью справочника."
+            ),
+        }
+
+    value = str(
+        getattr(counterparty, "full_name", "")
+        or getattr(counterparty, "name", "")
+        or ""
+    ).strip()
+    source = str(getattr(counterparty, "source", "") or "").strip()
+    source_labels = {
+        "1c": "Справочник 1С",
+        "manual": "Ручной справочник",
+        "ocr": "Справочник из распознавания",
+    }
+    requisites = []
+    inn = str(getattr(counterparty, "inn", "") or "").strip()
+    kpp = str(getattr(counterparty, "kpp", "") or "").strip()
+    if inn:
+        requisites.append("ИНН " + inn)
+    if kpp:
+        requisites.append("КПП " + kpp)
+
+    return {
+        "reference_available": bool(value),
+        "reference_value": value,
+        "reference_display": _display_review_value(field_name, value),
+        "reference_source_label": source_labels.get(
+            source, "Справочник контрагентов"
+        ),
+        "reference_detail": " · ".join(requisites),
+    }
+
+
 def build_invoice_field_review_workspace(
     invoice: Invoice,
     reviews=None,
@@ -252,13 +362,14 @@ def build_invoice_field_review_workspace(
         review = reviews_by_field.get(field_name)
         current_value = serialize_field_value(invoice, field_name)
         if review is not None:
-            recognized_value = str(review.recognized_value or "").strip()
+            raw_recognized_value = str(review.recognized_value or "").strip()
             confirmed_value = str(review.confirmed_value or "").strip()
             is_confirmed = bool(review.is_confirmed)
+            recognized_at = review.recognized_at
             confirmed_by = review.confirmed_by
             confirmed_at = review.confirmed_at
         else:
-            recognized_value = (
+            raw_recognized_value = (
                 serialize_field_value(invoice, field_name, recognized=True)
                 if field_name == InvoiceFieldReview.FIELD_AMOUNT
                 else current_value
@@ -271,8 +382,17 @@ def build_invoice_field_review_workspace(
                 else ""
             )
             is_confirmed = bool(confirmed_value)
+            recognized_at = None
             confirmed_by = None
             confirmed_at = None
+
+        source_contract = _recognized_source_contract(review)
+        recognized_value = (
+            raw_recognized_value
+            if source_contract["recognized_is_document_evidence"]
+            else ""
+        )
+        reference_contract = _reference_contract(invoice, field_name)
 
         if is_confirmed:
             status_code = "confirmed"
@@ -288,9 +408,22 @@ def build_invoice_field_review_workspace(
             attention_count += 1
         elif not recognized_value:
             status_code = "unrecognized"
-            status_label = "Нет данных из документа"
             status_tone = "warning"
-            status_detail = "Сверьте значение с оригиналом перед подтверждением."
+            if (
+                raw_recognized_value
+                and source_contract["recognized_source"]
+                == InvoiceFieldReview.SOURCE_LEGACY_CURRENT
+            ):
+                status_label = "Источник не подтверждён"
+                status_detail = (
+                    "Прежнее значение перенесено из системы и не считается "
+                    "доказанным результатом распознавания."
+                )
+            else:
+                status_label = "Нет данных из документа"
+                status_detail = (
+                    "Сверьте значение с оригиналом перед подтверждением."
+                )
             attention_count += 1
         elif current_value == recognized_value:
             status_code = "matched"
@@ -304,6 +437,17 @@ def build_invoice_field_review_workspace(
             status_tone = "warning"
             status_detail = "Выберите итоговое значение после сверки с оригиналом."
             attention_count += 1
+
+        recognized_at_label = ""
+        if recognized_at is not None:
+            recognized_display_time = (
+                timezone.localtime(recognized_at)
+                if timezone.is_aware(recognized_at)
+                else recognized_at
+            )
+            recognized_at_label = recognized_display_time.strftime(
+                "%d.%m.%Y %H:%M"
+            )
 
         confirmed_at_label = ""
         if confirmed_at is not None:
@@ -319,8 +463,14 @@ def build_invoice_field_review_workspace(
                 "field_name": field_name,
                 "label": label,
                 "recognized_value": recognized_value,
-                "recognized_display": _display_review_value(
-                    field_name, recognized_value
+                "recognized_display": (
+                    _display_review_value(field_name, recognized_value)
+                    if source_contract["recognized_is_document_evidence"]
+                    else "Нет доказанного значения"
+                ),
+                "raw_recognized_value": raw_recognized_value,
+                "raw_recognized_display": _display_review_value(
+                    field_name, raw_recognized_value
                 ),
                 "current_value": current_value,
                 "current_display": _display_review_value(
@@ -341,8 +491,19 @@ def build_invoice_field_review_workspace(
                     and recognized_value
                     and current_value == recognized_value
                 ),
+                "reference_matches_current": bool(
+                    current_value
+                    and reference_contract["reference_value"]
+                    and _normalized_comparison_text(current_value)
+                    == _normalized_comparison_text(
+                        reference_contract["reference_value"]
+                    )
+                ),
+                "recognized_at_label": recognized_at_label,
                 "confirmed_by_label": _confirmed_by_label(confirmed_by),
                 "confirmed_at_label": confirmed_at_label,
+                **source_contract,
+                **reference_contract,
                 **input_contracts[field_name],
             }
         )
@@ -395,6 +556,8 @@ def sync_ocr_field_review(
         field_name,
         recognized_value,
     )
+    review.recognized_source = InvoiceFieldReview.SOURCE_OCR
+    review.recognized_at = timezone.now()
     review.current_value = serialize_field_value(invoice, field_name)
 
     if (
@@ -410,6 +573,8 @@ def sync_ocr_field_review(
     review.save(
         update_fields=(
             "recognized_value",
+            "recognized_source",
+            "recognized_at",
             "current_value",
             "confirmed_value",
             "is_confirmed",

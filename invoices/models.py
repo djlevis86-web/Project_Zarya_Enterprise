@@ -618,6 +618,18 @@ class InvoiceFieldReview(models.Model):
     FIELD_DOCUMENT_DATE = "document_date"
     FIELD_VENDOR = "vendor"
 
+    SOURCE_UNKNOWN = "unknown"
+    SOURCE_OCR = "ocr"
+    SOURCE_LEGACY_OCR = "legacy_ocr"
+    SOURCE_LEGACY_CURRENT = "legacy_current"
+
+    SOURCE_CHOICES = (
+        (SOURCE_UNKNOWN, "Источник не подтверждён"),
+        (SOURCE_OCR, "Распознавание документа"),
+        (SOURCE_LEGACY_OCR, "Распознавание до фиксации источника"),
+        (SOURCE_LEGACY_CURRENT, "Перенесено из текущих данных"),
+    )
+
     FIELD_CHOICES = (
         (FIELD_AMOUNT, "Сумма"),
         (FIELD_INVOICE_NUMBER, "Номер документа"),
@@ -641,6 +653,18 @@ class InvoiceFieldReview(models.Model):
         blank=True,
         default="",
         verbose_name="Распознанное значение",
+    )
+    recognized_source = models.CharField(
+        max_length=32,
+        choices=SOURCE_CHOICES,
+        default=SOURCE_UNKNOWN,
+        db_index=True,
+        verbose_name="Источник распознанного значения",
+    )
+    recognized_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Когда получено распознанное значение",
     )
     current_value = models.TextField(
         blank=True,

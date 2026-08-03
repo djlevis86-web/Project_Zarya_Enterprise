@@ -172,6 +172,7 @@ class InvoiceFieldReviewAdmin(admin.ModelAdmin):
     list_display = (
         "invoice",
         "field_name",
+        "recognized_source",
         "is_confirmed",
         "confirmed_by",
         "confirmed_at",
@@ -179,6 +180,7 @@ class InvoiceFieldReviewAdmin(admin.ModelAdmin):
     )
     list_filter = (
         "field_name",
+        "recognized_source",
         "is_confirmed",
     )
     search_fields = (
@@ -189,6 +191,7 @@ class InvoiceFieldReviewAdmin(admin.ModelAdmin):
         "confirmed_value",
     )
     readonly_fields = (
+        "recognized_at",
         "created_at",
         "updated_at",
     )

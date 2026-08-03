@@ -167,6 +167,7 @@
                         <span role="columnheader">Поле</span>
                         <span role="columnheader">В системе</span>
                         <span role="columnheader">Из документа</span>
+                        <span role="columnheader">Справочник</span>
                         <span role="columnheader">Результат</span>
                         <span role="columnheader">Действие</span>
                     </div>
@@ -180,11 +181,18 @@
                             <strong role="cell">{{ row.label }}</strong>
 
                             <span role="cell" data-label="В системе">
-                                {{ row.current_display }}
+                                <strong class="field-evidence-value">{{ row.current_display }}</strong>
+                                <small class="field-evidence-source">Текущее значение системы</small>
                             </span>
 
                             <span role="cell" data-label="Из документа">
-                                {{ row.recognized_display }}
+                                <strong class="field-evidence-value">{{ row.recognized_display }}</strong>
+                                <small class="field-evidence-source">{{ row.recognized_source_label }}</small>
+                            </span>
+
+                            <span role="cell" data-label="Справочник">
+                                <strong class="field-evidence-value">{{ row.reference_display }}</strong>
+                                <small class="field-evidence-source">{{ row.reference_source_label }}</small>
                             </span>
 
                             <div class="field-review-result" role="cell" data-label="Результат">
@@ -222,6 +230,31 @@
                                             <dt>Из документа</dt>
                                             <dd>{{ row.recognized_display }}</dd>
                                         </div>
+                                        <div>
+                                            <dt>Источник</dt>
+                                            <dd>
+                                                {{ row.recognized_source_label }}
+                                                <small>{{ row.recognized_source_detail }}</small>
+                                                {% if row.recognized_at_label %}
+                                                    <small>Получено: {{ row.recognized_at_label }}</small>
+                                                {% endif %}
+                                            </dd>
+                                        </div>
+                                        {% if not row.recognized_is_document_evidence and row.raw_recognized_value %}
+                                            <div>
+                                                <dt>Перенесённое значение</dt>
+                                                <dd>{{ row.raw_recognized_display }}</dd>
+                                            </div>
+                                        {% endif %}
+                                        {% if row.field_name == 'vendor' %}
+                                            <div>
+                                                <dt>{{ row.reference_source_label }}</dt>
+                                                <dd>
+                                                    {{ row.reference_display }}
+                                                    {% if row.reference_detail %}<small>{{ row.reference_detail }}</small>{% endif %}
+                                                </dd>
+                                            </div>
+                                        {% endif %}
                                         {% if row.is_confirmed %}
                                             <div>
                                                 <dt>Подтвердил</dt>
@@ -522,8 +555,20 @@
                         </div>
                         <div>
                             <dt>Из документа</dt>
-                            <dd>{{ row.recognized_display }}</dd>
+                            <dd>
+                                {{ row.recognized_display }}
+                                <small>{{ row.recognized_source_label }}</small>
+                            </dd>
                         </div>
+                        {% if row.field_name == 'vendor' %}
+                            <div>
+                                <dt>{{ row.reference_source_label }}</dt>
+                                <dd>
+                                    {{ row.reference_display }}
+                                    {% if row.reference_detail %}<small>{{ row.reference_detail }}</small>{% endif %}
+                                </dd>
+                            </div>
+                        {% endif %}
                     </dl>
                     {% if can_confirm_invoice_fields %}
                         <button
@@ -597,6 +642,7 @@
                         <div>
                             <span>Из документа</span>
                             <strong>{{ row.recognized_display }}</strong>
+                            <small>{{ row.recognized_source_label }}</small>
                             {% if row.recognized_value %}
                                 <button
                                     type="button"
@@ -609,6 +655,22 @@
                                 </button>
                             {% endif %}
                         </div>
+                        {% if row.reference_available %}
+                            <div>
+                                <span>{{ row.reference_source_label }}</span>
+                                <strong>{{ row.reference_display }}</strong>
+                                {% if row.reference_detail %}<small>{{ row.reference_detail }}</small>{% endif %}
+                                <button
+                                    type="button"
+                                    class="production-text-link"
+                                    data-field-value-use
+                                    data-field-value-target="field-review-input-{{ row.field_name }}"
+                                    data-field-value="{{ row.reference_value }}"
+                                >
+                                    Использовать из справочника
+                                </button>
+                            </div>
+                        {% endif %}
                     </div>
 
                     <label

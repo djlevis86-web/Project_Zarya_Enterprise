@@ -13,7 +13,7 @@ from django.utils import timezone
 from invoices.document_field_review_service import (
     build_invoice_field_review_workspace,
 )
-from invoices.models import Invoice, InvoiceFieldReview
+from invoices.models import Counterparty, Invoice, InvoiceFieldReview
 
 
 class DocumentFieldReviewInteractionTests(TestCase):
@@ -30,6 +30,13 @@ class DocumentFieldReviewInteractionTests(TestCase):
             email="interaction-regular@example.com",
             password="test-password",
         )
+        self.counterparty = Counterparty.objects.create(
+            name="ООО Справочник",
+            full_name="Общество с ограниченной ответственностью Справочник",
+            inn="7700000000",
+            kpp="770001001",
+            source=Counterparty.SOURCE_1C,
+        )
         self.invoice = Invoice.objects.create(
             user=self.staff,
             title="Документ V19",
@@ -43,6 +50,7 @@ class DocumentFieldReviewInteractionTests(TestCase):
             document_date=date(2026, 7, 3),
             invoice_date="03.07.2026",
             vendor="ООО Итог",
+            counterparty=self.counterparty,
             status=Invoice.STATUS_IN_WORK,
         )
         now = timezone.now()
@@ -51,18 +59,21 @@ class DocumentFieldReviewInteractionTests(TestCase):
                 invoice=self.invoice,
                 field_name=InvoiceFieldReview.FIELD_AMOUNT,
                 recognized_value="1250.00",
+                recognized_source=InvoiceFieldReview.SOURCE_OCR,
                 current_value="1300.00",
             ),
             InvoiceFieldReview.FIELD_INVOICE_NUMBER: InvoiceFieldReview.objects.create(
                 invoice=self.invoice,
                 field_name=InvoiceFieldReview.FIELD_INVOICE_NUMBER,
                 recognized_value="DOC-42",
+                recognized_source=InvoiceFieldReview.SOURCE_OCR,
                 current_value="SYS-42",
             ),
             InvoiceFieldReview.FIELD_DOCUMENT_DATE: InvoiceFieldReview.objects.create(
                 invoice=self.invoice,
                 field_name=InvoiceFieldReview.FIELD_DOCUMENT_DATE,
                 recognized_value="2026-07-02",
+                recognized_source=InvoiceFieldReview.SOURCE_OCR,
                 current_value="2026-07-03",
                 confirmed_value="2026-07-03",
                 is_confirmed=True,
@@ -73,6 +84,7 @@ class DocumentFieldReviewInteractionTests(TestCase):
                 invoice=self.invoice,
                 field_name=InvoiceFieldReview.FIELD_VENDOR,
                 recognized_value="ООО Из документа",
+                recognized_source=InvoiceFieldReview.SOURCE_OCR,
                 current_value="ООО Итог",
                 confirmed_value="ООО Итог",
                 is_confirmed=True,
@@ -99,6 +111,11 @@ class DocumentFieldReviewInteractionTests(TestCase):
         self.assertContains(response, "1 250,00 ₽")
         self.assertContains(response, "DOC-42")
         self.assertContains(response, "ООО Из документа")
+        self.assertContains(response, "Справочник 1С")
+        self.assertContains(
+            response,
+            "Общество с ограниченной ответственностью Справочник",
+        )
         self.assertContains(response, "2/4 подтверждено")
         self.assertContains(
             response,
@@ -203,6 +220,9 @@ class InteractionLayerStaticContractTests(TestCase):
         detail = (base / "templates/invoices/detail.html").read_text(
             encoding="utf-8-sig"
         )
+        accessibility = (
+            base / "static/css/base/accessibility.css"
+        ).read_text(encoding="utf-8-sig")
 
         self.assertIn("interaction-layer-v1.js", template)
         self.assertIn("data-toast-region", template)
@@ -220,3 +240,8 @@ class InteractionLayerStaticContractTests(TestCase):
         self.assertNotIn("https://", runtime)
         self.assertNotIn("onclick=", detail)
         self.assertNotIn("onsubmit=", detail)
+        self.assertIn('class="skip-link"', template)
+        self.assertIn('id="main-content"', template)
+        self.assertGreaterEqual(template.count('aria-current="page"'), 10)
+        self.assertIn(":focus-visible", accessibility)
+        self.assertIn("prefers-reduced-motion", accessibility)

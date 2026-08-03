@@ -26,6 +26,10 @@
     data-brand-layer="zarya-digital-horizon-v1"
 >
 
+<a class="skip-link" href="#main-content">
+    Перейти к основному содержимому
+</a>
+
 {% with current=request.resolver_match.url_name %}
 
 {% include "components/sidebar_icon_sprite_v3.html" %}
@@ -126,7 +130,8 @@
                     </div>
 
                     <a href="{% url 'dashboard' %}"
-                       class="nav-link {% if current == 'dashboard' %}is-active{% endif %}">
+                       class="nav-link {% if current == 'dashboard' %}is-active{% endif %}"
+                       {% if current == 'dashboard' %}aria-current="page"{% endif %}>
                         <svg
                             class="nav-icon"
                             viewBox="0 0 24 24"
@@ -139,7 +144,8 @@
                     </a>
 
                     <a href="{% url 'invoice_list' %}"
-                       class="nav-link {% if current == 'invoice_list' or current == 'invoice_detail' or current == 'edit_invoice' or current == 'invoice_assign_counterparty' %}is-active{% endif %}">
+                       class="nav-link {% if current == 'invoice_list' or current == 'invoice_detail' or current == 'edit_invoice' or current == 'invoice_assign_counterparty' %}is-active{% endif %}"
+                       {% if current == 'invoice_list' or current == 'invoice_detail' or current == 'edit_invoice' or current == 'invoice_assign_counterparty' %}aria-current="page"{% endif %}>
                         <svg
                             class="nav-icon"
                             viewBox="0 0 24 24"
@@ -152,7 +158,8 @@
                     </a>
 
                     <a href="{% url 'upload_invoice' %}"
-                       class="nav-link {% if current == 'upload_invoice' %}is-active{% endif %}">
+                       class="nav-link {% if current == 'upload_invoice' %}is-active{% endif %}"
+                       {% if current == 'upload_invoice' %}aria-current="page"{% endif %}>
                         <svg
                             class="nav-icon"
                             viewBox="0 0 24 24"
@@ -165,7 +172,8 @@
                     </a>
 
                     <a href="{% url 'upload_batches' %}"
-                       class="nav-link {% if current == 'upload_batches' or current == 'upload_batch_detail' %}is-active{% endif %}">
+                       class="nav-link {% if current == 'upload_batches' or current == 'upload_batch_detail' %}is-active{% endif %}"
+                       {% if current == 'upload_batches' or current == 'upload_batch_detail' %}aria-current="page"{% endif %}>
                         <svg
                             class="nav-icon"
                             viewBox="0 0 24 24"
@@ -189,7 +197,8 @@
                     </div>
 
                     <a href="{% url 'payment_schedule' %}"
-                       class="nav-link {% if current == 'payment_schedule' %}is-active{% endif %}">
+                       class="nav-link {% if current == 'payment_schedule' %}is-active{% endif %}"
+                       {% if current == 'payment_schedule' %}aria-current="page"{% endif %}>
                         <svg
                             class="nav-icon"
                             viewBox="0 0 24 24"
@@ -202,7 +211,8 @@
                     </a>
 
                     <a href="{% url 'payment_registry' %}"
-                       class="nav-link {% if current == 'payment_registry' %}is-active{% endif %}">
+                       class="nav-link {% if current == 'payment_registry' %}is-active{% endif %}"
+                       {% if current == 'payment_registry' %}aria-current="page"{% endif %}>
                         <svg
                             class="nav-icon"
                             viewBox="0 0 24 24"
@@ -228,7 +238,8 @@
                         </div>
 
                         <a href="{% url 'counterparty_directory' %}"
-                           class="nav-link {% if current == 'counterparty_directory' or current == 'counterparty_detail' or current == 'counterparty_create' or current == 'counterparty_edit' %}is-active{% endif %}">
+                           class="nav-link {% if current == 'counterparty_directory' or current == 'counterparty_detail' or current == 'counterparty_create' or current == 'counterparty_edit' %}is-active{% endif %}"
+                       {% if current == 'counterparty_directory' or current == 'counterparty_detail' or current == 'counterparty_create' or current == 'counterparty_edit' %}aria-current="page"{% endif %}>
                             <svg
                                 class="nav-icon"
                                 viewBox="0 0 24 24"
@@ -241,7 +252,8 @@
                         </a>
 
                         <a href="{% url 'unmatched_counterparties' %}"
-                           class="nav-link {% if current == 'unmatched_counterparties' %}is-active{% endif %}">
+                           class="nav-link {% if current == 'unmatched_counterparties' %}is-active{% endif %}"
+                       {% if current == 'unmatched_counterparties' %}aria-current="page"{% endif %}>
                             <svg
                                 class="nav-icon"
                                 viewBox="0 0 24 24"
@@ -254,7 +266,8 @@
                         </a>
 
                         <a href="{% url 'counterparties_missing_requisites' %}"
-                           class="nav-link {% if current == 'counterparties_missing_requisites' %}is-active{% endif %}">
+                           class="nav-link {% if current == 'counterparties_missing_requisites' %}is-active{% endif %}"
+                       {% if current == 'counterparties_missing_requisites' %}aria-current="page"{% endif %}>
                             <svg
                                 class="nav-icon"
                                 viewBox="0 0 24 24"
@@ -267,7 +280,8 @@
                         </a>
 
                         <a href="{% url 'import_counterparties_1c' %}"
-                           class="nav-link {% if current == 'import_counterparties_1c' %}is-active{% endif %}">
+                           class="nav-link {% if current == 'import_counterparties_1c' %}is-active{% endif %}"
+                       {% if current == 'import_counterparties_1c' %}aria-current="page"{% endif %}>
                             <svg
                                 class="nav-icon"
                                 viewBox="0 0 24 24"
@@ -292,7 +306,8 @@
                     {% if request.user.is_superuser or request.user.role == 'ADMIN' %}
 
                         <a href="{% url 'system_dashboard' %}"
-                           class="nav-link {% if current == 'system_dashboard' or current == 'backups_list' or current == 'versions_page' or current == 'updates_page' or current == 'maintenance_page' %}is-active{% endif %}">
+                           class="nav-link {% if current == 'system_dashboard' or current == 'backups_list' or current == 'versions_page' or current == 'updates_page' or current == 'maintenance_page' %}is-active{% endif %}"
+                       {% if current == 'system_dashboard' or current == 'backups_list' or current == 'versions_page' or current == 'updates_page' or current == 'maintenance_page' %}aria-current="page"{% endif %}>
                             <svg
                                 class="nav-icon"
                                 viewBox="0 0 24 24"
@@ -306,7 +321,8 @@
 
 {% if request.user.is_superuser or request.user.role == 'ADMIN' %}
                         <a href="{% url 'audit:audit_log_list' %}"
-                           class="nav-link {% if current == 'audit_log_list' %}is-active{% endif %}">
+                           class="nav-link {% if current == 'audit_log_list' %}is-active{% endif %}"
+                       {% if current == 'audit_log_list' %}aria-current="page"{% endif %}>
                             <svg
                                 class="nav-icon"
                                 viewBox="0 0 24 24"
@@ -322,7 +338,8 @@
                         {% if request.user.is_superuser or request.user.role == 'ADMIN' %}
 
                             <a href="{% url 'user_admin_list' %}"
-                               class="nav-link {% if current == 'user_admin_list' or current == 'user_admin_create' or current == 'user_admin_edit' %}is-active{% endif %}">
+                               class="nav-link {% if current == 'user_admin_list' or current == 'user_admin_create' or current == 'user_admin_edit' %}is-active{% endif %}"
+                       {% if current == 'user_admin_list' or current == 'user_admin_create' or current == 'user_admin_edit' %}aria-current="page"{% endif %}>
                                 <svg
                                     class="nav-icon"
                                     viewBox="0 0 24 24"
@@ -417,7 +434,7 @@
         tabindex="-1"
     ></button>
 
-    <main class="main">
+    <main class="main" id="main-content" tabindex="-1">
 
         <header class="topbar">
 

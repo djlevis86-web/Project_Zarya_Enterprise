@@ -155,7 +155,7 @@
 
 .verification-row {
     display: grid;
-    grid-template-columns: .72fr minmax(120px, 1fr) minmax(120px, 1fr) minmax(150px, .95fr) auto;
+    grid-template-columns: .65fr minmax(110px, 1fr) minmax(110px, 1fr) minmax(120px, 1fr) minmax(145px, .95fr) auto;
     gap: 12px;
     align-items: center;
     padding: 13px;
@@ -181,6 +181,20 @@
 .field-review-row.status-mismatch,
 .field-review-row.status-missing {
     background: color-mix(in srgb, var(--zds-color-warning) 5%, var(--zds-color-surface-elevated));
+}
+
+.field-evidence-value {
+    display: block;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.field-evidence-source {
+    display: block;
+    margin-top: 4px;
+    color: var(--zds-color-text-muted);
+    font-size: 11px;
+    line-height: 1.35;
 }
 
 .field-review-result {
@@ -300,6 +314,12 @@
     font-weight: 700;
 }
 
+.field-review-compare-grid small {
+    color: var(--zds-color-text-muted);
+    font-size: 11px;
+    line-height: 1.35;
+}
+
 .field-review-compare-grid strong {
     min-width: 0;
     overflow-wrap: anywhere;
@@ -378,6 +398,15 @@
 .field-review-drawer-item dt {
     color: var(--zds-color-text-muted);
     font-size: 12px;
+}
+
+.field-review-drawer-item dd small,
+.field-review-popover dd small {
+    display: block;
+    margin-top: 3px;
+    color: var(--zds-color-text-muted);
+    font-size: 11px;
+    line-height: 1.35;
 }
 
 .field-review-drawer-item dd {
@@ -486,7 +515,7 @@
 
 @media (max-width: 900px) {
     .verification-row {
-        grid-template-columns: minmax(110px, .7fr) minmax(120px, 1fr) minmax(120px, 1fr) minmax(140px, 1fr);
+        grid-template-columns: minmax(100px, .65fr) minmax(110px, 1fr) minmax(110px, 1fr) minmax(120px, 1fr) minmax(135px, 1fr);
     }
 
     .verification-head span:last-child,

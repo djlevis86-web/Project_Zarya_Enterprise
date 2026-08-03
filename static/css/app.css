@@ -5,6 +5,7 @@
 @import url("./base/reset.css");
 @import url("./base/typography.css");
 @import url("./base/animations.css");
+@import url("./base/accessibility.css");
 
 /* Layout */
 @import url("./layout/shell.css");

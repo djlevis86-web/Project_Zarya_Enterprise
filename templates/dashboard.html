@@ -2,214 +2,167 @@
 {% load static money %}
 
 {% block content %}
-<div class="enterprise-page enterprise-dashboard" data-enterprise-screen="dashboard">
-    <header class="page-header page-header-v1 enterprise-hero enterprise-dashboard-hero">
-        <div class="page-header-copy-v1">
-            <span class="production-kicker">Рабочий центр</span>
-            <h1 class="page-title">Документы и платежи</h1>
-            <p class="page-subtitle">Всё, что требует решения сегодня, в одном рабочем маршруте.</p>
+{% firstof request.user.first_name request.user.username request.user.email "Пользователь" as dashboard_greeting_name %}
+{% now 'Y-m-d' as dashboard_today_iso %}
+<div class="enterprise-page enterprise-dashboard dashboard-compact-work-center" data-enterprise-screen="dashboard">
+    <header class="dashboard-command-bar" aria-labelledby="dashboard-title">
+        <div class="dashboard-command-copy">
+            <h1 id="dashboard-title">Добрый день, {{ dashboard_greeting_name }}!</h1>
+            <p>Вот что требует внимания сегодня в ОАО «Заря».</p>
         </div>
-        <div class="page-header-actions-v1">
+        <div class="dashboard-command-actions">
+            <span class="dashboard-working-date">Сегодня · {% now 'd.m.Y' %}</span>
             <a href="{% url 'upload_invoice' %}" class="btn btn-primary">Загрузить документы</a>
-            <a href="{% url 'invoice_list' %}" class="btn btn-secondary">Все документы</a>
         </div>
     </header>
 
-    <section class="enterprise-metric-grid enterprise-dashboard-metrics" aria-label="Ключевые показатели рабочего центра">
-        <a class="enterprise-metric metric-warning" href="{% url 'invoice_list' %}?readiness=attention">
+    <section class="dashboard-kpi-grid" aria-label="Ключевые показатели рабочего центра">
+        <a class="dashboard-kpi dashboard-kpi-warning" href="{% url 'invoice_list' %}?readiness=attention">
             <span>Требует проверки</span>
-            <strong>{{ dashboard_workspace.attention_count }}</strong>
-            <small>Есть блокирующие данные</small>
+            <strong>{{ enterprise_dashboard.metrics.0.amount|money_ru }}</strong>
+            <small>{{ enterprise_dashboard.metrics.0.count }} документов</small>
         </a>
-        <a class="enterprise-metric metric-accent" href="{% url 'invoice_list' %}?planned_payment_date_from={% now 'Y-m-d' %}&planned_payment_date_to={% now 'Y-m-d' %}">
+        <a class="dashboard-kpi dashboard-kpi-accent" href="{% url 'invoice_list' %}?planned_payment_date_from={{ dashboard_today_iso }}&planned_payment_date_to={{ dashboard_today_iso }}">
             <span>К оплате сегодня</span>
-            <strong>{{ dashboard_workspace.due_today_count }}</strong>
-            <small>Остаток больше нуля</small>
+            <strong>{{ enterprise_dashboard.metrics.1.amount|money_ru }}</strong>
+            <small>{{ enterprise_dashboard.metrics.1.count }} документов</small>
         </a>
-        <a class="enterprise-metric metric-danger" href="{% url 'invoice_list' %}?readiness=overdue">
+        <a class="dashboard-kpi dashboard-kpi-danger" href="{% url 'invoice_list' %}?readiness=overdue">
             <span>Просрочено</span>
-            <strong>{{ dashboard_workspace.overdue_count }}</strong>
-            <small>Плановая дата прошла</small>
+            <strong>{{ enterprise_dashboard.metrics.2.amount|money_ru }}</strong>
+            <small>{{ enterprise_dashboard.metrics.2.count }} документов</small>
         </a>
-        <a class="enterprise-metric metric-success" href="{% url 'invoice_list' %}?status=paid">
-            <span>Оплачено за месяц</span>
-            <strong>{{ dashboard_workspace.paid_month_count }}</strong>
-            <small>Закрытые обязательства</small>
+        <a class="dashboard-kpi dashboard-kpi-success" href="{% url 'invoice_list' %}?readiness=ready">
+            <span>Готово к реестру</span>
+            <strong>{{ enterprise_dashboard.metrics.3.amount|money_ru }}</strong>
+            <small>{{ enterprise_dashboard.metrics.3.count }} документов</small>
         </a>
     </section>
 
-    <section class="production-panel enterprise-attention-panel" aria-labelledby="attention-title" aria-label="Документы, требующие внимания">
-        <div class="production-panel-header">
-            <div>
-                <span class="production-eyebrow">Приоритет</span>
-                <h2 id="attention-title">Требуют внимания</h2>
-                <p>Документы отсортированы по срочности и причине блокировки.</p>
-            </div>
-            <a href="{% url 'invoice_list' %}?readiness=attention" class="production-text-link">Открыть очередь</a>
-        </div>
-        <div class="dashboard-work-list">
-            {% for item in dashboard_workspace.attention_documents %}
-                <a href="{% url 'invoice_detail' item.invoice.id %}" class="dashboard-work-item">
-                    <span class="readiness-indicator readiness-{{ item.readiness_tone }}"></span>
-                    <span class="dashboard-work-identity">
-                        <strong>{{ item.title }}</strong>
-                        <small>{{ item.invoice.counterparty.name|default:'Контрагент не назначен' }}</small>
-                    </span>
-                    <span class="dashboard-work-reason">
-                        <strong>{{ item.readiness_label }}</strong>
-                        <small>{{ item.reason }}</small>
-                    </span>
-                    <span class="dashboard-work-date {% if item.is_overdue %}is-overdue{% endif %}">{{ item.planned_payment_date_label }}</span>
-                    <span class="dashboard-work-action">{{ item.next_action }} →</span>
-                </a>
-            {% empty %}
-                <div class="production-empty-state">Нет документов, требующих срочного действия.</div>
-            {% endfor %}
-        </div>
-    </section>
-
-    <div class="enterprise-dashboard-analytics" aria-label="Аналитика рабочего центра">
-        <section class="production-panel enterprise-chart-panel" aria-labelledby="status-chart-title">
-            <div class="production-panel-header">
+    <div class="dashboard-primary-grid" data-dashboard-primary-workspace>
+        <section class="dashboard-panel dashboard-tasks-panel" aria-labelledby="dashboard-tasks-title">
+            <div class="dashboard-panel-heading">
                 <div>
-                    <span class="production-eyebrow">Статусы</span>
-                    <h2 id="status-chart-title">Статусы документов</h2>
-                </div>
-                <strong class="enterprise-panel-value">{{ enterprise_dashboard.total_documents }}</strong>
-            </div>
-            <div class="enterprise-chart-layout">
-                <canvas class="enterprise-chart enterprise-chart-donut" data-enterprise-chart="donut" data-source="enterprise-dashboard-data" aria-label="Распределение документов по статусам"></canvas>
-                <div class="enterprise-chart-legend">
-                    {% for item in enterprise_dashboard.status_distribution %}
-                        {% if item.count %}
-                            <div>
-                                <span class="legend-dot status-{{ item.code }}"></span>
-                                <span>{{ item.label }}</span>
-                                <strong>{{ item.count }} · {{ item.share_percent }}%</strong>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-        </section>
-
-        <section class="production-panel enterprise-chart-panel" aria-labelledby="payment-chart-title">
-            <div class="production-panel-header">
-                <div>
-                    <span class="production-eyebrow">Динамика</span>
-                    <h2 id="payment-chart-title">Суммы к оплате</h2>
-                    <p>Ближайшие 7 дней</p>
-                </div>
-                <a href="{% url 'payment_schedule' %}" class="production-text-link">График платежей</a>
-            </div>
-            <canvas class="enterprise-chart enterprise-chart-bars" data-enterprise-chart="bars" data-source="enterprise-dashboard-data" aria-label="Суммы к оплате по дням"></canvas>
-        </section>
-    </div>
-
-    <div class="enterprise-dashboard-work">
-        <section class="production-panel" aria-labelledby="dashboard-tasks-title">
-            <div class="production-panel-header">
-                <div>
-                    <span class="production-eyebrow">Работа</span>
+                    <span class="dashboard-section-kicker">Рабочая очередь</span>
                     <h2 id="dashboard-tasks-title">Мои задачи</h2>
-                    <p>Приоритетные документы из доступной рабочей очереди.</p>
+                    <p>Документы, требующие следующего действия.</p>
                 </div>
-                <a href="{% url 'invoice_list' %}?readiness=attention" class="production-text-link">Вся очередь</a>
+                <div class="dashboard-heading-action">
+                    <span class="dashboard-count-badge">{{ enterprise_dashboard.tasks|length }}</span>
+                    <a href="{% url 'invoice_list' %}?readiness=attention">Все задачи</a>
+                </div>
             </div>
-            <div class="enterprise-task-list">
-                {% for task in enterprise_dashboard.tasks %}
-                    <a href="{% url 'invoice_detail' task.invoice_id %}" class="enterprise-task-item">
-                        <span class="readiness-indicator readiness-{{ task.readiness_tone }}"></span>
-                        <span>
+
+            <div class="dashboard-task-list">
+                {% for task in enterprise_dashboard.tasks|slice:":4" %}
+                    <a href="{% url 'invoice_detail' task.invoice_id %}" class="dashboard-task-row">
+                        <span class="dashboard-task-marker readiness-{{ task.readiness_tone }}" aria-hidden="true"></span>
+                        <span class="dashboard-task-copy">
                             <strong>{{ task.title }}</strong>
-                            <small>{{ task.counterparty_label }}</small>
-                        </span>
-                        <span>
-                            <strong>{{ task.readiness_label }}</strong>
                             <small>{{ task.reason }}</small>
+                            <span>{{ task.counterparty_label }}</span>
                         </span>
-                        <span class="enterprise-task-money">
-                            <strong>{{ task.remaining_amount|money_ru }}</strong>
-                            <small>{% if task.planned_payment_date %}{{ task.planned_payment_date|date:'d.m.Y' }}{% else %}Без даты{% endif %}</small>
+                        <span class="dashboard-task-next">
+                            <strong>{{ task.next_action }}</strong>
+                            <small>{% if task.planned_payment_date %}{{ task.planned_payment_date|date:'d.m.Y' }}{% else %}Без срока{% endif %}</small>
                         </span>
                     </a>
                 {% empty %}
-                    <div class="production-empty-state">Активных задач нет.</div>
+                    <div class="dashboard-empty-state">
+                        <strong>Активных задач нет</strong>
+                        <span>Документы не требуют срочного действия.</span>
+                    </div>
                 {% endfor %}
             </div>
         </section>
 
-        <section class="production-panel" aria-labelledby="dashboard-actions-title">
-            <div class="production-panel-header">
+        <section class="dashboard-panel dashboard-chart-panel" aria-labelledby="dashboard-chart-title">
+            <div class="dashboard-panel-heading">
                 <div>
-                    <span class="production-eyebrow">Контекст</span>
-                    <h2 id="dashboard-actions-title">Последние действия</h2>
+                    <span class="dashboard-section-kicker">Финансовый горизонт</span>
+                    <h2 id="dashboard-chart-title">График платежей</h2>
+                    <p>Суммы к оплате на ближайшие 7 дней.</p>
                 </div>
-                <a href="{% url 'audit:audit_log_list' %}" class="production-text-link">Журнал</a>
+                <a href="{% url 'payment_schedule' %}">Открыть календарь</a>
             </div>
-            <div class="enterprise-activity-list">
-                {% for action in enterprise_dashboard.recent_actions %}
-                    <a href="{% url 'invoice_detail' action.invoice_id %}" class="enterprise-activity-item">
-                        <time>{{ action.created_at|date:'d.m H:i' }}</time>
-                        <span>
-                            <strong>{{ action.title }}</strong>
-                            <small>{{ action.action }}</small>
-                        </span>
-                        <small>{{ action.actor_label }}</small>
-                    </a>
-                {% empty %}
-                    <div class="production-empty-state">Действий пока нет.</div>
+
+            {% if enterprise_dashboard.largest_payments %}
+                <canvas class="enterprise-chart enterprise-chart-bars dashboard-payment-chart" data-enterprise-chart="bars" data-source="enterprise-dashboard-data" aria-label="Суммы к оплате по дням"></canvas>
+            {% else %}
+                <div class="dashboard-chart-empty">
+                    <strong>Платежи на 7 дней не назначены</strong>
+                    <span>Укажите плановые даты в карточках документов.</span>
+                    <a href="{% url 'payment_schedule' %}">Открыть график →</a>
+                </div>
+            {% endif %}
+
+            <div class="dashboard-status-summary" aria-label="Статусы документов">
+                <span class="dashboard-status-label">Статусы документов</span>
+                {% for item in enterprise_dashboard.status_distribution %}
+                    {% if item.count %}
+                        <a href="{% url 'invoice_list' %}?status={{ item.code }}" class="dashboard-status-item">
+                            <span class="legend-dot status-{{ item.code }}" aria-hidden="true"></span>
+                            <span>{{ item.label }}</span>
+                            <strong>{{ item.count }}</strong>
+                        </a>
+                    {% endif %}
                 {% endfor %}
             </div>
         </section>
     </div>
 
-    <div class="enterprise-dashboard-lower">
-        <section class="production-panel">
-            <div class="production-panel-header">
+    <div class="dashboard-secondary-grid">
+        <section class="dashboard-panel dashboard-secondary-panel" aria-labelledby="dashboard-payments-title">
+            <div class="dashboard-panel-heading dashboard-panel-heading-compact">
                 <div>
-                    <span class="production-eyebrow">Платежи</span>
-                    <h2>Крупнейшие платежи недели</h2>
+                    <span class="dashboard-section-kicker">Ближайшие 7 дней</span>
+                    <h2 id="dashboard-payments-title">Ближайшие платежи</h2>
                 </div>
-                <a href="{% url 'payment_schedule' %}" class="production-text-link">Показать все</a>
+                <a href="{% url 'payment_schedule' %}">Все платежи</a>
             </div>
-            <div class="compact-work-list">
-                {% for item in enterprise_dashboard.largest_payments %}
-                    <a href="{% url 'invoice_detail' item.invoice_id %}" class="compact-work-item">
+            <div class="dashboard-compact-list">
+                {% for item in enterprise_dashboard.largest_payments|slice:":4" %}
+                    <a href="{% url 'invoice_detail' item.invoice_id %}" class="dashboard-compact-row">
                         <span>
                             <strong>{{ item.title }}</strong>
                             <small>{{ item.counterparty_label }}</small>
                         </span>
-                        <span class="compact-work-value">
+                        <span class="dashboard-compact-value">
                             <strong>{{ item.remaining_amount|money_ru }}</strong>
                             <small>{{ item.planned_payment_date|date:'d.m.Y' }}</small>
                         </span>
                     </a>
                 {% empty %}
-                    <div class="production-empty-state">Платежи не назначены.</div>
+                    <div class="dashboard-empty-state dashboard-empty-state-compact">
+                        <strong>Нет назначенных платежей</strong>
+                        <span>Ближайшие обязательства появятся после назначения дат.</span>
+                    </div>
                 {% endfor %}
             </div>
         </section>
 
-        <section class="production-panel">
-            <div class="production-panel-header">
+        <section class="dashboard-panel dashboard-secondary-panel" aria-labelledby="dashboard-actions-title">
+            <div class="dashboard-panel-heading dashboard-panel-heading-compact">
                 <div>
-                    <span class="production-eyebrow">Последние изменения</span>
-                    <h2>Недавние документы</h2>
+                    <span class="dashboard-section-kicker">Рабочий контекст</span>
+                    <h2 id="dashboard-actions-title">Последние действия</h2>
                 </div>
-                <a href="{% url 'invoice_list' %}" class="production-text-link">Все документы</a>
+                <a href="{% url 'audit:audit_log_list' %}">Журнал</a>
             </div>
-            <div class="compact-work-list">
-                {% for item in dashboard_workspace.latest_documents %}
-                    <a href="{% url 'invoice_detail' item.invoice.id %}" class="compact-work-item">
+            <div class="dashboard-compact-list">
+                {% for action in enterprise_dashboard.recent_actions|slice:":4" %}
+                    <a href="{% url 'invoice_detail' action.invoice_id %}" class="dashboard-activity-row">
+                        <time>{{ action.created_at|date:'d.m H:i' }}</time>
                         <span>
-                            <strong>{{ item.title }}</strong>
-                            <small>{{ item.invoice.updated_at|date:'d.m.Y H:i' }}</small>
+                            <strong>{{ action.title }}</strong>
+                            <small>{{ action.action }} · {{ action.actor_label }}</small>
                         </span>
-                        <span class="production-readiness-badge readiness-{{ item.readiness_tone }}">{{ item.readiness_label }}</span>
                     </a>
                 {% empty %}
-                    <div class="production-empty-state">Документов пока нет.</div>
+                    <div class="dashboard-empty-state dashboard-empty-state-compact">
+                        <strong>Действий пока нет</strong>
+                        <span>Здесь появятся последние изменения документов.</span>
+                    </div>
                 {% endfor %}
             </div>
         </section>

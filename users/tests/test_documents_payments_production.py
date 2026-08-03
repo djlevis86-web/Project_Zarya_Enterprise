@@ -96,12 +96,15 @@ class DocumentsPaymentsProductionTests(TestCase):
         response = self.client.get(reverse("dashboard"))
         self.assertEqual(response.status_code, 200)
         for text in (
-            "Статусы документов",
-            "Суммы к оплате",
+            "Требует проверки",
+            "К оплате сегодня",
+            "Просрочено",
+            "Готово к реестру",
             "Мои задачи",
+            "График платежей",
+            "Статусы документов",
+            "Ближайшие платежи",
             "Последние действия",
-            "Документы, требующие внимания",
-            "Крупнейшие платежи недели",
         ):
             self.assertContains(response, text)
         self.assertContains(response, "enterprise-dashboard-data")

@@ -244,31 +244,33 @@ class BrandLayerV1Tests(SimpleTestCase):
             css,
         )
 
-    def test_dashboard_attention_uses_shared_enterprise_surface(self) -> None:
+    def test_dashboard_compact_surfaces_use_brand_tokens(self) -> None:
         template = self.dashboard_template.read_text(
             encoding="utf-8-sig"
         )
         page_css = self.dashboard_css.read_text(
             encoding="utf-8-sig"
         )
-        workspace_css = self.workspace_css.read_text(
-            encoding="utf-8-sig"
-        )
 
         self.assertEqual(
-            template.count(
-                "production-panel enterprise-attention-panel"
-            ),
-            1,
-        )
-        self.assertIn(".production-panel {", workspace_css)
-        self.assertIn(
-            "background:var(--zds-color-surface-elevated)",
-            workspace_css,
+            template.count('class="dashboard-panel '),
+            4,
         )
         self.assertIn(
-            ".dashboard-work-item",
+            "background: var(--zds-color-surface-elevated);",
             page_css,
+        )
+        self.assertIn(
+            "border: 1px solid var(--zds-color-border);",
+            page_css,
+        )
+        self.assertIn(
+            ".dashboard-task-row",
+            page_css,
+        )
+        self.assertNotIn(
+            "production-panel enterprise-attention-panel",
+            template,
         )
         self.assertNotIn(
             "DASHBOARD-ATTENTION-QUEUE-V2",

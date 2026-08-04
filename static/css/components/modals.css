@@ -228,74 +228,154 @@ body.has-interaction-overlay {
 .z-toast-region {
     position: fixed;
     top: calc(var(--zds-topbar-height) + 16px);
-    right: 18px;
-    z-index: 1400;
-    width: min(420px, calc(100vw - 36px));
+    right: 20px;
+    z-index: 900;
+    width: min(480px, calc(100vw - 40px));
+    max-height: calc(100vh - var(--zds-topbar-height) - 32px);
+    margin: 0;
+    padding: 0;
     display: grid;
-    gap: 10px;
+    justify-items: stretch;
+    gap: 8px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     pointer-events: none;
 }
 
 .z-toast {
-    min-height: 58px;
+    width: 100%;
+    min-height: 44px;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: 20px minmax(0, 1fr) 28px;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     margin: 0;
-    padding: 12px 12px 12px 16px;
+    padding: 9px 8px 9px 12px;
     border: 1px solid var(--zds-color-border-strong);
-    border-left: 4px solid var(--zds-color-info);
-    border-radius: var(--zds-radius-control);
-    background: var(--zds-color-surface-elevated);
+    border-radius: 12px;
+    background: var(--zds-color-surface-soft);
     color: var(--zds-color-text);
-    box-shadow: var(--zds-shadow-overlay, 0 20px 54px color-mix(in srgb, var(--zds-color-canvas-deep) 50%, transparent));
+    box-shadow: 0 16px 42px color-mix(in srgb, #000 24%, transparent);
     pointer-events: auto;
     animation: z-toast-enter 180ms ease both;
 }
 
+.z-toast-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-grid;
+    place-items: center;
+    color: var(--zds-color-info);
+}
+
+.z-toast-icon svg,
+.z-toast-close svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
 .z-toast.tone-success {
-    border-left-color: var(--zds-color-success);
+    border-color: color-mix(in srgb, var(--zds-color-success) 42%, var(--zds-color-border));
+    background: color-mix(in srgb, var(--zds-color-success) 7%, var(--zds-color-surface-soft));
+}
+
+.z-toast.tone-success .z-toast-icon {
+    color: var(--zds-color-success);
 }
 
 .z-toast.tone-warning {
-    border-left-color: var(--zds-color-warning);
+    border-color: color-mix(in srgb, var(--zds-color-warning) 48%, var(--zds-color-border));
+    background: color-mix(in srgb, var(--zds-color-warning) 8%, var(--zds-color-surface-soft));
+}
+
+.z-toast.tone-warning .z-toast-icon {
+    color: var(--zds-color-warning);
 }
 
 .z-toast.tone-error,
 .z-toast.tone-danger {
-    border-left-color: var(--zds-color-danger);
+    border-color: color-mix(in srgb, var(--zds-color-danger) 52%, var(--zds-color-border));
+    background: color-mix(in srgb, var(--zds-color-danger) 7%, var(--zds-color-surface-soft));
+}
+
+.z-toast.tone-error .z-toast-icon,
+.z-toast.tone-danger .z-toast-icon {
+    color: var(--zds-color-danger);
 }
 
 .z-toast.is-leaving {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translate3d(12px, -2px, 0);
     transition: opacity 160ms ease, transform 160ms ease;
 }
 
 .z-toast-message {
     min-width: 0;
+    color: var(--zds-color-text-soft);
+    font-size: 13px;
+    line-height: 1.4;
     overflow-wrap: anywhere;
 }
 
 .z-toast-close {
-    min-width: 34px;
-    min-height: 34px;
-    font-size: 18px;
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    min-height: 28px;
+    padding: 6px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--zds-color-text-muted);
+    font-size: 0;
+}
+
+.z-toast-close:hover {
+    border-color: transparent;
+    background: var(--zds-color-control-hover);
+    color: var(--zds-color-text);
 }
 
 @keyframes z-toast-enter {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translate3d(12px, -4px, 0);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translate3d(0, 0, 0);
     }
 }
 
 @media (max-width: 680px) {
+    .z-toast-region {
+        top: 80px;
+        right: 12px;
+        left: 12px;
+        width: auto;
+        max-height: calc(100dvh - 92px);
+        gap: 6px;
+    }
+
+    .z-toast {
+        width: 100%;
+        grid-template-columns: 18px minmax(0, 1fr) 28px;
+        padding-left: 10px;
+    }
+
+    .z-toast-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+
     .z-modal {
         width: calc(100vw - 20px);
         max-height: calc(100vh - 20px);
@@ -324,10 +404,8 @@ body.has-interaction-overlay {
         justify-self: end;
     }
 
-    .z-toast-region {
-        top: calc(var(--zds-topbar-height) + 10px);
-        right: 10px;
-        width: calc(100vw - 20px);
+    .z-toast {
+        padding: 9px 9px 9px 11px;
     }
 }
 

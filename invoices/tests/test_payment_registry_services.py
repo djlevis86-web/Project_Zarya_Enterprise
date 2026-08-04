@@ -345,7 +345,7 @@ class PaymentRegistryServiceTests(TestCase):
         self.assertEqual(restored_item.id, item.id)
         self.assertEqual(restored_item.status, PaymentRegistryItem.STATUS_ADDED)
         self.assertIn(
-            "Документ был ранее удалён из черновика и теперь восстановлен.",
+            "Ранее удалён из черновика. Сейчас восстановлен.",
             restore_warnings,
         )
 

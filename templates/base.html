@@ -551,19 +551,48 @@
                     {% for message in messages %}
 
                         <div
-                            class="alert alert-{{ message.tags|default:'info' }} z-toast tone-{{ message.tags|default:'info' }}"
+                            class="z-toast tone-{{ message.tags|default:'info' }}"
                             data-toast
                             data-toast-timeout="{% if message.tags == 'error' %}0{% else %}7000{% endif %}"
                             role="{% if message.tags == 'error' %}alert{% else %}status{% endif %}"
                         >
+                            <span class="z-toast-icon" aria-hidden="true">
+                                {% if message.tags == "success" %}
+                                    <svg viewBox="0 0 24 24" focusable="false">
+                                        <path d="M5 12.5 9.2 17 19 7" />
+                                    </svg>
+                                {% elif message.tags == "warning" %}
+                                    <svg viewBox="0 0 24 24" focusable="false">
+                                        <path d="M12 4 21 20H3L12 4Z" />
+                                        <path d="M12 9V14" />
+                                        <path d="M12 17.5H12.01" />
+                                    </svg>
+                                {% elif message.tags == "error" or message.tags == "danger" %}
+                                    <svg viewBox="0 0 24 24" focusable="false">
+                                        <circle cx="12" cy="12" r="9" />
+                                        <path d="M12 7V13" />
+                                        <path d="M12 16.5H12.01" />
+                                    </svg>
+                                {% else %}
+                                    <svg viewBox="0 0 24 24" focusable="false">
+                                        <circle cx="12" cy="12" r="9" />
+                                        <path d="M12 11V17" />
+                                        <path d="M12 7.5H12.01" />
+                                    </svg>
+                                {% endif %}
+                            </span>
                             <span class="z-toast-message">{{ message }}</span>
                             <button
                                 type="button"
                                 class="z-toast-close"
                                 data-toast-close
                                 aria-label="Закрыть уведомление"
+                                title="Закрыть"
                             >
-                                ×
+                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                    <path d="M7 7 17 17" />
+                                    <path d="M17 7 7 17" />
+                                </svg>
                             </button>
                         </div>
 

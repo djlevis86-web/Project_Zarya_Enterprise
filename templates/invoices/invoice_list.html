@@ -2,17 +2,338 @@
 {% load money %}
 {% block content %}
 <div class="enterprise-page enterprise-document-list" data-enterprise-screen="invoice-list">
-<header class="page-header page-header-v1 enterprise-hero"><div class="page-header-copy-v1"><span class="production-kicker">Документы к оплате</span><h1 class="page-title">Рабочая очередь</h1><p class="page-subtitle">Полный контекст документа, оплаты и готовности без перехода в технические разделы.</p></div><div class="page-header-actions-v1"><a href="{% url 'upload_invoice' %}" class="btn btn-primary">Загрузить документы</a></div></header>
-<section class="enterprise-metric-grid enterprise-metric-grid-list" aria-label="Состояние документов">
-<a class="enterprise-metric metric-neutral" href="{% url 'invoice_list' %}"><span>Всего документов</span><strong>{{ total_count }}</strong><small>{{ enterprise_list_analytics.total_outstanding_amount|money_ru }} остаток</small></a>
-<a class="enterprise-metric metric-warning" href="{% url 'invoice_list' %}?readiness=attention"><span>Требуют внимания</span><strong>{{ enterprise_metrics.needs_review.count }}</strong><small>{{ enterprise_metrics.needs_review.amount|money_ru }}</small></a>
-<a class="enterprise-metric metric-success" href="{% url 'invoice_list' %}?readiness=ready"><span>Готовы к реестру</span><strong>{{ enterprise_metrics.ready.count }}</strong><small>{{ enterprise_metrics.ready.amount|money_ru }}</small></a>
-<a class="enterprise-metric metric-danger" href="{% url 'invoice_list' %}?readiness=overdue"><span>Просрочены</span><strong>{{ enterprise_metrics.overdue.count }}</strong><small>{{ enterprise_metrics.overdue.amount|money_ru }}</small></a>
-</section>
-<section class="production-panel enterprise-filter-panel" aria-labelledby="invoice-filter-title"><div class="production-panel-header"><div><span class="production-eyebrow">Фильтры</span><h2 id="invoice-filter-title">Найти документ</h2></div>{% if search or status or readiness_filter or responsible_filter or document_type_filter or payment_status_filter or planned_payment_date_from or planned_payment_date_to %}<a href="{% url 'invoice_list' %}" class="production-text-link">Сбросить всё</a>{% endif %}</div>
-<div class="enterprise-quick-filters"><a href="{% url 'invoice_list' %}?planned_payment_date_from={% now 'Y-m-d' %}&planned_payment_date_to={% now 'Y-m-d' %}">Сегодня</a><a href="{% url 'invoice_list' %}?readiness=overdue">Просрочено</a><a href="{% url 'invoice_list' %}?readiness=attention">На проверке</a><a href="{% url 'invoice_list' %}?readiness=ready">Готово к реестру</a></div>
-{% if recent_invoice_filters %}<div class="enterprise-recent-filters"><strong>Последние поиски</strong><div>{% for recent_filter in recent_invoice_filters %}<a href="{% url 'invoice_list' %}?{{ recent_filter.querystring }}">{{ recent_filter.label }}</a>{% endfor %}</div><form method="post" action="{% url 'clear_recent_invoice_filters' %}">{% csrf_token %}<button type="submit" class="production-text-link">Очистить</button></form></div>{% endif %}
-<form method="get" class="enterprise-filter-grid"><label class="production-filter-field enterprise-filter-search"><span>Поиск</span><input type="search" name="search" value="{{ search }}" placeholder="Документ, контрагент, ИНН, название"></label><label class="production-filter-field"><span>Готовность</span><select name="readiness">{% for value,label in readiness_choices %}<option value="{{ value }}" {% if readiness_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label><label class="production-filter-field"><span>Статус</span><select name="status"><option value="">Все статусы</option>{% for value,label in statuses %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label><label class="production-filter-field"><span>Ответственный</span><select name="responsible"><option value="">Все ответственные</option>{% for responsible in responsibles %}<option value="{{ responsible.id }}" {% if responsible_filter == responsible.id|stringformat:'s' %}selected{% endif %}>{{ responsible.full_name }}</option>{% endfor %}</select></label><label class="production-filter-field"><span>Тип документа</span><select name="document_type"><option value="">Все типы</option>{% for value,label in document_type_choices %}<option value="{{ value }}" {% if document_type_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label><label class="production-filter-field"><span>Оплата</span><select name="payment_status">{% for value,label in payment_status_choices %}<option value="{{ value }}" {% if payment_status_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label><label class="production-filter-field"><span>Оплата с</span><input type="date" name="planned_payment_date_from" value="{{ planned_payment_date_from }}"></label><label class="production-filter-field"><span>Оплата по</span><input type="date" name="planned_payment_date_to" value="{{ planned_payment_date_to }}"></label>{% if request.user.is_staff %}<label class="production-filter-field"><span>Загрузил</span><select name="user"><option value="">Все пользователи</option>{% for item_user in users %}<option value="{{ item_user.id }}" {% if user_filter == item_user.id|stringformat:'s' %}selected{% endif %}>{{ item_user.username }}</option>{% endfor %}</select></label>{% endif %}<label class="production-filter-field"><span>Сортировка</span><select name="sort"><option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>Сначала новые</option><option value="planned_payment_date" {% if sort == 'planned_payment_date' %}selected{% endif %}>По сроку оплаты</option><option value="-amount" {% if sort == '-amount' %}selected{% endif %}>По сумме</option><option value="document_date" {% if sort == 'document_date' %}selected{% endif %}>По дате документа</option></select></label><div class="production-filter-actions"><button type="submit" class="btn btn-primary">Применить</button><a href="{% url 'invoice_list' %}" class="btn btn-secondary">Сбросить</a></div></form></section>
-<section class="production-panel enterprise-table-panel" aria-labelledby="invoice-results-title"><div class="production-panel-header"><div><span class="production-eyebrow">Результат</span><h2 id="invoice-results-title">Документы</h2><p>Показано {{ page_obj.object_list|length }} из {{ page_obj.paginator.count }}.</p></div></div><div class="enterprise-table-wrap"><table class="enterprise-table document-enterprise-table"><thead><tr><th>Документ</th><th>Контрагент</th><th>Сумма / остаток</th><th>Срок</th><th>Статус</th><th>Готовность</th><th>Ответственный</th><th>Действия</th></tr></thead><tbody>{% for invoice in page_obj %}<tr class="readiness-row-{{ invoice.production.readiness_tone }}"><td data-label="Документ"><a class="enterprise-document-link" href="{% url 'invoice_detail' invoice.id %}">{{ invoice.production.title }}</a><small>{{ invoice.production.meta|default:invoice.original_filename }}</small></td><td data-label="Контрагент">{% if invoice.counterparty %}<strong>{{ invoice.counterparty.name }}</strong><small>{% if invoice.counterparty.inn %}ИНН {{ invoice.counterparty.inn }}{% endif %}</small>{% else %}<span class="missing-value">Не назначен</span>{% endif %}</td><td data-label="Сумма / остаток"><strong>{{ invoice.production.payment.invoice_amount|money_ru }}</strong><small>Остаток {{ invoice.production.payment.remaining_amount|money_ru }}</small></td><td data-label="Срок" class="{% if invoice.production.is_overdue %}is-overdue{% endif %}"><strong>{{ invoice.production.planned_payment_date_label }}</strong>{% if invoice.production.is_overdue %}<small>Срок прошёл</small>{% endif %}</td><td data-label="Статус"><span class="enterprise-status-label status-{{ invoice.status }}">{{ invoice.production.status_label }}</span></td><td data-label="Готовность"><span class="production-readiness-badge readiness-{{ invoice.production.readiness_tone }}">{{ invoice.production.readiness_label }}</span><small>{{ invoice.production.reason }}</small></td><td data-label="Ответственный">{% if invoice.responsible %}<strong>{{ invoice.responsible.full_name }}</strong>{% else %}<span class="missing-value">Не назначен</span>{% endif %}</td><td data-label="Действия"><details class="enterprise-action-menu"><summary aria-label="Действия с документом">•••</summary><div><a href="{% url 'invoice_detail' invoice.id %}">Открыть</a><a href="{% url 'edit_invoice' invoice.id %}">Редактировать</a><a href="{% url 'invoice_assign_counterparty' invoice.id %}">{% if invoice.counterparty %}Изменить контрагента{% else %}Назначить контрагента{% endif %}</a>{% if invoice.production.readiness_code == 'ready' %}<form method="post" action="{% url 'add_to_payment_registry' %}">{% csrf_token %}<input type="hidden" name="invoice_ids" value="{{ invoice.id }}"><button type="submit">Добавить в реестр</button></form>{% endif %}</div></details></td></tr>{% empty %}<tr><td colspan="8"><div class="production-empty-state">По выбранным условиям документов нет.</div></td></tr>{% endfor %}</tbody></table></div>{% if page_obj.paginator.num_pages > 1 %}<nav class="production-pagination" aria-label="Страницы документов">{% if page_obj.has_previous %}<a href="?{% if querystring_without_page %}{{ querystring_without_page }}&{% endif %}page={{ page_obj.previous_page_number }}" class="btn btn-secondary btn-sm">Назад</a>{% endif %}<span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?{% if querystring_without_page %}{{ querystring_without_page }}&{% endif %}page={{ page_obj.next_page_number }}" class="btn btn-secondary btn-sm">Дальше</a>{% endif %}</nav>{% endif %}</section>
+    <header class="page-header page-header-v1 invoice-list-commandbar">
+        <div class="page-header-copy-v1">
+            <span class="production-kicker">Рабочая очередь</span>
+            <h1 class="page-title">Документы к оплате</h1>
+            <p class="page-subtitle">Найдите документ, поймите причину блокировки и продолжите работу.</p>
+        </div>
+        <div class="page-header-actions-v1">
+            <a href="{% url 'upload_invoice' %}" class="btn btn-primary invoice-list-upload-action">
+                <span class="invoice-list-upload-label-full">Загрузить документы</span>
+                <span class="invoice-list-upload-label-short">Загрузить</span>
+            </a>
+        </div>
+    </header>
+
+    <section class="enterprise-metric-grid enterprise-metric-grid-list invoice-list-metrics" aria-label="Состояние документов">
+        <a class="enterprise-metric metric-neutral" href="{% url 'invoice_list' %}">
+            <span>Всего документов</span>
+            <strong>{{ total_count }}</strong>
+            <small>{{ enterprise_list_analytics.total_outstanding_amount|money_ru }} остаток</small>
+        </a>
+        <a class="enterprise-metric metric-warning" href="{% url 'invoice_list' %}?readiness=attention">
+            <span>Требуют внимания</span>
+            <strong>{{ enterprise_metrics.needs_review.count }}</strong>
+            <small>{{ enterprise_metrics.needs_review.amount|money_ru }}</small>
+        </a>
+        <a class="enterprise-metric metric-success" href="{% url 'invoice_list' %}?readiness=ready">
+            <span>Готовы к реестру</span>
+            <strong>{{ enterprise_metrics.ready.count }}</strong>
+            <small>{{ enterprise_metrics.ready.amount|money_ru }}</small>
+        </a>
+        <a class="enterprise-metric metric-danger" href="{% url 'invoice_list' %}?readiness=overdue">
+            <span>Просрочены</span>
+            <strong>{{ enterprise_metrics.overdue.count }}</strong>
+            <small>{{ enterprise_metrics.overdue.amount|money_ru }}</small>
+        </a>
+    </section>
+
+    <section class="production-panel enterprise-filter-panel invoice-list-filter-panel" aria-labelledby="invoice-filter-title">
+        <div class="production-panel-header invoice-list-filter-header">
+            <div>
+                <span class="production-eyebrow">Фильтры</span>
+                <h2 id="invoice-filter-title">Найти документ</h2>
+            </div>
+            {% if search or status or readiness_filter or responsible_filter or document_type_filter or payment_status_filter or document_date_from or document_date_to or planned_payment_date_from or planned_payment_date_to or user_filter or sort != '-created_at' %}
+                <a href="{% url 'invoice_list' %}" class="production-text-link">Сбросить всё</a>
+            {% endif %}
+        </div>
+
+        <div class="enterprise-quick-filters invoice-list-quick-filters" aria-label="Быстрые фильтры">
+            <a href="{% url 'invoice_list' %}?planned_payment_date_from={% now 'Y-m-d' %}&planned_payment_date_to={% now 'Y-m-d' %}">Сегодня</a>
+            <a href="{% url 'invoice_list' %}?readiness=overdue">Просрочено</a>
+            <a href="{% url 'invoice_list' %}?readiness=attention">На проверке</a>
+            <a href="{% url 'invoice_list' %}?readiness=ready">Готово к реестру</a>
+        </div>
+
+        {% if recent_invoice_filters %}
+            <div class="enterprise-recent-filters invoice-list-recent-filters">
+                <strong>Последние поиски</strong>
+                <div>
+                    {% for recent_filter in recent_invoice_filters %}
+                        <a href="{% url 'invoice_list' %}?{{ recent_filter.querystring }}">{{ recent_filter.label }}</a>
+                    {% endfor %}
+                </div>
+                <form method="post" action="{% url 'clear_recent_invoice_filters' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="production-text-link">Очистить</button>
+                </form>
+            </div>
+        {% endif %}
+
+        <form method="get" class="invoice-list-filter-form">
+            <div class="invoice-list-primary-filters">
+                <label class="production-filter-field invoice-list-search-field">
+                    <span>Поиск</span>
+                    <input type="search" name="search" value="{{ search }}" placeholder="Номер, контрагент, ИНН, название">
+                </label>
+                <label class="production-filter-field invoice-list-readiness-field">
+                    <span>Готовность</span>
+                    <select name="readiness">
+                        {% for value,label in readiness_choices %}
+                            <option value="{{ value }}" {% if readiness_filter == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <button type="submit" class="btn btn-primary invoice-list-apply-primary">Применить</button>
+            </div>
+
+            <details class="invoice-list-advanced-filters" {% if status or responsible_filter or document_type_filter or payment_status_filter or document_date_from or document_date_to or planned_payment_date_from or planned_payment_date_to or user_filter or sort != '-created_at' %}open{% endif %}>
+                <summary>
+                    <span class="invoice-list-advanced-filter-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                            <path d="M4 5h16l-6.25 7.2v5.1L10.25 19v-6.8L4 5z"></path>
+                        </svg>
+                    </span>
+                    <span class="invoice-list-advanced-filter-copy">
+                        <span class="invoice-list-advanced-filter-label">
+                            <span class="invoice-list-advanced-filter-label-closed">Расширенные фильтры</span>
+                            <span class="invoice-list-advanced-filter-label-open">Свернуть фильтры</span>
+                        </span>
+                        <small>Статус, ответственный, тип, даты и сортировка</small>
+                    </span>
+                    <svg class="invoice-list-advanced-filter-chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="m7 10 5 5 5-5"></path>
+                    </svg>
+                </summary>
+                <div class="invoice-list-advanced-grid">
+                    <label class="production-filter-field">
+                        <span>Статус</span>
+                        <select name="status">
+                            <option value="">Все статусы</option>
+                            {% for value,label in statuses %}
+                                <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label class="production-filter-field">
+                        <span>Ответственный</span>
+                        <select name="responsible">
+                            <option value="">Все ответственные</option>
+                            {% for responsible in responsibles %}
+                                <option value="{{ responsible.id }}" {% if responsible_filter == responsible.id|stringformat:'s' %}selected{% endif %}>{{ responsible.full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label class="production-filter-field">
+                        <span>Тип документа</span>
+                        <select name="document_type">
+                            <option value="">Все типы</option>
+                            {% for value,label in document_type_choices %}
+                                <option value="{{ value }}" {% if document_type_filter == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label class="production-filter-field">
+                        <span>Оплата</span>
+                        <select name="payment_status">
+                            {% for value,label in payment_status_choices %}
+                                <option value="{{ value }}" {% if payment_status_filter == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label class="production-filter-field">
+                        <span>Документ с</span>
+                        <input type="date" name="document_date_from" value="{{ document_date_from }}">
+                    </label>
+                    <label class="production-filter-field">
+                        <span>Документ по</span>
+                        <input type="date" name="document_date_to" value="{{ document_date_to }}">
+                    </label>
+                    <label class="production-filter-field">
+                        <span>Оплата с</span>
+                        <input type="date" name="planned_payment_date_from" value="{{ planned_payment_date_from }}">
+                    </label>
+                    <label class="production-filter-field">
+                        <span>Оплата по</span>
+                        <input type="date" name="planned_payment_date_to" value="{{ planned_payment_date_to }}">
+                    </label>
+                    {% if request.user.is_staff %}
+                        <label class="production-filter-field">
+                            <span>Загрузил</span>
+                            <select name="user">
+                                <option value="">Все пользователи</option>
+                                {% for item_user in users %}
+                                    <option value="{{ item_user.id }}" {% if user_filter == item_user.id|stringformat:'s' %}selected{% endif %}>{{ item_user.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    {% endif %}
+                    <label class="production-filter-field invoice-list-sort-field">
+                        <span>Сортировка</span>
+                        <select name="sort">
+                            <option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>Сначала новые</option>
+                            <option value="planned_payment_date" {% if sort == 'planned_payment_date' %}selected{% endif %}>По сроку оплаты</option>
+                            <option value="-amount" {% if sort == '-amount' %}selected{% endif %}>По сумме</option>
+                            <option value="document_date" {% if sort == 'document_date' %}selected{% endif %}>По дате документа</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="production-filter-actions invoice-list-advanced-actions">
+                    <button type="submit" class="btn btn-primary">Применить фильтры</button>
+                    <a href="{% url 'invoice_list' %}" class="btn btn-secondary">Сбросить</a>
+                </div>
+            </details>
+        </form>
+    </section>
+
+    <section class="production-panel enterprise-table-panel invoice-list-results" aria-labelledby="invoice-results-title">
+        <div class="production-panel-header invoice-list-results-header">
+            <div>
+                <span class="production-eyebrow">Результат</span>
+                <h2 id="invoice-results-title">Документы</h2>
+            </div>
+            <p>Показано {{ page_obj.object_list|length }} из {{ page_obj.paginator.count }}</p>
+        </div>
+
+        <div class="enterprise-table-wrap invoice-list-desktop-table">
+            <table class="enterprise-table document-enterprise-table">
+                <thead>
+                    <tr>
+                        <th>Документ</th>
+                        <th>Контрагент</th>
+                        <th>Сумма / остаток</th>
+                        <th>Срок</th>
+                        <th>Статус</th>
+                        <th>Готовность</th>
+                        <th>Ответственный</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in page_obj %}
+                        <tr class="readiness-row-{{ invoice.production.readiness_tone }}">
+                            <td data-label="Документ">
+                                <a class="enterprise-document-link" href="{% url 'invoice_detail' invoice.id %}">{{ invoice.production.title }}</a>
+                                <small>{{ invoice.production.meta|default:invoice.original_filename }}</small>
+                            </td>
+                            <td data-label="Контрагент">
+                                {% if invoice.counterparty %}
+                                    <strong>{{ invoice.counterparty.name }}</strong>
+                                    <small>{% if invoice.counterparty.inn %}ИНН {{ invoice.counterparty.inn }}{% endif %}</small>
+                                {% else %}
+                                    <span class="missing-value">Не назначен</span>
+                                {% endif %}
+                            </td>
+                            <td data-label="Сумма / остаток">
+                                <strong>{{ invoice.production.payment.invoice_amount|money_ru }}</strong>
+                                <small>Остаток {{ invoice.production.payment.remaining_amount|money_ru }}</small>
+                            </td>
+                            <td data-label="Срок" class="{% if invoice.production.is_overdue %}is-overdue{% endif %}">
+                                <strong>{{ invoice.production.planned_payment_date_label }}</strong>
+                                {% if invoice.production.is_overdue %}<small>Срок прошёл</small>{% endif %}
+                            </td>
+                            <td data-label="Статус"><span class="enterprise-status-label status-{{ invoice.status }}">{{ invoice.production.status_label }}</span></td>
+                            <td data-label="Готовность">
+                                <span class="production-readiness-badge readiness-{{ invoice.production.readiness_tone }}">{{ invoice.production.readiness_label }}</span>
+                                <small>{{ invoice.production.reason }}</small>
+                            </td>
+                            <td data-label="Ответственный">
+                                {% if invoice.responsible %}<strong>{{ invoice.responsible.full_name }}</strong>{% else %}<span class="missing-value">Не назначен</span>{% endif %}
+                            </td>
+                            <td data-label="Действия">
+                                <div class="invoice-desktop-actions">
+                                    <a
+                                        class="btn btn-secondary btn-sm invoice-desktop-card-link"
+                                        href="{% url 'invoice_detail' invoice.id %}"
+                                        aria-label="Открыть карточку документа {{ invoice.production.title }}"
+                                        title="Открыть карточку документа"
+                                    >
+                                        <svg class="invoice-card-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                            <path d="M2.75 12s3.45-5.75 9.25-5.75S21.25 12 21.25 12 17.8 17.75 12 17.75 2.75 12 2.75 12z"></path>
+                                            <circle cx="12" cy="12" r="2.5"></circle>
+                                        </svg>
+                                        <span class="invoice-desktop-card-label">Открыть</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="8"><div class="production-empty-state">По выбранным условиям документов нет.</div></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="invoice-list-mobile-cards" aria-label="Документы">
+            {% for invoice in page_obj %}
+                <article class="invoice-mobile-card readiness-row-{{ invoice.production.readiness_tone }}">
+                    <header class="invoice-mobile-identity">
+                        <div>
+                            <a class="enterprise-document-link" href="{% url 'invoice_detail' invoice.id %}">{{ invoice.production.title }}</a>
+                            <small>{{ invoice.production.meta|default:invoice.original_filename }}</small>
+                        </div>
+                        <span class="enterprise-status-label status-{{ invoice.status }}">{{ invoice.production.status_label }}</span>
+                    </header>
+
+                    <div class="invoice-mobile-counterparty">
+                        {% if invoice.counterparty %}
+                            <strong>{{ invoice.counterparty.name }}</strong>
+                            {% if invoice.counterparty.inn %}<small>ИНН {{ invoice.counterparty.inn }}</small>{% endif %}
+                        {% else %}
+                            <strong class="missing-value">Контрагент не назначен</strong>
+                        {% endif %}
+                    </div>
+
+                    <div class="invoice-mobile-finance">
+                        <div>
+                            <span>Сумма</span>
+                            <strong>{{ invoice.production.payment.invoice_amount|money_ru }}</strong>
+                            <small>Остаток {{ invoice.production.payment.remaining_amount|money_ru }}</small>
+                        </div>
+                        <div class="{% if invoice.production.is_overdue %}is-overdue{% endif %}">
+                            <span>Срок</span>
+                            <strong>{{ invoice.production.planned_payment_date_label }}</strong>
+                            {% if invoice.production.is_overdue %}<small>Срок прошёл</small>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="invoice-mobile-readiness">
+                        <span class="production-readiness-badge readiness-{{ invoice.production.readiness_tone }}">{{ invoice.production.readiness_label }}</span>
+                        <p>{{ invoice.production.reason }}</p>
+                    </div>
+
+                    <footer class="invoice-mobile-actions">
+                        <div class="invoice-mobile-responsible">
+                            <span>Ответственный</span>
+                            <strong>{% if invoice.responsible %}{{ invoice.responsible.full_name }}{% else %}Не назначен{% endif %}</strong>
+                        </div>
+                        <a
+                            href="{% url 'invoice_detail' invoice.id %}"
+                            class="btn btn-primary btn-sm invoice-mobile-card-link"
+                            aria-label="Открыть карточку документа {{ invoice.production.title }}"
+                        >
+                            <svg class="invoice-card-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M2.75 12s3.45-5.75 9.25-5.75S21.25 12 21.25 12 17.8 17.75 12 17.75 2.75 12 2.75 12z"></path>
+                                <circle cx="12" cy="12" r="2.5"></circle>
+                            </svg>
+                            <span class="invoice-mobile-card-label">Открыть карточку</span>
+                        </a>
+                    </footer>
+                </article>
+            {% empty %}
+                <div class="production-empty-state">По выбранным условиям документов нет.</div>
+            {% endfor %}
+        </div>
+
+        {% if page_obj.paginator.num_pages > 1 %}
+            <nav class="production-pagination" aria-label="Страницы документов">
+                {% if page_obj.has_previous %}<a href="?{% if querystring_without_page %}{{ querystring_without_page }}&{% endif %}page={{ page_obj.previous_page_number }}" class="btn btn-secondary btn-sm">Назад</a>{% endif %}
+                <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}<a href="?{% if querystring_without_page %}{{ querystring_without_page }}&{% endif %}page={{ page_obj.next_page_number }}" class="btn btn-secondary btn-sm">Дальше</a>{% endif %}
+            </nav>
+        {% endif %}
+    </section>
 </div>
 {% endblock %}

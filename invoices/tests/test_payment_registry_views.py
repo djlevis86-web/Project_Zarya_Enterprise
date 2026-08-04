@@ -3,6 +3,8 @@ import tempfile
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
+from django.contrib.messages import constants as message_constants
+from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -71,6 +73,13 @@ class PaymentRegistryViewTests(TestCase):
             full_name="Ответственный страницы реестра",
             is_active=True,
         )
+
+    @staticmethod
+    def _message_pairs(response):
+        return [
+            (message.level, str(message))
+            for message in get_messages(response.wsgi_request)
+        ]
 
     def _create_invoice(
         self,
@@ -221,6 +230,16 @@ class PaymentRegistryViewTests(TestCase):
         self.assertEqual(item.registry.created_by, self.staff_user)
         self.assertEqual(item.registry.status, PaymentRegistry.STATUS_DRAFT)
 
+        self.assertEqual(
+            self._message_pairs(response),
+            [
+                (
+                    message_constants.SUCCESS,
+                    f"В реестр №{item.registry_id} добавлен 1 документ.",
+                ),
+            ],
+        )
+
         item.registry.refresh_from_db()
 
         self.assertEqual(item.registry.items_count, 1)
@@ -250,6 +269,89 @@ class PaymentRegistryViewTests(TestCase):
         )
         self.assertFalse(
             PaymentRegistry.objects.filter(created_by=self.staff_user).exists()
+        )
+
+
+    def test_multiple_added_documents_use_natural_plural_success_copy(self):
+        first_invoice = self._create_invoice(
+            user=self.staff_user,
+            title="REGISTRY-VIEW-MULTIPLE-FIRST",
+        )
+        second_invoice = self._create_invoice(
+            user=self.staff_user,
+            title="REGISTRY-VIEW-MULTIPLE-SECOND",
+        )
+
+        self.client.force_login(self.staff_user)
+
+        response = self.client.post(
+            reverse("add_to_payment_registry"),
+            data={
+                "invoice_ids": [
+                    str(first_invoice.id),
+                    str(second_invoice.id),
+                ],
+            },
+        )
+
+        registry = PaymentRegistry.objects.get(
+            created_by=self.staff_user,
+            status=PaymentRegistry.STATUS_DRAFT,
+        )
+
+        self.assertEqual(
+            self._message_pairs(response),
+            [
+                (
+                    message_constants.SUCCESS,
+                    f"В реестр №{registry.id} добавлено 2 документа.",
+                ),
+            ],
+        )
+
+    def test_restored_document_uses_warning_tone_and_natural_copy(self):
+        invoice = self._create_invoice(
+            user=self.staff_user,
+            title="REGISTRY-VIEW-RESTORED-WARNING",
+        )
+        registry, _ = get_or_create_draft_payment_registry(
+            self.staff_user
+        )
+        item, errors, warnings = add_invoice_to_payment_registry(
+            invoice,
+            registry,
+        )
+
+        self.assertIsNotNone(item)
+        self.assertEqual(errors, [])
+
+        item.status = PaymentRegistryItem.STATUS_CANCELLED
+        item.save(update_fields=["status"])
+
+        self.client.force_login(self.staff_user)
+
+        response = self.client.post(
+            reverse("add_to_payment_registry"),
+            data={
+                "invoice_ids": [str(invoice.id)],
+            },
+        )
+
+        self.assertEqual(
+            self._message_pairs(response),
+            [
+                (
+                    message_constants.SUCCESS,
+                    f"В реестр №{registry.id} добавлен 1 документ.",
+                ),
+                (
+                    message_constants.WARNING,
+                    (
+                        f"Документ №{invoice.id}: Ранее удалён из "
+                        "черновика. Сейчас восстановлен."
+                    ),
+                ),
+            ],
         )
 
     def test_staff_can_remove_item_from_own_draft_registry(self):
@@ -289,6 +391,19 @@ class PaymentRegistryViewTests(TestCase):
         self.assertEqual(item.status, PaymentRegistryItem.STATUS_CANCELLED)
         self.assertEqual(registry.items_count, 0)
         self.assertEqual(registry.total_amount, Decimal("0.00"))
+        self.assertEqual(
+            self._message_pairs(response),
+            [
+                (
+                    message_constants.SUCCESS,
+                    (
+                        f"Документ №{invoice.id} удалён из реестра "
+                        f"№{registry.id}. Если реестр уже выгружали, "
+                        "выгрузите его повторно."
+                    ),
+                ),
+            ],
+        )
 
     def test_staff_can_remove_item_from_foreign_draft_registry(self):
         invoice = self._create_invoice(

@@ -10,9 +10,9 @@ from django.test import SimpleTestCase
 class PageHeaderSemanticScopeV1Tests(
     SimpleTestCase
 ):
-    expected_template_files = (
-        "templates/dashboard.html",
+    custom_dashboard_file = "templates/dashboard.html"
 
+    expected_template_files = (
         "templates/invoices/"
         "counterparties_missing_requisites.html",
 
@@ -127,6 +127,50 @@ class PageHeaderSemanticScopeV1Tests(
     def test_page_header_semantic_scope_v1_contract(
         self,
     ):
+        dashboard_path = (
+            Path(settings.BASE_DIR)
+            / self.custom_dashboard_file
+        )
+
+        self.assertTrue(
+            dashboard_path.is_file(),
+            self.custom_dashboard_file,
+        )
+
+        dashboard_tokens = self.class_tokens(
+            self.normalize_text(dashboard_path)
+        )
+
+        for token in (
+            "dashboard-command-bar",
+            "dashboard-command-copy",
+            "dashboard-command-actions",
+        ):
+            with self.subTest(
+                relative_path=self.custom_dashboard_file,
+                token=token,
+            ):
+                self.assertEqual(
+                    dashboard_tokens.count(token),
+                    1,
+                )
+
+        for generic_token in (
+            "page-header-v1",
+            "page-header-copy-v1",
+            "page-header-actions-v1",
+            "page-title",
+            "page-subtitle",
+        ):
+            with self.subTest(
+                relative_path=self.custom_dashboard_file,
+                token=generic_token,
+            ):
+                self.assertEqual(
+                    dashboard_tokens.count(generic_token),
+                    0,
+                )
+
         expected_files = frozenset(
             self.expected_template_files
         )
@@ -286,25 +330,25 @@ class PageHeaderSemanticScopeV1Tests(
 
         self.assertEqual(
             total_outer,
-            22,
+            21,
         )
 
         self.assertEqual(
             total_copy,
-            22,
+            21,
         )
 
         self.assertEqual(
             total_actions,
-            20,
+            19,
         )
 
         self.assertEqual(
             total_title,
-            22,
+            21,
         )
 
         self.assertEqual(
             total_subtitle,
-            22,
+            21,
         )

@@ -26,6 +26,27 @@ from ..payment_registry_services import (
 )
 
 
+
+def _format_added_documents_message(registry_id, count):
+    count = int(count)
+    last_two_digits = count % 100
+    last_digit = count % 10
+
+    if 11 <= last_two_digits <= 14:
+        noun = 'документов'
+    elif last_digit == 1:
+        noun = 'документ'
+    elif last_digit in (2, 3, 4):
+        noun = 'документа'
+    else:
+        noun = 'документов'
+
+    if noun == 'документ':
+        return f'В реестр №{registry_id} добавлен {count} документ.'
+
+    return f'В реестр №{registry_id} добавлено {count} {noun}.'
+
+
 @login_required
 @require_payment_registry_permission(
     user_can_manage_payment_registry,
@@ -97,20 +118,20 @@ def add_to_payment_registry(request):
         if errors:
 
             skipped_messages.append(
-                f'#{invoice.id}: ' + '; '.join(errors)
+                f'Документ №{invoice.id}: ' + '; '.join(errors)
             )
 
         if warnings:
 
             warning_messages.append(
-                f'#{invoice.id}: ' + '; '.join(warnings)
+                f'Документ №{invoice.id}: ' + '; '.join(warnings)
             )
 
     if added_count:
 
         messages.success(
             request,
-            f'Добавлено документов в реестр №{registry.id}: {added_count}.'
+            _format_added_documents_message(registry.id, added_count)
         )
 
     if skipped_messages:
@@ -122,9 +143,9 @@ def add_to_payment_registry(request):
 
     if warning_messages:
 
-        messages.info(
+        messages.warning(
             request,
-            'Предупреждения: ' + ' | '.join(warning_messages[:5])
+            ' | '.join(warning_messages[:5])
         )
 
     if created and not added_count:
@@ -203,7 +224,7 @@ def remove_from_payment_registry_item(request, item_id):
 
     messages.success(
         request,
-        f'Документ #{invoice_id} удалён из реестра №{registry.id}. Если реестр уже выгружался, выгрузи его заново.'
+        f'Документ №{invoice_id} удалён из реестра №{registry.id}. Если реестр уже выгружали, выгрузите его повторно.'
     )
 
     return redirect(

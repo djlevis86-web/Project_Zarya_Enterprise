@@ -231,13 +231,13 @@ def add_invoice_to_payment_registry(invoice, registry):
             )
 
             warnings.append(
-                "Документ был ранее удалён из черновика и теперь восстановлен."
+                "Ранее удалён из черновика. Сейчас восстановлен."
             )
 
             return existing_item, errors, warnings
 
         warnings.append(
-            "Документ уже есть в текущем черновике реестра."
+            "Уже есть в текущем черновике реестра."
         )
 
         return existing_item, errors, warnings

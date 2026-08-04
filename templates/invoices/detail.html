@@ -7,93 +7,151 @@
     data-enterprise-screen="invoice-detail"
     data-interaction-contract="v19"
 >
-    <header class="page-header page-header-v1 enterprise-hero">
+    <header class="page-header page-header-v1 enterprise-hero document-detail-command-bar">
         <div class="page-header-copy-v1">
-            <a href="{% url 'invoice_list' %}" class="production-back-link">← Документы</a>
-            <span class="production-kicker">Карточка документа</span>
-            <h1 class="page-title">{{ workspace.title }}</h1>
+            <a
+                href="{% url 'invoice_list' %}"
+                class="production-back-link document-detail-back-link"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <path d="m15 18-6-6 6-6"></path>
+                </svg>
+                <span>Все документы</span>
+            </a>
+
+            <div class="document-detail-title-row">
+                <h1 class="page-title">{{ workspace.title }}</h1>
+                <span class="status-badge status-{{ invoice.status }} document-detail-status-badge">
+                    {{ workspace.status_label }}
+                </span>
+            </div>
+
             <p class="page-subtitle">
-                {{ workspace.meta|default:invoice.original_filename }} · {{ workspace.status_label }}
+                {{ workspace.meta|default:invoice.original_filename }}
             </p>
         </div>
 
-        <div class="page-header-actions-v1">
+        <div class="page-header-actions-v1 document-detail-command-actions">
             {% if can_edit_invoice %}
-                <a href="{% url 'edit_invoice' invoice.id %}" class="btn btn-primary">
-                    Редактировать
+                <a
+                    href="{% url 'edit_invoice' invoice.id %}"
+                    class="btn btn-primary document-detail-action"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        focusable="false"
+                    >
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
+                    </svg>
+                    <span>Редактировать</span>
                 </a>
             {% endif %}
 
-            {% if can_assign_counterparty %}
+            {% if show_invoice_counterparty_primary_action %}
                 <a
                     href="{% url 'invoice_assign_counterparty' invoice.id %}"
-                    class="btn btn-secondary"
+                    class="btn btn-secondary document-detail-action"
                 >
-                    Привязать контрагента
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        focusable="false"
+                    >
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M19 8v6"></path>
+                        <path d="M22 11h-6"></path>
+                    </svg>
+                    <span>Привязать контрагента</span>
                 </a>
             {% endif %}
         </div>
     </header>
 
-    <nav class="enterprise-stepper enterprise-document-stepper" aria-label="Этапы документа">
-        {% for step in workflow_steps %}
-            <div class="{% if step.is_complete %}is-complete{% endif %} {% if step.is_current %}is-current{% endif %}">
-                <span>{{ forloop.counter }}</span>
-                <strong>{{ step.label }}</strong>
-            </div>
-        {% endfor %}
-    </nav>
+    <section
+        class="production-panel document-detail-overview"
+        aria-label="Состояние документа"
+    >
+        <nav
+            class="enterprise-stepper enterprise-document-stepper"
+            aria-label="Этапы документа"
+        >
+            {% for step in workflow_steps %}
+                <div class="{% if step.is_complete %}is-complete{% endif %} {% if step.is_current %}is-current{% endif %}">
+                    <span>{{ forloop.counter }}</span>
+                    <strong>{{ step.label }}</strong>
+                </div>
+            {% endfor %}
+        </nav>
 
-    <section class="enterprise-document-summary">
-        <div>
-            <span>Контрагент</span>
-            <strong>{{ invoice.counterparty.name|default:'Не назначен' }}</strong>
-        </div>
-        <div>
-            <span>Ответственный</span>
-            <strong>{{ invoice.responsible.full_name|default:'Не назначен' }}</strong>
-        </div>
-        <div>
-            <span>Плановая дата</span>
-            <strong>{{ workspace.planned_payment_date_label }}</strong>
-        </div>
-        <div>
-            <span>Сумма</span>
-            <strong>{{ payment_summary.invoice_amount|money_ru }}</strong>
-        </div>
-        <div>
-            <span>Оплачено</span>
-            <strong>{{ payment_summary.paid_amount|money_ru }}</strong>
-        </div>
-        <div>
-            <span>Остаток</span>
-            <strong>{{ payment_summary.remaining_amount|money_ru }}</strong>
-        </div>
-    </section>
+        <p class="document-workflow-current" aria-live="polite">
+            {% for step in workflow_steps %}
+                {% if step.is_current %}
+                    Этап {{ forloop.counter }} из {{ workflow_steps|length }} · {{ step.label }}
+                {% endif %}
+            {% endfor %}
+        </p>
 
-    <section class="enterprise-readiness-banner readiness-{{ workspace.readiness_tone }}">
-        <div>
-            <span class="production-eyebrow">Готовность документа</span>
-            <h2>{{ workspace.readiness_label }}</h2>
-            <p>{{ workspace.reason }}</p>
-        </div>
-        <div>
-            <small>Следующее действие</small>
-            <strong>{{ workspace.next_action }}</strong>
+        <div class="document-detail-overview-lower">
+            <section
+                class="enterprise-document-summary"
+                aria-label="Ключевые показатели документа"
+            >
+                <div>
+                    <span>Контрагент</span>
+                    <strong>{{ invoice.counterparty.name|default:'Не назначен' }}</strong>
+                </div>
+                <div>
+                    <span>Ответственный</span>
+                    <strong>{{ invoice.responsible.full_name|default:'Не назначен' }}</strong>
+                </div>
+                <div>
+                    <span>Плановая дата</span>
+                    <strong>{{ workspace.planned_payment_date_label }}</strong>
+                </div>
+                <div>
+                    <span>Сумма</span>
+                    <strong>{{ payment_summary.invoice_amount|money_ru }}</strong>
+                </div>
+                <div>
+                    <span>Оплачено</span>
+                    <strong>{{ payment_summary.paid_amount|money_ru }}</strong>
+                </div>
+                <div>
+                    <span>Остаток</span>
+                    <strong>{{ payment_summary.remaining_amount|money_ru }}</strong>
+                </div>
+            </section>
+
+            <section class="enterprise-readiness-banner readiness-{{ workspace.readiness_tone }}">
+                <div>
+                    <span class="production-eyebrow">Готовность документа</span>
+                    <h2>{{ workspace.readiness_label }}</h2>
+                    <p>{{ workspace.reason }}</p>
+                </div>
+                <div>
+                    <small>Следующее действие</small>
+                    <strong>{{ workspace.next_action }}</strong>
+                </div>
+            </section>
         </div>
     </section>
 
     <div class="enterprise-detail-workspace">
         <main class="enterprise-detail-main">
-            <section class="production-panel">
+            <div class="document-detail-primary-grid">
+            <section class="production-panel document-data-panel">
                 <div class="production-panel-header">
                     <div>
                         <span class="production-eyebrow">Основные данные</span>
                         <h2>Документ и реквизиты</h2>
                     </div>
-                    <span class="production-readiness-badge readiness-{{ workspace.readiness_tone }}">
-                        {{ workspace.readiness_label }}
-                    </span>
                 </div>
 
                 <div class="enterprise-data-grid">
@@ -113,11 +171,11 @@
                         <span>Статус</span>
                         <strong>{{ workspace.status_label }}</strong>
                     </div>
-                    <div>
+                    <div class="document-uploaded-by-fact">
                         <span>Загрузил</span>
                         <strong>{{ invoice.user.username }}</strong>
                     </div>
-                    <div>
+                    <div class="document-file-fact">
                         <span>Файл</span>
                         <strong>{{ invoice.original_filename }}</strong>
                     </div>
@@ -132,7 +190,52 @@
                 </div>
             </section>
 
-            <section class="production-panel field-review-panel" data-field-review-workspace>
+        <aside class="enterprise-original-column document-original-column">
+            <section class="production-panel document-preview-panel document-original-panel">
+                <div class="production-panel-header">
+                    <div>
+                        <span class="production-eyebrow">Оригинал</span>
+                        <h2>Документ</h2>
+                    </div>
+                    <a
+                        href="{{ invoice.file.url }}"
+                        target="_blank"
+                        rel="noopener"
+                        class="production-text-link"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <path d="M14 5h5v5"></path>
+                            <path d="m19 5-8 8"></path>
+                            <path d="M18 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"></path>
+                        </svg>
+                        <span>Открыть файл</span>
+                    </a>
+                </div>
+
+                <div class="document-preview-frame">
+                    {% if invoice.file.url|lower|slice:'-4:' == '.pdf' %}
+                        <object
+                            data="{{ invoice.file.url }}#toolbar=0&navpanes=0"
+                            type="application/pdf"
+                        >
+                            <a href="{{ invoice.file.url }}">Открыть PDF</a>
+                        </object>
+                    {% else %}
+                        <img
+                            src="{{ invoice.file.url }}"
+                            alt="Оригинал документа {{ workspace.title }}"
+                        >
+                    {% endif %}
+                </div>
+            </section>
+        </aside>
+            </div>
+
+            <section class="production-panel field-review-panel document-field-review-panel" data-field-review-workspace>
                 <div class="production-panel-header field-review-panel-header">
                     <div>
                         <span class="production-eyebrow">Проверка данных</span>
@@ -150,15 +253,6 @@
                         >
                             {{ field_review_workspace.confirmed_count }}/{{ field_review_workspace.total_count }} подтверждено
                         </span>
-                        <button
-                            type="button"
-                            class="btn btn-secondary btn-sm"
-                            data-drawer-open="field-review-drawer"
-                            aria-controls="field-review-drawer"
-                            aria-expanded="false"
-                        >
-                            Открыть проверку
-                        </button>
                     </div>
                 </div>
 
@@ -167,7 +261,6 @@
                         <span role="columnheader">Поле</span>
                         <span role="columnheader">В системе</span>
                         <span role="columnheader">Из документа</span>
-                        <span role="columnheader">Справочник</span>
                         <span role="columnheader">Результат</span>
                         <span role="columnheader">Действие</span>
                     </div>
@@ -178,106 +271,37 @@
                             role="row"
                             data-field-review-row="{{ row.field_name }}"
                         >
-                            <strong role="cell">{{ row.label }}</strong>
+                            <strong class="field-review-field-name" role="cell">{{ row.label }}</strong>
 
-                            <span role="cell" data-label="В системе">
+                            <span class="field-review-current" role="cell" data-label="В системе">
                                 <strong class="field-evidence-value">{{ row.current_display }}</strong>
                                 <small class="field-evidence-source">Текущее значение системы</small>
                             </span>
 
-                            <span role="cell" data-label="Из документа">
+                            <span class="field-review-recognized" role="cell" data-label="Из документа">
                                 <strong class="field-evidence-value">{{ row.recognized_display }}</strong>
                                 <small class="field-evidence-source">{{ row.recognized_source_label }}</small>
                             </span>
 
-                            <span role="cell" data-label="Справочник">
-                                <strong class="field-evidence-value">{{ row.reference_display }}</strong>
-                                <small class="field-evidence-source">{{ row.reference_source_label }}</small>
-                            </span>
-
                             <div class="field-review-result" role="cell" data-label="Результат">
-                                <span class="field-review-status tone-{{ row.status_tone }}">
+                                <span class="field-review-status field-review-status-static tone-{{ row.status_tone }}">
                                     {{ row.status_label }}
                                 </span>
-
-                                <button
-                                    type="button"
-                                    class="field-review-info-button"
-                                    data-popover-toggle="field-review-popover-{{ row.field_name }}"
-                                    aria-controls="field-review-popover-{{ row.field_name }}"
-                                    aria-expanded="false"
-                                    aria-label="Показать сведения о поле {{ row.label }}"
-                                >
-                                    i
-                                </button>
-
-                                <div
-                                    id="field-review-popover-{{ row.field_name }}"
-                                    class="z-popover field-review-popover"
-                                    data-popover
-                                    role="dialog"
-                                    aria-label="Сведения о поле {{ row.label }}"
-                                    hidden
-                                >
-                                    <strong>{{ row.status_label }}</strong>
-                                    <p>{{ row.status_detail }}</p>
-                                    <dl>
-                                        <div>
-                                            <dt>Текущее</dt>
-                                            <dd>{{ row.current_display }}</dd>
-                                        </div>
-                                        <div>
-                                            <dt>Из документа</dt>
-                                            <dd>{{ row.recognized_display }}</dd>
-                                        </div>
-                                        <div>
-                                            <dt>Источник</dt>
-                                            <dd>
-                                                {{ row.recognized_source_label }}
-                                                <small>{{ row.recognized_source_detail }}</small>
-                                                {% if row.recognized_at_label %}
-                                                    <small>Получено: {{ row.recognized_at_label }}</small>
-                                                {% endif %}
-                                            </dd>
-                                        </div>
-                                        {% if not row.recognized_is_document_evidence and row.raw_recognized_value %}
-                                            <div>
-                                                <dt>Перенесённое значение</dt>
-                                                <dd>{{ row.raw_recognized_display }}</dd>
-                                            </div>
-                                        {% endif %}
-                                        {% if row.field_name == 'vendor' %}
-                                            <div>
-                                                <dt>{{ row.reference_source_label }}</dt>
-                                                <dd>
-                                                    {{ row.reference_display }}
-                                                    {% if row.reference_detail %}<small>{{ row.reference_detail }}</small>{% endif %}
-                                                </dd>
-                                            </div>
-                                        {% endif %}
-                                        {% if row.is_confirmed %}
-                                            <div>
-                                                <dt>Подтвердил</dt>
-                                                <dd>{{ row.confirmed_by_label|default:'Пользователь не указан' }}</dd>
-                                            </div>
-                                            <div>
-                                                <dt>Когда</dt>
-                                                <dd>{{ row.confirmed_at_label|default:'Время не указано' }}</dd>
-                                            </div>
-                                        {% endif %}
-                                    </dl>
-                                </div>
                             </div>
 
                             <div class="field-review-action" role="cell" data-label="Действие">
                                 {% if can_confirm_invoice_fields %}
                                     <button
                                         type="button"
-                                        class="btn {% if row.is_confirmed %}btn-secondary{% else %}btn-primary{% endif %} btn-sm"
+                                        class="btn btn-secondary btn-sm field-review-row-action"
                                         data-modal-open="field-review-modal-{{ row.field_name }}"
                                         aria-controls="field-review-modal-{{ row.field_name }}"
+                                        aria-label="{% if row.is_confirmed %}Изменить{% else %}Проверить{% endif %} поле {{ row.label }}"
                                     >
-                                        {% if row.is_confirmed %}Изменить{% else %}Проверить{% endif %}
+                                        <span>{% if row.is_confirmed %}Изменить{% else %}Проверить{% endif %}</span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                            <path d="m9 18 6-6-6-6"></path>
+                                        </svg>
                                     </button>
                                 {% else %}
                                     <span class="field-review-readonly">Только просмотр</span>
@@ -288,18 +312,34 @@
                 </div>
 
                 {% if document_readiness.blockers or document_readiness.warnings %}
-                    <div class="readiness-issue-list">
-                        {% for issue in document_readiness.blockers %}
-                            <div class="readiness-issue readiness-danger">{{ issue.message }}</div>
-                        {% endfor %}
-                        {% for issue in document_readiness.warnings %}
-                            <div class="readiness-issue readiness-warning">{{ issue.message }}</div>
-                        {% endfor %}
-                    </div>
+                    <details class="readiness-issues-disclosure">
+                        <summary>
+                            <span class="readiness-issues-label">
+                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                    <path d="M12 3 2.8 20h18.4L12 3Z"></path>
+                                    <path d="M12 9v5"></path>
+                                    <path d="M12 17h.01"></path>
+                                </svg>
+                                <span>Причины и предупреждения</span>
+                            </span>
+                            <svg class="readiness-issues-chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="m7 10 5 5 5-5"></path>
+                            </svg>
+                        </summary>
+                        <div class="readiness-issue-list">
+                            {% for issue in document_readiness.blockers %}
+                                <div class="readiness-issue readiness-danger">{{ issue.message }}</div>
+                            {% endfor %}
+                            {% for issue in document_readiness.warnings %}
+                                <div class="readiness-issue readiness-warning">{{ issue.message }}</div>
+                            {% endfor %}
+                        </div>
+                    </details>
                 {% endif %}
             </section>
 
-            <section class="production-panel">
+            <div class="document-detail-secondary-grid">
+            <section class="production-panel document-payment-panel">
                 <div class="production-panel-header">
                     <div>
                         <span class="production-eyebrow">Оплата</span>
@@ -383,7 +423,7 @@
                 </div>
             </section>
 
-            <section class="production-panel">
+            <section class="production-panel document-activity-panel">
                 <div class="production-panel-header">
                     <div>
                         <span class="production-eyebrow">Работа с документом</span>
@@ -392,7 +432,7 @@
                 </div>
 
                 <div class="activity-columns">
-                    <details open>
+                    <details class="document-history-disclosure">
                         <summary>История изменений</summary>
                         <div class="timeline-list">
                             {% for log in logs %}
@@ -406,7 +446,7 @@
                         </div>
                     </details>
 
-                    <details open>
+                    <details class="document-comments-disclosure" open>
                         <summary>Комментарии</summary>
                         <form
                             method="post"
@@ -439,156 +479,66 @@
                     </details>
                 </div>
             </section>
+            </div>
 
             {% if can_delete_invoice %}
-                <section class="document-danger-zone">
-                    <div>
-                        <h2>Удаление документа</h2>
-                        <p>Документ исчезнет из рабочих списков, но сохранится в истории.</p>
+                <section class="document-danger-zone document-detail-danger-zone">
+                    <div class="document-danger-copy">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M4 7h16"></path>
+                            <path d="M9 7V4h6v3"></path>
+                            <path d="m7 7 1 13h8l1-13"></path>
+                            <path d="M10 11v5"></path>
+                            <path d="M14 11v5"></path>
+                        </svg>
+                        <div>
+                            <h2>Удаление документа</h2>
+                            <p>Документ исчезнет из рабочих списков. История сохранится.</p>
+                        </div>
                     </div>
-                    <form
-                        method="post"
-                        action="{% url 'delete_invoice' invoice.id %}"
-                        class="document-danger-form"
-                    >
-                        {% csrf_token %}
-                        <label>
-                            <input type="checkbox" required>
-                            <span>Подтверждаю удаление из рабочих списков</span>
-                        </label>
-                        <button type="submit" class="btn btn-danger">Удалить документ</button>
-                    </form>
+                    <button type="button" class="btn btn-secondary document-danger-trigger" data-modal-open="delete-invoice-modal" aria-controls="delete-invoice-modal">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M4 7h16"></path><path d="M9 7V4h6v3"></path><path d="m7 7 1 13h8l1-13"></path>
+                        </svg>
+                        <span>Удалить документ…</span>
+                    </button>
                 </section>
             {% endif %}
         </main>
-
-        <aside class="enterprise-original-column">
-            <section class="production-panel document-preview-panel">
-                <div class="production-panel-header">
-                    <div>
-                        <span class="production-eyebrow">Оригинал</span>
-                        <h2>Документ</h2>
-                    </div>
-                    <a
-                        href="{{ invoice.file.url }}"
-                        target="_blank"
-                        rel="noopener"
-                        class="production-text-link"
-                    >
-                        Открыть файл
-                    </a>
-                </div>
-
-                <div class="document-preview-frame">
-                    {% if invoice.file.url|lower|slice:'-4:' == '.pdf' %}
-                        <object
-                            data="{{ invoice.file.url }}#toolbar=0&navpanes=0"
-                            type="application/pdf"
-                        >
-                            <a href="{{ invoice.file.url }}">Открыть PDF</a>
-                        </object>
-                    {% else %}
-                        <img
-                            src="{{ invoice.file.url }}"
-                            alt="Оригинал документа {{ workspace.title }}"
-                        >
-                    {% endif %}
-                </div>
-            </section>
-        </aside>
     </div>
 </div>
 
-<aside
-    id="field-review-drawer"
-    class="z-drawer"
-    data-drawer
-    aria-hidden="true"
-    hidden
->
-    <button
-        type="button"
-        class="z-drawer-backdrop"
-        data-drawer-close
-        aria-label="Закрыть проверку полей"
-        tabindex="-1"
-    ></button>
-
-    <section
-        class="z-drawer-panel field-review-drawer-panel"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="field-review-drawer-title"
-    >
-        <header class="z-drawer-header">
-            <div>
-                <span class="production-eyebrow">Проверка полей</span>
-                <h2 id="field-review-drawer-title">{{ workspace.title }}</h2>
-                <p>
-                    Подтверждено {{ field_review_workspace.confirmed_count }}
-                    из {{ field_review_workspace.total_count }} полей.
-                </p>
-            </div>
-            <button
-                type="button"
-                class="z-layer-close"
-                data-drawer-close
-                aria-label="Закрыть"
-            >
-                ×
-            </button>
-        </header>
-
-        <div class="z-drawer-body field-review-drawer-list">
-            {% for row in field_review_workspace.rows %}
-                <article class="field-review-drawer-item status-{{ row.status_code }}">
-                    <header>
-                        <strong>{{ row.label }}</strong>
-                        <span class="field-review-status tone-{{ row.status_tone }}">
-                            {{ row.status_label }}
-                        </span>
-                    </header>
-                    <dl>
-                        <div>
-                            <dt>В системе</dt>
-                            <dd>{{ row.current_display }}</dd>
-                        </div>
-                        <div>
-                            <dt>Из документа</dt>
-                            <dd>
-                                {{ row.recognized_display }}
-                                <small>{{ row.recognized_source_label }}</small>
-                            </dd>
-                        </div>
-                        {% if row.field_name == 'vendor' %}
-                            <div>
-                                <dt>{{ row.reference_source_label }}</dt>
-                                <dd>
-                                    {{ row.reference_display }}
-                                    {% if row.reference_detail %}<small>{{ row.reference_detail }}</small>{% endif %}
-                                </dd>
-                            </div>
-                        {% endif %}
-                    </dl>
-                    {% if can_confirm_invoice_fields %}
-                        <button
-                            type="button"
-                            class="btn {% if row.is_confirmed %}btn-secondary{% else %}btn-primary{% endif %} btn-sm"
-                            data-modal-open="field-review-modal-{{ row.field_name }}"
-                            data-close-parent-drawer
-                        >
-                            {% if row.is_confirmed %}Изменить подтверждение{% else %}Проверить поле{% endif %}
-                        </button>
-                    {% endif %}
-                </article>
-            {% endfor %}
+{% if can_delete_invoice %}
+    <dialog id="delete-invoice-modal" class="z-modal delete-invoice-modal" data-modal aria-labelledby="delete-invoice-modal-title">
+        <div class="z-modal-surface">
+            <header class="z-modal-header">
+                <div>
+                    <span class="production-eyebrow">Опасная зона</span>
+                    <h2 id="delete-invoice-modal-title">Удалить документ?</h2>
+                    <p>Документ исчезнет из рабочих списков, но останется доступен в истории.</p>
+                </div>
+                <button type="button" class="z-layer-close" data-modal-close aria-label="Закрыть">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m7 7 10 10"></path><path d="m17 7-10 10"></path></svg>
+                </button>
+            </header>
+            <form method="post" action="{% url 'delete_invoice' invoice.id %}" class="document-delete-confirm-form">
+                {% csrf_token %}
+                <div class="document-delete-warning">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3 2.8 20h18.4L12 3Z"></path><path d="M12 9v5"></path><path d="M12 17h.01"></path></svg>
+                    <p>Проверьте, что документ не нужен в активных рабочих списках. Проведённые платежи и активный реестр дополнительно защищены сервером.</p>
+                </div>
+                <label class="document-delete-confirmation">
+                    <input type="checkbox" required>
+                    <span>Я понимаю последствия удаления документа</span>
+                </label>
+                <footer class="z-modal-footer">
+                    <button type="button" class="btn btn-secondary" data-modal-close>Отмена</button>
+                    <button type="submit" class="btn btn-danger">Удалить документ</button>
+                </footer>
+            </form>
         </div>
-
-        <footer class="z-drawer-footer">
-            <button type="button" class="btn btn-secondary" data-drawer-close>Закрыть</button>
-        </footer>
-    </section>
-</aside>
+    </dialog>
+{% endif %}
 
 {% if can_confirm_invoice_fields %}
     {% for row in field_review_workspace.rows %}
@@ -598,10 +548,12 @@
             data-modal
             aria-labelledby="field-review-modal-title-{{ row.field_name }}"
         >
-            <div class="z-modal-surface">
+            <div class="z-modal-surface field-review-modal-surface">
                 <header class="z-modal-header">
                     <div>
-                        <span class="production-eyebrow">Подтверждение поля</span>
+                        <span class="production-eyebrow field-review-modal-position">
+                            Проверка поля · {{ forloop.counter }} из {{ field_review_workspace.total_count }}
+                        </span>
                         <h2 id="field-review-modal-title-{{ row.field_name }}">{{ row.label }}</h2>
                         <p>{{ row.status_detail }}</p>
                     </div>
@@ -611,7 +563,14 @@
                         data-modal-close
                         aria-label="Закрыть"
                     >
-                        ×
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <path d="m7 7 10 10"></path>
+                            <path d="m17 7-10 10"></path>
+                        </svg>
                     </button>
                 </header>
 
@@ -699,7 +658,7 @@
                             Отмена
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            Подтвердить итоговое значение
+                            Подтвердить значение
                         </button>
                     </footer>
                 </form>

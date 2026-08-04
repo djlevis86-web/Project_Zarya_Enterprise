@@ -102,10 +102,14 @@ class DocumentFieldReviewInteractionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         html = response.content.decode("utf-8")
         self.assertIn('data-interaction-contract="v19"', html)
-        self.assertIn('id="field-review-drawer"', html)
-        self.assertIn('data-drawer-open="field-review-drawer"', html)
+        self.assertNotIn('id="field-review-drawer"', html)
+        self.assertNotIn('data-drawer-open="field-review-drawer"', html)
+        self.assertNotIn('data-popover-toggle="field-review-popover-', html)
         self.assertIn('id="field-review-modal-amount"', html)
-        self.assertIn('id="field-review-popover-invoice_number"', html)
+        self.assertEqual(
+            html.count('data-modal-open="field-review-modal-'),
+            4,
+        )
         self.assertEqual(html.count("data-field-review-row="), 4)
         self.assertContains(response, "1 300,00 ₽")
         self.assertContains(response, "1 250,00 ₽")
@@ -232,11 +236,15 @@ class InteractionLayerStaticContractTests(TestCase):
             css,
             r"\.z-drawer\[hidden\]\s*\{[^}]*display\s*:\s*none\s*;?[^}]*\}",
         )
-        self.assertIn('id="field-review-drawer"', detail)
-        self.assertRegex(
-            detail,
-            r'id="field-review-drawer"[\s\S]*?data-drawer[\s\S]*?aria-hidden="true"[\s\S]*?hidden',
+        self.assertNotIn('id="field-review-drawer"', detail)
+        self.assertNotIn('data-drawer-open="field-review-drawer"', detail)
+        self.assertNotIn('data-popover-toggle="field-review-popover-', detail)
+        self.assertEqual(
+            detail.count('data-modal-open="field-review-modal-'),
+            1,
         )
+        self.assertIn("field-review-status-static", detail)
+        self.assertIn("field-review-modal-position", detail)
         for token in (
             "data-modal-open",
             "data-drawer-open",
@@ -244,7 +252,9 @@ class InteractionLayerStaticContractTests(TestCase):
             "data-toast-close",
         ):
             self.assertIn(token, runtime)
-            self.assertIn(token, template + detail)
+
+        self.assertIn("data-modal-open", detail)
+        self.assertIn("data-toast-close", template)
         self.assertNotIn("http://", runtime)
         self.assertNotIn("https://", runtime)
         self.assertNotIn("onclick=", detail)

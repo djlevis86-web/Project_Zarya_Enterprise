@@ -1,1 +1,70 @@
-.enterprise-registry-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,.7fr);gap:var(--zds-space-6);align-items:start}.enterprise-registry-status-list{display:grid;gap:10px}.enterprise-registry-status-list>div{display:grid;grid-template-columns:1fr auto;gap:4px;padding:12px;border:1px solid var(--zds-color-border);border-radius:var(--zds-radius-control)}.enterprise-registry-status-list small{grid-column:1/-1;color:var(--zds-color-text-muted)}.enterprise-registry-empty{text-align:center}.enterprise-registry-queue .enterprise-table{min-width:920px}@media(max-width:1180px){.enterprise-registry-grid{grid-template-columns:1fr}}@media(max-width:760px){.enterprise-registry-queue .enterprise-table{min-width:0}}
+.enterprise-registry-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(300px, 0.7fr);
+    gap: var(--zds-space-6);
+    align-items: start;
+}
+
+.enterprise-registry-status-list {
+    display: grid;
+    gap: 10px;
+}
+
+.enterprise-registry-status-list > div {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px;
+    padding: 12px;
+    border: 1px solid var(--zds-color-border);
+    border-radius: var(--zds-radius-control);
+}
+
+.enterprise-registry-status-list small {
+    grid-column: 1 / -1;
+    color: var(--zds-color-text-muted);
+}
+
+.enterprise-registry-empty {
+    text-align: center;
+}
+
+.enterprise-registry-queue .enterprise-table {
+    min-width: 920px;
+}
+
+.enterprise-registry-pagination {
+    justify-content: space-between;
+    margin-top: var(--zds-space-4);
+}
+
+.enterprise-registry-pagination a {
+    color: var(--zds-color-accent-strong);
+    font-weight: 750;
+    text-decoration: none;
+}
+
+.enterprise-registry-pagination a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.enterprise-registry-pagination span {
+    color: var(--zds-color-text-muted);
+    font-size: 13px;
+}
+
+@media (max-width: 1180px) {
+    .enterprise-registry-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .enterprise-registry-queue .enterprise-table {
+        min-width: 0;
+    }
+
+    .enterprise-registry-pagination {
+        justify-content: center;
+    }
+}

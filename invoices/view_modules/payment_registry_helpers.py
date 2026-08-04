@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from django.db.models import DecimalField, F, Q, Sum, Value
+from django.db.models import DecimalField, ExpressionWrapper, F, Q, Sum, Value
 from django.db.models.functions import Coalesce
 
 from ..models import InvoicePayment
@@ -111,6 +111,16 @@ def apply_positive_payment_balance_filter(queryset):
         )
     )
 
+    queryset = queryset.annotate(
+        payment_outstanding_amount=ExpressionWrapper(
+            F("amount") - F("payment_paid_sum"),
+            output_field=DecimalField(
+                max_digits=12,
+                decimal_places=2
+            )
+        )
+    )
+
     return queryset.filter(
-        payment_paid_sum__lt=F("amount")
+        payment_outstanding_amount__gt=Decimal("0.00")
     )

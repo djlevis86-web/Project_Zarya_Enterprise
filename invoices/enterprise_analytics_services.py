@@ -938,12 +938,18 @@ def build_enterprise_payment_schedule_analytics(
     invoices: QuerySet,
     *,
     today: date | None = None,
+    period_start: date | None = None,
     period_days: int = 7,
     largest_payment_limit: int = 5,
 ) -> EnterprisePaymentScheduleAnalytics:
     resolved_today = (
         today
         or timezone.localdate()
+    )
+
+    resolved_period_start = (
+        period_start
+        or resolved_today
     )
 
     items = _presentation_items(
@@ -960,7 +966,7 @@ def build_enterprise_payment_schedule_analytics(
     week_end = (
         resolved_today
         + timedelta(
-            days=period_days - 1
+            days=6
         )
     )
 
@@ -1064,7 +1070,7 @@ def build_enterprise_payment_schedule_analytics(
                 _payment_series(
                     items,
                     period_start=(
-                        resolved_today
+                        resolved_period_start
                     ),
                     period_days=period_days,
                 )
@@ -1073,7 +1079,7 @@ def build_enterprise_payment_schedule_analytics(
                 _largest_payments(
                     items,
                     period_start=(
-                        resolved_today
+                        resolved_period_start
                     ),
                     period_days=period_days,
                     limit=(
@@ -1081,8 +1087,13 @@ def build_enterprise_payment_schedule_analytics(
                     ),
                 )
             ),
-            period_start=resolved_today,
-            period_end=week_end,
+            period_start=resolved_period_start,
+            period_end=(
+                resolved_period_start
+                + timedelta(
+                    days=period_days - 1
+                )
+            ),
         )
     )
 

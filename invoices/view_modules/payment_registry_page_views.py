@@ -58,6 +58,223 @@ from ..payment_registry_permissions import (
 )
 
 
+PAYMENT_SCHEDULE_PAGE_SIZE = 20
+PAYMENT_REGISTRY_PAGE_SIZE = 25
+PAYMENT_SCHEDULE_CHART_MAX_DAYS = 31
+
+PAYMENT_SCHEDULE_FILTERS = {
+    'all',
+    'today',
+    'week',
+    'month',
+    'overdue',
+    'no_date',
+}
+
+
+def _query_string(
+    request,
+    *,
+    overrides=None,
+    remove=(),
+):
+    query = request.GET.copy()
+
+    for key in remove:
+        query.pop(
+            key,
+            None,
+        )
+
+    for key, value in (
+        overrides
+        or {}
+    ).items():
+        if value in (
+            None,
+            '',
+        ):
+            query.pop(
+                key,
+                None,
+            )
+        else:
+            query[key] = str(
+                value
+            )
+
+    encoded = query.urlencode()
+
+    return (
+        f'?{encoded}'
+        if encoded
+        else ''
+    )
+
+
+def _pagination_query_string(
+    request,
+):
+    return _query_string(
+        request,
+        remove=(
+            'page',
+        ),
+    ).lstrip(
+        '?'
+    )
+
+
+def _schedule_period_links(
+    request,
+    *,
+    filter_type,
+):
+    links = []
+
+    for value, label in (
+        (
+            'week',
+            'Неделя',
+        ),
+        (
+            'month',
+            'Месяц',
+        ),
+        (
+            'all',
+            'Все',
+        ),
+    ):
+        links.append(
+            {
+                'value': value,
+                'label': label,
+                'is_active': (
+                    filter_type
+                    == value
+                ),
+                'query_string': (
+                    _query_string(
+                        request,
+                        overrides={
+                            'filter': value,
+                        },
+                        remove=(
+                            'page',
+                            'date_from',
+                            'date_to',
+                        ),
+                    )
+                ),
+            }
+        )
+
+    return links
+
+
+def _schedule_metric_cards(
+    request,
+    metrics,
+):
+    cards = []
+
+    for metric in metrics:
+        metric_filters = dict(
+            metric.filters
+        )
+
+        if metric.code == 'total':
+            metric_filters['filter'] = 'all'
+
+        cards.append(
+            {
+                'metric': metric,
+                'query_string': (
+                    _query_string(
+                        request,
+                        overrides=metric_filters,
+                        remove=(
+                            'page',
+                            'date_from',
+                            'date_to',
+                        ),
+                    )
+                ),
+            }
+        )
+
+    return cards
+
+
+def _schedule_chart_period(
+    *,
+    filter_type,
+    today,
+    parsed_date_from,
+    parsed_date_to,
+):
+    if filter_type == 'today':
+        default_days = 1
+    elif filter_type == 'week':
+        default_days = 7
+    else:
+        default_days = 30
+
+    if filter_type == 'overdue':
+        period_end = (
+            parsed_date_to
+            or (
+                today
+                - timedelta(
+                    days=1
+                )
+            )
+        )
+        period_start = (
+            parsed_date_from
+            or (
+                period_end
+                - timedelta(
+                    days=default_days - 1
+                )
+            )
+        )
+    else:
+        period_start = (
+            parsed_date_from
+            or today
+        )
+        period_end = (
+            parsed_date_to
+            or (
+                period_start
+                + timedelta(
+                    days=default_days - 1
+                )
+            )
+        )
+
+    if period_end < period_start:
+        period_end = period_start
+
+    requested_days = (
+        period_end
+        - period_start
+    ).days + 1
+
+    period_days = min(
+        requested_days,
+        PAYMENT_SCHEDULE_CHART_MAX_DAYS,
+    )
+
+    return (
+        period_start,
+        period_days,
+        requested_days > period_days,
+    )
+
+
 @login_required
 @require_user_permission(user_can_process_invoices, 'Нет прав на просмотр графика платежей.')
 def payment_schedule(request):
@@ -66,6 +283,9 @@ def payment_schedule(request):
         'filter',
         'all'
     )
+
+    if filter_type not in PAYMENT_SCHEDULE_FILTERS:
+        filter_type = 'all'
 
     search_query = request.GET.get(
         'q',
@@ -76,6 +296,19 @@ def payment_schedule(request):
         'status',
         'payment'
     )
+
+    valid_statuses = {
+        'payment',
+        'all',
+        *(
+            value
+            for value, _label
+            in Invoice.STATUS_CHOICES
+        ),
+    }
+
+    if selected_status not in valid_statuses:
+        selected_status = 'payment'
 
     selected_priority = request.GET.get(
         'priority',
@@ -97,9 +330,21 @@ def payment_schedule(request):
         ''
     )
 
-    parsed_date_from = parse_date(date_from) if date_from else None
+    parsed_date_from = (
+        parse_date(
+            date_from
+        )
+        if date_from
+        else None
+    )
 
-    parsed_date_to = parse_date(date_to) if date_to else None
+    parsed_date_to = (
+        parse_date(
+            date_to
+        )
+        if date_to
+        else None
+    )
 
     payment_statuses = [
         Invoice.STATUS_NEW,
@@ -119,156 +364,269 @@ def payment_schedule(request):
 
     today = timezone.localdate()
 
+    week_end = (
+        today
+        + timedelta(
+            days=6
+        )
+    )
+
+    month_end = (
+        today
+        + timedelta(
+            days=29
+        )
+    )
+
+    scoped_invoices = base_invoices
+
+    if (
+        selected_status
+        and selected_status
+        not in [
+            'payment',
+            'all',
+        ]
+    ):
+        scoped_invoices = (
+            scoped_invoices
+            .filter(
+                status=selected_status
+            )
+        )
+
+    if selected_priority:
+        scoped_invoices = (
+            scoped_invoices
+            .filter(
+                payment_priority=selected_priority
+            )
+        )
+
+    scoped_invoices = (
+        apply_payment_status_filter(
+            scoped_invoices,
+            schedule_payment_status_filter
+        )
+    )
+
+    if search_query:
+        scoped_invoices = (
+            scoped_invoices
+            .filter(
+                Q(
+                    invoice_number__icontains=search_query
+                )
+                |
+                Q(
+                    vendor__icontains=search_query
+                )
+                |
+                Q(
+                    counterparty__name__icontains=search_query
+                )
+                |
+                Q(
+                    original_filename__icontains=search_query
+                )
+                |
+                Q(
+                    title__icontains=search_query
+                )
+                |
+                Q(
+                    description__icontains=search_query
+                )
+            )
+        )
+
+    scoped_invoices = (
+        apply_positive_payment_balance_filter(
+            scoped_invoices
+        )
+    )
+
+    metric_analytics = (
+        build_enterprise_payment_schedule_analytics(
+            scoped_invoices,
+            today=today,
+            period_start=today,
+            period_days=7,
+            largest_payment_limit=0,
+        )
+    )
+
+    metric_by_code = {
+        metric.code: metric
+        for metric
+        in metric_analytics.metrics
+    }
+
+    total_count = (
+        metric_by_code[
+            'total'
+        ].count
+    )
+
+    today_count = (
+        metric_by_code[
+            'today'
+        ].count
+    )
+
+    week_count = (
+        metric_by_code[
+            'week'
+        ].count
+    )
+
+    overdue_count = (
+        metric_by_code[
+            'overdue'
+        ].count
+    )
+
+    no_date_count = (
+        metric_by_code[
+            'no_date'
+        ].count
+    )
+
+    month_count = (
+        scoped_invoices
+        .filter(
+            planned_payment_date__gte=today,
+            planned_payment_date__lte=month_end
+        )
+        .count()
+    )
+
+    total_amount = (
+        scoped_invoices
+        .aggregate(
+            total=Sum(
+                'payment_outstanding_amount'
+            )
+        )
+        .get(
+            'total'
+        )
+        or Decimal(
+            '0.00'
+        )
+    )
+
+    filtered_invoices = scoped_invoices
+
+    if filter_type == 'today':
+        filtered_invoices = (
+            filtered_invoices
+            .filter(
+                planned_payment_date=today
+            )
+        )
+
+    elif filter_type == 'week':
+        filtered_invoices = (
+            filtered_invoices
+            .filter(
+                planned_payment_date__gte=today,
+                planned_payment_date__lte=week_end
+            )
+        )
+
+    elif filter_type == 'month':
+        filtered_invoices = (
+            filtered_invoices
+            .filter(
+                planned_payment_date__gte=today,
+                planned_payment_date__lte=month_end
+            )
+        )
+
+    elif filter_type == 'overdue':
+        filtered_invoices = (
+            filtered_invoices
+            .filter(
+                planned_payment_date__lt=today
+            )
+        )
+
+    elif filter_type == 'no_date':
+        filtered_invoices = (
+            filtered_invoices
+            .filter(
+                planned_payment_date__isnull=True
+            )
+        )
+
+    if (
+        parsed_date_from
+        and filter_type != 'no_date'
+    ):
+        filtered_invoices = (
+            filtered_invoices
+            .filter(
+                planned_payment_date__gte=parsed_date_from
+            )
+        )
+
+    if (
+        parsed_date_to
+        and filter_type != 'no_date'
+    ):
+        filtered_invoices = (
+            filtered_invoices
+            .filter(
+                planned_payment_date__lte=parsed_date_to
+            )
+        )
+
+    filtered_count = (
+        filtered_invoices
+        .count()
+    )
+
+    filtered_amount = (
+        filtered_invoices
+        .aggregate(
+            total=Sum(
+                'payment_outstanding_amount'
+            )
+        )
+        .get(
+            'total'
+        )
+        or Decimal(
+            '0.00'
+        )
+    )
+
+    (
+        chart_period_start,
+        chart_period_days,
+        schedule_chart_limited,
+    ) = _schedule_chart_period(
+        filter_type=filter_type,
+        today=today,
+        parsed_date_from=parsed_date_from,
+        parsed_date_to=parsed_date_to,
+    )
+
     schedule_analytics = (
         build_enterprise_payment_schedule_analytics(
-            base_invoices,
+            filtered_invoices,
             today=today,
-            period_days=7,
+            period_start=chart_period_start,
+            period_days=chart_period_days,
             largest_payment_limit=5,
         )
     )
+
     schedule_payload = (
         enterprise_analytics_to_primitive(
             schedule_analytics
         )
-    )
-
-    week_end = today + timedelta(
-        days=7
-    )
-
-    month_end = today + timedelta(
-        days=30
-    )
-
-    total_count = base_invoices.count()
-
-    today_count = base_invoices.filter(
-        planned_payment_date=today
-    ).count()
-
-    week_count = base_invoices.filter(
-        planned_payment_date__gte=today,
-        planned_payment_date__lte=week_end
-    ).count()
-
-    month_count = base_invoices.filter(
-        planned_payment_date__gte=today,
-        planned_payment_date__lte=month_end
-    ).count()
-
-    overdue_count = base_invoices.filter(
-        planned_payment_date__lt=today
-    ).count()
-
-    no_date_count = base_invoices.filter(
-        planned_payment_date__isnull=True
-    ).count()
-
-    total_amount = (
-        base_invoices.aggregate(
-            total=Sum(
-                'amount'
-            )
-        ).get(
-            'total'
-        )
-        or 0
-    )
-
-    invoices = base_invoices
-
-    if filter_type == 'today':
-
-        invoices = invoices.filter(
-            planned_payment_date=today
-        )
-
-    elif filter_type == 'week':
-
-        invoices = invoices.filter(
-            planned_payment_date__gte=today,
-            planned_payment_date__lte=week_end
-        )
-
-    elif filter_type == 'month':
-
-        invoices = invoices.filter(
-            planned_payment_date__gte=today,
-            planned_payment_date__lte=month_end
-        )
-
-    elif filter_type == 'overdue':
-
-        invoices = invoices.filter(
-            planned_payment_date__lt=today
-        )
-
-    elif filter_type == 'no_date':
-
-        invoices = invoices.filter(
-            planned_payment_date__isnull=True
-        )
-
-    if selected_status and selected_status not in [
-        'payment',
-        'all',
-    ]:
-
-        invoices = invoices.filter(
-            status=selected_status
-        )
-
-    if selected_priority:
-
-        invoices = invoices.filter(
-            payment_priority=selected_priority
-        )
-
-    invoices = apply_payment_status_filter(
-        invoices,
-        schedule_payment_status_filter
-    )
-
-    if parsed_date_from and filter_type != 'no_date':
-
-        invoices = invoices.filter(
-            planned_payment_date__gte=parsed_date_from
-        )
-
-    if parsed_date_to and filter_type != 'no_date':
-
-        invoices = invoices.filter(
-            planned_payment_date__lte=parsed_date_to
-        )
-
-    if search_query:
-
-        invoices = invoices.filter(
-            Q(invoice_number__icontains=search_query)
-            |
-            Q(vendor__icontains=search_query)
-            |
-            Q(counterparty__name__icontains=search_query)
-            |
-            Q(original_filename__icontains=search_query)
-            |
-            Q(title__icontains=search_query)
-            |
-            Q(description__icontains=search_query)
-        )
-
-    filtered_count = invoices.count()
-
-    filtered_amount = (
-        invoices.aggregate(
-            total=Sum(
-                'amount'
-            )
-        ).get(
-            'total'
-        )
-        or 0
     )
 
     priority_field = Invoice._meta.get_field(
@@ -280,7 +638,6 @@ def payment_schedule(request):
     )
 
     if not priority_choices:
-
         priority_choices = [
             (
                 item,
@@ -302,23 +659,50 @@ def payment_schedule(request):
             )
         ]
 
-    invoices = apply_positive_payment_balance_filter(
-        invoices
-    )
-
-    invoices = list(
+    ordered_invoices = (
         annotate_invoice_workspace(
-            invoices
-        ).order_by(
+            filtered_invoices
+        )
+        .order_by(
             'planned_payment_date',
             '-payment_priority',
             'counterparty__name',
             'id'
         )
     )
+
+    paginator = Paginator(
+        ordered_invoices,
+        PAYMENT_SCHEDULE_PAGE_SIZE,
+    )
+
+    page_obj = paginator.get_page(
+        request.GET.get(
+            'page'
+        )
+    )
+
+    invoices = list(
+        page_obj.object_list
+    )
+
     build_presentations(
         invoices,
         today=today,
+    )
+
+    schedule_period_links = (
+        _schedule_period_links(
+            request,
+            filter_type=filter_type,
+        )
+    )
+
+    schedule_metric_cards = (
+        _schedule_metric_cards(
+            request,
+            metric_analytics.metrics,
+        )
     )
 
     return render(
@@ -326,6 +710,12 @@ def payment_schedule(request):
         'invoices/payment_schedule.html',
         {
             'invoices': invoices,
+            'page_obj': page_obj,
+            'pagination_query': (
+                _pagination_query_string(
+                    request
+                )
+            ),
             'today': today,
             'week_end': week_end,
             'month_end': month_end,
@@ -348,8 +738,12 @@ def payment_schedule(request):
             'total_amount': total_amount,
             'filtered_count': filtered_count,
             'filtered_amount': filtered_amount,
+            'schedule_metrics': metric_analytics.metrics,
+            'schedule_metric_cards': schedule_metric_cards,
+            'schedule_period_links': schedule_period_links,
             'schedule_analytics': schedule_analytics,
             'schedule_payload': schedule_payload,
+            'schedule_chart_limited': schedule_chart_limited,
         }
     )
 
@@ -566,6 +960,18 @@ def payment_registry(request):
         Invoice.STATUS_APPROVED
     )
 
+    valid_statuses = {
+        'all',
+        *(
+            value
+            for value, _label
+            in Invoice.STATUS_CHOICES
+        ),
+    }
+
+    if selected_status not in valid_statuses:
+        selected_status = Invoice.STATUS_APPROVED
+
     selected_counterparty = request.GET.get(
         'counterparty',
         ''
@@ -711,28 +1117,51 @@ def payment_registry(request):
         invoices
     )
 
+    total_count = invoices.count()
+
     total_amount = (
         invoices.aggregate(
             total=Sum(
-                'amount'
+                'payment_outstanding_amount'
             )
         ).get(
             'total'
         )
-        or 0
+        or Decimal(
+            '0.00'
+        )
     )
 
-    invoices = list(
+    ordered_invoices = (
         annotate_invoice_workspace(
             invoices
-        ).order_by(
+        )
+        .order_by(
             'planned_payment_date',
             '-payment_priority',
             'counterparty__name',
             'id'
         )
     )
-    build_presentations(invoices)
+
+    paginator = Paginator(
+        ordered_invoices,
+        PAYMENT_REGISTRY_PAGE_SIZE,
+    )
+
+    page_obj = paginator.get_page(
+        request.GET.get(
+            'page'
+        )
+    )
+
+    invoices = list(
+        page_obj.object_list
+    )
+
+    build_presentations(
+        invoices
+    )
 
     readiness_blocked_count = 0
 
@@ -799,6 +1228,13 @@ def payment_registry(request):
         'invoices/payment_registry.html',
         {
             'invoices': invoices,
+            'page_obj': page_obj,
+            'pagination_query': (
+                _pagination_query_string(
+                    request
+                )
+            ),
+            'total_count': total_count,
             'total_amount': total_amount,
             'selected_status': selected_status,
             'selected_counterparty': selected_counterparty,

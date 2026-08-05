@@ -211,8 +211,8 @@
                     </a>
 
                     <a href="{% url 'payment_registry' %}"
-                       class="nav-link {% if current == 'payment_registry' %}is-active{% endif %}"
-                       {% if current == 'payment_registry' %}aria-current="page"{% endif %}>
+                       class="nav-link {% if current == 'payment_registry' or current == 'payment_registry_history' or current == 'payment_registry_detail' %}is-active{% endif %}"
+                       {% if current == 'payment_registry' or current == 'payment_registry_history' or current == 'payment_registry_detail' %}aria-current="page"{% endif %}>
                         <svg
                             class="nav-icon"
                             viewBox="0 0 24 24"
@@ -486,6 +486,10 @@
                         График платежей
                     {% elif current == 'payment_registry' %}
                         Реестр оплаты
+                    {% elif current == 'payment_registry_history' %}
+                        История реестров
+                    {% elif current == 'payment_registry_detail' %}
+                        Карточка реестра
                     {% elif current == 'counterparty_directory' %}
                         Справочник контрагентов
                     {% elif current == 'counterparty_detail' %}

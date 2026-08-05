@@ -397,3 +397,111 @@ class PaymentRegistryWorkspaceV7Tests(TestCase):
             "page=3",
             current_query,
         )
+
+    def test_queue_workspace_uses_visual_page_size(
+        self,
+    ) -> None:
+        for index in range(17):
+            self._create_invoice(
+                title=(
+                    "WORKSPACE-V13-QUEUE-PAGE-"
+                    f"{index + 1:02d}"
+                ),
+            )
+
+        self.client.force_login(
+            self.staff_user
+        )
+
+        first_page = self.client.get(
+            reverse("payment_registry"),
+            data={
+                "workspace": "queue",
+                "page": "1",
+            },
+        )
+        second_page = self.client.get(
+            reverse("payment_registry"),
+            data={
+                "workspace": "queue",
+                "page": "2",
+            },
+        )
+
+        self.assertEqual(
+            first_page.context[
+                "page_obj"
+            ].paginator.per_page,
+            15,
+        )
+        self.assertEqual(
+            first_page.context[
+                "page_obj"
+            ].paginator.num_pages,
+            2,
+        )
+        self.assertEqual(
+            len(
+                first_page.context[
+                    "invoices"
+                ]
+            ),
+            15,
+        )
+        self.assertEqual(
+            len(
+                second_page.context[
+                    "invoices"
+                ]
+            ),
+            2,
+        )
+
+    def test_registry_kpi_copy_separates_workspaces(
+        self,
+    ) -> None:
+        self.client.force_login(
+            self.staff_user
+        )
+
+        response = self.client.get(
+            reverse("payment_registry")
+        )
+
+        self.assertContains(
+            response,
+            "В текущем реестре",
+        )
+        self.assertContains(
+            response,
+            "Готовы к выгрузке",
+        )
+        self.assertContains(
+            response,
+            "Блокировки в реестре",
+        )
+        self.assertContains(
+            response,
+            "На странице очереди:",
+        )
+
+    def test_history_uses_finance_topbar_title(
+        self,
+    ) -> None:
+        self.client.force_login(
+            self.staff_user
+        )
+
+        response = self.client.get(
+            reverse("payment_registry_history")
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+        self.assertContains(
+            response,
+            "История реестров",
+            count=2,
+        )

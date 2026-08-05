@@ -981,3 +981,188 @@
         gap: 8px;
     }
 }
+
+/* V20.3B registry adaptive visual acceptance refinement */
+
+@media (max-width: 1024px) {
+    .registry-queue-table,
+    .payment-registry-history-table {
+        min-width: 0;
+        table-layout: auto;
+    }
+
+    .registry-queue-table thead,
+    .payment-registry-history-table thead {
+        display: none;
+    }
+
+    .registry-queue-table tbody,
+    .payment-registry-history-table tbody {
+        display: grid;
+        gap: 10px;
+    }
+
+    .registry-queue-table tr,
+    .payment-registry-history-table tr {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px 16px;
+        padding: 14px;
+        border: 1px solid var(--zds-color-border);
+        border-radius: var(--zds-radius-control);
+        background: var(--zds-color-surface-soft);
+    }
+
+    .registry-queue-table td,
+    .payment-registry-history-table td {
+        min-width: 0;
+        width: auto;
+        display: grid;
+        gap: 3px;
+        padding: 0;
+    }
+
+    .registry-queue-table td::before,
+    .payment-registry-history-table td::before {
+        content: attr(data-label);
+        color: var(--zds-color-text-muted);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .registry-queue-table td[colspan],
+    .payment-registry-history-table td[colspan] {
+        grid-column: 1 / -1;
+    }
+
+    .registry-queue-table td[colspan]::before,
+    .payment-registry-history-table td[colspan]::before {
+        display: none;
+    }
+
+    .registry-queue-table td:nth-child(1),
+    .registry-queue-table td:nth-child(2),
+    .registry-queue-table td:nth-child(5),
+    .registry-queue-table td:nth-child(6) {
+        grid-column: 1 / -1;
+    }
+
+    .registry-queue-table td:nth-child(4) {
+        text-align: right;
+    }
+
+    .registry-queue-table td:nth-child(6) .zds-button {
+        width: 100%;
+    }
+
+    .payment-registry-history-table td:nth-child(1),
+    .payment-registry-history-table td:nth-child(6),
+    .payment-registry-history-table td:nth-child(7) {
+        grid-column: 1 / -1;
+    }
+
+    .payment-registry-history-table td:nth-child(3),
+    .payment-registry-history-table td:nth-child(4),
+    .payment-registry-history-table td:nth-child(5) {
+        align-content: start;
+    }
+
+    .payment-registry-history-table td:nth-child(4) {
+        text-align: right;
+    }
+
+    .registry-history-actions,
+    .registry-history-open,
+    .registry-history-actions .registry-export-controls {
+        width: 100%;
+    }
+
+    .registry-history-actions {
+        align-items: stretch;
+    }
+
+    .registry-history-actions .registry-export-controls {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 760px) {
+    .registry-kpi-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .registry-kpi-card {
+        min-height: 88px;
+        grid-template-columns: 28px minmax(0, 1fr);
+        align-items: start;
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .registry-kpi-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .registry-kpi-copy {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "label"
+            "value"
+            "note";
+        align-items: start;
+        gap: 2px;
+    }
+
+    .registry-kpi-copy > strong {
+        justify-self: start;
+        font-size: 18px;
+    }
+
+    .registry-workspace-tab {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .registry-workspace-tab.is-active {
+        border-color: var(--zds-color-accent-strong);
+        background: var(--zds-color-surface);
+    }
+
+    .registry-workspace-tab.is-active::after {
+        content: "";
+        position: absolute;
+        right: 10px;
+        bottom: 0;
+        left: 10px;
+        height: 2px;
+        border-radius: 999px 999px 0 0;
+        background: var(--zds-color-accent-strong);
+    }
+
+    .registry-workspace-tab:not(.is-active) b {
+        background: var(--zds-color-surface-soft);
+        color: var(--zds-color-text-muted);
+    }
+
+    .registry-current-table tr,
+    .registry-queue-table tr,
+    .payment-registry-history-table tr {
+        gap: 6px 10px;
+        padding: 10px;
+    }
+
+    .registry-kpi-copy > span,
+    .registry-kpi-copy > small,
+    .registry-current-table td::before,
+    .registry-queue-table td::before,
+    .payment-registry-history-table td::before,
+    .registry-row-message,
+    .registry-history-meta small,
+    .registry-panel-heading p {
+        color: var(--zds-color-text);
+        opacity: 0.72;
+    }
+}

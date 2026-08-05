@@ -154,10 +154,13 @@ class PaymentRegistryPaidAtTests(TestCase):
         )
         self.assertContains(
             response,
-            "Факт. оплата",
+            "Последнее событие",
+        )
+        self.assertContains(
+            response,
+            "Оплачен",
         )
         self.assertContains(
             response,
             expected_paid_at,
         )
-

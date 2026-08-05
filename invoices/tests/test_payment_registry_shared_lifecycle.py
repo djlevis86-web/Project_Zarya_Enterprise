@@ -127,7 +127,7 @@ class PaymentRegistrySharedLifecycleTests(TestCase):
 
         self.assertNotContains(
             response,
-            'class="status-badge status-draft"',
+            "status-draft",
         )
 
     def test_second_staff_user_sees_shared_draft_registry(self):
@@ -175,7 +175,7 @@ class PaymentRegistrySharedLifecycleTests(TestCase):
 
         self.assertContains(
             response,
-            'class="status-badge status-draft"',
+            "status-draft",
             count=1,
         )
 
@@ -274,6 +274,24 @@ class PaymentRegistrySharedLifecycleTests(TestCase):
         self.assertContains(
             response,
             "Excel",
+        )
+
+        self.assertContains(
+            response,
+            reverse(
+                "export_payment_registry_draft_1c",
+                args=[registry.id],
+            ),
+        )
+
+        self.assertContains(
+            response,
+            'method="post"',
+        )
+
+        self.assertContains(
+            response,
+            "csrfmiddlewaretoken",
         )
 
 

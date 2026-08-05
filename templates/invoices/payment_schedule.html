@@ -8,11 +8,11 @@
     data-zds-migrated="payment-schedule-v1"
     data-schedule-concept="premium-workspace-v3"
 >
-    <header class="schedule-command-header">
-        <div class="schedule-command-copy">
+    <header class="page-header page-header-v1 schedule-command-header">
+        <div class="page-header-copy-v1 schedule-command-copy">
             <span class="production-kicker">Платежи</span>
             <h1 class="page-title">Платёжный календарь</h1>
-            <p class="schedule-command-period">
+            <p class="page-subtitle schedule-command-period">
                 <span class="schedule-command-period-range">
                     {{ schedule_analytics.period_start|date:'d.m.Y' }}
                     —
@@ -30,7 +30,7 @@
             </p>
         </div>
 
-        <div class="schedule-command-actions">
+        <div class="page-header-actions-v1 schedule-command-actions">
             <a
                 href="{% url 'payment_registry' %}"
                 class="zds-button zds-button--primary"

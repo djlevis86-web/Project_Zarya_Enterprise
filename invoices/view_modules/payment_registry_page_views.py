@@ -1014,6 +1014,12 @@ def payment_registry_history(request):
         request.GET.get('page')
     )
 
+    permission_context = (
+        get_payment_registry_permission_context(
+            request.user
+        )
+    )
+
     return render(
         request,
         'invoices/payment_registry_history.html',
@@ -1029,6 +1035,7 @@ def payment_registry_history(request):
             'draft_count': draft_count,
             'exported_count': exported_count,
             'paid_count': paid_count,
+            **permission_context,
         }
     )
 

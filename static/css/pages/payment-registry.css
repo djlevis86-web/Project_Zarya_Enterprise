@@ -1,70 +1,822 @@
-.enterprise-registry-grid {
+.registry-workspace,
+.registry-detail-workspace,
+.registry-history-workspace {
     display: grid;
-    grid-template-columns: minmax(0, 1.6fr) minmax(300px, 0.7fr);
     gap: var(--zds-space-6);
+}
+
+.registry-command-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--zds-space-6);
+    padding: var(--zds-space-1) 0;
+}
+
+.registry-command-copy {
+    min-width: 0;
+    display: grid;
+    gap: 6px;
+}
+
+.registry-command-copy p {
+    max-width: 760px;
+    margin: 0;
+    color: var(--zds-color-text-muted);
+}
+
+.registry-command-actions,
+.registry-workflow-actions,
+.registry-export-controls,
+.registry-history-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--zds-space-2);
+}
+
+.registry-command-actions {
+    justify-content: flex-end;
+}
+
+.registry-back-link {
+    width: max-content;
+    color: var(--zds-color-text-muted);
+    text-decoration: none;
+}
+
+.registry-back-link:hover {
+    color: var(--zds-color-text);
+}
+
+.registry-kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--zds-space-3);
+}
+
+.registry-kpi-card {
+    min-width: 0;
+    min-height: 86px;
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    align-items: center;
+    gap: var(--zds-space-3);
+    padding: 14px;
+    border: 1px solid var(--zds-color-border);
+    border-radius: var(--zds-radius-card);
+    background: var(--zds-color-surface);
+    box-shadow: var(--zds-shadow-card);
+}
+
+.registry-kpi-card--success {
+    border-color: var(--zds-color-border-brand);
+}
+
+.registry-kpi-card--warning {
+    border-color: var(--zds-color-border-dawn);
+}
+
+.registry-kpi-card--danger {
+    border-color: var(--zds-color-danger);
+}
+
+.registry-kpi-icon {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--zds-radius-control);
+    background: var(--zds-color-surface-soft);
+    color: var(--zds-color-accent-strong);
+}
+
+.registry-kpi-copy {
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+}
+
+.registry-kpi-copy > span,
+.registry-kpi-copy > small {
+    color: var(--zds-color-text-muted);
+    font-size: 12px;
+}
+
+.registry-kpi-copy strong {
+    color: var(--zds-color-text);
+    font-size: clamp(19px, 2vw, 27px);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.registry-active-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.65fr);
+    gap: var(--zds-space-4);
     align-items: start;
 }
 
-.enterprise-registry-status-list {
+.registry-active-panel,
+.registry-readiness-panel,
+.registry-queue-panel,
+.registry-detail-panel,
+.registry-history-panel {
+    min-width: 0;
+    padding: var(--zds-space-6);
+    border: 1px solid var(--zds-color-border);
+    border-radius: var(--zds-radius-card);
+    background: var(--zds-color-surface);
+    box-shadow: var(--zds-shadow-card);
+}
+
+.registry-panel-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--zds-space-4);
+    margin-bottom: var(--zds-space-4);
+}
+
+.registry-panel-heading > div {
+    min-width: 0;
+    display: grid;
+    gap: var(--zds-space-1);
+}
+
+.registry-panel-heading h2,
+.registry-panel-heading p {
+    margin: 0;
+}
+
+.registry-panel-heading p {
+    color: var(--zds-color-text-muted);
+}
+
+.registry-blocking-alert,
+.registry-readiness-note,
+.registry-export-notice {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+    padding: var(--zds-space-3);
+    border: 1px solid var(--zds-color-border-dawn);
+    border-radius: var(--zds-radius-control);
+    background: var(--zds-color-dawn-soft);
+}
+
+.registry-blocking-alert {
+    border-color: var(--zds-color-danger);
+    background: var(--zds-color-surface-soft);
+}
+
+.registry-blocking-alert > div {
+    display: grid;
+    gap: 3px;
+}
+
+.registry-blocking-alert span,
+.registry-readiness-note p,
+.registry-export-notice p {
+    margin: 0;
+    color: var(--zds-color-text-muted);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.registry-issue-list {
+    display: grid;
+    gap: var(--zds-space-2);
+    margin: var(--zds-space-3) 0;
+}
+
+.registry-issue-list a {
+    display: grid;
+    gap: 3px;
+    padding: 10px var(--zds-space-3);
+    border-left: 3px solid var(--zds-color-danger);
+    border-radius: 0 var(--zds-radius-control) var(--zds-radius-control) 0;
+    background: var(--zds-color-surface-soft);
+    color: var(--zds-color-text);
+    text-decoration: none;
+}
+
+.registry-issue-list span {
+    color: var(--zds-color-text-muted);
+    font-size: 12px;
+}
+
+.registry-table-shell {
+    min-width: 0;
+}
+
+.registry-current-table,
+.registry-queue-table,
+.registry-detail-table,
+.payment-registry-history-table {
+    width: 100%;
+}
+
+.registry-row-message {
+    display: block;
+    margin-top: var(--zds-space-1);
+    color: var(--zds-color-text-muted);
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.registry-inline-form {
+    display: inline-flex;
+}
+
+.registry-empty-state {
+    padding: 28px var(--zds-space-4);
+    color: var(--zds-color-text-muted);
+    text-align: center;
+}
+
+.registry-workflow-actions {
+    justify-content: flex-start;
+    margin-top: var(--zds-space-4);
+    padding-top: var(--zds-space-4);
+    border-top: 1px solid var(--zds-color-border);
+}
+
+.registry-status-list {
     display: grid;
     gap: 10px;
 }
 
-.enterprise-registry-status-list > div {
+.registry-status-item {
     display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 4px;
-    padding: 12px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--zds-space-1) var(--zds-space-3);
+    padding: var(--zds-space-3);
     border: 1px solid var(--zds-color-border);
     border-radius: var(--zds-radius-control);
+    background: var(--zds-color-surface-soft);
 }
 
-.enterprise-registry-status-list small {
+.registry-status-item strong {
+    font-variant-numeric: tabular-nums;
+}
+
+.registry-status-item small {
     grid-column: 1 / -1;
     color: var(--zds-color-text-muted);
 }
 
-.enterprise-registry-empty {
-    text-align: center;
-}
-
-.enterprise-registry-queue .enterprise-table {
-    min-width: 920px;
-}
-
-.enterprise-registry-pagination {
-    justify-content: space-between;
+.registry-readiness-note {
     margin-top: var(--zds-space-4);
 }
 
-.enterprise-registry-pagination a {
-    color: var(--zds-color-accent-strong);
-    font-weight: 750;
-    text-decoration: none;
+.registry-filter-toolbar,
+.registry-history-filter {
+    margin-bottom: var(--zds-space-4);
 }
 
-.enterprise-registry-pagination a:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
+.registry-filter-toolbar > *,
+.registry-history-filter > * {
+    grid-column: 1 / -1;
 }
 
-.enterprise-registry-pagination span {
+.registry-filter-primary {
+    display: grid;
+    grid-template-columns: minmax(260px, 2fr) minmax(180px, 0.8fr) auto;
+    gap: var(--zds-space-3);
+    align-items: end;
+}
+
+.registry-filter-search {
+    min-width: 0;
+}
+
+.registry-filter-disclosure {
+    display: grid;
+    gap: var(--zds-space-3);
+}
+
+.registry-filter-disclosure > summary {
+    width: max-content;
+    list-style: none;
+    cursor: pointer;
+}
+
+.registry-filter-disclosure > summary::-webkit-details-marker {
+    display: none;
+}
+
+.registry-filter-advanced {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(150px, 1fr)) auto;
+    gap: var(--zds-space-3);
+    align-items: end;
+}
+
+.registry-history-filter {
+    grid-template-columns: minmax(180px, 0.7fr) minmax(280px, 1.6fr) auto auto;
+    align-items: end;
+}
+
+.registry-pagination {
+    margin-top: var(--zds-space-4);
+}
+
+.registry-lifecycle {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--zds-space-2);
+}
+
+.registry-lifecycle-step {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    align-items: center;
+    gap: var(--zds-space-2);
+    padding: 10px var(--zds-space-3);
+    border: 1px solid var(--zds-color-border);
+    border-radius: var(--zds-radius-control);
     color: var(--zds-color-text-muted);
-    font-size: 13px;
+}
+
+.registry-lifecycle-step > span {
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--zds-color-surface-soft);
+    font-size: 12px;
+}
+
+.registry-lifecycle-step.is-complete {
+    border-color: var(--zds-color-border-brand);
+}
+
+.registry-lifecycle-step.is-current {
+    border-color: var(--zds-color-accent-strong);
+    color: var(--zds-color-text);
+    background: var(--zds-color-accent-soft);
+}
+
+.registry-history-actions {
+    align-items: flex-start;
+}
+
+.registry-history-actions .registry-export-controls {
+    flex-wrap: nowrap;
+}
+
+.registry-export-modal-surface {
+    width: min(520px, calc(100vw - 32px));
+}
+
+.registry-export-form {
+    display: grid;
+    gap: var(--zds-space-4);
+}
+
+.registry-export-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0;
+}
+
+.registry-export-summary > div {
+    min-width: 0;
+    display: grid;
+    gap: 3px;
+    padding: var(--zds-space-3);
+    border: 1px solid var(--zds-color-border);
+    border-radius: var(--zds-radius-control);
+    background: var(--zds-color-surface-soft);
+}
+
+.registry-export-summary dt {
+    color: var(--zds-color-text-muted);
+    font-size: 11px;
+}
+
+.registry-export-summary dd {
+    margin: 0;
+    color: var(--zds-color-text);
+    font-weight: 750;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.registry-export-controls[data-export-pending="true"] {
+    opacity: 0.72;
 }
 
 @media (max-width: 1180px) {
-    .enterprise-registry-grid {
+    .registry-active-grid {
         grid-template-columns: 1fr;
+    }
+
+    .registry-kpi-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .registry-filter-advanced {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .registry-lifecycle {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .registry-command-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .registry-command-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .registry-filter-primary {
+        grid-template-columns: minmax(0, 1fr) minmax(170px, 0.7fr);
+    }
+
+    .registry-filter-apply {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
+    .registry-history-filter {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .registry-lifecycle {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 760px) {
-    .enterprise-registry-queue .enterprise-table {
+    .registry-workspace,
+    .registry-detail-workspace,
+    .registry-history-workspace {
+        gap: var(--zds-space-4);
+    }
+
+    .registry-command-actions > *,
+    .registry-workflow-actions > *,
+    .registry-export-controls,
+    .registry-export-controls > * {
+        width: 100%;
+    }
+
+    .registry-kpi-strip {
+        grid-template-columns: 1fr;
+        gap: var(--zds-space-2);
+    }
+
+    .registry-kpi-card {
+        min-height: 62px;
+        grid-template-columns: 30px minmax(0, 1fr);
+        padding: var(--zds-space-2) 11px;
+    }
+
+    .registry-kpi-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .registry-kpi-copy {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "label value"
+            "note value";
+        align-items: center;
+        gap: 2px 10px;
+    }
+
+    .registry-kpi-copy > span {
+        grid-area: label;
+    }
+
+    .registry-kpi-copy > strong {
+        grid-area: value;
+        justify-self: end;
+        font-size: 17px;
+    }
+
+    .registry-kpi-copy > small {
+        grid-area: note;
+    }
+
+    .registry-active-panel,
+    .registry-readiness-panel,
+    .registry-queue-panel,
+    .registry-detail-panel,
+    .registry-history-panel {
+        padding: var(--zds-space-4);
+    }
+
+    .registry-panel-heading {
+        flex-direction: column;
+    }
+
+    .registry-filter-primary,
+    .registry-filter-advanced,
+    .registry-history-filter {
+        grid-template-columns: 1fr;
+    }
+
+    .registry-filter-apply {
+        grid-column: auto;
+    }
+
+    .registry-lifecycle {
+        grid-template-columns: 1fr;
+    }
+
+    .registry-current-table thead,
+    .registry-queue-table thead,
+    .registry-detail-table thead {
+        display: none;
+    }
+
+    .registry-current-table tbody,
+    .registry-queue-table tbody,
+    .registry-detail-table tbody {
+        display: grid;
+        gap: 10px;
+    }
+
+    .registry-current-table tr,
+    .registry-queue-table tr,
+    .registry-detail-table tr {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px var(--zds-space-4);
+        padding: 14px;
+        border: 1px solid var(--zds-color-border);
+        border-radius: var(--zds-radius-control);
+        background: var(--zds-color-surface-soft);
+    }
+
+    .registry-current-table td,
+    .registry-queue-table td,
+    .registry-detail-table td {
+        min-width: 0;
+        display: grid;
+        gap: 3px;
+        padding: 0;
+    }
+
+    .registry-current-table td::before,
+    .registry-queue-table td::before,
+    .registry-detail-table td::before {
+        content: attr(data-label);
+        color: var(--zds-color-text-muted);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .registry-export-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .registry-export-modal-surface {
+        width: min(520px, calc(100vw - 24px));
+        max-height: calc(100dvh - 24px);
+    }
+}
+
+/* V20.2C visual reconciliation after screenshots 101 */
+
+.payment-registry-history-responsive {
+    overflow: visible;
+}
+
+.payment-registry-history-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+}
+
+.registry-history-cell--registry {
+    width: 23%;
+}
+
+.registry-history-cell--status {
+    width: 10%;
+}
+
+.registry-history-cell--count {
+    width: 8%;
+}
+
+.registry-history-cell--amount {
+    width: 12%;
+}
+
+.registry-history-cell--created {
+    width: 14%;
+}
+
+.registry-history-cell--event {
+    width: 16%;
+}
+
+.registry-history-cell--actions {
+    width: 17%;
+}
+
+.registry-history-title,
+.registry-history-meta {
+    min-width: 0;
+    display: grid;
+    gap: 3px;
+}
+
+.registry-history-title {
+    color: var(--zds-color-accent-strong);
+    font-weight: 750;
+    line-height: 1.35;
+    text-decoration: none;
+    overflow-wrap: break-word;
+}
+
+.registry-history-meta strong,
+.registry-history-meta small {
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+
+.registry-history-meta small {
+    color: var(--zds-color-text-muted);
+}
+
+.registry-history-actions {
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.registry-history-actions .registry-export-controls {
+    flex-wrap: nowrap;
+}
+
+.registry-export-close {
+    color: var(--zds-color-text);
+}
+
+.registry-export-close-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+    color: currentColor;
+}
+
+@media (max-width: 900px) {
+    .payment-registry-history-responsive {
+        overflow: visible;
+    }
+
+    .payment-registry-history-table {
         min-width: 0;
     }
 
-    .enterprise-registry-pagination {
-        justify-content: center;
+    .registry-history-cell--registry,
+    .registry-history-cell--status,
+    .registry-history-cell--count,
+    .registry-history-cell--amount,
+    .registry-history-cell--created,
+    .registry-history-cell--event,
+    .registry-history-cell--actions {
+        width: auto;
+    }
+}
+
+@media (max-width: 760px) {
+    .registry-history-actions,
+    .registry-history-open,
+    .registry-history-actions .registry-export-controls,
+    .registry-history-actions .registry-export-controls > * {
+        width: 100%;
+    }
+
+    .registry-history-actions .registry-export-controls {
+        flex-direction: column;
+    }
+
+    .payment-registry-history-table td {
+        padding-block: 3px;
+    }
+
+    .payment-registry-history-table tr {
+        gap: 6px;
+    }
+}
+
+/* V20.2C modal spacing reconciliation after V8 screenshots */
+
+.registry-export-modal-surface {
+    width: min(600px, calc(100vw - 48px));
+    overflow: hidden;
+}
+
+.registry-export-modal-header {
+    align-items: flex-start;
+    gap: 18px;
+    padding: 24px 24px 18px;
+}
+
+.registry-export-modal-heading {
+    min-width: 0;
+    display: grid;
+    gap: 6px;
+    padding-right: 8px;
+}
+
+.registry-export-modal-heading h2,
+.registry-export-modal-heading p {
+    margin: 0;
+}
+
+.registry-export-modal-heading p {
+    max-width: 46ch;
+    line-height: 1.5;
+}
+
+.registry-export-close {
+    flex: 0 0 auto;
+    margin-top: 0;
+}
+
+.registry-export-form {
+    gap: 16px;
+    padding: 0 24px 24px;
+}
+
+.registry-export-summary {
+    gap: 12px;
+}
+
+.registry-export-summary > div {
+    min-height: 72px;
+    align-content: center;
+    gap: 5px;
+    padding: 14px 16px;
+}
+
+.registry-export-notice {
+    gap: 12px;
+    padding: 14px 16px;
+}
+
+.registry-export-modal-footer {
+    gap: 12px;
+    padding: 2px 0 0;
+}
+
+@media (max-width: 760px) {
+    .registry-export-modal-surface {
+        width: min(560px, calc(100vw - 20px));
+        max-height: calc(100dvh - 20px);
+    }
+
+    .registry-export-modal-header {
+        gap: 12px;
+        padding: 18px 16px 14px;
+    }
+
+    .registry-export-modal-heading {
+        gap: 5px;
+        padding-right: 0;
+    }
+
+    .registry-export-form {
+        gap: 12px;
+        padding: 0 16px 16px;
+    }
+
+    .registry-export-summary {
+        gap: 8px;
+    }
+
+    .registry-export-summary > div {
+        min-height: 64px;
+        padding: 12px 14px;
+    }
+
+    .registry-export-notice {
+        gap: 10px;
+        padding: 12px 14px;
+    }
+
+    .registry-export-modal-footer {
+        gap: 8px;
+        padding-top: 2px;
     }
 }

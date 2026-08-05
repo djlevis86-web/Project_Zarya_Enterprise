@@ -230,3 +230,139 @@ dated subset.
 
 The right-side analytical panel is named `Крупнейшие обязательства`
 unless its data is explicitly restricted to actual risk states.
+
+## V20.2C — premium registry workspace and export confirmation
+
+The payment registry is a financial work centre, not a collection of
+legacy cards and GET links.
+
+Required structure:
+
+- compact command header;
+- four operational KPI values;
+- active-registry workspace plus readiness summary;
+- dense document queue with compact filters;
+- premium detail and history surfaces;
+- global ZDS buttons, badges, tables, filters, pagination and modal;
+- page CSS must not own canonical `.zds-*` APIs.
+
+Draft Excel and 1C exports are separate POST-only operations:
+
+- each format has its own form and CSRF token;
+- each format opens a financial confirmation modal;
+- modal shows registry number, document count, total amount and format;
+- financial modal may close through Escape or explicit Cancel, but not
+  by clicking the backdrop;
+- backend permissions and readiness checks remain authoritative;
+- GET export requests redirect without changing the registry;
+- successful attachment responses also enqueue a success message;
+- the page runtime downloads the attachment, shows immediate feedback
+  and reloads the registry state;
+- validation failures follow the backend redirect and server message.
+
+The shared interaction layer owns modal behaviour. Registry page CSS
+owns only local layout and content density.
+
+## V20.2C — visual reconciliation after screenshots 101
+
+The first premium registry implementation passed its technical gate,
+but visual acceptance requires these additional rules:
+
+- every registry KPI card must contain its icon owner; content must
+  never be placed into the 36 px icon track;
+- registry detail KPI values must remain readable at 393–480 px;
+- history desktop and tablet must use a compact seven-column journal,
+  not an eleven-column spreadsheet with horizontal scrolling;
+- history mobile cards show seven business groups:
+  registry, status, documents, amount, creation, latest event and
+  actions;
+- separate created/exported/paid timestamps are combined into a single
+  `Последнее событие` block;
+- financial modal close controls use the global `z-icon-close` symbol
+  and must never look like an empty square.
+
+The export POST, CSRF, permissions, readiness checks and download
+runtime remain unchanged.
+
+### V20.2C page-local action hooks
+
+Page CSS must not select global `.zds-button` classes, including inside
+compound selectors. When local layout needs a full-width or positional
+hook, the template adds a page-owned class such as
+`.registry-history-open` alongside the global ZDS class.
+
+### V20.2C financial modal close icon owner
+
+A sprite `<use href="#z-icon-close">` is not sufficient by itself.
+The rendered SVG must also carry the global `.zds-icon` class because
+that owner supplies `fill: none`, `stroke: currentColor`, stroke width,
+line caps and line joins.
+
+Financial modal close icons therefore use:
+
+`class="zds-icon registry-export-close-icon"`
+
+The page-local class controls only size and placement. It must not
+duplicate the global stroke contract.
+
+### V20.2C financial modal spacing
+
+Financial export dialogs use page-local layout hooks for spacing while
+global ZDS owners continue to define modal, button and icon appearance.
+
+Desktop contract:
+- surface width: up to 600 px;
+- header inset: 24 px horizontally;
+- form/body inset: 24 px;
+- footer remains inside the body inset;
+- summary, warning and actions are separated by visible gaps.
+
+Mobile contract:
+- surface inset from viewport: 10 px on each side;
+- header/body inset: 16 px;
+- summary cards keep at least 64 px height;
+- warning and actions do not touch the surface border.
+
+Local hooks:
+- `.registry-export-modal-header`;
+- `.registry-export-modal-heading`;
+- `.registry-export-modal-footer`.
+
+Page CSS must not style global `.z-modal-*` or `.zds-*` owners directly.
+
+### V20.2C full-suite compatibility contract
+
+The premium payment registry keeps page-local visual owners and also
+carries the global page-header semantic classes:
+
+- `.page-header.page-header-v1`;
+- `.page-header-copy-v1`;
+- `.page-header-actions-v1`;
+- `.page-title`;
+- `.page-subtitle`.
+
+These semantic classes are additive and do not replace the local
+`.registry-command-*` layout owners.
+
+The payment registry queue does not render disabled selection controls
+for blocked documents. It renders a direct `Исправить` action and omits
+`invoice_ids` controls until the document becomes ready.
+
+The compact history journal exposes paid time through
+`Последнее событие` and the `Оплачен` event rather than restoring the
+retired `Факт. оплата` column.
+
+Legacy `.enterprise-registry-*`, `production-panel` and
+`.enterprise-table` markers remain retired. Brand regression tests
+must validate current ZDS and local page owners instead.
+
+The same additive semantic header contract applies to
+`payment_registry_detail.html`. Both registry surfaces retain their
+local `.registry-command-*` layout owners while exposing exactly one
+global page header, copy, actions, title and subtitle semantic token.
+
+The additive semantic header contract also applies to
+`payment_schedule.html`. Its premium `.schedule-command-*` classes
+remain the page-layout owners, while global page-header semantic classes
+are exposed exactly once for cross-project accessibility and regression
+scope.

@@ -1,0 +1,181 @@
+{% load money %}
+
+{% if export_registry and can_export_payment_registry and export_registry.items_count %}
+    {% if export_registry.status == 'draft' or export_registry.status == 'checked' or export_registry.status == 'exported' %}
+        <div class="registry-export-controls" data-registry-export-controls>
+            <button
+                type="button"
+                class="zds-button zds-button--secondary registry-export-trigger"
+                data-modal-open="registry-export-excel-{{ export_registry.id }}"
+                aria-controls="registry-export-excel-{{ export_registry.id }}"
+            >
+                <svg class="zds-icon zds-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <use href="#z-icon-file-text"></use>
+                </svg>
+                <span>Excel</span>
+            </button>
+
+            <button
+                type="button"
+                class="zds-button zds-button--tertiary registry-export-trigger"
+                data-modal-open="registry-export-1c-{{ export_registry.id }}"
+                aria-controls="registry-export-1c-{{ export_registry.id }}"
+            >
+                <svg class="zds-icon zds-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <use href="#z-icon-settings"></use>
+                </svg>
+                <span>1С</span>
+            </button>
+        </div>
+
+        <dialog
+            id="registry-export-excel-{{ export_registry.id }}"
+            class="z-modal registry-export-modal"
+            data-modal
+            data-modal-static
+            aria-labelledby="registry-export-excel-title-{{ export_registry.id }}"
+        >
+            <div class="z-modal-surface registry-export-modal-surface">
+                <header class="z-modal-header registry-export-modal-header">
+                    <div class="registry-export-modal-heading">
+                        <span class="production-eyebrow">Финансовая выгрузка</span>
+                        <h2 id="registry-export-excel-title-{{ export_registry.id }}">Сформировать Excel?</h2>
+                        <p>Проверьте состав и итоговую сумму перед выгрузкой.</p>
+                    </div>
+                    <button
+                        type="button"
+                        class="z-layer-close registry-export-close"
+                        data-modal-close
+                        aria-label="Закрыть"
+                        title="Закрыть"
+                    >
+                        <svg
+                            class="zds-icon registry-export-close-icon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <use href="#z-icon-close"></use>
+                        </svg>
+                    </button>
+                </header>
+
+                <form
+                    method="post"
+                    action="{% url 'export_payment_registry_draft_excel' export_registry.id %}"
+                    class="registry-export-form"
+                    data-registry-export-form
+                    data-export-format="Excel"
+                    data-export-registry="{{ export_registry.id }}"
+                >
+                    {% csrf_token %}
+                    <dl class="registry-export-summary">
+                        <div><dt>Реестр</dt><dd>№{{ export_registry.id }}</dd></div>
+                        <div><dt>Документов</dt><dd>{{ export_registry.items_count }}</dd></div>
+                        <div><dt>Сумма</dt><dd>{{ export_registry.total_amount|money_ru }}</dd></div>
+                        <div><dt>Формат</dt><dd>Excel · XLSX</dd></div>
+                    </dl>
+
+                    <div class="registry-export-notice">
+                        <svg class="zds-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <use href="#z-icon-warning"></use>
+                        </svg>
+                        <p>
+                            После формирования реестр получит статус «Выгружен».
+                            При изменении состава файл потребуется сформировать повторно.
+                        </p>
+                    </div>
+
+                    <footer class="z-modal-footer registry-export-modal-footer">
+                        <button type="button" class="zds-button zds-button--secondary" data-modal-close>
+                            Отмена
+                        </button>
+                        <button
+                            type="submit"
+                            class="zds-button zds-button--primary"
+                            data-registry-export-submit
+                            data-loading-label="Формируем Excel…"
+                        >
+                            Сформировать Excel
+                        </button>
+                    </footer>
+                </form>
+            </div>
+        </dialog>
+
+        <dialog
+            id="registry-export-1c-{{ export_registry.id }}"
+            class="z-modal registry-export-modal"
+            data-modal
+            data-modal-static
+            aria-labelledby="registry-export-1c-title-{{ export_registry.id }}"
+        >
+            <div class="z-modal-surface registry-export-modal-surface">
+                <header class="z-modal-header registry-export-modal-header">
+                    <div class="registry-export-modal-heading">
+                        <span class="production-eyebrow">Финансовая выгрузка</span>
+                        <h2 id="registry-export-1c-title-{{ export_registry.id }}">Сформировать файл для 1С?</h2>
+                        <p>Будет создан отдельный текстовый файл обмена.</p>
+                    </div>
+                    <button
+                        type="button"
+                        class="z-layer-close registry-export-close"
+                        data-modal-close
+                        aria-label="Закрыть"
+                        title="Закрыть"
+                    >
+                        <svg
+                            class="zds-icon registry-export-close-icon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <use href="#z-icon-close"></use>
+                        </svg>
+                    </button>
+                </header>
+
+                <form
+                    method="post"
+                    action="{% url 'export_payment_registry_draft_1c' export_registry.id %}"
+                    class="registry-export-form"
+                    data-registry-export-form
+                    data-export-format="1С"
+                    data-export-registry="{{ export_registry.id }}"
+                >
+                    {% csrf_token %}
+                    <dl class="registry-export-summary">
+                        <div><dt>Реестр</dt><dd>№{{ export_registry.id }}</dd></div>
+                        <div><dt>Документов</dt><dd>{{ export_registry.items_count }}</dd></div>
+                        <div><dt>Сумма</dt><dd>{{ export_registry.total_amount|money_ru }}</dd></div>
+                        <div><dt>Формат</dt><dd>1С · TXT</dd></div>
+                    </dl>
+
+                    <div class="registry-export-notice">
+                        <svg class="zds-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <use href="#z-icon-warning"></use>
+                        </svg>
+                        <p>
+                            Перед загрузкой в 1С проверьте реквизиты контрагентов
+                            и назначения платежей.
+                        </p>
+                    </div>
+
+                    <footer class="z-modal-footer registry-export-modal-footer">
+                        <button type="button" class="zds-button zds-button--secondary" data-modal-close>
+                            Отмена
+                        </button>
+                        <button
+                            type="submit"
+                            class="zds-button zds-button--primary"
+                            data-registry-export-submit
+                            data-loading-label="Формируем файл 1С…"
+                        >
+                            Сформировать для 1С
+                        </button>
+                    </footer>
+                </form>
+            </div>
+        </dialog>
+    {% endif %}
+{% endif %}

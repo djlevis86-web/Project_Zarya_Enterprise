@@ -1,3 +1,238 @@
 {% extends 'base.html' %}
 {% load money %}
-{% block content %}<div class="enterprise-page enterprise-registry-detail"><header class="page-header page-header-v1 enterprise-hero"><div class="page-header-copy-v1"><a href="{% url 'payment_registry_history' %}" class="production-back-link">← История реестров</a><span class="production-kicker">Реестр №{{ registry.id }}</span><h1 class="page-title">{{ registry.title|default:'Реестр оплаты' }}</h1><p class="page-subtitle">Создан {{ registry.created_at|date:'d.m.Y H:i' }} · {{ registry.created_by.get_username|default:'Система' }}</p></div><div class="page-header-actions-v1"><a href="{% url 'payment_registry' %}" class="btn btn-secondary">Рабочий реестр</a></div></header><nav class="enterprise-stepper">{% for step in registry_analytics.lifecycle %}<div class="{% if step.is_complete %}is-complete{% endif %} {% if step.is_current %}is-current{% endif %}"><span>{{ step.position|add:'1' }}</span><strong>{{ step.label }}</strong></div>{% endfor %}</nav><section class="enterprise-metric-grid"><div class="enterprise-metric"><span>Документов</span><strong>{{ registry_analytics.item_count }}</strong><small>{{ registry_analytics.calculated_total_amount|money_ru }}</small></div><div class="enterprise-metric metric-success"><span>Готовы</span><strong>{{ registry_analytics.ready_count }}</strong></div><div class="enterprise-metric metric-danger"><span>Ошибки</span><strong>{{ registry_analytics.errors_count }}</strong></div><div class="enterprise-metric metric-warning"><span>Предупреждения</span><strong>{{ registry_analytics.warnings_count }}</strong></div></section><section class="production-panel enterprise-table-panel"><div class="production-panel-header"><div><span class="production-eyebrow">Состав</span><h2>Документы реестра</h2></div><span class="production-readiness-badge">{{ registry.get_status_display }}</span></div>{% if registry_analytics.issues %}<div class="enterprise-issue-list">{% for issue in registry_analytics.issues %}<a href="{% url 'invoice_detail' issue.invoice_id %}"><strong>{{ issue.title }}</strong><span>{% for message in issue.messages %}{{ message }}{% if not forloop.last %}; {% endif %}{% endfor %}</span></a>{% endfor %}</div>{% endif %}<div class="enterprise-table-wrap"><table class="enterprise-table"><thead><tr><th>Документ</th><th>Контрагент</th><th>Сумма</th><th>Дата</th><th>Статус</th><th>Действие</th></tr></thead><tbody>{% for item in registry_items %}<tr><td data-label="Документ"><a href="{% url 'invoice_detail' item.invoice.id %}">{{ item.invoice.invoice_number|default:'Без номера' }}</a></td><td data-label="Контрагент">{{ item.invoice.counterparty.name|default:'Не назначен' }}</td><td data-label="Сумма">{{ item.amount|money_ru }}</td><td data-label="Дата">{{ item.planned_payment_date|date:'d.m.Y'|default:'Не назначена' }}</td><td data-label="Статус"><span class="status-badge status-{{ item.status }}">{{ item.get_status_display }}</span></td><td data-label="Действие">{% if can_edit_registry and can_manage_payment_registry %}<form method="post" action="{% url 'remove_from_payment_registry_item' item.id %}">{% csrf_token %}<button class="btn btn-secondary btn-sm" type="submit">Убрать</button></form>{% endif %}</td></tr>{% empty %}<tr><td colspan="6"><div class="production-empty-state">Реестр пуст.</div></td></tr>{% endfor %}</tbody></table></div><div class="enterprise-registry-actions">{% if can_check_payment_registry and registry.status == 'draft' %}<form method="post" action="{% url 'check_payment_registry' registry.id %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Проверить</button></form>{% endif %}{% if can_export_payment_registry %}<a class="btn btn-secondary" href="{% url 'export_payment_registry_draft_excel' registry.id %}">Excel</a><a class="btn btn-secondary" href="{% url 'export_payment_registry_draft_1c' registry.id %}">1С</a>{% endif %}{% if can_mark_payment_registry_paid %}<form method="post" action="{% url 'mark_payment_registry_paid' registry.id %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Отметить оплаченным</button></form>{% endif %}{% if can_cancel_payment_registry %}<form method="post" action="{% url 'cancel_payment_registry' registry.id %}">{% csrf_token %}<button class="btn btn-danger" type="submit">Отменить реестр</button></form>{% endif %}</div></section></div>{% endblock %}
+{% load static %}
+
+{% block content %}
+<div
+    class="enterprise-page registry-detail-workspace"
+    data-enterprise-screen="payment-registry-detail"
+    data-zds-migrated="payment-registry-v1"
+>
+    <header class="page-header page-header-v1 registry-command-header">
+        <div class="page-header-copy-v1 registry-command-copy">
+            <a
+                href="{% url 'payment_registry_history' %}"
+                class="registry-back-link"
+            >
+                ← История реестров
+            </a>
+            <span class="production-kicker">Реестр №{{ registry.id }}</span>
+            <h1 class="page-title">
+                {{ registry.title|default:'Реестр оплаты' }}
+            </h1>
+            <p class="page-subtitle">
+                Создан {{ registry.created_at|date:'d.m.Y H:i' }}
+                ·
+                {{ registry.created_by.get_username|default:'Система' }}
+            </p>
+        </div>
+
+        <div class="page-header-actions-v1 registry-command-actions">
+            <a
+                href="{% url 'payment_registry' %}"
+                class="zds-button zds-button--primary"
+            >
+                Рабочий реестр
+            </a>
+        </div>
+    </header>
+
+    <nav class="registry-lifecycle" aria-label="Этапы реестра">
+        {% for step in registry_analytics.lifecycle %}
+            <div
+                class="registry-lifecycle-step{% if step.is_complete %} is-complete{% endif %}{% if step.is_current %} is-current{% endif %}"
+            >
+                <span>{{ step.position|add:'1' }}</span>
+                <strong>{{ step.label }}</strong>
+            </div>
+        {% endfor %}
+    </nav>
+
+    <section class="registry-kpi-strip" aria-label="Сводка реестра">
+        <article class="registry-kpi-card">
+            <span class="registry-kpi-icon" aria-hidden="true">
+                <svg class="zds-icon" viewBox="0 0 24 24" focusable="false">
+                    <use href="#z-icon-file-text"></use>
+                </svg>
+            </span>
+            <span class="registry-kpi-copy">
+                <span>Документов</span>
+                <strong>{{ registry_analytics.item_count }}</strong>
+                <small>{{ registry_analytics.calculated_total_amount|money_ru }}</small>
+            </span>
+        </article>
+        <article class="registry-kpi-card registry-kpi-card--success">
+            <span class="registry-kpi-icon" aria-hidden="true">
+                <svg class="zds-icon" viewBox="0 0 24 24" focusable="false">
+                    <use href="#z-icon-wallet"></use>
+                </svg>
+            </span>
+            <span class="registry-kpi-copy">
+                <span>Готовы</span>
+                <strong>{{ registry_analytics.ready_count }}</strong>
+                <small>к выгрузке</small>
+            </span>
+        </article>
+        <article class="registry-kpi-card registry-kpi-card--danger">
+            <span class="registry-kpi-icon" aria-hidden="true">
+                <svg class="zds-icon" viewBox="0 0 24 24" focusable="false">
+                    <use href="#z-icon-error"></use>
+                </svg>
+            </span>
+            <span class="registry-kpi-copy">
+                <span>Ошибки</span>
+                <strong>{{ registry_analytics.errors_count }}</strong>
+                <small>блокируют выгрузку</small>
+            </span>
+        </article>
+        <article class="registry-kpi-card registry-kpi-card--warning">
+            <span class="registry-kpi-icon" aria-hidden="true">
+                <svg class="zds-icon" viewBox="0 0 24 24" focusable="false">
+                    <use href="#z-icon-warning"></use>
+                </svg>
+            </span>
+            <span class="registry-kpi-copy">
+                <span>Предупреждения</span>
+                <strong>{{ registry_analytics.warnings_count }}</strong>
+                <small>{{ registry.get_status_display }}</small>
+            </span>
+        </article>
+    </section>
+
+    <section class="registry-detail-panel">
+        <header class="registry-panel-heading">
+            <div>
+                <span class="production-eyebrow">Состав</span>
+                <h2>Документы реестра</h2>
+            </div>
+            <span
+                class="zds-badge zds-badge--neutral status-badge status-{{ registry.status }}"
+            >
+                {{ registry.get_status_display }}
+            </span>
+        </header>
+
+        {% if registry_analytics.issues %}
+            <div class="registry-issue-list">
+                {% for issue in registry_analytics.issues %}
+                    <a href="{% url 'invoice_detail' issue.invoice_id %}">
+                        <strong>{{ issue.title }}</strong>
+                        <span>
+                            {% for message in issue.messages %}
+                                {{ message }}{% if not forloop.last %}; {% endif %}
+                            {% endfor %}
+                        </span>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="registry-table-shell">
+            <table class="zds-table zds-table--dense registry-detail-table">
+                <thead>
+                    <tr>
+                        <th>Документ</th>
+                        <th>Контрагент</th>
+                        <th class="zds-table__numeric">Сумма</th>
+                        <th>Дата</th>
+                        <th>Статус</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in registry_items %}
+                        <tr>
+                            <td data-label="Документ">
+                                <a href="{% url 'invoice_detail' item.invoice.id %}">
+                                    {{ item.invoice.invoice_number|default:'Без номера' }}
+                                </a>
+                            </td>
+                            <td data-label="Контрагент">
+                                {{ item.invoice.counterparty.name|default:'Не назначен' }}
+                            </td>
+                            <td data-label="Сумма" class="zds-table__numeric">
+                                {{ item.amount|money_ru }}
+                            </td>
+                            <td data-label="Дата">
+                                {{ item.planned_payment_date|date:'d.m.Y'|default:'Не назначена' }}
+                            </td>
+                            <td data-label="Статус">
+                                <span class="zds-badge zds-badge--neutral status-{{ item.status }}">
+                                    {{ item.get_status_display }}
+                                </span>
+                            </td>
+                            <td data-label="Действие">
+                                {% if can_edit_registry and can_manage_payment_registry %}
+                                    <form
+                                        method="post"
+                                        action="{% url 'remove_from_payment_registry_item' item.id %}"
+                                        class="registry-inline-form"
+                                    >
+                                        {% csrf_token %}
+                                        <button
+                                            class="zds-button zds-button--text"
+                                            type="submit"
+                                        >
+                                            Убрать
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6">
+                                <div class="registry-empty-state">Реестр пуст.</div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <footer class="registry-workflow-actions">
+            {% if can_check_payment_registry and registry.status == 'draft' %}
+                <form
+                    method="post"
+                    action="{% url 'check_payment_registry' registry.id %}"
+                >
+                    {% csrf_token %}
+                    <button class="zds-button zds-button--primary" type="submit">
+                        Проверить
+                    </button>
+                </form>
+            {% endif %}
+
+            {% include 'invoices/components/payment_registry_export_controls.html' with export_registry=registry %}
+
+            {% if can_mark_payment_registry_paid %}
+                <form
+                    method="post"
+                    action="{% url 'mark_payment_registry_paid' registry.id %}"
+                >
+                    {% csrf_token %}
+                    <button class="zds-button zds-button--primary" type="submit">
+                        Отметить оплаченным
+                    </button>
+                </form>
+            {% endif %}
+
+            {% if can_cancel_payment_registry %}
+                <form
+                    method="post"
+                    action="{% url 'cancel_payment_registry' registry.id %}"
+                >
+                    {% csrf_token %}
+                    <button class="zds-button zds-button--danger" type="submit">
+                        Отменить реестр
+                    </button>
+                </form>
+            {% endif %}
+        </footer>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/enterprise-workspace.js' %}" defer></script>
+{% endblock %}

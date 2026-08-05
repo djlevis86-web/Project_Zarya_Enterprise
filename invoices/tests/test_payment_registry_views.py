@@ -173,10 +173,10 @@ class PaymentRegistryViewTests(TestCase):
             PaymentRegistryItem.objects.filter(invoice=invoice).exists()
         )
 
-    def test_unready_invoice_checkbox_is_disabled_on_payment_registry_page(self):
+    def test_unready_invoice_has_repair_action_without_selection_control(self):
         invoice = self._create_invoice(
             user=self.staff_user,
-            title="REGISTRY-VIEW-UNREADY-CHECKBOX",
+            title="REGISTRY-VIEW-UNREADY-REPAIR-ACTION",
             counterparty_marker="none",
         )
 
@@ -195,12 +195,25 @@ class PaymentRegistryViewTests(TestCase):
 
         self.assertContains(
             response,
-            "disabled",
+            "Исправить",
+        )
+
+        self.assertContains(
+            response,
+            reverse(
+                "invoice_detail",
+                args=[invoice.id],
+            ),
         )
 
         self.assertNotContains(
             response,
             f'name="invoice_ids" value="{invoice.id}"',
+        )
+
+        self.assertNotContains(
+            response,
+            "disabled",
         )
 
     def test_staff_can_add_verified_invoice_to_registry(self):

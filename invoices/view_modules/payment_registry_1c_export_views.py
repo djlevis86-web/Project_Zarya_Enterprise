@@ -197,6 +197,15 @@ def export_payment_registry_draft_1c(request, registry_id):
 
     content = '\ufeff' + buffer.getvalue()
 
+    messages.success(
+        request,
+        (
+            f'Файл 1С реестра №{registry.id} сформирован. '
+            f'Документов: {check_result["items_count"]}, '
+            f'сумма: {registry.total_amount:.2f} ₽.'
+        )
+    )
+
     response = HttpResponse(
         content,
         content_type='text/plain; charset=utf-8',

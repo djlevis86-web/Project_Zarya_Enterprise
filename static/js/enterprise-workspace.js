@@ -581,6 +581,359 @@
             });
     }
 
+    function registryToastIcon(tone) {
+        if (tone === "success") {
+            return (
+                '<svg viewBox="0 0 24 24" focusable="false">'
+                + '<path d="M5 12.5 9.2 17 19 7"></path>'
+                + "</svg>"
+            );
+        }
+
+        return (
+            '<svg viewBox="0 0 24 24" focusable="false">'
+            + '<circle cx="12" cy="12" r="9"></circle>'
+            + '<path d="M12 7V13"></path>'
+            + '<path d="M12 16.5H12.01"></path>'
+            + "</svg>"
+        );
+    }
+
+    function ensureRegistryToastRegion() {
+        let region = document.querySelector(
+            "[data-toast-region]",
+        );
+
+        if (region) {
+            return region;
+        }
+
+        region = document.createElement("div");
+        region.className = "messages z-toast-region";
+        region.dataset.toastRegion = "";
+        region.setAttribute("aria-live", "polite");
+        region.setAttribute("aria-atomic", "false");
+        region.setAttribute(
+            "aria-label",
+            "Системные уведомления",
+        );
+        document.body.appendChild(region);
+
+        return region;
+    }
+
+    function pushRegistryToast(message, tone) {
+        const region = ensureRegistryToastRegion();
+        const toast = document.createElement("div");
+        const normalizedTone = tone || "info";
+
+        toast.className = (
+            "z-toast tone-"
+            + normalizedTone
+        );
+        toast.dataset.toast = "";
+        toast.dataset.toastTimeout = (
+            normalizedTone === "error"
+            ? "0"
+            : "7000"
+        );
+        toast.setAttribute(
+            "role",
+            normalizedTone === "error"
+            ? "alert"
+            : "status",
+        );
+
+        const icon = document.createElement("span");
+        icon.className = "z-toast-icon";
+        icon.setAttribute("aria-hidden", "true");
+        icon.innerHTML = registryToastIcon(
+            normalizedTone,
+        );
+
+        const copy = document.createElement("span");
+        copy.className = "z-toast-message";
+        copy.textContent = message;
+
+        const close = document.createElement("button");
+        close.type = "button";
+        close.className = "z-toast-close";
+        close.dataset.toastClose = "";
+        close.setAttribute(
+            "aria-label",
+            "Закрыть уведомление",
+        );
+        close.setAttribute("title", "Закрыть");
+        close.innerHTML = (
+            '<svg viewBox="0 0 24 24" '
+            + 'aria-hidden="true" focusable="false">'
+            + '<path d="M7 7 17 17"></path>'
+            + '<path d="M17 7 7 17"></path>'
+            + "</svg>"
+        );
+
+        toast.append(icon, copy, close);
+        region.appendChild(toast);
+
+        close.addEventListener(
+            "click",
+            () => toast.remove(),
+        );
+
+        if (normalizedTone !== "error") {
+            window.setTimeout(
+                () => {
+                    toast.classList.add("is-leaving");
+                    window.setTimeout(
+                        () => toast.remove(),
+                        180,
+                    );
+                },
+                7000,
+            );
+        }
+    }
+
+    function exportFilename(response, fallback) {
+        const disposition = (
+            response.headers.get(
+                "Content-Disposition",
+            )
+            || ""
+        );
+        const utfMatch = disposition.match(
+            /filename\*=UTF-8''([^;]+)/i,
+        );
+
+        if (utfMatch) {
+            return decodeURIComponent(
+                utfMatch[1],
+            );
+        }
+
+        const plainMatch = disposition.match(
+            /filename="?([^";]+)"?/i,
+        );
+
+        return plainMatch
+            ? plainMatch[1]
+            : fallback;
+    }
+
+    function triggerRegistryDownload(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = filename;
+        link.hidden = true;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        window.setTimeout(
+            () => URL.revokeObjectURL(url),
+            1000,
+        );
+    }
+
+    function setRegistryExportPending(form, pending) {
+        const button = form.querySelector(
+            "[data-registry-export-submit]",
+        );
+
+        form.dataset.exportPending = (
+            pending
+            ? "true"
+            : "false"
+        );
+
+        if (!button) {
+            return;
+        }
+
+        if (!button.dataset.originalLabel) {
+            button.dataset.originalLabel = (
+                button.textContent.trim()
+            );
+        }
+
+        button.disabled = pending;
+        button.setAttribute(
+            "aria-busy",
+            pending
+            ? "true"
+            : "false",
+        );
+
+        const modal = form.closest(
+            "[data-modal]",
+        );
+
+        if (modal) {
+            modal
+                .querySelectorAll(
+                    "[data-modal-close]",
+                )
+                .forEach(control => {
+                    control.disabled = pending;
+                });
+        }
+
+        button.textContent = (
+            pending
+            ? (
+                button.dataset.loadingLabel
+                || "Формируем файл…"
+            )
+            : button.dataset.originalLabel
+        );
+    }
+
+    async function submitRegistryExport(form) {
+        if (
+            form.dataset.exportPending
+            === "true"
+        ) {
+            return;
+        }
+
+        setRegistryExportPending(form, true);
+
+        const format = (
+            form.dataset.exportFormat
+            || "файл"
+        );
+        const registryId = (
+            form.dataset.exportRegistry
+            || ""
+        );
+
+        try {
+            const response = await fetch(
+                form.action,
+                {
+                    method: "POST",
+                    body: new FormData(form),
+                    credentials: "same-origin",
+                    headers: {
+                        "X-Requested-With":
+                            "XMLHttpRequest",
+                    },
+                },
+            );
+
+            if (response.redirected) {
+                window.location.assign(
+                    response.url,
+                );
+                return;
+            }
+
+            const contentType = (
+                response.headers.get(
+                    "Content-Type",
+                )
+                || ""
+            );
+
+            if (
+                !response.ok
+                || contentType.includes(
+                    "text/html",
+                )
+            ) {
+                throw new Error(
+                    "Сервер не сформировал файл.",
+                );
+            }
+
+            const blob = await response.blob();
+            const extension = (
+                format === "Excel"
+                ? "xlsx"
+                : "txt"
+            );
+            const fallback = (
+                "payment_registry_"
+                + registryId
+                + "."
+                + extension
+            );
+            const filename = exportFilename(
+                response,
+                fallback,
+            );
+
+            triggerRegistryDownload(
+                blob,
+                filename,
+            );
+
+            setRegistryExportPending(
+                form,
+                false,
+            );
+
+            const modal = form.closest(
+                "[data-modal]",
+            );
+            const closer = modal
+                ? modal.querySelector(
+                    "[data-modal-close]",
+                )
+                : null;
+
+            if (closer) {
+                closer.click();
+            }
+
+            pushRegistryToast(
+                (
+                    "Файл "
+                    + format
+                    + " сформирован. "
+                    + "Обновляем состояние реестра…"
+                ),
+                "success",
+            );
+
+            window.setTimeout(
+                () => window.location.reload(),
+                900,
+            );
+        } catch (error) {
+            setRegistryExportPending(
+                form,
+                false,
+            );
+            pushRegistryToast(
+                (
+                    error instanceof Error
+                    ? error.message
+                    : "Не удалось сформировать файл."
+                ),
+                "error",
+            );
+        }
+    }
+
+    function initRegistryExportForms() {
+        document
+            .querySelectorAll(
+                "[data-registry-export-form]",
+            )
+            .forEach(form => {
+                form.addEventListener(
+                    "submit",
+                    event => {
+                        event.preventDefault();
+                        submitRegistryExport(form);
+                    },
+                );
+            });
+    }
+
     document
         .querySelectorAll(
             "[data-submit-lock]",
@@ -631,6 +984,9 @@
 
     document.addEventListener(
         "DOMContentLoaded",
-        renderCharts,
+        () => {
+            renderCharts();
+            initRegistryExportForms();
+        },
     );
 })();

@@ -281,7 +281,7 @@ class BrandLayerV1Tests(SimpleTestCase):
             page_css,
         )
 
-    def test_payment_registry_uses_shared_enterprise_surfaces(self) -> None:
+    def test_payment_registry_uses_shared_zds_surfaces(self) -> None:
         page_css = self.payment_registry_css.read_text(
             encoding="utf-8-sig"
         )
@@ -301,24 +301,42 @@ class BrandLayerV1Tests(SimpleTestCase):
         )
 
         required_page_css = (
-            ".enterprise-registry-grid",
-            ".enterprise-registry-status-list",
-            ".enterprise-registry-queue .enterprise-table",
+            ".registry-active-grid",
+            ".registry-readiness-panel",
+            ".registry-queue-panel",
+            ".registry-current-table",
+            ".registry-queue-table",
         )
         for marker in required_page_css:
             with self.subTest(marker=marker):
                 self.assertIn(marker, page_css)
 
+        combined_templates = registry_template + detail_template
         required_templates = (
+            'data-zds-migrated="payment-registry-v1"',
+            'class="zds-table zds-table--dense registry-current-table"',
+            'class="zds-table zds-table--dense registry-queue-table"',
+            'data-enterprise-screen="payment-registry-detail"',
+            "registry-detail-workspace",
+        )
+        for marker in required_templates:
+            with self.subTest(marker=marker):
+                self.assertIn(marker, combined_templates)
+
+        for retired_marker in (
+            ".enterprise-registry-grid",
+            ".enterprise-registry-status-list",
+            ".enterprise-registry-queue .enterprise-table",
             "production-panel enterprise-registry-summary",
             "production-panel enterprise-registry-queue",
             "production-panel enterprise-table-panel",
             'class="enterprise-table"',
-        )
-        combined_templates = registry_template + detail_template
-        for marker in required_templates:
-            with self.subTest(marker=marker):
-                self.assertIn(marker, combined_templates)
+        ):
+            with self.subTest(retired_marker=retired_marker):
+                self.assertNotIn(
+                    retired_marker,
+                    page_css + combined_templates,
+                )
 
         shared_brand_css = workspace_css + tables_css
         for marker in (

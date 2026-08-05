@@ -241,6 +241,15 @@ def export_payment_registry_draft_excel(request, registry_id):
         registry
     )
 
+    messages.success(
+        request,
+        (
+            f'Excel-файл реестра №{registry.id} сформирован. '
+            f'Документов: {check_result["items_count"]}, '
+            f'сумма: {registry.total_amount:.2f} ₽.'
+        )
+    )
+
     response = HttpResponse(
         output.getvalue(),
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

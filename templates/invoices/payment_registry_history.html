@@ -1,344 +1,292 @@
 {% extends "base.html" %}
 {% load money %}
+{% load static %}
 
 {% block content %}
-
-<div class="registry-page">
-
-    <div class="registry-page-header">
-        <div>
-            <span class="registry-eyebrow">
-                Финансы
-            </span>
-
-            <h1>
-                История реестров оплаты
-            </h1>
-
+<div
+    class="enterprise-page registry-history-workspace"
+    data-enterprise-screen="payment-registry-history"
+    data-zds-migrated="payment-registry-v1"
+>
+    <header class="registry-command-header">
+        <div class="registry-command-copy">
+            <span class="production-kicker">Финансы · Архив</span>
+            <h1 class="page-title">История реестров оплаты</h1>
             <p>
-                Все созданные, проверенные, выгруженные и оплаченные реестры оплаты.
+                Все созданные, проверенные, выгруженные и оплаченные
+                реестры.
             </p>
         </div>
 
-        <div class="registry-actions">
-            <a href="{% url 'payment_registry' %}" class="btn btn-primary">
+        <div class="registry-command-actions">
+            <a
+                href="{% url 'payment_registry' %}"
+                class="zds-button zds-button--primary"
+            >
                 Текущий реестр
             </a>
-
-            <a href="{% url 'payment_schedule' %}" class="btn btn-secondary">
+            <a
+                href="{% url 'payment_schedule' %}"
+                class="zds-button zds-button--secondary"
+            >
                 График платежей
             </a>
         </div>
-    </div>
+    </header>
 
-    <div class="registry-summary payment-registry-history-summary">
-
-        <div class="registry-summary-card">
-            <span>
-                Всего реестров
+    <section class="registry-kpi-strip" aria-label="Сводка истории">
+        <article class="registry-kpi-card">
+            <span class="registry-kpi-icon" aria-hidden="true">
+                <svg class="zds-icon" viewBox="0 0 24 24" focusable="false">
+                    <use href="#z-icon-file-text"></use>
+                </svg>
             </span>
-
-            <strong>
-                {{ total_registries }}
-            </strong>
-        </div>
-
-        <div class="registry-summary-card">
-            <span>
-                Общая сумма
+            <span class="registry-kpi-copy">
+                <span>Всего реестров</span>
+                <strong>{{ total_registries }}</strong>
+                <small>{{ total_amount|money_ru }}</small>
             </span>
-
-            <strong>
-                {{ total_amount|money_ru }}
-            </strong>
-        </div>
-
-        <div class="registry-summary-card">
-            <span>
-                Черновики
+        </article>
+        <article class="registry-kpi-card registry-kpi-card--warning">
+            <span class="registry-kpi-icon" aria-hidden="true">
+                <svg class="zds-icon" viewBox="0 0 24 24" focusable="false">
+                    <use href="#z-icon-clock"></use>
+                </svg>
             </span>
-
-            <strong>
-                {{ draft_count }}
-            </strong>
-        </div>
-
-        <div class="registry-summary-card">
-            <span>
-                Выгружено
+            <span class="registry-kpi-copy">
+                <span>Черновики</span>
+                <strong>{{ draft_count }}</strong>
+                <small>в работе</small>
             </span>
-
-            <strong>
-                {{ exported_count }}
-            </strong>
-        </div>
-
-        <div class="registry-summary-card">
-            <span>
-                Оплачено
+        </article>
+        <article class="registry-kpi-card registry-kpi-card--success">
+            <span class="registry-kpi-icon" aria-hidden="true">
+                <svg class="zds-icon" viewBox="0 0 24 24" focusable="false">
+                    <use href="#z-icon-upload"></use>
+                </svg>
             </span>
+            <span class="registry-kpi-copy">
+                <span>Выгружено</span>
+                <strong>{{ exported_count }}</strong>
+                <small>файлы сформированы</small>
+            </span>
+        </article>
+        <article class="registry-kpi-card registry-kpi-card--success">
+            <span class="registry-kpi-icon" aria-hidden="true">
+                <svg class="zds-icon" viewBox="0 0 24 24" focusable="false">
+                    <use href="#z-icon-check"></use>
+                </svg>
+            </span>
+            <span class="registry-kpi-copy">
+                <span>Оплачено</span>
+                <strong>{{ paid_count }}</strong>
+                <small>завершено</small>
+            </span>
+        </article>
+    </section>
 
-            <strong>
-                {{ paid_count }}
-            </strong>
-        </div>
-
-    </div>
-
-    <div class="card registry-filter-card payment-registry-history-filter">
-
-        <form method="get" class="registry-filter-form">
-
-            <div class="form-group">
-                <label>
-                    Статус
-                </label>
-
-                <select name="status" class="form-control">
-                    <option value="">
-                        Все статусы
-                    </option>
-
+    <section class="registry-history-panel">
+        <form
+            method="get"
+            class="zds-filter-bar registry-history-filter"
+        >
+            <label class="zds-filter-field">
+                <span>Статус</span>
+                <select name="status">
+                    <option value="">Все статусы</option>
                     {% for value, label in status_choices %}
-                        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>
+                        <option
+                            value="{{ value }}"
+                            {% if status_filter == value %}selected{% endif %}
+                        >
                             {{ label }}
                         </option>
                     {% endfor %}
                 </select>
-            </div>
+            </label>
 
-            <div class="form-group">
-                <label>
-                    Поиск
-                </label>
-
+            <label class="zds-filter-field zds-filter-search">
+                <span>Поиск</span>
                 <input
-                    type="text"
+                    type="search"
                     name="q"
                     value="{{ search_query }}"
-                    class="form-control"
                     placeholder="Название, комментарий, пользователь"
                 >
-            </div>
+            </label>
 
-            <div class="registry-filter-actions">
-                <button type="submit" class="btn btn-primary">
-                    Применить
-                </button>
-
-                <a href="{% url 'payment_registry_history' %}" class="btn btn-secondary">
-                    Сбросить
-                </a>
-            </div>
-
+            <button type="submit" class="zds-button zds-button--primary">
+                Применить
+            </button>
+            <a
+                href="{% url 'payment_registry_history' %}"
+                class="zds-button zds-button--text"
+            >
+                Сбросить
+            </a>
         </form>
 
-    </div>
-
-    <div class="card registry-table-card">
-
-        <div class="registry-table-header">
+        <header class="registry-panel-heading">
             <div>
-                <h2>
-                    Реестры оплаты
-                </h2>
-
-                <p>
-                    Последние операции по подготовке и выгрузке платежей.
-                </p>
+                <span class="production-eyebrow">Журнал</span>
+                <h2>Реестры оплаты</h2>
+                <p>Последние операции подготовки и выгрузки.</p>
             </div>
-        </div>
+        </header>
 
-        <div class="table-responsive payment-registry-history-responsive">
-            <table class="table payment-registry-history-table">
-                <thead>
-                    <tr>
-                        <th>
-                            №
-                        </th>
-
-                        <th>
-                            Название
-                        </th>
-
-                        <th>
-                            Статус
-                        </th>
-
-                        <th>
-                            Счетов
-                        </th>
-
-                        <th>
-                            Сумма
-                        </th>
-
-                        <th>
-                            Создал
-                        </th>
-
-                        <th>
-                            Дата создания
-                        </th>
-
-                        <th>
-                            Выгрузил
-                        </th>
-
-                        <th>
-                            Дата выгрузки
-                        </th>
-
-                        <th>
-                            Факт. оплата
-                        </th>
-
-                        <th>
-                            Действия
-                        </th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for registry in registries %}
+        <div class="registry-table-shell">
+            <div class="table-responsive payment-registry-history-responsive">
+                <table class="table payment-registry-history-table zds-table zds-table--dense">
+                    <thead>
                         <tr>
-                            <td data-label="№">
-                                <a href="{% url 'payment_registry_detail' registry.id %}" class="registry-detail-link">
-                                    №{{ registry.id }}
-                                </a>
-                            </td>
-
-                            <td data-label="Название">
-                                <a href="{% url 'payment_registry_detail' registry.id %}" class="registry-detail-title">
-                                    {{ registry.title|default:"Реестр оплаты" }}
-                                </a>
-
-                                {% if registry.comment %}
-                                    <div class="muted">
-                                        {{ registry.comment|truncatechars:80 }}
-                                    </div>
-                                {% endif %}
-                            </td>
-
-                            <td data-label="Статус">
-                                <span class="status-badge status-{{ registry.status }}">
-                                    {{ registry.get_status_display }}
-                                </span>
-                            </td>
-
-                            <td data-label="Счетов">
-                                {{ registry.items_count }}
-                            </td>
-
-                            <td data-label="Сумма">
-                                <strong>
-                                    {{ registry.total_amount|money_ru }}
-                                </strong>
-                            </td>
-
-                            <td data-label="Создал">
-                                {% if registry.created_by %}
-                                    {{ registry.created_by.get_username }}
-                                {% else %}
-                                    <span class="muted">
-                                        —
-                                    </span>
-                                {% endif %}
-                            </td>
-
-                            <td data-label="Дата создания">
-                                {{ registry.created_at|date:"d.m.Y H:i" }}
-                            </td>
-
-                            <td data-label="Выгрузил">
-                                {% if registry.exported_by %}
-                                    {{ registry.exported_by.get_username }}
-                                {% else %}
-                                    <span class="muted">
-                                        —
-                                    </span>
-                                {% endif %}
-                            </td>
-
-                            <td data-label="Дата выгрузки">
-                                {% if registry.exported_at %}
-                                    {{ registry.exported_at|date:"d.m.Y H:i" }}
-                                {% else %}
-                                    <span class="muted">
-                                        —
-                                    </span>
-                                {% endif %}
-                            </td>
-
-                            <td data-label="Факт. оплата">
-                                {% if registry.paid_at %}
-                                    {{ registry.paid_at|date:"d.m.Y H:i" }}
-                                {% else %}
-                                    <span class="muted">
-                                        —
-                                    </span>
-                                {% endif %}
-                            </td>
-
-                            <td data-label="Действия">
-                                {% if registry.items_count %}
-                                    {% if registry.status == 'draft' or registry.status == 'checked' or registry.status == 'exported' %}
-                                        <form
-                                            method="post"
-                                            action="{% url 'export_payment_registry_draft_excel' registry.id %}"
-                                            class="inline-form registry-history-export-form"
-                                        >
-                                            {% csrf_token %}
-
-                                            <button type="submit" class="btn btn-primary btn-sm">
-                                                Excel
-                                            </button>
-                                        </form>
-                                    {% else %}
-                                        <span class="muted">
-                                            —
-                                        </span>
+                            <th class="registry-history-cell--registry">Реестр</th>
+                            <th class="registry-history-cell--status">Статус</th>
+                            <th class="registry-history-cell--count">Документы</th>
+                            <th class="registry-history-cell--amount zds-table__numeric">Сумма</th>
+                            <th class="registry-history-cell--created">Создан</th>
+                            <th class="registry-history-cell--event">Последнее событие</th>
+                            <th class="registry-history-cell--actions">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for registry in registries %}
+                            <tr>
+                                <td
+                                    data-label="Реестр"
+                                    class="registry-history-cell--registry"
+                                >
+                                    <a
+                                        href="{% url 'payment_registry_detail' registry.id %}"
+                                        class="registry-history-title"
+                                    >
+                                        №{{ registry.id }}
+                                        ·
+                                        {{ registry.title|default:"Реестр оплаты" }}
+                                    </a>
+                                    {% if registry.comment %}
+                                        <small class="registry-row-message">
+                                            {{ registry.comment|truncatechars:72 }}
+                                        </small>
                                     {% endif %}
-                                {% else %}
-                                    <span class="muted">
-                                        —
+                                </td>
+                                <td
+                                    data-label="Статус"
+                                    class="registry-history-cell--status"
+                                >
+                                    <span class="zds-badge zds-badge--neutral status-{{ registry.status }}">
+                                        {{ registry.get_status_display }}
                                     </span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="11" class="empty-table">
-                                Реестры оплаты пока не найдены.
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                                </td>
+                                <td
+                                    data-label="Документы"
+                                    class="registry-history-cell--count"
+                                >
+                                    {{ registry.items_count }}
+                                </td>
+                                <td
+                                    data-label="Сумма"
+                                    class="registry-history-cell--amount zds-table__numeric"
+                                >
+                                    {{ registry.total_amount|money_ru }}
+                                </td>
+                                <td
+                                    data-label="Создан"
+                                    class="registry-history-cell--created"
+                                >
+                                    <span class="registry-history-meta">
+                                        <strong>
+                                            {{ registry.created_by.get_username|default:'Система' }}
+                                        </strong>
+                                        <small>
+                                            {{ registry.created_at|date:"d.m.Y H:i" }}
+                                        </small>
+                                    </span>
+                                </td>
+                                <td
+                                    data-label="Последнее событие"
+                                    class="registry-history-cell--event"
+                                >
+                                    <span class="registry-history-meta">
+                                        {% if registry.paid_at %}
+                                            <strong>Оплачен</strong>
+                                            <small>
+                                                {{ registry.paid_at|date:"d.m.Y H:i" }}
+                                            </small>
+                                        {% elif registry.exported_at %}
+                                            <strong>
+                                                Выгружен
+                                                ·
+                                                {{ registry.exported_by.get_username|default:'Система' }}
+                                            </strong>
+                                            <small>
+                                                {{ registry.exported_at|date:"d.m.Y H:i" }}
+                                            </small>
+                                        {% else %}
+                                            <strong>Не выгружен</strong>
+                                            <small>Ожидает подготовки</small>
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td
+                                    data-label="Действия"
+                                    class="registry-history-cell--actions"
+                                >
+                                    <div class="registry-history-actions">
+                                        <a
+                                            href="{% url 'payment_registry_detail' registry.id %}"
+                                            class="zds-button zds-button--text registry-history-open"
+                                        >
+                                            Открыть
+                                        </a>
+                                        {% include 'invoices/components/payment_registry_export_controls.html' with export_registry=registry %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7">
+                                    <div class="registry-empty-state">
+                                        Реестры оплаты пока не найдены.
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         {% if page_obj.has_other_pages %}
-            <div class="pagination">
+            <nav
+                class="zds-pagination registry-pagination"
+                aria-label="Страницы истории реестров"
+            >
                 {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}&q={{ search_query }}">
+                    <a
+                        class="zds-button zds-button--secondary"
+                        href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}&q={{ search_query }}"
+                    >
                         Назад
                     </a>
                 {% endif %}
-
                 <span>
-                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+                    Страница {{ page_obj.number }}
+                    из {{ page_obj.paginator.num_pages }}
                 </span>
-
                 {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}&q={{ search_query }}">
+                    <a
+                        class="zds-button zds-button--secondary"
+                        href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}&q={{ search_query }}"
+                    >
                         Вперёд
                     </a>
                 {% endif %}
-            </div>
+            </nav>
         {% endif %}
-
-    </div>
-
+    </section>
 </div>
+{% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/enterprise-workspace.js' %}" defer></script>
 {% endblock %}

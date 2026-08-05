@@ -276,10 +276,23 @@
         modal.setAttribute("aria-hidden", modal.open ? "false" : "true");
         modal.addEventListener("cancel", (event) => {
             event.preventDefault();
+
+            if (
+                modal.querySelector(
+                    '[data-registry-export-form]'
+                    + '[data-export-pending="true"]'
+                )
+            ) {
+                return;
+            }
+
             closeModal(modal);
         });
         modal.addEventListener("click", (event) => {
-            if (event.target === modal) {
+            if (
+                event.target === modal
+                && !modal.hasAttribute("data-modal-static")
+            ) {
                 closeModal(modal);
             }
         });

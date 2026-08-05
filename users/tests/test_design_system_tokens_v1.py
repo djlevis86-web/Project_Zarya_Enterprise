@@ -247,9 +247,19 @@ class DesignSystemTokensV1Tests(
             for name, value in root_zds_declarations
         }
 
+        root_v1_tokens = {
+            name: root_zds_tokens[name]
+            for name in expected_tokens
+        }
+
         self.assertEqual(
-            root_zds_tokens,
+            root_v1_tokens,
             expected_tokens,
+        )
+
+        self.assertEqual(
+            len(root_zds_tokens),
+            113,
         )
 
         expected_brand_tokens = {'--zarya-forest-950': '#041008',

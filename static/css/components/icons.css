@@ -1,0 +1,72 @@
+/*
+ * Project Zarya — global icon system V1.
+ *
+ * The local SVG sprite is the only icon source for production UI.
+ * Outline is used for secondary actions; duotone is the default
+ * for primary navigation/actions; filled symbols are reserved for
+ * statuses and explicit selected states.
+ */
+
+.zds-icon-sprite,
+.sidebar-icon-sprite-v3 {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.zds-icon {
+    width: var(--zds-icon-size-default);
+    min-width: var(--zds-icon-size-default);
+    height: var(--zds-icon-size-default);
+    display: inline-block;
+    flex: 0 0 auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: var(--zds-icon-stroke-width);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+}
+
+.zds-icon--compact {
+    width: var(--zds-icon-size-compact);
+    min-width: var(--zds-icon-size-compact);
+    height: var(--zds-icon-size-compact);
+}
+
+.zds-icon--large {
+    width: var(--zds-icon-size-large);
+    min-width: var(--zds-icon-size-large);
+    height: var(--zds-icon-size-large);
+}
+
+.zds-icon--success {
+    color: var(--zds-color-success);
+}
+
+.zds-icon--warning {
+    color: var(--zds-color-warning);
+}
+
+.zds-icon--danger {
+    color: var(--zds-color-danger);
+}
+
+.zds-icon--info {
+    color: var(--zds-color-info);
+}
+
+.zds-icon--neutral {
+    color: var(--zds-color-neutral);
+}
+
+.zds-icon--filled {
+    fill: currentColor;
+    stroke: none;
+}
+
+.zds-icon[aria-hidden="true"] {
+    pointer-events: none;
+}

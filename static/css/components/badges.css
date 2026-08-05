@@ -351,3 +351,68 @@ label {
     color: #bfdbfe;
     background: rgba(37, 99, 235, 0.20);
 }
+
+/* DESIGN-SYSTEM-V20-BADGES-START */
+/* Canonical semantic badge API for all Project Zarya modules. */
+
+.zds-badge {
+    min-height: 26px;
+    width: fit-content;
+    max-width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 4px 9px;
+    border: 1px solid var(--zds-color-neutral-border);
+    border-radius: var(--zds-radius-pill);
+    background: var(--zds-color-neutral-soft);
+    color: var(--zds-color-text-soft);
+    font-size: 12px;
+    font-weight: var(--zds-font-weight-semibold);
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.zds-badge--neutral {
+    border-color: var(--zds-color-neutral-border);
+    background: var(--zds-color-neutral-soft);
+    color: var(--zds-color-text-soft);
+}
+
+.zds-badge--success {
+    border-color: var(--zds-color-success-border);
+    background: var(--zds-color-success-soft);
+    color: var(--zds-color-success);
+}
+
+.zds-badge--warning {
+    border-color: var(--zds-color-warning-border);
+    background: var(--zds-color-warning-soft);
+    color: var(--zds-color-warning);
+}
+
+.zds-badge--danger {
+    border-color: var(--zds-color-danger-border);
+    background: var(--zds-color-danger-soft);
+    color: var(--zds-color-danger);
+}
+
+.zds-badge--info {
+    border-color: var(--zds-color-info-border);
+    background: var(--zds-color-info-soft);
+    color: var(--zds-color-info);
+}
+
+.zds-badge--compact {
+    min-height: 22px;
+    padding: 3px 7px;
+    font-size: 11px;
+}
+
+.zds-badge__icon {
+    width: var(--zds-icon-size-compact);
+    min-width: var(--zds-icon-size-compact);
+    height: var(--zds-icon-size-compact);
+}
+/* DESIGN-SYSTEM-V20-BADGES-END */

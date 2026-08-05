@@ -927,6 +927,100 @@
 }
 /* INVOICE-LIST-UX-CLEANUP-V1-END */
 
+/* DESIGN-SYSTEM-V20-TABLES-START */
+/* Canonical data-table and row-state API. */
+
+.zds-table-wrap {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--zds-color-border);
+    border-radius: var(--zds-radius-panel);
+    background: var(--zds-color-surface);
+}
+
+.zds-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--zds-color-text-soft);
+}
+
+.zds-table th {
+    height: var(--zds-table-row-height-dense);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--zds-color-border-strong);
+    color: var(--zds-color-text-muted);
+    font-size: 12px;
+    font-weight: var(--zds-font-weight-semibold);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.zds-table td {
+    min-height: var(--zds-table-row-height-standard);
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--zds-color-border);
+    vertical-align: middle;
+}
+
+.zds-table tbody tr {
+    transition:
+        background-color var(--zds-motion-duration-fast) ease,
+        box-shadow var(--zds-motion-duration-fast) ease;
+}
+
+.zds-table tbody tr:hover {
+    background: var(--zds-color-control-hover);
+}
+
+.zds-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.zds-table--dense td {
+    min-height: var(--zds-table-row-height-dense);
+    padding-block: 7px;
+}
+
+.zds-table__numeric {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.zds-row--selected {
+    background: var(--zds-row-selected-surface);
+    box-shadow: inset 3px 0 0 var(--zds-row-selected-border);
+}
+
+.zds-row--overdue {
+    background: var(--zds-row-overdue-surface);
+    box-shadow: inset 3px 0 0 var(--zds-row-overdue-border);
+}
+
+.zds-row--warning {
+    background: var(--zds-row-warning-surface);
+    box-shadow: inset 3px 0 0 var(--zds-color-warning-border);
+}
+
+.zds-row--error {
+    background: var(--zds-row-error-surface);
+    box-shadow: inset 3px 0 0 var(--zds-color-danger-border);
+}
+
+.zds-row--disabled {
+    opacity: var(--zds-row-disabled-opacity);
+}
+
+.zds-table-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--zds-space-2);
+    white-space: nowrap;
+}
+/* DESIGN-SYSTEM-V20-TABLES-END */
+
 /* =========================================================
    V19 mobile payment registry history cards
    ========================================================= */

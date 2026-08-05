@@ -13,6 +13,7 @@
 @import url("./layout/topbar.css");
 
 /* Components */
+@import url("./components/icons.css");
 @import url("./components/buttons.css");
 @import url("./components/page-headers.css");
 @import url("./components/forms.css");

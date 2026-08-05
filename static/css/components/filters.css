@@ -525,3 +525,101 @@
         width: 100% !important;
     }
 }
+
+/* DESIGN-SYSTEM-V20-FILTERS-START */
+/* Canonical filter/search layout for all modules. */
+
+.zds-filter-bar {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--zds-space-3);
+    align-items: end;
+}
+
+.zds-filter-field {
+    grid-column: span 2;
+    min-width: 0;
+    display: grid;
+    gap: 6px;
+    color: var(--zds-color-text-muted);
+    font-size: 12px;
+    font-weight: var(--zds-font-weight-medium);
+}
+
+.zds-filter-field input,
+.zds-filter-field select {
+    min-height: var(--zds-filter-control-height);
+}
+
+.zds-filter-search {
+    grid-column: span 4;
+}
+
+.zds-filter-actions {
+    grid-column: span 2;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--zds-space-2);
+}
+
+.zds-filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--zds-space-2);
+}
+
+.zds-filter-chip {
+    min-height: var(--zds-filter-chip-height);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 var(--zds-button-padding-compact);
+    border: 1px solid var(--zds-color-border);
+    border-radius: var(--zds-radius-pill);
+    background: transparent;
+    color: var(--zds-color-text-soft);
+    font-size: 12px;
+    font-weight: var(--zds-font-weight-medium);
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.zds-filter-chip:hover,
+.zds-filter-chip.is-active {
+    border-color: var(--zds-color-border-brand);
+    background: var(--zds-color-accent-soft);
+    color: var(--zds-color-accent-strong);
+    text-decoration: none;
+}
+
+@media (max-width: 1180px) {
+    .zds-filter-field,
+    .zds-filter-search {
+        grid-column: span 4;
+    }
+
+    .zds-filter-actions {
+        grid-column: span 12;
+    }
+}
+
+@media (max-width: 760px) {
+    .zds-filter-bar {
+        grid-template-columns: 1fr;
+    }
+
+    .zds-filter-field,
+    .zds-filter-search,
+    .zds-filter-actions {
+        grid-column: 1;
+    }
+
+    .zds-filter-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+}
+/* DESIGN-SYSTEM-V20-FILTERS-END */

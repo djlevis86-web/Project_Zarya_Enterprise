@@ -220,7 +220,7 @@ label {
             template,
         )
         self.assertIn(
-            "metric-{{ metric.tone }}",
+            "metric-{{ card.metric.tone }}",
             template,
         )
         self.assertIn(

@@ -241,3 +241,156 @@
     cursor: pointer;
 }
 
+/* DESIGN-SYSTEM-V20-BUTTONS-START */
+/*
+ * Canonical Project Zarya button API.
+ *
+ * Legacy aliases above remain until every module is migrated.
+ * New and redesigned templates use only .zds-button.
+ */
+
+.zds-button {
+    min-height: var(--zds-button-height-medium);
+    min-width: 0;
+    max-width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--zds-space-2);
+    padding: 0 var(--zds-button-padding-medium);
+    border: 1px solid var(--zds-color-border-strong);
+    border-radius: var(--zds-button-radius);
+    background: var(--zds-color-control);
+    color: var(--zds-color-text);
+    font-family: var(--zds-font-family-sans);
+    font-size: 13px;
+    font-weight: var(--zds-font-weight-semibold);
+    line-height: 1;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition:
+        background-color var(--zds-motion-duration-default) ease,
+        border-color var(--zds-motion-duration-default) ease,
+        color var(--zds-motion-duration-default) ease,
+        box-shadow var(--zds-motion-duration-default) ease;
+}
+
+.zds-button:hover {
+    background: var(--zds-color-control-hover);
+    border-color: var(--zds-color-border-brand);
+    color: var(--zds-color-text);
+    text-decoration: none;
+}
+
+.zds-button:active {
+    background: var(--zds-color-surface-accent);
+}
+
+.zds-button--primary {
+    background: var(--zds-color-accent);
+    border-color: var(--zds-color-border-brand);
+    color: var(--zds-color-text-on-accent);
+}
+
+.zds-button--primary:hover {
+    background: var(--zds-color-accent-strong);
+    color: var(--zds-color-text-on-dark);
+}
+
+.zds-button--secondary {
+    background: var(--zds-color-control);
+    border-color: var(--zds-color-border-strong);
+}
+
+.zds-button--tertiary {
+    background: transparent;
+    border-color: var(--zds-color-border);
+    color: var(--zds-color-text-soft);
+}
+
+.zds-button--danger {
+    background: var(--zds-color-danger-soft);
+    border-color: var(--zds-color-danger-border);
+    color: var(--zds-color-danger);
+}
+
+.zds-button--danger:hover {
+    background: var(--zds-color-danger);
+    border-color: var(--zds-color-danger);
+    color: var(--zds-color-text-on-dark);
+}
+
+.zds-button--text {
+    min-height: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--zds-color-accent-strong);
+}
+
+.zds-button--text:hover {
+    background: transparent;
+    border-color: transparent;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.zds-button--large {
+    min-height: var(--zds-button-height-large);
+    padding-inline: var(--zds-button-padding-large);
+    font-size: 14px;
+}
+
+.zds-button--compact {
+    min-height: var(--zds-button-height-compact);
+    padding-inline: var(--zds-button-padding-compact);
+    font-size: 12px;
+}
+
+.zds-button--icon {
+    width: var(--zds-button-height-icon);
+    min-width: var(--zds-button-height-icon);
+    min-height: var(--zds-button-height-icon);
+    padding: 0;
+}
+
+.zds-button--block {
+    width: 100%;
+}
+
+.zds-button:disabled,
+.zds-button[disabled],
+.zds-button[aria-disabled="true"] {
+    background: var(--zds-color-disabled-soft);
+    border-color: var(--zds-color-border);
+    color: var(--zds-color-disabled);
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none;
+}
+
+.zds-button.is-loading {
+    cursor: progress;
+    pointer-events: none;
+}
+
+.zds-button__icon {
+    width: var(--zds-icon-size-default);
+    min-width: var(--zds-icon-size-default);
+    height: var(--zds-icon-size-default);
+}
+
+.zds-button--compact .zds-button__icon,
+.zds-button--icon .zds-button__icon {
+    width: var(--zds-icon-size-compact);
+    min-width: var(--zds-icon-size-compact);
+    height: var(--zds-icon-size-compact);
+}
+/* DESIGN-SYSTEM-V20-BUTTONS-END */
+

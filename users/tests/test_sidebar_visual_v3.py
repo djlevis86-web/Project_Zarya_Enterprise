@@ -23,7 +23,7 @@ class SidebarVisualV3Tests(
         repo_root
         / "templates"
         / "components"
-        / "sidebar_icon_sprite_v3.html"
+        / "zds_icon_sprite_v1.html"
     )
 
     brand_asset_path = (
@@ -87,7 +87,7 @@ class SidebarVisualV3Tests(
 
         required_markers = (
             'data-sidebar-version="v3"',
-            'sidebar_icon_sprite_v3.html',
+            'zds_icon_sprite_v1.html',
             'js/sidebar-state-v3.js',
             'js/sidebar-mobile-drawer.js',
             'js/sidebar-tooltip-v3.js',
@@ -208,19 +208,19 @@ class SidebarVisualV3Tests(
 
         self.assertEqual(
             len(symbol_ids),
-            20,
+            58,
         )
 
         self.assertEqual(
             len(set(symbol_ids)),
-            20,
+            58,
         )
 
         self.assertEqual(
             sprite_text.count(
                 'viewBox="0 0 24 24"'
             ),
-            20,
+            58,
         )
 
         self.assertIn(
@@ -440,7 +440,7 @@ class SidebarVisualV3Tests(
 
         self.assertEqual(
             len(imports),
-            39,
+            40,
         )
 
         self.assertEqual(
@@ -453,6 +453,20 @@ class SidebarVisualV3Tests(
         self.assertIn(
             "./base/accessibility.css",
             imports,
+        )
+
+        self.assertIn(
+            "./components/icons.css",
+            imports,
+        )
+
+        self.assertLess(
+            imports.index(
+                "./components/icons.css"
+            ),
+            imports.index(
+                "./components/buttons.css"
+            ),
         )
 
         self.assertLess(

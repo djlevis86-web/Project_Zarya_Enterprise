@@ -102,6 +102,54 @@
     --zds-transition-base: 220ms ease;
     /* DESIGN-SYSTEM-TOKENS-V1-END */
 
+    /* DESIGN-SYSTEM-TOKENS-V2-START */
+    /*
+     * Project-wide component contract approved in V20.2A.
+     * Page owners consume these tokens; they do not redefine them.
+     */
+    --zds-color-neutral: #9aa7a0;
+    --zds-color-neutral-soft: rgba(154, 167, 160, 0.14);
+    --zds-color-neutral-border: rgba(154, 167, 160, 0.28);
+    --zds-color-success-soft: rgba(57, 185, 106, 0.14);
+    --zds-color-success-border: rgba(57, 185, 106, 0.36);
+    --zds-color-warning-soft: rgba(229, 166, 50, 0.14);
+    --zds-color-warning-border: rgba(229, 166, 50, 0.38);
+    --zds-color-danger-soft: rgba(232, 103, 103, 0.14);
+    --zds-color-danger-border: rgba(232, 103, 103, 0.38);
+    --zds-color-info-soft: rgba(95, 159, 232, 0.14);
+    --zds-color-info-border: rgba(95, 159, 232, 0.36);
+    --zds-color-disabled: #64748b;
+    --zds-color-disabled-soft: rgba(100, 116, 139, 0.14);
+    --zds-button-height-large: 42px;
+    --zds-button-height-medium: 36px;
+    --zds-button-height-compact: 32px;
+    --zds-button-height-icon: 32px;
+    --zds-button-radius: 8px;
+    --zds-button-padding-large: 18px;
+    --zds-button-padding-medium: 14px;
+    --zds-button-padding-compact: 10px;
+    --zds-icon-size-compact: 16px;
+    --zds-icon-size-default: 18px;
+    --zds-icon-size-large: 20px;
+    --zds-icon-stroke-width: 1.8;
+    --zds-font-weight-medium: 500;
+    --zds-font-weight-semibold: 600;
+    --zds-font-weight-bold: 700;
+    --zds-motion-duration-fast: 120ms;
+    --zds-motion-duration-default: 160ms;
+    --zds-table-row-height-dense: 40px;
+    --zds-table-row-height-standard: 48px;
+    --zds-row-selected-surface: rgba(8, 122, 54, 0.18);
+    --zds-row-selected-border: rgba(120, 196, 66, 0.42);
+    --zds-row-overdue-surface: rgba(232, 103, 103, 0.10);
+    --zds-row-overdue-border: rgba(232, 103, 103, 0.34);
+    --zds-row-error-surface: rgba(232, 103, 103, 0.14);
+    --zds-row-warning-surface: rgba(229, 166, 50, 0.12);
+    --zds-row-disabled-opacity: 0.56;
+    --zds-filter-chip-height: 32px;
+    --zds-filter-control-height: 36px;
+    /* DESIGN-SYSTEM-TOKENS-V2-END */
+
     /* Compatibility aliases for existing modules. */
     --z-font: var(--font-family-base);
     --color-bg-main: var(--zds-color-canvas-deep);

@@ -64,6 +64,7 @@ PAYMENT_REGISTRY_RETURN_QUERY_KEYS = frozenset(
 )
 PAYMENT_REGISTRY_RETURN_QUERY_MAX_LENGTH = 2048
 PAYMENT_REGISTRY_RETURN_VALUE_MAX_LENGTH = 200
+PAYMENT_REGISTRY_QUEUE_ANCHOR = "#registry-document-queue"
 
 
 def _payment_registry_return_url(request):
@@ -80,7 +81,10 @@ def _payment_registry_return_url(request):
         or len(raw_query)
         > PAYMENT_REGISTRY_RETURN_QUERY_MAX_LENGTH
     ):
-        return default_url
+        return (
+            default_url
+            + PAYMENT_REGISTRY_QUEUE_ANCHOR
+        )
 
     try:
         query_pairs = parse_qsl(
@@ -89,7 +93,10 @@ def _payment_registry_return_url(request):
             max_num_fields=20,
         )
     except ValueError:
-        return default_url
+        return (
+            default_url
+            + PAYMENT_REGISTRY_QUEUE_ANCHOR
+        )
 
     clean_query = {}
 
@@ -110,12 +117,16 @@ def _payment_registry_return_url(request):
     )
 
     if not encoded_query:
-        return default_url
+        return (
+            default_url
+            + PAYMENT_REGISTRY_QUEUE_ANCHOR
+        )
 
     return (
         default_url
         + "?"
         + encoded_query
+        + PAYMENT_REGISTRY_QUEUE_ANCHOR
     )
 
 

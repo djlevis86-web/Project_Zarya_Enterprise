@@ -135,6 +135,7 @@ class PaymentRegistryFilterPersistenceV20Tests(TestCase):
                 reverse("payment_registry")
                 + "?"
                 + return_query
+                + "#registry-document-queue"
             ),
             fetch_redirect_response=False,
         )
@@ -186,6 +187,7 @@ class PaymentRegistryFilterPersistenceV20Tests(TestCase):
                 reverse("payment_registry")
                 + "?"
                 + return_query
+                + "#registry-document-queue"
             ),
             fetch_redirect_response=False,
         )
@@ -228,6 +230,7 @@ class PaymentRegistryFilterPersistenceV20Tests(TestCase):
                 reverse("payment_registry")
                 + "?"
                 + return_query
+                + "#registry-document-queue"
             ),
             fetch_redirect_response=False,
         )
@@ -264,6 +267,7 @@ class PaymentRegistryFilterPersistenceV20Tests(TestCase):
             (
                 reverse("payment_registry")
                 + "?status=approved&page=2"
+                + "#registry-document-queue"
             ),
             fetch_redirect_response=False,
         )
@@ -311,6 +315,10 @@ class PaymentRegistryFilterPersistenceV20Tests(TestCase):
         self.assertEqual(
             response.context["registry_return_query"],
             expected_query,
+        )
+        self.assertContains(
+            response,
+            'id="registry-document-queue"',
         )
         self.assertContains(
             response,

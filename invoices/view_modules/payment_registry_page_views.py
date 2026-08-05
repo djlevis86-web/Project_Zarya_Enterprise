@@ -1265,6 +1265,15 @@ def payment_registry(request):
         if readiness_errors:
             readiness_blocked_count += 1
 
+    ready_page_count = sum(
+        1
+        for invoice in invoices
+        if invoice.payment_registry_is_ready
+    )
+    registry_return_query = (
+        request.GET.urlencode()
+    )
+
     # OCR_REGISTRY_SUMMARY_CONTEXT_V3
     ocr_registry_draft_items = list(draft_registry_items or [])
     draft_registry_items = ocr_registry_draft_items
@@ -1322,6 +1331,8 @@ def payment_registry(request):
                     request
                 )
             ),
+            'registry_return_query': registry_return_query,
+            'ready_page_count': ready_page_count,
             'total_count': total_count,
             'total_amount': total_amount,
             'selected_status': selected_status,

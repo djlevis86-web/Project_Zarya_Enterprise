@@ -190,6 +190,25 @@
                 <h2>Очередь документов</h2>
                 <p>Показано {{ invoices|length }} из {{ total_count }} · {{ total_amount|money_ru }}</p>
             </div>
+            {% if can_manage_payment_registry and ready_page_count %}
+                <form
+                    id="registry-bulk-add-form"
+                    method="post"
+                    action="{% url 'add_to_payment_registry' %}"
+                    class="registry-inline-form"
+                >
+                    {% csrf_token %}
+                    <input type="hidden" name="return_query" value="{{ registry_return_query }}">
+                    {% for invoice in invoices %}
+                        {% if invoice.payment_registry_is_ready %}
+                            <input type="hidden" name="invoice_ids" value="{{ invoice.id }}">
+                        {% endif %}
+                    {% endfor %}
+                    <button class="zds-button zds-button--primary" type="submit">
+                        Добавить готовые · {{ ready_page_count }}
+                    </button>
+                </form>
+            {% endif %}
         </header>
 
         <form method="get" class="zds-filter-bar registry-filter-toolbar">
@@ -268,6 +287,7 @@
                                 {% if invoice.payment_registry_is_ready %}
                                     <form method="post" action="{% url 'add_to_payment_registry' %}" class="registry-inline-form">
                                         {% csrf_token %}
+                                        <input type="hidden" name="return_query" value="{{ registry_return_query }}">
                                         <input type="hidden" name="invoice_ids" value="{{ invoice.id }}">
                                         <button class="zds-button zds-button--primary" type="submit">Добавить</button>
                                     </form>

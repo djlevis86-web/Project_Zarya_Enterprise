@@ -1,8 +1,11 @@
+from urllib.parse import parse_qsl, urlencode
+
 from ..payment_registry_services import EDITABLE_REGISTRY_STATUSES, mark_payment_registry_dirty_after_edit
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from django.utils import timezone
 
 from ..models import (
@@ -47,6 +50,75 @@ def _format_added_documents_message(registry_id, count):
     return f'В реестр №{registry_id} добавлено {count} {noun}.'
 
 
+PAYMENT_REGISTRY_RETURN_QUERY_KEYS = frozenset(
+    {
+        "q",
+        "status",
+        "counterparty",
+        "payment_status",
+        "ocr_status",
+        "date_from",
+        "date_to",
+        "page",
+    }
+)
+PAYMENT_REGISTRY_RETURN_QUERY_MAX_LENGTH = 2048
+PAYMENT_REGISTRY_RETURN_VALUE_MAX_LENGTH = 200
+
+
+def _payment_registry_return_url(request):
+    default_url = reverse(
+        "payment_registry"
+    )
+    raw_query = request.POST.get(
+        "return_query",
+        "",
+    ).strip()
+
+    if (
+        not raw_query
+        or len(raw_query)
+        > PAYMENT_REGISTRY_RETURN_QUERY_MAX_LENGTH
+    ):
+        return default_url
+
+    try:
+        query_pairs = parse_qsl(
+            raw_query,
+            keep_blank_values=True,
+            max_num_fields=20,
+        )
+    except ValueError:
+        return default_url
+
+    clean_query = {}
+
+    for key, value in query_pairs:
+        if (
+            key
+            not in PAYMENT_REGISTRY_RETURN_QUERY_KEYS
+            or key in clean_query
+            or len(value)
+            > PAYMENT_REGISTRY_RETURN_VALUE_MAX_LENGTH
+        ):
+            continue
+
+        clean_query[key] = value
+
+    encoded_query = urlencode(
+        clean_query
+    )
+
+    if not encoded_query:
+        return default_url
+
+    return (
+        default_url
+        + "?"
+        + encoded_query
+    )
+
+
 @login_required
 @require_payment_registry_permission(
     user_can_manage_payment_registry,
@@ -77,7 +149,9 @@ def add_to_payment_registry(request):
         )
 
         return redirect(
-            'payment_schedule'
+            _payment_registry_return_url(
+                request
+            )
         )
 
     from ..payment_registry_services import (
@@ -153,7 +227,9 @@ def add_to_payment_registry(request):
         registry.delete()
 
     return redirect(
-        'payment_registry'
+        _payment_registry_return_url(
+            request
+        )
     )
 
 @login_required
@@ -458,4 +534,3 @@ def cancel_payment_registry_view(request, registry_id):
         'payment_registry_detail',
         registry_id=registry.id,
     )
-

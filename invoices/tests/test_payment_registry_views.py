@@ -183,7 +183,10 @@ class PaymentRegistryViewTests(TestCase):
         self.client.force_login(self.staff_user)
 
         response = self.client.get(
-            reverse("payment_registry")
+            reverse("payment_registry"),
+            data={
+                "workspace": "queue",
+            },
         )
 
         self.assertEqual(response.status_code, 200)

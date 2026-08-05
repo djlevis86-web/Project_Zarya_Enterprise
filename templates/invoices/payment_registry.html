@@ -66,7 +66,33 @@
         </article>
     </section>
 
-    <section class="registry-active-grid">
+    <nav class="registry-workspace-switcher" aria-label="Рабочие области реестра">
+        <a
+            href="{% url 'payment_registry' %}{{ registry_current_workspace_query }}#registry-current-workspace"
+            class="registry-workspace-tab{% if registry_workspace == 'current' %} is-active{% endif %}"
+            {% if registry_workspace == 'current' %}aria-current="page"{% endif %}
+        >
+            <span>
+                <small>Рабочий состав</small>
+                <strong>Текущий реестр</strong>
+            </span>
+            <b>{{ draft_registry_items_count }}</b>
+        </a>
+        <a
+            href="{% url 'payment_registry' %}{{ registry_queue_workspace_query }}#registry-document-queue"
+            class="registry-workspace-tab{% if registry_workspace == 'queue' %} is-active{% endif %}"
+            {% if registry_workspace == 'queue' %}aria-current="page"{% endif %}
+        >
+            <span>
+                <small>Отбор и добавление</small>
+                <strong>Очередь документов</strong>
+            </span>
+            <b>{{ total_count }}</b>
+        </a>
+    </nav>
+
+    {% if registry_workspace == 'current' %}
+    <section id="registry-current-workspace" class="registry-active-grid">
         <article class="registry-active-panel">
             <header class="registry-panel-heading">
                 <div>
@@ -142,6 +168,18 @@
                 </table>
             </div>
 
+            {% if registry_page_obj.paginator.num_pages > 1 %}
+                <nav class="zds-pagination enterprise-registry-pagination registry-pagination registry-current-pagination" aria-label="Страницы текущего реестра">
+                    {% if registry_page_obj.has_previous %}
+                        <a class="zds-button zds-button--secondary" href="?{% if registry_current_pagination_query %}{{ registry_current_pagination_query }}&{% endif %}registry_page={{ registry_page_obj.previous_page_number }}#registry-current-workspace">Назад</a>
+                    {% endif %}
+                    <span>Страница {{ registry_page_obj.number }} из {{ registry_page_obj.paginator.num_pages }}</span>
+                    {% if registry_page_obj.has_next %}
+                        <a class="zds-button zds-button--secondary" href="?{% if registry_current_pagination_query %}{{ registry_current_pagination_query }}&{% endif %}registry_page={{ registry_page_obj.next_page_number }}#registry-current-workspace">Далее</a>
+                    {% endif %}
+                </nav>
+            {% endif %}
+
             {% if draft_registry %}
                 <footer class="registry-workflow-actions">
                     {% if can_check_payment_registry %}
@@ -182,7 +220,9 @@
             </div>
         </aside>
     </section>
+    {% endif %}
 
+    {% if registry_workspace == 'queue' %}
     <section id="registry-document-queue" class="registry-queue-panel">
         <header class="registry-panel-heading registry-queue-heading">
             <div>
@@ -212,6 +252,7 @@
         </header>
 
         <form method="get" class="zds-filter-bar registry-filter-toolbar">
+            <input type="hidden" name="workspace" value="queue">
             <div class="registry-filter-primary">
                 <label class="zds-filter-field zds-filter-search registry-filter-search">
                     <span>Поиск</span>
@@ -253,7 +294,7 @@
                     </label>
                     <label class="zds-filter-field"><span>Оплата с</span><input type="date" name="date_from" value="{{ date_from }}"></label>
                     <label class="zds-filter-field"><span>Оплата по</span><input type="date" name="date_to" value="{{ date_to }}"></label>
-                    <a href="{% url 'payment_registry' %}" class="zds-button zds-button--text">Сбросить</a>
+                    <a href="{% url 'payment_registry' %}?workspace=queue#registry-document-queue" class="zds-button zds-button--text">Сбросить</a>
                 </div>
             </details>
         </form>
@@ -306,15 +347,16 @@
         {% if page_obj.paginator.num_pages > 1 %}
             <nav class="zds-pagination enterprise-registry-pagination registry-pagination" aria-label="Страницы очереди документов">
                 {% if page_obj.has_previous %}
-                    <a class="zds-button zds-button--secondary" href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}">Назад</a>
+                    <a class="zds-button zds-button--secondary" href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}#registry-document-queue">Назад</a>
                 {% endif %}
                 <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
                 {% if page_obj.has_next %}
-                    <a class="zds-button zds-button--secondary" href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}">Далее</a>
+                    <a class="zds-button zds-button--secondary" href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}#registry-document-queue">Далее</a>
                 {% endif %}
             </nav>
         {% endif %}
     </section>
+    {% endif %}
 </div>
 {% endblock %}
 

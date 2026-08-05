@@ -59,6 +59,7 @@ PAYMENT_REGISTRY_RETURN_QUERY_KEYS = frozenset(
         "ocr_status",
         "date_from",
         "date_to",
+        "workspace",
         "page",
     }
 )

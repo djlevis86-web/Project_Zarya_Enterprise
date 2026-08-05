@@ -287,6 +287,7 @@ class PaymentRegistryFilterPersistenceV20Tests(TestCase):
         )
         today = timezone.localdate().isoformat()
         query = {
+            "workspace": "queue",
             "status": Invoice.STATUS_APPROVED,
             "date_from": today,
             "date_to": today,

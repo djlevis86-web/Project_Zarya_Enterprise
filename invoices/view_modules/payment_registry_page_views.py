@@ -60,6 +60,7 @@ from ..payment_registry_permissions import (
 
 PAYMENT_SCHEDULE_PAGE_SIZE = 12
 PAYMENT_REGISTRY_PAGE_SIZE = 25
+PAYMENT_REGISTRY_CURRENT_PAGE_SIZE = 15
 PAYMENT_SCHEDULE_CHART_MAX_DAYS = 31
 
 PAYMENT_SCHEDULE_FILTERS = {
@@ -1090,6 +1091,17 @@ def payment_registry(request):
         ''
     ).strip()
 
+    registry_workspace = request.GET.get(
+        'workspace',
+        'current'
+    ).strip()
+
+    if registry_workspace not in {
+        'current',
+        'queue',
+    }:
+        registry_workspace = 'current'
+
     from ..models import PaymentRegistry, PaymentRegistryItem
     from ..payment_registry_services import ACTIVE_REGISTRY_STATUSES, check_payment_registry, get_active_editable_payment_registry, validate_invoice_for_payment_registry
 
@@ -1273,6 +1285,42 @@ def payment_registry(request):
     registry_return_query = (
         request.GET.urlencode()
     )
+    registry_current_workspace_query = (
+        _query_string(
+            request,
+            overrides={
+                'workspace': 'current',
+            },
+            remove=(
+                'page',
+            ),
+        )
+    )
+    registry_queue_workspace_query = (
+        _query_string(
+            request,
+            overrides={
+                'workspace': 'queue',
+            },
+            remove=(
+                'registry_page',
+            ),
+        )
+    )
+    registry_current_pagination_query = (
+        _query_string(
+            request,
+            overrides={
+                'workspace': 'current',
+            },
+            remove=(
+                'page',
+                'registry_page',
+            ),
+        ).lstrip(
+            '?'
+        )
+    )
 
     # OCR_REGISTRY_SUMMARY_CONTEXT_V3
     ocr_registry_draft_items = list(draft_registry_items or [])
@@ -1314,6 +1362,19 @@ def payment_registry(request):
             )
         )
 
+    registry_paginator = Paginator(
+        draft_registry_items,
+        PAYMENT_REGISTRY_CURRENT_PAGE_SIZE,
+    )
+    registry_page_obj = registry_paginator.get_page(
+        request.GET.get(
+            'registry_page'
+        )
+    )
+    draft_registry_items = list(
+        registry_page_obj.object_list
+    )
+
     permission_context = (
         get_payment_registry_permission_context(
             request.user
@@ -1332,6 +1393,11 @@ def payment_registry(request):
                 )
             ),
             'registry_return_query': registry_return_query,
+            'registry_workspace': registry_workspace,
+            'registry_current_workspace_query': registry_current_workspace_query,
+            'registry_queue_workspace_query': registry_queue_workspace_query,
+            'registry_current_pagination_query': registry_current_pagination_query,
+            'registry_page_obj': registry_page_obj,
             'ready_page_count': ready_page_count,
             'total_count': total_count,
             'total_amount': total_amount,

@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from datetime import timedelta
 from decimal import Decimal
@@ -325,6 +325,9 @@ class PaymentSurfacesV20ViewTests(TestCase):
 
         response = self.client.get(
             reverse("payment_registry"),
+            {
+                "workspace": "queue",
+            },
         )
 
         self.assertEqual(
@@ -344,12 +347,16 @@ class PaymentSurfacesV20ViewTests(TestCase):
             27,
         )
         self.assertEqual(
+            response.context["page_obj"].paginator.per_page,
+            15,
+        )
+        self.assertEqual(
             len(response.context["invoices"]),
-            25,
+            15,
         )
         self.assertContains(
             response,
-            "Показано 25 из 27",
+            "Показано 15 из 27",
         )
 
     def test_registry_pagination_keeps_filters(self):

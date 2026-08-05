@@ -1,4 +1,4 @@
-from decimal import Decimal
+﻿from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -125,6 +125,7 @@ class CounterpartySearchInListsTests(TestCase):
         response = self.client.get(
             reverse('payment_registry'),
             {
+                'workspace': 'queue',
                 'status': Invoice.STATUS_APPROVED,
                 'q': 'база',
             },
@@ -153,6 +154,7 @@ class CounterpartySearchInListsTests(TestCase):
         response = self.client.get(
             reverse('payment_registry'),
             {
+                'workspace': 'queue',
                 'status': Invoice.STATUS_APPROVED,
                 'q': '7705551111',
             },
@@ -172,4 +174,3 @@ class CounterpartySearchInListsTests(TestCase):
             response,
             'ДРУГОЙ ПОСТАВЩИК',
         )
-

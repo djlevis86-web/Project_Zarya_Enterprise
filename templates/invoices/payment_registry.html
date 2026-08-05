@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load money %}
 {% load static %}
 
@@ -143,20 +143,20 @@
                     <tbody>
                         {% for item in draft_registry_items %}
                             <tr>
-                                <td data-label="Документ">
+                                <td data-label="Документ" class="registry-current-cell--document">
                                     <a href="{% url 'invoice_detail' item.invoice.id %}">
                                         {{ item.invoice.get_document_type_display }}
                                         {% if item.invoice.invoice_number %}№{{ item.invoice.invoice_number }}{% else %}без номера{% endif %}
                                     </a>
                                 </td>
-                                <td data-label="Контрагент">{{ item.invoice.counterparty.name|default:'Не назначен' }}</td>
-                                <td data-label="Сумма" class="zds-table__numeric">{{ item.amount|money_ru }}</td>
-                                <td data-label="Дата">{{ item.planned_payment_date|date:'d.m.Y'|default:'Не назначена' }}</td>
-                                <td data-label="Действие">
+                                <td data-label="Контрагент" class="registry-current-cell--counterparty">{{ item.invoice.counterparty.name|default:'Не назначен' }}</td>
+                                <td data-label="Сумма" class="registry-current-cell--amount zds-table__numeric">{{ item.amount|money_ru }}</td>
+                                <td data-label="Дата" class="registry-current-cell--date">{{ item.planned_payment_date|date:'d.m.Y'|default:'Не назначена' }}</td>
+                                <td data-label="Действие" class="registry-current-cell--action">
                                     {% if can_manage_payment_registry %}
-                                        <form method="post" action="{% url 'remove_from_payment_registry_item' item.id %}" class="registry-inline-form">
+                                        <form method="post" action="{% url 'remove_from_payment_registry_item' item.id %}" class="registry-inline-form registry-current-action-form">
                                             {% csrf_token %}
-                                            <button class="zds-button zds-button--text" type="submit">Убрать</button>
+                                            <button class="zds-button zds-button--text registry-current-action-control" type="submit">Убрать</button>
                                         </form>
                                     {% endif %}
                                 </td>
@@ -235,7 +235,7 @@
                     id="registry-bulk-add-form"
                     method="post"
                     action="{% url 'add_to_payment_registry' %}"
-                    class="registry-inline-form"
+                    class="registry-inline-form registry-queue-bulk-form"
                 >
                     {% csrf_token %}
                     <input type="hidden" name="return_query" value="{{ registry_return_query }}">
@@ -244,7 +244,7 @@
                             <input type="hidden" name="invoice_ids" value="{{ invoice.id }}">
                         {% endif %}
                     {% endfor %}
-                    <button class="zds-button zds-button--primary" type="submit">
+                    <button class="zds-button zds-button--primary registry-queue-bulk-control" type="submit">
                         Добавить готовые · {{ ready_page_count }}
                     </button>
                 </form>
@@ -314,26 +314,26 @@
                 <tbody>
                     {% for invoice in invoices %}
                         <tr>
-                            <td data-label="Документ"><a href="{% url 'invoice_detail' invoice.id %}">{{ invoice.production.title }}</a></td>
-                            <td data-label="Контрагент">{{ invoice.counterparty.name|default:'Не назначен' }}</td>
-                            <td data-label="Остаток" class="zds-table__numeric">{{ invoice.production.payment.remaining_amount|money_ru }}</td>
-                            <td data-label="Дата">{{ invoice.production.planned_payment_date_label }}</td>
-                            <td data-label="Готовность">
+                            <td data-label="Документ" class="registry-queue-cell--document"><a href="{% url 'invoice_detail' invoice.id %}">{{ invoice.production.title }}</a></td>
+                            <td data-label="Контрагент" class="registry-queue-cell--counterparty">{{ invoice.counterparty.name|default:'Не назначен' }}</td>
+                            <td data-label="Остаток" class="registry-queue-cell--amount zds-table__numeric">{{ invoice.production.payment.remaining_amount|money_ru }}</td>
+                            <td data-label="Дата" class="registry-queue-cell--date">{{ invoice.production.planned_payment_date_label }}</td>
+                            <td data-label="Готовность" class="registry-queue-cell--readiness">
                                 <span class="zds-badge zds-badge--{{ invoice.production.readiness_tone }}">{{ invoice.production.readiness_label }}</span>
                                 {% for message in invoice.payment_registry_block_errors %}
                                     <small class="registry-row-message">{{ message }}</small>
                                 {% endfor %}
                             </td>
-                            <td data-label="Действие">
+                            <td data-label="Действие" class="registry-queue-cell--action">
                                 {% if invoice.payment_registry_is_ready %}
-                                    <form method="post" action="{% url 'add_to_payment_registry' %}" class="registry-inline-form">
+                                    <form method="post" action="{% url 'add_to_payment_registry' %}" class="registry-inline-form registry-queue-action-form">
                                         {% csrf_token %}
                                         <input type="hidden" name="return_query" value="{{ registry_return_query }}">
                                         <input type="hidden" name="invoice_ids" value="{{ invoice.id }}">
-                                        <button class="zds-button zds-button--primary" type="submit">Добавить</button>
+                                        <button class="zds-button zds-button--primary registry-queue-action-control" type="submit">Добавить</button>
                                     </form>
                                 {% else %}
-                                    <a class="zds-button zds-button--text" href="{% url 'invoice_detail' invoice.id %}">Исправить</a>
+                                    <a class="zds-button zds-button--text registry-queue-action-control" href="{% url 'invoice_detail' invoice.id %}">Исправить</a>
                                 {% endif %}
                             </td>
                         </tr>

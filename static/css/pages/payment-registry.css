@@ -1,4 +1,4 @@
-.registry-workspace,
+﻿.registry-workspace,
 .registry-detail-workspace,
 .registry-history-workspace {
     display: grid;
@@ -939,8 +939,8 @@
         font-size: 11px;
     }
 
-    .registry-queue-heading .registry-inline-form,
-    .registry-queue-heading .registry-inline-form .zds-button {
+    .registry-queue-bulk-form,
+    .registry-queue-bulk-control {
         width: 100%;
     }
 
@@ -950,23 +950,23 @@
         padding: 11px;
     }
 
-    .registry-current-table td:nth-child(1),
-    .registry-current-table td:nth-child(2),
-    .registry-current-table td:nth-child(5),
-    .registry-queue-table td:nth-child(1),
-    .registry-queue-table td:nth-child(2),
-    .registry-queue-table td:nth-child(5),
-    .registry-queue-table td:nth-child(6) {
+    .registry-current-cell--document,
+    .registry-current-cell--counterparty,
+    .registry-current-cell--action,
+    .registry-queue-cell--document,
+    .registry-queue-cell--counterparty,
+    .registry-queue-cell--readiness,
+    .registry-queue-cell--action {
         grid-column: 1 / -1;
     }
 
-    .registry-current-table td:nth-child(4),
-    .registry-queue-table td:nth-child(4) {
+    .registry-current-cell--date,
+    .registry-queue-cell--date {
         text-align: right;
     }
 
-    .registry-current-table td:nth-child(5) .zds-button,
-    .registry-queue-table td:nth-child(6) .zds-button {
+    .registry-current-action-control,
+    .registry-queue-action-control {
         width: 100%;
     }
 
@@ -1041,34 +1041,34 @@
         display: none;
     }
 
-    .registry-queue-table td:nth-child(1),
-    .registry-queue-table td:nth-child(2),
-    .registry-queue-table td:nth-child(5),
-    .registry-queue-table td:nth-child(6) {
+    .registry-queue-cell--document,
+    .registry-queue-cell--counterparty,
+    .registry-queue-cell--readiness,
+    .registry-queue-cell--action {
         grid-column: 1 / -1;
     }
 
-    .registry-queue-table td:nth-child(4) {
+    .registry-queue-cell--date {
         text-align: right;
     }
 
-    .registry-queue-table td:nth-child(6) .zds-button {
+    .registry-queue-action-control {
         width: 100%;
     }
 
-    .payment-registry-history-table td:nth-child(1),
-    .payment-registry-history-table td:nth-child(6),
-    .payment-registry-history-table td:nth-child(7) {
+    .registry-history-cell--registry,
+    .registry-history-cell--event,
+    .registry-history-cell--actions {
         grid-column: 1 / -1;
     }
 
-    .payment-registry-history-table td:nth-child(3),
-    .payment-registry-history-table td:nth-child(4),
-    .payment-registry-history-table td:nth-child(5) {
+    .registry-history-cell--count,
+    .registry-history-cell--amount,
+    .registry-history-cell--created {
         align-content: start;
     }
 
-    .payment-registry-history-table td:nth-child(4) {
+    .registry-history-cell--amount {
         text-align: right;
     }
 

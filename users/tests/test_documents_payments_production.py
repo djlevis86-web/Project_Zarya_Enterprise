@@ -140,8 +140,16 @@ class DocumentsPaymentsProductionTests(TestCase):
         response = self.client.get(reverse("payment_schedule"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Платёжный календарь")
-        self.assertContains(response, "По дням, ₽")
-        self.assertContains(response, "Крупнейшие")
+        self.assertContains(
+            response,
+            "Платежи с назначенной датой",
+        )
+        self.assertContains(
+            response,
+            "Крупнейшие обязательства",
+        )
+        self.assertContains(response, "На графике")
+        self.assertNotContains(response, "По дням, ₽")
         self.assertContains(response, "enterprise-schedule-data")
 
     def test_registry_has_lifecycle_check_and_queue(self):

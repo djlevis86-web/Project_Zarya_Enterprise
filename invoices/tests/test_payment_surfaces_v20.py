@@ -146,6 +146,20 @@ class PaymentSurfacesV20ViewTests(TestCase):
             response.context["page_obj"].paginator.count,
             1,
         )
+        self.assertEqual(
+            response.context["page_obj"].paginator.per_page,
+            12,
+        )
+        self.assertEqual(
+            response.context["nearest_payment"].id,
+            partial.id,
+        )
+        self.assertTrue(
+            hasattr(
+                response.context["nearest_payment"],
+                "production",
+            )
+        )
 
         series_total = sum(
             (
@@ -177,6 +191,44 @@ class PaymentSurfacesV20ViewTests(TestCase):
         self.assertEqual(
             largest[0].remaining_amount,
             Decimal("60.00"),
+        )
+
+        undated = self._invoice(
+            title="V20-SCHEDULE-UNDATED",
+            amount=Decimal("70.00"),
+        )
+        Invoice.objects.filter(
+            pk=undated.pk,
+        ).update(
+            planned_payment_date=None,
+        )
+
+        coverage_response = self.client.get(
+            reverse("payment_schedule"),
+            {
+                "filter": "all",
+            },
+        )
+
+        self.assertEqual(
+            coverage_response.status_code,
+            200,
+        )
+        self.assertEqual(
+            coverage_response.context["charted_amount"],
+            Decimal("60.00"),
+        )
+        self.assertEqual(
+            coverage_response.context["charted_count"],
+            1,
+        )
+        self.assertEqual(
+            coverage_response.context["chart_outside_amount"],
+            Decimal("70.00"),
+        )
+        self.assertEqual(
+            coverage_response.context["chart_outside_count"],
+            1,
         )
 
     def test_schedule_paginates_and_keeps_non_period_filters(self):
@@ -212,8 +264,12 @@ class PaymentSurfacesV20ViewTests(TestCase):
             2,
         )
         self.assertEqual(
+            response.context["page_obj"].paginator.per_page,
+            12,
+        )
+        self.assertEqual(
             len(response.context["invoices"]),
-            2,
+            10,
         )
 
         for tab in response.context[
@@ -379,6 +435,128 @@ class PaymentSurfacesV20StaticTests(TestCase):
         self.assertIn(
             "Показано {{ invoices|length }} из {{ total_count }}",
             registry,
+        )
+
+    def test_schedule_uses_project_wide_design_system_contract(self):
+        base = Path(settings.BASE_DIR)
+
+        schedule = (
+            base
+            / "templates/invoices/payment_schedule.html"
+        ).read_text(
+            encoding="utf-8-sig"
+        )
+        css = (
+            base
+            / "static/css/pages/payment-schedule.css"
+        ).read_text(
+            encoding="utf-8-sig"
+        )
+        runtime = (
+            base
+            / "static/js/enterprise-workspace.js"
+        ).read_text(
+            encoding="utf-8-sig"
+        )
+        specification = (
+            base
+            / "docs/design-system-v20.md"
+        ).read_text(
+            encoding="utf-8-sig"
+        )
+
+        for marker in (
+            'data-zds-migrated="payment-schedule-v1"',
+            'data-schedule-concept="premium-workspace-v3"',
+            "zds-button zds-button--primary",
+            "zds-filter-bar",
+            "zds-filter-chip",
+            "zds-table zds-table--dense",
+            "zds-badge",
+            "zds-pagination",
+            'data-label-density="adaptive"',
+            "schedule-command-header",
+            "schedule-kpi-strip",
+            "schedule-filter-toolbar",
+            "schedule-mobile-filter",
+            "schedule-mobile-nearest",
+            "schedule-command-period-range",
+            "schedule-command-period-separator",
+            "schedule-chart-metrics",
+            "schedule-chart-coverage",
+            "charted_amount",
+            "chart_outside_amount",
+            "schedule-insight-grid",
+            "schedule-risk-list",
+            "schedule-operations-desktop",
+            "schedule-operations-tablet",
+            "schedule-operations-mobile",
+            "schedule-queue-table",
+            "schedule-mobile-obligation-list",
+            "schedule-mobile-queue-disclosure",
+            "schedule-attention-list",
+            'schedule_analytics.largest_payments|slice:":3"',
+            'invoices|slice:":5"',
+        ):
+            with self.subTest(
+                marker=marker
+            ):
+                self.assertIn(
+                    marker,
+                    schedule,
+                )
+
+        for forbidden in (
+            'class="btn',
+            "enterprise-period-tabs",
+            "schedule-document-grid",
+            "schedule-document-card",
+            "data-schedule-concept=\"premium-workspace-v2\"",
+        ):
+            with self.subTest(
+                forbidden=forbidden
+            ):
+                self.assertNotIn(
+                    forbidden,
+                    schedule,
+                )
+
+        for selector in (
+            ".zds-button",
+            ".zds-badge",
+            ".zds-table",
+            ".zds-filter-bar",
+            ".zds-pagination",
+        ):
+            with self.subTest(
+                selector=selector
+            ):
+                self.assertNotIn(
+                    selector,
+                    css,
+                )
+
+        for marker in (
+            "resolveLabelEvery",
+            "formatAxisValue",
+            "resolveBarTone",
+            "drawRoundedBar",
+            "drawBarValue",
+            "drawTrendLine",
+            "cumulativeValues",
+            "cumulativeMax",
+        ):
+            with self.subTest(
+                marker=marker
+            ):
+                self.assertIn(
+                    marker,
+                    runtime,
+                )
+
+        self.assertIn(
+            "V20.2B — График платежей: premium adaptive workspace reference",
+            specification,
         )
 
     def test_queryset_annotation_does_not_shadow_invoice_property(self):

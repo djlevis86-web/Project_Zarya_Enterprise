@@ -2,211 +2,1265 @@
 {% load static money %}
 
 {% block content %}
-<div class="enterprise-page enterprise-payment-schedule" data-enterprise-screen="payment-schedule">
-    <header class="page-header page-header-v1 enterprise-hero">
-        <div class="page-header-copy-v1">
-            <span class="production-kicker">График платежей</span>
+<div
+    class="enterprise-page enterprise-payment-schedule"
+    data-enterprise-screen="payment-schedule"
+    data-zds-migrated="payment-schedule-v1"
+    data-schedule-concept="premium-workspace-v3"
+>
+    <header class="schedule-command-header">
+        <div class="schedule-command-copy">
+            <span class="production-kicker">Платежи</span>
             <h1 class="page-title">Платёжный календарь</h1>
-            <p class="page-subtitle">Сроки, суммы и крупнейшие обязательства выбранного периода.</p>
+            <p class="schedule-command-period">
+                <span class="schedule-command-period-range">
+                    {{ schedule_analytics.period_start|date:'d.m.Y' }}
+                    —
+                    {{ schedule_analytics.period_end|date:'d.m.Y' }}
+                </span>
+                <span
+                    class="schedule-command-period-separator"
+                    aria-hidden="true"
+                >
+                    ·
+                </span>
+                <span class="schedule-command-period-count">
+                    {{ filtered_count }} документов
+                </span>
+            </p>
         </div>
-        <div class="page-header-actions-v1">
-            <a href="{% url 'payment_registry' %}" class="btn btn-primary">Открыть реестр</a>
-            <a href="{% url 'invoice_list' %}" class="btn btn-secondary">Документы</a>
+
+        <div class="schedule-command-actions">
+            <a
+                href="{% url 'payment_registry' %}"
+                class="zds-button zds-button--primary"
+            >
+                <svg
+                    class="zds-icon zds-button__icon"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <use href="#z-icon-wallet"></use>
+                </svg>
+                <span>Открыть реестр</span>
+            </a>
+
+            <a
+                href="{% url 'invoice_list' %}"
+                class="zds-button zds-button--secondary schedule-command-secondary"
+            >
+                <svg
+                    class="zds-icon zds-button__icon"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <use href="#z-icon-file-text"></use>
+                </svg>
+                <span>Все документы</span>
+            </a>
         </div>
     </header>
 
-    <section class="enterprise-metric-grid enterprise-metric-grid-five" aria-label="Состояние платежей">
+    <section
+        class="schedule-kpi-strip"
+        aria-label="Оперативное состояние платежей"
+    >
         {% for card in schedule_metric_cards %}
             <a
-                class="enterprise-metric metric-{{ card.metric.tone }}"
+                class="schedule-kpi-card schedule-kpi-card--{{ card.metric.code }} metric-{{ card.metric.tone }}"
                 href="{% url 'payment_schedule' %}{{ card.query_string }}"
+                title="{{ card.metric.label }}: {{ card.metric.amount|money_ru }}"
             >
-                <span>{{ card.metric.label }}</span>
-                <strong>{{ card.metric.count }}</strong>
-                <small>{{ card.metric.amount|money_ru }}</small>
+                <span class="schedule-kpi-icon" aria-hidden="true">
+                    <svg
+                        class="zds-icon zds-icon--compact"
+                        viewBox="0 0 24 24"
+                        focusable="false"
+                    >
+                        {% if card.metric.code == 'total' %}
+                            <use href="#z-icon-wallet"></use>
+                        {% elif card.metric.code == 'today' %}
+                            <use href="#z-icon-clock"></use>
+                        {% elif card.metric.code == 'week' %}
+                            <use href="#z-icon-calendar"></use>
+                        {% elif card.metric.code == 'overdue' %}
+                            <use href="#z-icon-error"></use>
+                        {% else %}
+                            <use href="#z-icon-warning"></use>
+                        {% endif %}
+                    </svg>
+                </span>
+
+                <span class="schedule-kpi-copy">
+                    <span class="schedule-kpi-label">
+                        {{ card.metric.label }}
+                    </span>
+                    <strong>{{ card.metric.amount|money_ru }}</strong>
+                    <small>
+                        {{ card.metric.count }}
+                        {% if card.metric.count == 1 %}
+                            документ
+                        {% else %}
+                            документов
+                        {% endif %}
+                    </small>
+                </span>
             </a>
         {% endfor %}
     </section>
 
-    <section class="production-panel enterprise-filter-panel">
-        <form method="get" class="enterprise-schedule-filters">
+    <section
+        class="schedule-filter-shell"
+        aria-label="Фильтры платёжного календаря"
+    >
+        <form
+            method="get"
+            class="zds-filter-bar schedule-filter-toolbar schedule-filter-desktop"
+            data-schedule-filter-form
+        >
             <input type="hidden" name="filter" value="{{ filter_type }}">
 
-            <div class="enterprise-period-tabs" aria-label="Период">
-                {% for tab in schedule_period_links %}
-                    <a
-                        href="{% url 'payment_schedule' %}{{ tab.query_string }}"
-                        class="{% if tab.is_active %}is-active{% endif %}"
-                        {% if tab.is_active %}aria-current="page"{% endif %}
-                    >
-                        {{ tab.label }}
-                    </a>
-                {% endfor %}
-            </div>
-
-            <label>
-                <span>Поиск</span>
-                <input
-                    type="search"
-                    name="q"
-                    value="{{ search_query }}"
-                    placeholder="Документ или контрагент"
+            <div class="schedule-filter-topline">
+                <div
+                    class="zds-filter-chips schedule-period-chips"
+                    aria-label="Период"
                 >
-            </label>
-
-            <label>
-                <span>Статус</span>
-                <select name="status">
-                    <option value="payment" {% if selected_status == 'payment' %}selected{% endif %}>К оплате</option>
-                    <option value="all" {% if selected_status == 'all' %}selected{% endif %}>Все</option>
-                    {% for value,label in status_choices %}
-                        <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+                    {% for tab in schedule_period_links %}
+                        <a
+                            href="{% url 'payment_schedule' %}{{ tab.query_string }}"
+                            class="zds-filter-chip{% if tab.is_active %} is-active{% endif %}"
+                            {% if tab.is_active %}aria-current="page"{% endif %}
+                        >
+                            {{ tab.label }}
+                        </a>
                     {% endfor %}
-                </select>
-            </label>
+                </div>
 
-            <label>
-                <span>Приоритет</span>
-                <select name="priority">
-                    <option value="">Все</option>
-                    {% for value,label in priority_choices %}
-                        <option value="{{ value }}" {% if selected_priority == value|stringformat:'s' %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </label>
+                <div class="schedule-filter-topline-actions">
+                    {% if search_query or selected_priority or schedule_payment_status_filter or date_from or date_to or selected_status != 'payment' %}
+                        <span class="schedule-filter-state">
+                            Есть активные условия
+                        </span>
+                    {% endif %}
 
-            <label>
-                <span>С</span>
-                <input type="date" name="date_from" value="{{ date_from }}">
-            </label>
-
-            <label>
-                <span>По</span>
-                <input type="date" name="date_to" value="{{ date_to }}">
-            </label>
-
-            <button class="btn btn-primary" type="submit">Применить</button>
-        </form>
-    </section>
-
-    <section class="production-panel enterprise-chart-panel">
-        <div class="production-panel-header">
-            <div>
-                <span class="production-eyebrow">Сумма к оплате</span>
-                <h2>По дням, ₽</h2>
-                <p>
-                    {{ schedule_analytics.period_start|date:'d.m.Y' }}
-                    —
-                    {{ schedule_analytics.period_end|date:'d.m.Y' }}
-                </p>
-                {% if schedule_chart_limited %}
-                    <small class="enterprise-chart-period-note">
-                        На графике показан первый 31 день выбранного диапазона.
-                    </small>
-                {% endif %}
-            </div>
-            <strong class="enterprise-panel-value">{{ filtered_amount|money_ru }}</strong>
-        </div>
-
-        <canvas
-            class="enterprise-chart enterprise-chart-bars enterprise-chart-wide"
-            data-enterprise-chart="bars"
-            data-source="enterprise-schedule-data"
-            aria-label="Сумма платежей по дням"
-        ></canvas>
-    </section>
-
-    <div class="enterprise-schedule-bottom">
-        <section class="production-panel enterprise-table-panel">
-            <div class="production-panel-header">
-                <div>
-                    <span class="production-eyebrow">Крупнейшие</span>
-                    <h2>Платежи периода</h2>
+                    <a
+                        href="{% url 'payment_schedule' %}"
+                        class="zds-button zds-button--text"
+                    >
+                        Сбросить
+                    </a>
                 </div>
             </div>
 
-            <div class="enterprise-table-wrap">
-                <table class="enterprise-table">
+            <div class="schedule-filter-primary">
+                <label class="zds-filter-field zds-filter-search schedule-filter-search">
+                    <span>Поиск</span>
+                    <input
+                        type="search"
+                        name="q"
+                        value="{{ search_query }}"
+                        placeholder="Документ или контрагент"
+                    >
+                </label>
+
+                <label class="zds-filter-field schedule-filter-status">
+                    <span>Статус</span>
+                    <select name="status">
+                        <option
+                            value="payment"
+                            {% if selected_status == 'payment' %}selected{% endif %}
+                        >
+                            К оплате
+                        </option>
+                        <option
+                            value="all"
+                            {% if selected_status == 'all' %}selected{% endif %}
+                        >
+                            Все
+                        </option>
+                        {% for value,label in status_choices %}
+                            <option
+                                value="{{ value }}"
+                                {% if selected_status == value %}selected{% endif %}
+                            >
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <button
+                    class="zds-button zds-button--primary schedule-filter-apply"
+                    type="submit"
+                >
+                    <svg
+                        class="zds-icon zds-button__icon"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        focusable="false"
+                    >
+                        <use href="#z-icon-filter"></use>
+                    </svg>
+                    <span>Применить</span>
+                </button>
+            </div>
+
+            <details
+                class="schedule-filter-disclosure"
+                {% if selected_priority or schedule_payment_status_filter or date_from or date_to %}open{% endif %}
+            >
+                <summary
+                    class="zds-button zds-button--tertiary schedule-filter-disclosure-summary"
+                >
+                    <svg
+                        class="zds-icon zds-button__icon"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        focusable="false"
+                    >
+                        <use href="#z-icon-settings"></use>
+                    </svg>
+                    <span>Дополнительные фильтры</span>
+                    <svg
+                        class="zds-icon zds-icon--compact schedule-filter-disclosure-chevron"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        focusable="false"
+                    >
+                        <use href="#z-icon-chevron-right"></use>
+                    </svg>
+                </summary>
+
+                <div class="schedule-filter-advanced">
+                    <label class="zds-filter-field">
+                        <span>Приоритет</span>
+                        <select name="priority">
+                            <option value="">Все</option>
+                            {% for value,label in priority_choices %}
+                                <option
+                                    value="{{ value }}"
+                                    {% if selected_priority == value|stringformat:'s' %}selected{% endif %}
+                                >
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </label>
+
+                    <label class="zds-filter-field">
+                        <span>Оплата</span>
+                        <select name="payment_status">
+                            {% for value,label in payment_status_choices %}
+                                <option
+                                    value="{{ value }}"
+                                    {% if schedule_payment_status_filter == value %}selected{% endif %}
+                                >
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </label>
+
+                    <label class="zds-filter-field">
+                        <span>Дата с</span>
+                        <input
+                            type="date"
+                            name="date_from"
+                            value="{{ date_from }}"
+                        >
+                    </label>
+
+                    <label class="zds-filter-field">
+                        <span>Дата по</span>
+                        <input
+                            type="date"
+                            name="date_to"
+                            value="{{ date_to }}"
+                        >
+                    </label>
+
+                    <div class="schedule-filter-advanced-actions">
+                        <button
+                            class="zds-button zds-button--secondary"
+                            type="submit"
+                        >
+                            Обновить выборку
+                        </button>
+                    </div>
+                </div>
+            </details>
+
+            {% if search_query or selected_priority or schedule_payment_status_filter or date_from or date_to or selected_status != 'payment' %}
+                <div
+                    class="schedule-active-filters"
+                    aria-label="Активные фильтры"
+                >
+                    <span class="schedule-active-filters-label">
+                        Активно:
+                    </span>
+
+                    {% if search_query %}
+                        <span class="zds-filter-chip is-active">
+                            Поиск: {{ search_query }}
+                        </span>
+                    {% endif %}
+
+                    {% if selected_status != 'payment' %}
+                        <span class="zds-filter-chip is-active">
+                            {% if selected_status == 'all' %}
+                                Все статусы
+                            {% else %}
+                                {% for value,label in status_choices %}
+                                    {% if selected_status == value %}
+                                        Статус: {{ label }}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </span>
+                    {% endif %}
+
+                    {% if selected_priority %}
+                        <span class="zds-filter-chip is-active">
+                            Приоритет:
+                            {% for value,label in priority_choices %}
+                                {% if selected_priority == value|stringformat:'s' %}
+                                    {{ label }}
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                    {% endif %}
+
+                    {% if schedule_payment_status_filter %}
+                        <span class="zds-filter-chip is-active">
+                            {% for value,label in payment_status_choices %}
+                                {% if schedule_payment_status_filter == value %}
+                                    {{ label }}
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                    {% endif %}
+
+                    {% if date_from or date_to %}
+                        <span class="zds-filter-chip is-active">
+                            Даты:
+                            {{ date_from|default:'…' }}
+                            —
+                            {{ date_to|default:'…' }}
+                        </span>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </form>
+
+        <details class="schedule-mobile-filter">
+            <summary class="schedule-mobile-filter-summary">
+                <span class="schedule-mobile-filter-summary-copy">
+                    <svg
+                        class="zds-icon zds-icon--compact"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        focusable="false"
+                    >
+                        <use href="#z-icon-filter"></use>
+                    </svg>
+                    <span>Фильтры</span>
+                </span>
+
+                <svg
+                    class="zds-icon zds-icon--compact schedule-mobile-filter-chevron"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <use href="#z-icon-chevron-right"></use>
+                </svg>
+            </summary>
+
+            <form method="get" class="schedule-mobile-filter-form">
+                <input type="hidden" name="filter" value="{{ filter_type }}">
+
+                <div
+                    class="zds-filter-chips schedule-mobile-period-chips"
+                    aria-label="Период"
+                >
+                    {% for tab in schedule_period_links %}
+                        <a
+                            href="{% url 'payment_schedule' %}{{ tab.query_string }}"
+                            class="zds-filter-chip{% if tab.is_active %} is-active{% endif %}"
+                            {% if tab.is_active %}aria-current="page"{% endif %}
+                        >
+                            {{ tab.label }}
+                        </a>
+                    {% endfor %}
+                </div>
+
+                <label class="zds-filter-field schedule-mobile-filter-field">
+                    <span>Поиск</span>
+                    <input
+                        type="search"
+                        name="q"
+                        value="{{ search_query }}"
+                        placeholder="Документ или контрагент"
+                    >
+                </label>
+
+                <label class="zds-filter-field schedule-mobile-filter-field">
+                    <span>Статус</span>
+                    <select name="status">
+                        <option
+                            value="payment"
+                            {% if selected_status == 'payment' %}selected{% endif %}
+                        >
+                            К оплате
+                        </option>
+                        <option
+                            value="all"
+                            {% if selected_status == 'all' %}selected{% endif %}
+                        >
+                            Все
+                        </option>
+                        {% for value,label in status_choices %}
+                            <option
+                                value="{{ value }}"
+                                {% if selected_status == value %}selected{% endif %}
+                            >
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label class="zds-filter-field schedule-mobile-filter-field">
+                    <span>Приоритет</span>
+                    <select name="priority">
+                        <option value="">Все</option>
+                        {% for value,label in priority_choices %}
+                            <option
+                                value="{{ value }}"
+                                {% if selected_priority == value|stringformat:'s' %}selected{% endif %}
+                            >
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label class="zds-filter-field schedule-mobile-filter-field">
+                    <span>Оплата</span>
+                    <select name="payment_status">
+                        {% for value,label in payment_status_choices %}
+                            <option
+                                value="{{ value }}"
+                                {% if schedule_payment_status_filter == value %}selected{% endif %}
+                            >
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label class="zds-filter-field schedule-mobile-filter-field">
+                    <span>Дата с</span>
+                    <input
+                        type="date"
+                        name="date_from"
+                        value="{{ date_from }}"
+                    >
+                </label>
+
+                <label class="zds-filter-field schedule-mobile-filter-field">
+                    <span>Дата по</span>
+                    <input
+                        type="date"
+                        name="date_to"
+                        value="{{ date_to }}"
+                    >
+                </label>
+
+                <div class="schedule-mobile-filter-actions">
+                    <a
+                        href="{% url 'payment_schedule' %}"
+                        class="zds-button zds-button--tertiary"
+                    >
+                        Сбросить
+                    </a>
+
+                    <button
+                        class="zds-button zds-button--primary"
+                        type="submit"
+                    >
+                        Применить
+                    </button>
+                </div>
+            </form>
+        </details>
+    </section>
+
+    {% if nearest_payment %}
+        <section
+            class="schedule-mobile-nearest"
+            aria-labelledby="schedule-mobile-nearest-title"
+        >
+            <div class="schedule-mobile-nearest-heading">
+                <div>
+                    <span class="production-eyebrow">Ближайший платёж</span>
+                    <h2 id="schedule-mobile-nearest-title">
+                        {{ nearest_payment.production.planned_payment_date_label }}
+                    </h2>
+                </div>
+
+                <span
+                    class="zds-badge zds-badge--compact zds-badge--{{ nearest_payment.production.readiness_tone }}"
+                >
+                    {{ nearest_payment.production.readiness_label }}
+                </span>
+            </div>
+
+            <a
+                href="{% url 'invoice_detail' nearest_payment.id %}"
+                class="schedule-mobile-nearest-card"
+            >
+                <span class="schedule-mobile-nearest-main">
+                    <strong>{{ nearest_payment.counterparty.name|default:'Контрагент не назначен' }}</strong>
+                    <small>{{ nearest_payment.production.title }}</small>
+                </span>
+
+                <span class="schedule-mobile-nearest-value">
+                    {{ nearest_payment.production.payment.remaining_amount|money_ru }}
+                </span>
+
+                <svg
+                    class="zds-icon zds-icon--compact"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <use href="#z-icon-chevron-right"></use>
+                </svg>
+            </a>
+        </section>
+    {% endif %}
+
+    <div class="schedule-insight-grid">
+        <section
+            class="schedule-surface schedule-chart-workspace"
+            aria-labelledby="schedule-chart-title"
+        >
+            <div class="schedule-surface-header">
+                <div>
+                    <span class="production-eyebrow">Динамика платежей</span>
+                    <h2 id="schedule-chart-title">
+                        Платежи с назначенной датой
+                    </h2>
+                    <p>
+                        {{ schedule_analytics.period_start|date:'d.m.Y' }}
+                        —
+                        {{ schedule_analytics.period_end|date:'d.m.Y' }}
+                    </p>
+                </div>
+
+                <div class="schedule-chart-metrics">
+                    <div class="schedule-chart-summary">
+                        <span>На графике</span>
+                        <strong>{{ charted_amount|money_ru }}</strong>
+                        <small>
+                            {{ charted_count }}
+                            из
+                            {{ filtered_count }}
+                            документов
+                        </small>
+                    </div>
+
+                    {% if chart_outside_amount > 0 %}
+                        <div class="schedule-chart-coverage">
+                            <span>Вне графика</span>
+                            <strong>{{ chart_outside_amount|money_ru }}</strong>
+                            <small>
+                                {{ chart_outside_count }}
+                                документов без даты или вне 31 дня
+                            </small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="schedule-chart-legend" aria-label="Легенда графика">
+                <span>
+                    <i class="schedule-legend-dot schedule-legend-dot--future"></i>
+                    Будущие
+                </span>
+                <span>
+                    <i class="schedule-legend-dot schedule-legend-dot--today"></i>
+                    Сегодня
+                </span>
+                <span>
+                    <i class="schedule-legend-dot schedule-legend-dot--overdue"></i>
+                    Просрочено
+                </span>
+                <span>
+                    <i class="schedule-legend-line"></i>
+                    Накопительный план
+                </span>
+            </div>
+
+            {% if schedule_chart_limited %}
+                <p class="schedule-chart-note">
+                    На графике показан первый 31 день выбранного диапазона.
+                </p>
+            {% endif %}
+
+            <div class="schedule-chart-canvas-wrap">
+                <canvas
+                    class="enterprise-chart enterprise-chart-bars schedule-chart-canvas"
+                    data-enterprise-chart="bars"
+                    data-source="enterprise-schedule-data"
+                    data-label-density="adaptive"
+                    data-today="{{ today|date:'Y-m-d' }}"
+                    aria-label="Динамика сумм платежей по дням"
+                ></canvas>
+            </div>
+        </section>
+
+        <aside
+            class="schedule-surface schedule-risk-panel"
+            aria-labelledby="schedule-risk-title"
+        >
+            <div class="schedule-surface-header schedule-risk-header">
+                <div>
+                    <span class="production-eyebrow">Приоритет</span>
+                    <h2 id="schedule-risk-title">
+                        Крупнейшие обязательства
+                    </h2>
+                    <p>Позиции с максимальным остатком в выборке.</p>
+                </div>
+                <span class="schedule-panel-count">
+                    {{ schedule_analytics.largest_payments|length }}
+                </span>
+            </div>
+
+            <div class="schedule-risk-list">
+                {% for item in schedule_analytics.largest_payments %}
+                    <a
+                        href="{% url 'invoice_detail' item.invoice_id %}"
+                        class="schedule-risk-item schedule-risk-item--{{ item.readiness_code }}"
+                    >
+                        <span class="schedule-risk-date">
+                            {{ item.planned_payment_date|date:'d.m' }}
+                        </span>
+
+                        <span class="schedule-risk-main">
+                            <strong>{{ item.counterparty_label }}</strong>
+                            <small>{{ item.title }}</small>
+                        </span>
+
+                        <span class="schedule-risk-value">
+                            <strong>{{ item.remaining_amount|money_ru }}</strong>
+                            <span
+                                class="zds-badge zds-badge--compact
+                                {% if item.readiness_code == 'ready' %}
+                                    zds-badge--success
+                                {% elif item.readiness_code == 'overdue' %}
+                                    zds-badge--danger
+                                {% elif item.readiness_code == 'attention' or item.readiness_code == 'payment_blocked' %}
+                                    zds-badge--warning
+                                {% elif item.readiness_code == 'in_registry' or item.readiness_code == 'approval' or item.readiness_code == 'in_work' %}
+                                    zds-badge--info
+                                {% else %}
+                                    zds-badge--neutral
+                                {% endif %}"
+                            >
+                                {{ item.readiness_label }}
+                            </span>
+                        </span>
+
+                        <svg
+                            class="zds-icon zds-icon--compact schedule-risk-arrow"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <use href="#z-icon-chevron-right"></use>
+                        </svg>
+                    </a>
+                {% empty %}
+                    <div class="production-empty-state">
+                        Риски периода не выявлены.
+                    </div>
+                {% endfor %}
+            </div>
+        </aside>
+    </div>
+
+    <div class="schedule-operations-desktop">
+        <section
+            id="schedule-payment-queue"
+            class="schedule-surface schedule-queue-panel"
+            aria-labelledby="schedule-queue-title"
+        >
+            <div class="schedule-surface-header">
+                <div>
+                    <span class="production-eyebrow">Рабочая очередь</span>
+                    <h2 id="schedule-queue-title">Платежи периода</h2>
+                    <p>
+                        Показано {{ invoices|length }} из {{ filtered_count }}
+                    </p>
+                </div>
+
+                <span class="schedule-queue-total">
+                    {{ filtered_amount|money_ru }}
+                </span>
+            </div>
+
+            <div class="zds-table-wrap schedule-queue-wrap">
+                <table class="zds-table zds-table--dense schedule-queue-table">
                     <thead>
                         <tr>
-                            <th>Документ</th>
-                            <th>Контрагент</th>
-                            <th>Сумма</th>
                             <th>Дата</th>
+                            <th>Контрагент</th>
+                            <th>Документ</th>
+                            <th>Остаток</th>
                             <th>Готовность</th>
                             <th>Действие</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for item in schedule_analytics.largest_payments %}
-                            <tr>
-                                <td data-label="Документ"><strong>{{ item.title }}</strong></td>
-                                <td data-label="Контрагент">{{ item.counterparty_label }}</td>
-                                <td data-label="Сумма"><strong>{{ item.remaining_amount|money_ru }}</strong></td>
-                                <td data-label="Дата">{{ item.planned_payment_date|date:'d.m.Y' }}</td>
-                                <td data-label="Готовность">
-                                    <span class="production-readiness-badge">{{ item.readiness_label }}</span>
+                        {% for invoice in invoices %}
+                            <tr
+                                class="schedule-queue-row schedule-queue-row--{{ invoice.production.readiness_tone }}"
+                            >
+                                <td class="schedule-queue-date">
+                                    {{ invoice.production.planned_payment_date_label }}
                                 </td>
-                                <td data-label="Действие">
-                                    <a href="{% url 'invoice_detail' item.invoice_id %}" class="btn btn-secondary btn-sm">Открыть</a>
+                                <td class="schedule-queue-counterparty">
+                                    {{ invoice.counterparty.name|default:'Не назначен' }}
+                                </td>
+                                <td class="schedule-queue-document">
+                                    <strong>{{ invoice.production.title }}</strong>
+                                </td>
+                                <td class="zds-table__numeric schedule-queue-amount">
+                                    <strong>
+                                        {{ invoice.production.payment.remaining_amount|money_ru }}
+                                    </strong>
+                                </td>
+                                <td class="schedule-queue-readiness">
+                                    <span
+                                        class="zds-badge zds-badge--compact zds-badge--{{ invoice.production.readiness_tone }}"
+                                    >
+                                        {{ invoice.production.readiness_label }}
+                                    </span>
+                                </td>
+                                <td class="schedule-queue-action">
+                                    <div class="zds-table-actions schedule-queue-action-bar">
+                                        <a
+                                            href="{% url 'invoice_detail' invoice.id %}"
+                                            class="zds-button zds-button--secondary zds-button--compact"
+                                            title="Открыть документ"
+                                        >
+                                            <svg
+                                                class="zds-icon zds-button__icon"
+                                                viewBox="0 0 24 24"
+                                                aria-hidden="true"
+                                                focusable="false"
+                                            >
+                                                <use href="#z-icon-eye"></use>
+                                            </svg>
+                                            <span>Открыть</span>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         {% empty %}
                             <tr>
                                 <td colspan="6">
-                                    <div class="production-empty-state">Платежи периода не назначены.</div>
+                                    <div class="production-empty-state">
+                                        В выбранном периоде платежей нет.
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-        </section>
-
-        <section class="production-panel enterprise-schedule-list">
-            <div class="production-panel-header">
-                <div>
-                    <span class="production-eyebrow">Выборка</span>
-                    <h2>Документы</h2>
-                    <p>
-                        Показано {{ invoices|length }} из {{ filtered_count }}
-                        ·
-                        {{ filtered_amount|money_ru }}
-                    </p>
-                </div>
-            </div>
-
-            <div class="compact-work-list">
-                {% for invoice in invoices %}
-                    <a href="{% url 'invoice_detail' invoice.id %}" class="compact-work-item">
-                        <span>
-                            <strong>{{ invoice.production.title }}</strong>
-                            <small>{{ invoice.counterparty.name|default:'Контрагент не назначен' }}</small>
-                        </span>
-                        <span class="compact-work-value">
-                            <strong>{{ invoice.production.payment.remaining_amount|money_ru }}</strong>
-                            <small>{{ invoice.production.planned_payment_date_label }}</small>
-                        </span>
-                    </a>
-                {% empty %}
-                    <div class="production-empty-state">Документов нет.</div>
-                {% endfor %}
-            </div>
 
             {% if page_obj.paginator.num_pages > 1 %}
-                <nav class="pagination enterprise-schedule-pagination" aria-label="Страницы графика платежей">
+                <nav
+                    class="zds-pagination enterprise-schedule-pagination"
+                    aria-label="Страницы платёжной очереди"
+                >
                     {% if page_obj.has_previous %}
-                        <a href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}">Назад</a>
+                        <a
+                            class="zds-pagination__link"
+                            href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}"
+                        >
+                            <svg
+                                class="zds-icon zds-icon--compact"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <use href="#z-icon-chevron-left"></use>
+                            </svg>
+                            <span>Назад</span>
+                        </a>
                     {% endif %}
 
-                    <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+                    <span class="zds-pagination__current">
+                        {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                    </span>
 
                     {% if page_obj.has_next %}
-                        <a href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}">Далее</a>
+                        <a
+                            class="zds-pagination__link"
+                            href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}"
+                        >
+                            <span>Далее</span>
+                            <svg
+                                class="zds-icon zds-icon--compact"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <use href="#z-icon-chevron-right"></use>
+                            </svg>
+                        </a>
                     {% endif %}
                 </nav>
             {% endif %}
         </section>
+
+        <aside
+            class="schedule-surface schedule-attention-panel"
+            aria-labelledby="schedule-attention-title"
+        >
+            <div class="schedule-surface-header">
+                <div>
+                    <span class="production-eyebrow">Контроль</span>
+                    <h2 id="schedule-attention-title">Документы внимания</h2>
+                    <p>Пять первых позиций текущей очереди.</p>
+                </div>
+
+                <span class="schedule-panel-count">
+                    {{ invoices|slice:':5'|length }}
+                </span>
+            </div>
+
+            <div class="schedule-attention-list">
+                {% for invoice in invoices|slice:":5" %}
+                    <a
+                        href="{% url 'invoice_detail' invoice.id %}"
+                        class="schedule-attention-item"
+                    >
+                        <span class="schedule-attention-index">
+                            {{ forloop.counter }}
+                        </span>
+
+                        <span class="schedule-attention-main">
+                            <strong>{{ invoice.production.title }}</strong>
+                            <small>
+                                {{ invoice.counterparty.name|default:'Контрагент не назначен' }}
+                            </small>
+                            <span
+                                class="zds-badge zds-badge--compact zds-badge--{{ invoice.production.readiness_tone }}"
+                            >
+                                {{ invoice.production.readiness_label }}
+                            </span>
+                        </span>
+
+                        <span class="schedule-attention-value">
+                            <strong>
+                                {{ invoice.production.payment.remaining_amount|money_ru }}
+                            </strong>
+                            <small>
+                                {{ invoice.production.planned_payment_date_label }}
+                            </small>
+                        </span>
+                    </a>
+                {% empty %}
+                    <div class="production-empty-state">
+                        Документов внимания нет.
+                    </div>
+                {% endfor %}
+            </div>
+
+            <a
+                href="{% url 'invoice_list' %}"
+                class="zds-button zds-button--text schedule-panel-link"
+            >
+                Показать все документы
+                <svg
+                    class="zds-icon zds-icon--compact"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <use href="#z-icon-chevron-right"></use>
+                </svg>
+            </a>
+        </aside>
+    </div>
+
+    <div class="schedule-operations-tablet">
+        <details class="schedule-compact-panel">
+            <summary class="schedule-compact-summary">
+                <span>
+                    <strong>Платёжная очередь</strong>
+                    <small>{{ filtered_count }} записей</small>
+                </span>
+                <span class="schedule-compact-summary-value">
+                    {{ filtered_amount|money_ru }}
+                </span>
+                <svg
+                    class="zds-icon zds-icon--compact schedule-compact-chevron"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <use href="#z-icon-chevron-right"></use>
+                </svg>
+            </summary>
+
+            <div class="schedule-compact-table-wrap">
+                <table class="zds-table zds-table--dense schedule-tablet-queue-table">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Контрагент</th>
+                            <th>Документ</th>
+                            <th>Остаток</th>
+                            <th>Готовность</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in invoices %}
+                            <tr>
+                                <td>{{ invoice.production.planned_payment_date_label }}</td>
+                                <td>{{ invoice.counterparty.name|default:'Не назначен' }}</td>
+                                <td><strong>{{ invoice.production.title }}</strong></td>
+                                <td class="zds-table__numeric">
+                                    {{ invoice.production.payment.remaining_amount|money_ru }}
+                                </td>
+                                <td>
+                                    <span
+                                        class="zds-badge zds-badge--compact zds-badge--{{ invoice.production.readiness_tone }}"
+                                    >
+                                        {{ invoice.production.readiness_label }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5">
+                                    <div class="production-empty-state">
+                                        Платежей нет.
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if page_obj.paginator.num_pages > 1 %}
+                <nav
+                    class="zds-pagination enterprise-schedule-pagination"
+                    aria-label="Страницы платёжной очереди"
+                >
+                    {% if page_obj.has_previous %}
+                        <a
+                            class="zds-pagination__link"
+                            href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}"
+                        >
+                            <svg
+                                class="zds-icon zds-icon--compact"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <use href="#z-icon-chevron-left"></use>
+                            </svg>
+                            <span>Назад</span>
+                        </a>
+                    {% endif %}
+
+                    <span class="zds-pagination__current">
+                        {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                    </span>
+
+                    {% if page_obj.has_next %}
+                        <a
+                            class="zds-pagination__link"
+                            href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}"
+                        >
+                            <span>Далее</span>
+                            <svg
+                                class="zds-icon zds-icon--compact"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <use href="#z-icon-chevron-right"></use>
+                            </svg>
+                        </a>
+                    {% endif %}
+                </nav>
+            {% endif %}
+        </details>
+
+        <details class="schedule-compact-panel">
+            <summary class="schedule-compact-summary">
+                <span>
+                    <strong>Документы внимания</strong>
+                    <small>Первые пять позиций</small>
+                </span>
+                <span class="schedule-panel-count">
+                    {{ invoices|slice:':5'|length }}
+                </span>
+                <svg
+                    class="zds-icon zds-icon--compact schedule-compact-chevron"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <use href="#z-icon-chevron-right"></use>
+                </svg>
+            </summary>
+
+            <div class="schedule-attention-list schedule-attention-list--compact">
+                {% for invoice in invoices|slice:":5" %}
+                    <a
+                        href="{% url 'invoice_detail' invoice.id %}"
+                        class="schedule-attention-item"
+                    >
+                        <span class="schedule-attention-index">
+                            {{ forloop.counter }}
+                        </span>
+                        <span class="schedule-attention-main">
+                            <strong>{{ invoice.production.title }}</strong>
+                            <small>
+                                {{ invoice.counterparty.name|default:'Контрагент не назначен' }}
+                            </small>
+                        </span>
+                        <span class="schedule-attention-value">
+                            <strong>
+                                {{ invoice.production.payment.remaining_amount|money_ru }}
+                            </strong>
+                        </span>
+                    </a>
+                {% empty %}
+                    <div class="production-empty-state">
+                        Документов внимания нет.
+                    </div>
+                {% endfor %}
+            </div>
+        </details>
+    </div>
+
+    <div class="schedule-operations-mobile">
+        <section
+            class="schedule-mobile-obligations"
+            aria-labelledby="schedule-mobile-obligations-title"
+        >
+            <div class="schedule-mobile-section-heading">
+                <div>
+                    <span class="production-eyebrow">Приоритет</span>
+                    <h2 id="schedule-mobile-obligations-title">
+                        Крупнейшие обязательства
+                    </h2>
+                </div>
+                <span class="schedule-panel-count">
+                    {{ schedule_analytics.largest_payments|length }}
+                </span>
+            </div>
+
+            <div class="schedule-mobile-obligation-list">
+                {% for item in schedule_analytics.largest_payments|slice:":3" %}
+                    <a
+                        href="{% url 'invoice_detail' item.invoice_id %}"
+                        class="schedule-mobile-obligation"
+                    >
+                        <span class="schedule-mobile-obligation-index">
+                            {{ forloop.counter }}
+                        </span>
+                        <span class="schedule-mobile-obligation-main">
+                            <strong>{{ item.counterparty_label }}</strong>
+                            <small>{{ item.title }}</small>
+                            <span
+                                class="zds-badge zds-badge--compact
+                                {% if item.readiness_code == 'ready' %}
+                                    zds-badge--success
+                                {% elif item.readiness_code == 'overdue' %}
+                                    zds-badge--danger
+                                {% elif item.readiness_code == 'attention' or item.readiness_code == 'payment_blocked' %}
+                                    zds-badge--warning
+                                {% elif item.readiness_code == 'in_registry' or item.readiness_code == 'approval' or item.readiness_code == 'in_work' %}
+                                    zds-badge--info
+                                {% else %}
+                                    zds-badge--neutral
+                                {% endif %}"
+                            >
+                                {{ item.readiness_label }}
+                            </span>
+                        </span>
+                        <span class="schedule-mobile-obligation-value">
+                            {{ item.remaining_amount|money_ru }}
+                        </span>
+                    </a>
+                {% empty %}
+                    <div class="production-empty-state">
+                        Обязательств в периоде нет.
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <details class="schedule-compact-panel schedule-mobile-queue-disclosure">
+            <summary class="schedule-compact-summary">
+                <span>
+                    <strong>Платёжная очередь</strong>
+                    <small>{{ filtered_count }} записей</small>
+                </span>
+                <span class="schedule-compact-summary-value">
+                    Все
+                </span>
+                <svg
+                    class="zds-icon zds-icon--compact schedule-compact-chevron"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <use href="#z-icon-chevron-right"></use>
+                </svg>
+            </summary>
+
+            <div class="schedule-mobile-queue-list">
+                {% for invoice in invoices %}
+                    <a
+                        href="{% url 'invoice_detail' invoice.id %}"
+                        class="schedule-mobile-queue-item"
+                    >
+                        <span class="schedule-mobile-queue-main">
+                            <strong>{{ invoice.production.title }}</strong>
+                            <small>
+                                {{ invoice.counterparty.name|default:'Контрагент не назначен' }}
+                            </small>
+                            <span
+                                class="zds-badge zds-badge--compact zds-badge--{{ invoice.production.readiness_tone }}"
+                            >
+                                {{ invoice.production.readiness_label }}
+                            </span>
+                        </span>
+
+                        <span class="schedule-mobile-queue-value">
+                            <strong>
+                                {{ invoice.production.payment.remaining_amount|money_ru }}
+                            </strong>
+                            <small>
+                                {{ invoice.production.planned_payment_date_label }}
+                            </small>
+                        </span>
+                    </a>
+                {% empty %}
+                    <div class="production-empty-state">
+                        Платежей нет.
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if page_obj.paginator.num_pages > 1 %}
+                <nav
+                    class="zds-pagination enterprise-schedule-pagination"
+                    aria-label="Страницы платёжной очереди"
+                >
+                    {% if page_obj.has_previous %}
+                        <a
+                            class="zds-pagination__link"
+                            href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}"
+                        >
+                            <svg
+                                class="zds-icon zds-icon--compact"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <use href="#z-icon-chevron-left"></use>
+                            </svg>
+                            <span>Назад</span>
+                        </a>
+                    {% endif %}
+
+                    <span class="zds-pagination__current">
+                        {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                    </span>
+
+                    {% if page_obj.has_next %}
+                        <a
+                            class="zds-pagination__link"
+                            href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}"
+                        >
+                            <span>Далее</span>
+                            <svg
+                                class="zds-icon zds-icon--compact"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <use href="#z-icon-chevron-right"></use>
+                            </svg>
+                        </a>
+                    {% endif %}
+                </nav>
+            {% endif %}
+        </details>
+
+        <details class="schedule-compact-panel">
+            <summary class="schedule-compact-summary">
+                <span>
+                    <strong>Документы внимания</strong>
+                    <small>Первые пять позиций</small>
+                </span>
+                <span class="schedule-panel-count">
+                    {{ invoices|slice:':5'|length }}
+                </span>
+                <svg
+                    class="zds-icon zds-icon--compact schedule-compact-chevron"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <use href="#z-icon-chevron-right"></use>
+                </svg>
+            </summary>
+
+            <div class="schedule-attention-list schedule-attention-list--compact">
+                {% for invoice in invoices|slice:":5" %}
+                    <a
+                        href="{% url 'invoice_detail' invoice.id %}"
+                        class="schedule-attention-item"
+                    >
+                        <span class="schedule-attention-index">
+                            {{ forloop.counter }}
+                        </span>
+                        <span class="schedule-attention-main">
+                            <strong>{{ invoice.production.title }}</strong>
+                            <small>
+                                {{ invoice.counterparty.name|default:'Контрагент не назначен' }}
+                            </small>
+                        </span>
+                        <span class="schedule-attention-value">
+                            <strong>
+                                {{ invoice.production.payment.remaining_amount|money_ru }}
+                            </strong>
+                        </span>
+                    </a>
+                {% empty %}
+                    <div class="production-empty-state">
+                        Документов внимания нет.
+                    </div>
+                {% endfor %}
+            </div>
+        </details>
     </div>
 </div>
 

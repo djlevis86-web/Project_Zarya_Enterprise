@@ -134,3 +134,99 @@ Page-level CSS отвечает только за компоновку и уни
 5. Загрузка и журнал.
 6. Справочники и контроль.
 7. Система и администрирование.
+
+## V20.2B — График платежей: premium adaptive workspace reference
+
+`templates/invoices/payment_schedule.html` — эталон финансовой рабочей
+области Project Zarya. Этап не принимается только по техническим тестам:
+после каждого структурного изменения обязательны фактические screenshots
+desktop, tablet и mobile.
+
+Обязательная desktop-композиция:
+
+1. компактный command header с периодом и двумя действиями;
+2. оперативная KPI-полоса из пяти показателей без обрезки сумм;
+3. компактная панель основных фильтров;
+4. раскрываемые дополнительные условия;
+5. аналитическая зона «график + риски»;
+6. платёжная очередь по 12 записей на страницу;
+7. не более пяти документов внимания.
+
+Обязательная tablet-композиция:
+
+1. сбалансированная KPI-сетка;
+2. компактные фильтры без наложения подписей и controls;
+3. график перед рисками периода;
+4. платёжная очередь в закрываемой рабочей секции;
+5. документы внимания в отдельной закрываемой секции.
+
+Обязательная mobile-композиция:
+
+1. command header;
+2. компактные KPI;
+3. закрытая по умолчанию панель фильтров;
+4. ближайший платёж;
+5. график высотой около 190 px;
+6. три крупнейших обязательства;
+7. закрытая по умолчанию полная очередь;
+8. закрытая по умолчанию секция документов внимания.
+
+Правила premium adaptive workspace:
+
+- главный экран сохраняет порядок: состояние → ближайшее действие →
+  динамика → приоритетные обязательства → полная очередь;
+- суммы KPI не скрываются через ellipsis;
+- фильтры не должны визуально конкурировать с аналитикой;
+- прямые дочерние блоки canonical filter grid занимают полный ряд;
+- дополнительные условия раскрываются только по запросу пользователя;
+- график различает будущие, сегодняшние и просроченные даты;
+- тренд графика показывает накопительный план тех же данных;
+- при разреженных данных ненулевые столбцы получают числовые подписи;
+- desktop-очередь ограничена 12 строками на страницу;
+- tablet не показывает длинную очередь до раскрытия пользователем;
+- mobile показывает три обязательства, а полную очередь скрывает в details;
+- page CSS управляет только уникальной композицией и local hooks;
+- глобальные `.zds-*` компоненты не переопределяются на уровне страницы;
+- запрещено объявлять V20.2B закрытым без визуального сравнения с макетом.
+
+Глобальный API:
+
+- действия — `zds-button`;
+- периоды и активные условия — `zds-filter-chip`;
+- поля — `zds-filter-field`;
+- desktop/tablet очередь — `zds-table`;
+- готовность — `zds-badge`;
+- навигация страниц — `zds-pagination`;
+- графические символы — локальный ZDS SVG-спрайт.
+
+Responsive ownership:
+
+- desktop, tablet и mobile используют отдельные semantic layout hooks;
+- responsive-представления могут повторять одни данные в разных
+  структурах, но не меняют backend-смысл;
+- скрытые по breakpoint представления не должны создавать одинаковые id;
+- полная мобильная очередь остаётся доступной через disclosure;
+- visual acceptance является отдельным gate после targeted tests.
+
+## V20.2B — visual reconciliation after screenshots 99
+
+The premium adaptive composition is preserved, but the final visual
+contract adds three mandatory rules:
+
+- mobile KPI items are compact operational rows, not five tall cards;
+- the period separator must never render as a detached line on a phone;
+- chart totals must describe only the amount represented by dated points.
+
+The chart header therefore separates:
+
+- `На графике` — amount and document count represented by
+  `payment_series`;
+- `Вне графика` — selected amount without a point in the current
+  31-day chart window, including undated obligations.
+
+The global total remains available in KPI and queue surfaces. A chart
+must not display the global total when its bars represent only a small
+dated subset.
+
+The right-side analytical panel is named `Крупнейшие обязательства`
+unless its data is explicitly restricted to actual risk states.

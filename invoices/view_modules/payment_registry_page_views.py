@@ -58,7 +58,7 @@ from ..payment_registry_permissions import (
 )
 
 
-PAYMENT_SCHEDULE_PAGE_SIZE = 20
+PAYMENT_SCHEDULE_PAGE_SIZE = 12
 PAYMENT_REGISTRY_PAGE_SIZE = 25
 PAYMENT_SCHEDULE_CHART_MAX_DAYS = 31
 
@@ -629,6 +629,59 @@ def payment_schedule(request):
         )
     )
 
+    chart_payment_series = (
+        schedule_payload.get(
+            'payment_series',
+            []
+        )
+    )
+
+    charted_amount = sum(
+        (
+            Decimal(
+                str(
+                    point.get(
+                        'amount'
+                    )
+                    or '0.00'
+                )
+            )
+            for point
+            in chart_payment_series
+        ),
+        Decimal(
+            '0.00'
+        ),
+    )
+
+    charted_count = sum(
+        (
+            int(
+                point.get(
+                    'count'
+                )
+                or 0
+            )
+            for point
+            in chart_payment_series
+        ),
+        0,
+    )
+
+    chart_outside_amount = max(
+        filtered_amount
+        - charted_amount,
+        Decimal(
+            '0.00'
+        ),
+    )
+
+    chart_outside_count = max(
+        filtered_count
+        - charted_count,
+        0,
+    )
+
     priority_field = Invoice._meta.get_field(
         'payment_priority'
     )
@@ -671,6 +724,29 @@ def payment_schedule(request):
         )
     )
 
+    nearest_payment = (
+        annotate_invoice_workspace(
+            filtered_invoices.filter(
+                planned_payment_date__gte=today
+            )
+        )
+        .order_by(
+            'planned_payment_date',
+            '-payment_priority',
+            'counterparty__name',
+            'id'
+        )
+        .first()
+    )
+
+    if nearest_payment is not None:
+        build_presentations(
+            [
+                nearest_payment,
+            ],
+            today=today,
+        )
+
     paginator = Paginator(
         ordered_invoices,
         PAYMENT_SCHEDULE_PAGE_SIZE,
@@ -710,6 +786,7 @@ def payment_schedule(request):
         'invoices/payment_schedule.html',
         {
             'invoices': invoices,
+            'nearest_payment': nearest_payment,
             'page_obj': page_obj,
             'pagination_query': (
                 _pagination_query_string(
@@ -738,6 +815,10 @@ def payment_schedule(request):
             'total_amount': total_amount,
             'filtered_count': filtered_count,
             'filtered_amount': filtered_amount,
+            'charted_count': charted_count,
+            'charted_amount': charted_amount,
+            'chart_outside_count': chart_outside_count,
+            'chart_outside_amount': chart_outside_amount,
             'schedule_metrics': metric_analytics.metrics,
             'schedule_metric_cards': schedule_metric_cards,
             'schedule_period_links': schedule_period_links,

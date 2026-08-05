@@ -223,8 +223,16 @@ label {
             "metric-{{ card.metric.tone }}",
             template,
         )
-        self.assertIn(
+        self.assertNotIn(
             "production-readiness-badge",
+            template,
+        )
+        self.assertIn(
+            "zds-badge",
+            template,
+        )
+        self.assertIn(
+            "zds-badge--compact",
             template,
         )
 

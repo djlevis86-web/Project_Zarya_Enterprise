@@ -79,7 +79,7 @@
         min-width: 0;
     }
 
-    .enterprise-schedule-filters > .btn[type="submit"] {
+    .enterprise-schedule-filters > .schedule-filter-action[type="submit"] {
         grid-column: 1 / -1;
         min-width: 0;
         width: 100%;

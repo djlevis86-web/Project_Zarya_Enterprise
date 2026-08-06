@@ -106,6 +106,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
 
                 'config.context_processors.project_version',
+                'users.context_processors.access_policy',
             ],
         },
     },
@@ -216,4 +217,3 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 
 CELERY_TIMEZONE = "UTC"
-

@@ -157,6 +157,7 @@
                         <span class="nav-label">Документы к оплате</span>
                     </a>
 
+                    {% if access_policy.can_upload_invoices %}
                     <a href="{% url 'upload_invoice' %}"
                        class="nav-link {% if current == 'upload_invoice' %}is-active{% endif %}"
                        {% if current == 'upload_invoice' %}aria-current="page"{% endif %}>
@@ -170,6 +171,7 @@
                         </svg>
                         <span class="nav-label">Загрузка</span>
                     </a>
+                    {% endif %}
 
                     <a href="{% url 'upload_batches' %}"
                        class="nav-link {% if current == 'upload_batches' or current == 'upload_batch_detail' %}is-active{% endif %}"
@@ -188,7 +190,7 @@
                 </div>
 
                 {# ROLE_MENU_FINANCE_START #}
-                {% if request.user.is_staff %}
+                {% if access_policy.can_view_finance_workspace %}
 
                 <div class="nav-section">
 
@@ -229,7 +231,7 @@
                 {% endif %}
                 {# ROLE_MENU_FINANCE_END #}
 
-                {% if request.user.is_staff %}
+                {% if access_policy.can_view_counterparties %}
 
                     <div class="nav-section">
 
@@ -251,6 +253,7 @@
                             <span class="nav-label">Контрагенты</span>
                         </a>
 
+                        {% if access_policy.can_manage_counterparties %}
                         <a href="{% url 'unmatched_counterparties' %}"
                            class="nav-link {% if current == 'unmatched_counterparties' %}is-active{% endif %}"
                        {% if current == 'unmatched_counterparties' %}aria-current="page"{% endif %}>
@@ -264,7 +267,9 @@
                             </svg>
                             <span class="nav-label">Не найдено в 1С</span>
                         </a>
+                        {% endif %}
 
+                        {% if access_policy.can_manage_counterparties %}
                         <a href="{% url 'counterparties_missing_requisites' %}"
                            class="nav-link {% if current == 'counterparties_missing_requisites' %}is-active{% endif %}"
                        {% if current == 'counterparties_missing_requisites' %}aria-current="page"{% endif %}>
@@ -278,7 +283,9 @@
                             </svg>
                             <span class="nav-label">Проверка реквизитов</span>
                         </a>
+                        {% endif %}
 
+                        {% if access_policy.can_manage_counterparties %}
                         <a href="{% url 'import_counterparties_1c' %}"
                            class="nav-link {% if current == 'import_counterparties_1c' %}is-active{% endif %}"
                        {% if current == 'import_counterparties_1c' %}aria-current="page"{% endif %}>
@@ -292,6 +299,7 @@
                             </svg>
                             <span class="nav-label">Импорт из 1С</span>
                         </a>
+                        {% endif %}
 
                     </div>
 

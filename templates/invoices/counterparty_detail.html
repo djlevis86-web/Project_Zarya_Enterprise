@@ -509,7 +509,7 @@
                                     Открыть
                                 </a>
 
-                                {% if user.is_staff %}
+                                {% if access_policy.can_manage_counterparties %}
                                     <a
                                         href="{% url 'edit_invoice' invoice.id %}"
                                         class="btn btn-secondary btn-sm"

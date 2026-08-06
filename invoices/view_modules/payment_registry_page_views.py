@@ -11,7 +11,10 @@ from django.db.models.functions import Coalesce
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from users.permissions import require_user_permission, user_can_process_invoices
+from users.permissions import (
+    require_user_permission,
+    user_can_view_finance_workspace,
+)
 from django.utils.dateparse import parse_date
 
 from openpyxl import Workbook
@@ -277,7 +280,7 @@ def _schedule_chart_period(
 
 
 @login_required
-@require_user_permission(user_can_process_invoices, 'Нет прав на просмотр графика платежей.')
+@require_user_permission(user_can_view_finance_workspace, 'Нет прав на просмотр графика платежей.')
 def payment_schedule(request):
 
     filter_type = request.GET.get(
@@ -830,7 +833,7 @@ def payment_schedule(request):
     )
 
 @login_required
-@require_user_permission(user_can_process_invoices, 'Нет прав на просмотр реестра оплаты.')
+@require_user_permission(user_can_view_finance_workspace, 'Нет прав на просмотр реестра оплаты.')
 def payment_registry_detail(request, registry_id):
 
     from ..models import PaymentRegistry, PaymentRegistryItem
@@ -863,7 +866,7 @@ def payment_registry_detail(request, registry_id):
             'payment_registry_history'
         )
 
-    if not request.user.is_staff and registry.created_by_id != request.user.id:
+    if not user_can_view_finance_workspace(request.user) and registry.created_by_id != request.user.id:
 
         messages.warning(
             request,
@@ -933,7 +936,7 @@ def payment_registry_detail(request, registry_id):
     )
 
 @login_required
-@require_user_permission(user_can_process_invoices, 'Нет прав на просмотр истории реестров оплаты.')
+@require_user_permission(user_can_view_finance_workspace, 'Нет прав на просмотр истории реестров оплаты.')
 def payment_registry_history(request):
 
     from django.core.paginator import Paginator
@@ -964,7 +967,7 @@ def payment_registry_history(request):
         )
     )
 
-    if not request.user.is_staff:
+    if not user_can_view_finance_workspace(request.user):
 
         registries = registries.filter(
             created_by=request.user,
@@ -1041,7 +1044,7 @@ def payment_registry_history(request):
     )
 
 @login_required
-@require_user_permission(user_can_process_invoices, 'Нет прав на работу с реестром оплаты.')
+@require_user_permission(user_can_view_finance_workspace, 'Нет прав на работу с реестром оплаты.')
 def payment_registry(request):
 
     selected_status = request.GET.get(

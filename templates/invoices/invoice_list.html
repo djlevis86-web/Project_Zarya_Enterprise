@@ -159,7 +159,7 @@
                         <span>Оплата по</span>
                         <input type="date" name="planned_payment_date_to" value="{{ planned_payment_date_to }}">
                     </label>
-                    {% if request.user.is_staff %}
+                    {% if access_policy.can_view_finance_workspace %}
                         <label class="production-filter-field">
                             <span>Загрузил</span>
                             <select name="user">

@@ -1,5 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+
+from users.permissions import user_can_view_all_invoices
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, render
@@ -31,7 +33,7 @@ def upload_batches(request):
         .order_by("-created_at", "-id")
     )
 
-    if not request.user.is_staff:
+    if not user_can_view_all_invoices(request.user):
         base_batches = base_batches.filter(
             user=request.user
         )
@@ -100,7 +102,7 @@ def upload_batch_detail(request, batch_id):
     )
 
     if (
-        not request.user.is_staff
+        not user_can_view_all_invoices(request.user)
         and batch.user_id != request.user.id
     ):
         raise PermissionDenied

@@ -1,10 +1,19 @@
-from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
+
+from users.permissions import (
+    require_user_permission,
+    user_can_view_counterparties,
+)
 from django.shortcuts import get_object_or_404, render
 from ..models import Counterparty, Invoice
 
 
-@staff_member_required
+@login_required
+@require_user_permission(
+    user_can_view_counterparties,
+    "Нет прав на просмотр контрагента.",
+)
 def counterparty_detail(request, counterparty_id):
 
     counterparty = get_object_or_404(

@@ -7,8 +7,9 @@ class User(AbstractUser):
     class Role(models.TextChoices):
         ADMIN = "ADMIN", "Администратор"
         MANAGER = "MANAGER", "Финансовый директор"
+        GENERAL_DIRECTOR = "GENERAL_DIRECTOR", "Генеральный директор"
         USER = "USER", "Загрузчик документов"
-        ANALYST = "ANALYST", "Аналитик"
+        ANALYST = "ANALYST", "Полный просмотр"
 
     class Theme(models.TextChoices):
         DARK = "dark", "Zarya Corporate Dark"
@@ -42,8 +43,16 @@ class User(AbstractUser):
         return self.role == self.Role.MANAGER
 
     @property
+    def is_general_director_role(self):
+        return self.role == self.Role.GENERAL_DIRECTOR
+
+    @property
     def is_invoice_uploader_role(self):
         return self.role == self.Role.USER
+
+    @property
+    def is_read_only_finance_role(self):
+        return self.role == self.Role.ANALYST
 
     def get_role_display_name(self):
         return self.get_role_display()

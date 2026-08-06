@@ -15,6 +15,8 @@ from .payment_registry_helpers import PAYMENT_STATUS_FILTER_CHOICES, apply_payme
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 
+from users.permissions import user_can_view_all_invoices
+
 from ..models import ResponsiblePerson
 from ..presentation_services import (
     READINESS_FILTER_CHOICES,
@@ -359,7 +361,7 @@ def invoice_list(request):
     if status:
         invoices = invoices.filter(status=status)
 
-    if user_filter and request.user.is_staff:
+    if user_filter and user_can_view_all_invoices(request.user):
         invoices = invoices.filter(user_id=user_filter)
 
     if document_type_filter:
@@ -526,7 +528,7 @@ def invoice_list(request):
         "search": search,
         "user": (
             user_filter
-            if request.user.is_staff
+            if user_can_view_all_invoices(request.user)
             else ""
         ),
         "status": status,

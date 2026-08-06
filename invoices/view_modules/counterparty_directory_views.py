@@ -1,11 +1,20 @@
-from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+
+from users.permissions import (
+    require_user_permission,
+    user_can_view_counterparties,
+)
 from django.db.models import Count, Q, Sum
 from django.shortcuts import render
 from ..models import Counterparty, Invoice
 
 
-@staff_member_required
+@login_required
+@require_user_permission(
+    user_can_view_counterparties,
+    "Нет прав на просмотр справочника контрагентов.",
+)
 def counterparty_directory(request):
 
     search_query = request.GET.get(

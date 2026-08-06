@@ -22,6 +22,7 @@ from .views import (
     enqueue_ocr_jobs,
     ocr_queue,
     change_invoice_status,
+    approve_invoice,
     add_comment,
     edit_invoice,
     quick_update_invoice,
@@ -311,6 +312,12 @@ urlpatterns = [
         '<int:invoice_id>/assign-counterparty/',
         invoice_assign_counterparty,
         name='invoice_assign_counterparty'
+    ),
+
+    path(
+        '<int:invoice_id>/approve/',
+        approve_invoice,
+        name='approve_invoice'
     ),
 
     path(

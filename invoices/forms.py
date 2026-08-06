@@ -403,6 +403,24 @@ class InvoiceEditForm(forms.ModelForm):
             ),
         }
 
+class InvoiceUploaderEditForm(InvoiceEditForm):
+    """Limited edit form for the user who uploaded the document."""
+
+    class Meta(InvoiceEditForm.Meta):
+        fields = [
+            'document_type',
+            'title',
+            'description',
+            'vendor',
+            'invoice_number',
+            'invoice_date',
+            'document_date',
+            'amount',
+            'planned_payment_date',
+            'responsible',
+        ]
+
+
 class CounterpartyImportForm(forms.Form):
 
     file = forms.FileField(

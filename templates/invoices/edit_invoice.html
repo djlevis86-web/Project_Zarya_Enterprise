@@ -3,27 +3,29 @@
 {% block content %}
 
 <div class="page-header page-header-v1">
-
     <div class="page-header-copy-v1">
-
         <h2 class="page-title">
-            Редактирование счета
+            Редактирование документа
         </h2>
 
         <p class="page-subtitle">
-            Счет #{{ invoice.id }}
+            Документ #{{ invoice.id }}
         </p>
-
     </div>
-
 </div>
 
 <div class="upload-wrapper">
-
     <div class="upload-card">
 
-        <form method="post">
+        {% if owner_edit_mode %}
+            <div class="form-info-summary">
+                Вы редактируете собственный документ.
+                Статус, оплата, приоритет и финансовое подтверждение
+                доступны только финансовой службе.
+            </div>
+        {% endif %}
 
+        <form method="post">
             {% csrf_token %}
 
             {% if form.errors %}
@@ -33,75 +35,78 @@
                     {{ form.errors }}
                 </div>
             {% endif %}
+
             <div class="form-group">
-
-                <label>Тип документа</label>
-
+                <label for="{{ form.document_type.id_for_label }}">
+                    Тип документа
+                </label>
                 {{ form.document_type }}
-
             </div>
 
             <div class="form-group">
-
-                <label>Название</label>
-
+                <label for="{{ form.title.id_for_label }}">
+                    Название
+                </label>
                 {{ form.title }}
-
             </div>
 
             <div class="form-group">
-
-                <label>Описание</label>
-
+                <label for="{{ form.description.id_for_label }}">
+                    Описание
+                </label>
                 {{ form.description }}
-
             </div>
 
             <div class="form-group">
-
-                <label>Поставщик</label>
-
+                <label for="{{ form.vendor.id_for_label }}">
+                    Поставщик
+                </label>
                 {{ form.vendor }}
-
             </div>
 
             <div class="form-group">
-
-                <label>Номер счета</label>
-
+                <label for="{{ form.invoice_number.id_for_label }}">
+                    Номер документа
+                </label>
                 {{ form.invoice_number }}
-
             </div>
 
             <div class="form-group">
-
-                <label>Дата счета</label>
-
+                <label for="{{ form.invoice_date.id_for_label }}">
+                    Дата документа из OCR
+                </label>
                 {{ form.invoice_date }}
-
             </div>
 
             <div class="form-group">
+                <label for="{{ form.document_date.id_for_label }}">
+                    Дата документа
+                </label>
+                {{ form.document_date }}
+            </div>
 
-                <label>Подтвержденная сумма</label>
-
+            <div class="form-group">
+                <label for="{{ form.amount.id_for_label }}">
+                    {% if owner_edit_mode %}
+                        Сумма документа
+                    {% else %}
+                        Подтверждённая сумма
+                    {% endif %}
+                </label>
                 {{ form.amount }}
             </div>
 
             <div class="form-group">
-
-                <label>Плановая дата оплаты</label>
-
+                <label for="{{ form.planned_payment_date.id_for_label }}">
+                    Плановая дата оплаты
+                </label>
                 {{ form.planned_payment_date }}
-
             </div>
 
             <div class="form-group">
-
                 <label for="{{ form.responsible.id_for_label }}">
                     Ответственный
                 </label>
-
                 {{ form.responsible }}
 
                 {% if form.responsible.errors %}
@@ -109,47 +114,41 @@
                         {{ form.responsible.errors }}
                     </div>
                 {% endif %}
-
             </div>
 
-            <div class="form-group">
-
-                <label>Приоритет оплаты</label>
-
-                {{ form.payment_priority }}
-
-            </div>
-
-            <div class="form-group">
-
-                <label>Дата фактической оплаты</label>
-
-                {{ form.paid_at }}
-
-            </div>
-
-            <div class="form-group">
-
-                <label>OCR сумма</label>
-
-                <div class="ocr-value">
-
-                    {{ invoice.ocr_amount|default:"—" }}
-
+            {% if not owner_edit_mode %}
+                <div class="form-group">
+                    <label for="{{ form.payment_priority.id_for_label }}">
+                        Приоритет оплаты
+                    </label>
+                    {{ form.payment_priority }}
                 </div>
 
-            </div>
+                <div class="form-group">
+                    <label for="{{ form.paid_at.id_for_label }}">
+                        Дата фактической оплаты
+                    </label>
+                    {{ form.paid_at }}
+                </div>
+            {% endif %}
 
             <div class="form-group">
-
-                <label>Статус счёта</label>
-
-                {{ form.status }}
-
+                <label>OCR сумма</label>
+                <div class="ocr-value">
+                    {{ invoice.ocr_amount|default:"—" }}
+                </div>
             </div>
 
-            <div class="form-actions">
+            {% if not owner_edit_mode %}
+                <div class="form-group">
+                    <label for="{{ form.status.id_for_label }}">
+                        Статус документа
+                    </label>
+                    {{ form.status }}
+                </div>
+            {% endif %}
 
+            <div class="form-actions">
                 <button
                     type="submit"
                     class="secondary-btn"
@@ -157,21 +156,19 @@
                     Сохранить изменения
                 </button>
 
-                <button
-                    type="submit"
-                    name="confirm_amount"
-                    value="1"
-                    class="primary-btn"
-                >
-                    Сохранить и подтвердить сумму
-                </button>
-
+                {% if not owner_edit_mode %}
+                    <button
+                        type="submit"
+                        name="confirm_amount"
+                        value="1"
+                        class="primary-btn"
+                    >
+                        Сохранить и подтвердить сумму
+                    </button>
+                {% endif %}
             </div>
-
         </form>
-
     </div>
-
 </div>
 
 {% endblock %}

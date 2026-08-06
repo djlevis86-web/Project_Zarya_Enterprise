@@ -68,6 +68,7 @@ from .view_modules.invoice_delete_views import (
 
 from .view_modules.invoice_status_comment_views import (
     add_comment,
+    approve_invoice,
     change_invoice_status,
 )
 
@@ -148,6 +149,7 @@ __all__ = (
     'enqueue_ocr_jobs',
     'ocr_queue',
     'change_invoice_status',
+    'approve_invoice',
     'add_comment',
     'edit_invoice',
     'quick_update_invoice',

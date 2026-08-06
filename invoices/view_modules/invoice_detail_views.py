@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, render
 
 from users.permissions import user_can_process_invoices
 
+from ..access_policy import user_can_manage_invoice_data
 from ..comment_forms import InvoiceCommentForm
 from ..comment_models import InvoiceComment
 from ..document_field_review_service import (
@@ -60,7 +61,7 @@ def invoice_detail(request, invoice_id):
         invoice,
     )
     action_context["can_manage_invoice_payments"] = bool(
-        user_can_process_invoices(request.user)
+        user_can_manage_invoice_data(request.user)
     )
 
     workflow_codes = (
@@ -126,7 +127,11 @@ def invoice_detail(request, invoice_id):
             "payment_form": InvoicePaymentForm(),
             "workflow_steps": workflow_steps,
             "field_review_workspace": field_review_workspace,
-            "can_confirm_invoice_fields": bool(request.user.is_staff),
+            "can_confirm_invoice_fields": bool(
+                user_can_manage_invoice_data(
+                    request.user
+                )
+            ),
             **action_context,
         },
     )

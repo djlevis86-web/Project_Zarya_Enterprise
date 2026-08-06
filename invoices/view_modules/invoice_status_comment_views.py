@@ -1,15 +1,59 @@
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_POST
+
 from audit.models import AuditLog
 from audit.services import log_action
+
+from ..access_policy import (
+    user_can_add_invoice_comment,
+    user_can_approve_invoice,
+)
 from ..comment_forms import InvoiceCommentForm
 from ..log_service import create_invoice_log
 from ..models import Invoice
-from ..selectors import get_visible_invoices_for_user
 from ..readiness_services import evaluate_document_readiness
+from ..selectors import get_visible_invoices_for_user
+
+
+def _record_status_change(
+    request,
+    invoice,
+    old_status,
+):
+    old_status_label = dict(
+        Invoice.STATUS_CHOICES
+    ).get(
+        old_status,
+        old_status,
+    )
+    new_status_label = invoice.get_status_display()
+
+    create_invoice_log(
+        invoice,
+        request.user,
+        f'Статус изменён на "{new_status_label}"',
+    )
+
+    log_action(
+        request=request,
+        action=AuditLog.ACTION_UPDATE,
+        obj=invoice,
+        message=(
+            "Статус документа изменён: "
+            f"{old_status_label} -> {new_status_label}."
+        ),
+        metadata={
+            "field": "status",
+            "old_status": old_status,
+            "new_status": invoice.status,
+            "old_status_label": old_status_label,
+            "new_status_label": new_status_label,
+        },
+    )
 
 
 @staff_member_required
@@ -18,7 +62,8 @@ def change_invoice_status(request, invoice_id, status):
 
     invoice = get_object_or_404(
         Invoice,
-        id=invoice_id
+        id=invoice_id,
+        is_deleted=False,
     )
 
     allowed_statuses = [
@@ -43,8 +88,6 @@ def change_invoice_status(request, invoice_id, status):
         )
 
     old_status = invoice.status
-    old_status_label = dict(Invoice.STATUS_CHOICES).get(old_status, old_status)
-    new_status_label = dict(Invoice.STATUS_CHOICES).get(status, status)
 
     if status == Invoice.STATUS_APPROVED:
         readiness = evaluate_document_readiness(
@@ -68,27 +111,17 @@ def change_invoice_status(request, invoice_id, status):
             )
 
     invoice.status = status
-
-    invoice.save()
-
-    create_invoice_log(
-        invoice,
-        request.user,
-        f'Статус изменён на "{invoice.get_status_display()}"'
+    invoice.save(
+        update_fields=[
+            "status",
+            "updated_at",
+        ]
     )
 
-    log_action(
-        request=request,
-        action=AuditLog.ACTION_UPDATE,
-        obj=invoice,
-        message=f'Статус документа изменён: {old_status_label} -> {new_status_label}.',
-        metadata={
-            'field': 'status',
-            'old_status': old_status,
-            'new_status': status,
-            'old_status_label': old_status_label,
-            'new_status_label': new_status_label,
-        },
+    _record_status_change(
+        request,
+        invoice,
+        old_status,
     )
 
     messages.success(
@@ -101,6 +134,70 @@ def change_invoice_status(request, invoice_id, status):
         invoice_id=invoice.id
     )
 
+
+@login_required
+@require_POST
+def approve_invoice(request, invoice_id):
+    invoice = get_object_or_404(
+        Invoice,
+        id=invoice_id,
+        is_deleted=False,
+    )
+
+    if not user_can_approve_invoice(
+        request.user,
+        invoice,
+    ):
+        raise PermissionDenied(
+            "Этот документ нельзя утвердить текущим пользователем."
+        )
+
+    readiness = evaluate_document_readiness(
+        invoice
+    )
+
+    if not readiness.can_approve:
+        primary = readiness.primary_blocker
+        message = (
+            primary.message
+            if primary
+            else "Требуется проверка данных документа."
+        )
+        messages.error(
+            request,
+            "Документ нельзя утвердить: " + message,
+        )
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id,
+        )
+
+    old_status = invoice.status
+    invoice.status = Invoice.STATUS_APPROVED
+    invoice.save(
+        update_fields=[
+            "status",
+            "updated_at",
+        ]
+    )
+
+    _record_status_change(
+        request,
+        invoice,
+        old_status,
+    )
+
+    messages.success(
+        request,
+        "Документ утверждён к оплате."
+    )
+
+    return redirect(
+        "invoice_detail",
+        invoice_id=invoice.id,
+    )
+
+
 @login_required
 @require_POST
 def add_comment(request, invoice_id):
@@ -111,6 +208,14 @@ def add_comment(request, invoice_id):
         ),
         id=invoice_id,
     )
+
+    if not user_can_add_invoice_comment(
+        request.user,
+        invoice,
+    ):
+        raise PermissionDenied(
+            "Нет прав на добавление комментария."
+        )
 
     form = InvoiceCommentForm(
         request.POST

@@ -1,14 +1,20 @@
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
+from ..access_policy import (
+    user_can_edit_invoice,
+    user_can_manage_invoice_data,
+)
 from ..document_field_review_service import (
     confirm_invoice_field,
     sync_manual_field_review,
 )
-from ..forms import InvoiceEditForm
+from ..forms import InvoiceEditForm, InvoiceUploaderEditForm
 from ..log_service import create_invoice_log
 from ..models import Invoice, InvoiceFieldReview
 from ..ocr_verification_service import sync_invoice_amount_verification
@@ -211,17 +217,35 @@ def quick_update_invoice(request, invoice_id):
     )
 
 
-@staff_member_required
+@login_required
 def edit_invoice(request, invoice_id):
 
     invoice = get_object_or_404(
         Invoice,
-        id=invoice_id
+        id=invoice_id,
+        is_deleted=False,
+    )
+
+    if not user_can_edit_invoice(
+        request.user,
+        invoice,
+    ):
+        raise PermissionDenied(
+            "Нет прав на редактирование этого документа."
+        )
+
+    owner_edit_mode = not user_can_manage_invoice_data(
+        request.user
+    )
+    form_class = (
+        InvoiceUploaderEditForm
+        if owner_edit_mode
+        else InvoiceEditForm
     )
 
     if request.method == 'POST':
 
-        form = InvoiceEditForm(
+        form = form_class(
             request.POST,
             instance=invoice
         )
@@ -230,15 +254,19 @@ def edit_invoice(request, invoice_id):
 
             amount_changed = 'amount' in form.changed_data
 
-            amount_confirmation_requested = (
-                request.POST.get(
+            amount_confirmation_requested = bool(
+                not owner_edit_mode
+                and request.POST.get(
                     'confirm_amount'
                 ) == '1'
             )
 
-            should_sync_amount_verification = (
-                amount_changed
-                or amount_confirmation_requested
+            should_sync_amount_verification = bool(
+                not owner_edit_mode
+                and (
+                    amount_changed
+                    or amount_confirmation_requested
+                )
             )
 
             old_status_before_edit = (
@@ -255,7 +283,8 @@ def edit_invoice(request, invoice_id):
                 )
             )
             approval_requested = bool(
-                old_status_before_edit
+                not owner_edit_mode
+                and old_status_before_edit
                 != Invoice.STATUS_APPROVED
                 and requested_status
                 == Invoice.STATUS_APPROVED
@@ -299,7 +328,31 @@ def edit_invoice(request, invoice_id):
             approval_blocked = False
             verification_message = ""
 
-            if should_sync_amount_verification:
+            if owner_edit_mode and amount_changed:
+                invoice.amount_verified = False
+                invoice.ocr_verified = False
+                invoice.ocr_comment = (
+                    "Сумма изменена загрузчиком документа. "
+                    "Требуется проверка финансовым директором."
+                )
+                invoice.save(
+                    update_fields=[
+                        "amount_verified",
+                        "ocr_verified",
+                        "ocr_comment",
+                        "updated_at",
+                    ]
+                )
+                sync_manual_field_review(
+                    invoice,
+                    InvoiceFieldReview.FIELD_AMOUNT,
+                )
+                verification_message = (
+                    "Сумма изменена загрузчиком и ожидает "
+                    "финансового подтверждения."
+                )
+
+            elif should_sync_amount_verification:
                 (
                     _verification_changed,
                     verification_message,
@@ -368,55 +421,77 @@ def edit_invoice(request, invoice_id):
             create_invoice_log(
                 invoice,
                 request.user,
-                'Документ отредактирован'
+                (
+                    'Документ отредактирован загрузчиком'
+                    if owner_edit_mode
+                    else 'Документ отредактирован'
+                )
             )
 
-            if should_sync_amount_verification:
+            if verification_message:
                 create_invoice_log(
                     invoice,
                     request.user,
                     verification_message
                 )
 
-                if invoice.amount_verified:
-                    if invoice.ocr_verified:
-                        messages.success(
-                            request,
-                            (
-                                'Сумма подтверждена вручную '
-                                'и совпадает с OCR-суммой.'
-                            )
+            if (
+                should_sync_amount_verification
+                and invoice.amount_verified
+            ):
+                if invoice.ocr_verified:
+                    messages.success(
+                        request,
+                        (
+                            'Сумма подтверждена вручную '
+                            'и совпадает с OCR-суммой.'
                         )
+                    )
 
-                    elif invoice.ocr_amount is None:
-                        messages.success(
-                            request,
-                            (
-                                'Сумма подтверждена вручную. '
-                                'OCR-сумма не определена.'
-                            )
+                elif invoice.ocr_amount is None:
+                    messages.success(
+                        request,
+                        (
+                            'Сумма подтверждена вручную. '
+                            'OCR-сумма не определена.'
                         )
-
-                    else:
-                        messages.warning(
-                            request,
-                            (
-                                'Сумма подтверждена вручную '
-                                'и будет использоваться для оплаты. '
-                                'Она отличается от OCR-суммы.'
-                            )
-                        )
+                    )
 
                 else:
                     messages.warning(
                         request,
                         (
-                            'Сумма не подтверждена. '
-                            'Укажите положительную сумму.'
+                            'Сумма подтверждена вручную '
+                            'и будет использоваться для оплаты. '
+                            'Она отличается от OCR-суммы.'
                         )
                     )
 
-            if amount_changed:
+            elif (
+                should_sync_amount_verification
+                and not invoice.amount_verified
+            ):
+                messages.warning(
+                    request,
+                    (
+                        'Сумма не подтверждена. '
+                        'Укажите положительную сумму.'
+                    )
+                )
+
+            elif owner_edit_mode and amount_changed:
+                messages.warning(
+                    request,
+                    (
+                        'Сумма сохранена, но требует '
+                        'подтверждения финансовым директором.'
+                    )
+                )
+
+            if (
+                amount_changed
+                and not owner_edit_mode
+            ):
                 active_registry_items = list(
                     get_active_registry_items_for_invoice(
                         invoice
@@ -469,7 +544,7 @@ def edit_invoice(request, invoice_id):
 
     else:
 
-        form = InvoiceEditForm(
+        form = form_class(
             instance=invoice
         )
 
@@ -479,5 +554,6 @@ def edit_invoice(request, invoice_id):
         {
             'invoice': invoice,
             'form': form,
+            'owner_edit_mode': owner_edit_mode,
         }
     )

@@ -55,10 +55,14 @@ def user_can_view_audit_log(user):
 
 def user_can_view_finance_workspace(user):
     return bool(
-        user_is_admin(user)
-        or user_is_finance_director(user)
-        or user_is_general_director(user)
-        or user_is_read_only_finance(user)
+        user.is_authenticated
+        and (
+            user.is_staff
+            or user_is_admin(user)
+            or user_is_finance_director(user)
+            or user_is_general_director(user)
+            or user_is_read_only_finance(user)
+        )
     )
 
 

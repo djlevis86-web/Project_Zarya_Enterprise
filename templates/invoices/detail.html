@@ -36,6 +36,29 @@
         </div>
 
         <div class="page-header-actions-v1 document-detail-command-actions">
+            {% if can_approve_invoice %}
+                <form
+                    method="post"
+                    action="{% url 'approve_invoice' invoice.id %}"
+                    class="document-detail-approval-form"
+                >
+                    {% csrf_token %}
+                    <button
+                        type="submit"
+                        class="btn btn-primary document-detail-action"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <path d="m5 12 4 4L19 6"></path>
+                        </svg>
+                        <span>Утвердить к оплате</span>
+                    </button>
+                </form>
+            {% endif %}
+
             {% if can_edit_invoice %}
                 <a
                     href="{% url 'edit_invoice' invoice.id %}"
@@ -448,20 +471,22 @@
 
                     <details class="document-comments-disclosure" open>
                         <summary>Комментарии</summary>
-                        <form
-                            method="post"
-                            action="{% url 'add_comment' invoice.id %}"
-                            class="comment-production-form"
-                        >
-                            {% csrf_token %}
-                            <textarea
-                                name="text"
-                                class="form-control"
-                                rows="3"
-                                placeholder="Добавить рабочий комментарий"
-                            ></textarea>
-                            <button type="submit" class="btn btn-primary btn-sm">Добавить</button>
-                        </form>
+                        {% if can_add_invoice_comment %}
+                            <form
+                                method="post"
+                                action="{% url 'add_comment' invoice.id %}"
+                                class="comment-production-form"
+                            >
+                                {% csrf_token %}
+                                <textarea
+                                    name="text"
+                                    class="form-control"
+                                    rows="3"
+                                    placeholder="Добавить рабочий комментарий"
+                                ></textarea>
+                                <button type="submit" class="btn btn-primary btn-sm">Добавить</button>
+                            </form>
+                        {% endif %}
 
                         <div class="comment-list">
                             {% for comment in comments %}

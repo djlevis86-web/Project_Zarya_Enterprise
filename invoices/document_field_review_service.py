@@ -677,6 +677,34 @@ def _set_invoice_confirmed_value(
     return ["vendor"]
 
 
+
+def _rematch_counterparty_after_vendor_confirmation(
+    invoice: Invoice,
+) -> list[str]:
+    if invoice.counterparty_id:
+        return []
+
+    from .counterparty_service import find_counterparty_by_name
+
+    counterparty = find_counterparty_by_name(invoice.vendor)
+    if counterparty is None:
+        return []
+
+    invoice.counterparty = counterparty
+    invoice.counterparty_match_status = (
+        Invoice.COUNTERPARTY_MATCH_FOUND
+    )
+    invoice.counterparty_match_comment = (
+        "Контрагент найден в справочнике после подтверждения поставщика."
+    )
+
+    return [
+        "counterparty",
+        "counterparty_match_status",
+        "counterparty_match_comment",
+    ]
+
+
 @transaction.atomic
 def confirm_invoice_field(
     invoice: Invoice,
@@ -704,6 +732,13 @@ def confirm_invoice_field(
         field_name,
         normalized_value,
     )
+
+    if field_name == InvoiceFieldReview.FIELD_VENDOR:
+        update_fields.extend(
+            _rematch_counterparty_after_vendor_confirmation(
+                locked_invoice
+            )
+        )
 
     if field_name == InvoiceFieldReview.FIELD_AMOUNT:
         from .ocr_verification_service import sync_invoice_amount_verification
@@ -753,6 +788,9 @@ def confirm_invoice_field(
         "invoice_number",
         "document_date",
         "vendor",
+        "counterparty_id",
+        "counterparty_match_status",
+        "counterparty_match_comment",
         "updated_at",
     ):
         setattr(invoice, field, getattr(locked_invoice, field))

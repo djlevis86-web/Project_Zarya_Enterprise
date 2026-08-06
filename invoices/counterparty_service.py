@@ -543,6 +543,17 @@ def find_counterparty_by_requisites(inn, kpp=None):
 
 
 
+
+def normalize_counterparty_compact_key(value):
+    normalized = normalize_for_search(value)
+
+    return re.sub(
+        r"[^0-9A-ZА-ЯЁ]+",
+        "",
+        normalized,
+    )
+
+
 def normalize_counterparty_word_set(value):
     normalized = normalize_for_search(
         value
@@ -631,6 +642,29 @@ def find_counterparty_by_name(vendor_name):
             if normalized_vendor == normalized_candidate:
 
                 return counterparty
+
+    compact_vendor = normalize_counterparty_compact_key(
+        vendor_name
+    )
+
+    if compact_vendor:
+        for counterparty in candidates:
+            candidate_names = [
+                counterparty.name,
+                counterparty.full_name,
+            ]
+
+            for candidate_name in candidate_names:
+                if not candidate_name:
+                    continue
+
+                if (
+                    compact_vendor
+                    == normalize_counterparty_compact_key(
+                        candidate_name
+                    )
+                ):
+                    return counterparty
 
     for counterparty in candidates:
 

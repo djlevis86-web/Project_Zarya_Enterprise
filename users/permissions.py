@@ -72,8 +72,16 @@ def user_can_view_all_invoices(user):
 
 def user_can_process_invoices(user):
     return bool(
-        user_is_admin(user)
-        or user_is_finance_director(user)
+        user.is_authenticated
+        and (
+            user_is_admin(user)
+            or user_is_finance_director(user)
+            or (
+                user.is_staff
+                and not user_is_general_director(user)
+                and not user_is_read_only_finance(user)
+            )
+        )
     )
 
 
@@ -102,8 +110,16 @@ def user_can_view_counterparties(user):
 
 def user_can_manage_counterparties(user):
     return bool(
-        user_is_admin(user)
-        or user_is_finance_director(user)
+        user.is_authenticated
+        and (
+            user_is_admin(user)
+            or user_is_finance_director(user)
+            or (
+                user.is_staff
+                and not user_is_general_director(user)
+                and not user_is_read_only_finance(user)
+            )
+        )
     )
 
 
